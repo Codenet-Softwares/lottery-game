@@ -1,0 +1,12 @@
+.section {
+  transition: opacity 0.5s ease-in-out;
+  opacity: 0; /* Default to invisible */
+}
+
+.fade-in {
+  opacity: 1; /* Visible */
+}
+
+.fade-out {
+  opacity: 0; /* Invisible */
+}

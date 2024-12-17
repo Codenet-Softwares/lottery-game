@@ -1,0 +1,8 @@
+%gradient_1 {
+  background: -webkit-gradient(linear, left top, right top, from(#7c32ff), color-stop(70%, #a235ec), to(#c738d8));
+  background: -o-linear-gradient(left, #7c32ff 0%, #a235ec 70%, #c738d8 100%);
+  background: linear-gradient(90deg, #7c32ff 0%, #a235ec 70%, #c738d8 100%);
+}
+%gradient_3 {
+  background-image: linear-gradient(to bottom right, #863ee2, #571f9e);
+}

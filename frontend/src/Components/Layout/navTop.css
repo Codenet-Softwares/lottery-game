@@ -1,0 +1,208 @@
+/* Background color for the entire NavTop */
+.navtop-container {
+  background-color: #0e1a35; /* Dark matte blue for a luxurious feel */
+  padding: 10px 0;
+  border-bottom: 3px solid #1a2b4d; /* Stronger border for separation */
+}
+
+/* Center all nav options */
+.nav-options {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  gap: 60px; /* Spacing between each menu item */
+}
+
+/* Add a wrapper for nav options and profile info */
+.nav-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Vertically center the items */
+  height: 100%; /* Full height of the nav */
+}
+
+.nav-options .nav-link {
+  font-weight: bold;
+  font-size: 16px;
+  text-transform: uppercase;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+/* Only underline the text, not the icon */
+.nav-options .nav-link span {
+  text-decoration: none;
+}
+
+.nav-options .nav-link:hover span {
+  text-decoration: underline; /* Underline only the text on hover */
+}
+.nav-link.active-link {
+  background-color: #fff;
+  /* padding-bottom: 5px; */
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* Styling for the icons */
+.nav-options .nav-link .nav-icon {
+  font-size: 32px;
+  margin-bottom: 5px;
+  text-decoration: none; /* Ensure no underline on icons */
+}
+
+/* Different colors for each option */
+.nav-options .nav-link.dashboard {
+  color: #4b9cd3; /* Light sky blue */
+}
+
+.nav-options .nav-link.create-lottery {
+  color: #3cb371; /* Medium sea green */
+}
+
+.nav-options .nav-link.results {
+  color: #ff4500; /* Orange-red */
+}
+
+.nav-options .nav-link.win {
+  color: #FF9800; /* Gold */
+}
+
+.nav-options .nav-link.purchase-history {
+  color: #20b2aa; /* Light sea green */
+}
+
+.nav-options .nav-link.search-lottery {
+  color: #8a2be2; /* Blue-violet for a distinctive look */
+}
+.nav-options .nav-link.market-overview{
+  color: rgb(221 125 119);
+}
+.nav-options .nav-link.void-icon{
+  color: rgb(207, 63, 82);
+}
+.nav-options .nav-link.active-icon{
+  color: rgb(11, 134, 32);
+}
+/* Blinking effect for Results */
+.blink {
+  animation: colorChange 1.5s linear infinite;
+  font-weight: bold;
+}
+
+@keyframes colorChange {
+  0% {
+    color: #df73ff; /* Vibrant Heliotrope */
+  }
+  50% {
+    color: #ffbf00; /* Luminous Amber */
+  }
+  100% {
+    color: #b0ff00; /* Electric Mint */
+  }
+}
+
+/* Profile Info */
+.profile_info {
+  margin-left: auto;
+  display: flex; /* Use flex to align items */
+  align-items: center; /* Center align the icon and text */
+}
+
+.profile_info_iner {
+  padding-left: 10px;
+  color: #ffffff;
+}
+
+.profile_info i {
+  margin-right: 20px; /* Add margin to the icon to avoid overlap */
+}
+
+.profile_info_details a {
+  color: #ff6347; /* Tomato red */
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.profile_info_details a:hover {
+  color: #ff4500; /* Darker red */
+  text-decoration: underline;
+}
+
+/* Responsive styling */
+@media (max-width: 992px) {
+  .nav-options {
+    gap: 40px; /* Reduce gap between menu items */
+  }
+
+  .nav-options .nav-link {
+    font-size: 14px;
+  }
+
+  .nav-options .nav-icon {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .nav-options {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding-bottom: 10px;
+  }
+
+  .profile_info {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .nav-options {
+    flex-direction: column;
+    gap: 15px; /* Smaller gap for small screens */
+  }
+
+  .nav-options .nav-link {
+    font-size: 12px;
+  }
+
+  .nav-options .nav-icon {
+    font-size: 24px;
+  }
+
+  .profile_info .profile_info_iner p,
+  .profile_info .profile_info_iner h5 {
+    font-size: 12px;
+  }
+
+  .profile_info i {
+    font-size: 28px; /* Smaller icon for smaller screens */
+  }
+}
+
+/* Additional styling for LuckyHour */
+.nav-options .nav-link.lucky-hour {
+  color: #ff69b4; /* Hot pink for a standout look */
+  font-weight: bold;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.nav-options .nav-link.lucky-hour .nav-icon {
+  font-size: 34px; /* Slightly larger icon for emphasis */
+  margin-bottom: 5px;
+}
+
+/* Ensure all icons align consistently */
+.nav-options .nav-link .nav-icon {
+  font-size: 32px;
+  margin-bottom: 5px;
+}

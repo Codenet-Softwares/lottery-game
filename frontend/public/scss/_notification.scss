@@ -1,0 +1,207 @@
+.notification_wrapper {
+  .single_notification {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    .notification_info {
+      h4 {
+        color: #2e4765;
+        margin-bottom: 0;
+      }
+      p {
+        font-size: 13px;
+        font-weight: 400;
+        color: #7f8b9f;
+      }
+    }
+  }
+}
+.color_bg {
+  width: 27px;
+  height: 28px;
+  border-radius: 5px;
+  background: #c9f7f5;
+  flex: 27px 0 0;
+  &.color_lite_pink {
+    background: #ffe2e5;
+  }
+  &.color_lite_violate {
+    background: #e2e4ff;
+  }
+  &.color_lite_green {
+    background: #e2fff0;
+  }
+  &.color_lite_yellow {
+    background: #fdffe2;
+  }
+}
+.mr_15 {
+  margin-right: 15px;
+  margin-top: 7px;
+}
+
+.property_wrapper {
+  .single_property {
+    display: flex;
+    align-items: center;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+    @media #{$small_mobile} {
+      flex-wrap: wrap;
+    }
+    .property_thumb {
+      margin-right: 40px;
+      position: relative;
+      .img_up {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+      img {
+        width: 190px;
+        height: 173px;
+        border-radius: 5px;
+      }
+    }
+    .property_content {
+      margin: 10px 0;
+      a {
+        h4 {
+          font-size: 29px;
+          color: #2e4765;
+          font-weight: 700;
+          margin-bottom: 0;
+          @media #{$small_mobile} {
+            font-size: 20px;
+          }
+          &.Up_name {
+            color: #d1d1d1;
+          }
+        }
+        &.property_location {
+          font-size: 14px;
+          color: #2f90f7;
+          background: #e7f3fe;
+          display: inline-block;
+          padding: 10px 14px;
+          display: inline-flex;
+          align-items: center;
+          margin-top: 24px;
+          margin-bottom: 10px;
+          border-radius: 5px;
+          img {
+            margin-right: 10px;
+          }
+        }
+      }
+      p {
+        font-size: 14px;
+        color: #7f8b9f;
+        font-weight: 400;
+        span {
+          margin-right: 30px;
+          &:last-child {
+            margin: 0;
+          }
+        }
+      }
+    }
+  }
+}
+.weather_box {
+  background: #0090ff;
+  .weather_header {
+    display: flex;
+    position: relative;
+    justify-content: space-between;
+    align-items: center;
+    .thumb {
+      top: 0;
+      right: 0;
+      img {
+        width: 160px;
+        @media #{$small_mobile} {
+          width: 100%;
+        }
+      }
+    }
+    .weather_info {
+      display: inline-block;
+      h4 {
+        font-size: 22px;
+        color: #fff;
+        font-weight: 700;
+        margin-right: 25px;
+        display: inline-block;
+        vertical-align: top;
+      }
+      p {
+        font-size: 22px;
+        display: inline-block;
+        color: #ffffff;
+        vertical-align: top;
+        font-weight: 400;
+      }
+    }
+  }
+  .weather_content {
+    ul {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      @media #{$small_mobile} {
+        margin-top: 10px;
+      }
+      li {
+        span.selcias {
+          font-size: 71px;
+          font-weight: 700;
+          color: #ffdc7b;
+          text-transform: uppercase;
+          @media #{$tab} {
+            font-size: 30px;
+          }
+        }
+        &.weather_percent {
+          font-size: 37px;
+          font-weight: 400;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          @media #{$tab} {
+            font-size: 28px;
+          }
+          .thumb {
+            margin-right: 22px;
+          }
+        }
+      }
+    }
+    p {
+      font-size: 28px;
+      color: #fff;
+      font-weight: 400;
+      @media #{$tab} {
+        font-size: 18px;
+      }
+      .eql {
+        display: inline-block;
+      }
+      span {
+        span {
+          font-size: 21px;
+        }
+      }
+    }
+  }
+}
+
+.option_icon {
+  cursor: pointer;
+}

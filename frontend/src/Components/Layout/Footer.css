@@ -1,0 +1,56 @@
+/* Footer Container */
+.footer-container {
+  background-color: #0e1a35; /* Dark matte blue, matching NavTop */
+  color: #ffffff;
+  padding: 10px 0;
+  border-top: 3px solid #1a2b4d; /* Same border as NavTop for consistency */
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+  width: 100%;
+}
+
+/* Footer Content */
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Company Name Styling */
+.company-info .company-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffd700; /* Gold color for a luxurious feel */
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 5px 0;
+  animation: fadeIn 2s ease-in-out;
+}
+
+/* Copyright Styling */
+.copyright p {
+  font-size: 0.9rem;
+  margin: 0;
+  color: #87cefa; /* Light sky blue for contrast */
+}
+
+/* Subtle Fade-In Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Footer Hover Effects */
+.footer-container:hover .company-name {
+  color: #ffbf00; /* Soft gold when hovering */
+}
+
+.footer-container:hover .copyright p {
+  color: #ffd700; /* Gold for copyright text on hover */
+}

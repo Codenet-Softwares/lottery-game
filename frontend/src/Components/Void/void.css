@@ -1,0 +1,7 @@
+
+
+accordion-flush>.accordion-item>.accordion-header .accordion-button, .accordion-flush>.accordion-item>.accordion-header .accordion-button.collapsed {
+    border-radius: 10px;
+    border: 1px solid rgb(207, 200, 200);
+    background-color: rgb(243, 239, 239);
+}
