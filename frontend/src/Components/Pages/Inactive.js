@@ -82,7 +82,7 @@ const Inactive = () => {
                 </div>
                 <div className="card-body">
                     {/* Search and Entries Selection */}
-                    <div className="row mb-4">
+                    {/* <div className="row mb-4">
                         <div className="col-md-6 position-relative">
                             <FaSearch
                                 style={{
@@ -139,7 +139,7 @@ const Inactive = () => {
                             </select>
                             <label className="ms-2 fw-bold">Entries</label>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* Table */}
                     <SingleCard

@@ -292,10 +292,18 @@ const PurchasedTickets = () => {
                         maxHeight: dropdownOpen === index ? "200px" : "0", // Adjust to your desired max-height
                         overflow: "hidden", // Hide overflow initially
                         transition: "max-height 0.3s ease", // Smooth transition when opening
+                        background: "white",
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                        boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
                       }}
                     >
                       {dropdownOpen === index && (
-                        <div className="custom-dropdown-menu">
+                        <div style={{
+                          maxHeight: "200px", // Sets the maximum height
+                          overflowY: "auto", // Enables scrolling if necessary
+                          padding: "10px", // Optional: Space inside the dropdown
+                        }}>
                           <span className="dropdown-item-text">
                             Ticket Numbers:
                           </span>

@@ -93,7 +93,7 @@ const DashCard = [
       description:
         "Create and manage multiple draw times for lotteries each day for a more dynamic experience!",
       buttonName: "Active",
-      buttonLink: "/" ,
+      buttonLink: "/inactive" ,
       cardstyle: {
         borderRadius: "20px",
         backgroundColor: "rgb(11, 134, 32)",

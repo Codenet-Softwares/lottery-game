@@ -77,7 +77,7 @@ const Void = () => {
           ) : (
             <>
               {/* Search and Pagination Controls */}
-              <div className="row mb-4">
+              {/* <div className="row mb-4">
                 <div className="col-md-6">
                   <input
                     type="text"
@@ -92,7 +92,7 @@ const Void = () => {
                     onChange={handleSearchChange}
                   />
                 </div>
-              </div>
+              </div> */}
 
               {/* Market Data Table */}
               <div

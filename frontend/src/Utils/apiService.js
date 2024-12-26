@@ -290,9 +290,9 @@ export async function GetPurchaseOverview(body = {}, isToast = false) {
   }
 }
 
-export async function GetResultMarket(body = {}) {
+export async function GetResultMarket(body = {} , isToast = false) {
   try {
-    const callParams = await getAuthCallParams(strings.GET, body);
+    const callParams = await getAuthCallParams(strings.GET, body ,  isToast);
     const response = await makeCall(
       `${urls.getResultMarkets}?date=${body.date}`,
       callParams,

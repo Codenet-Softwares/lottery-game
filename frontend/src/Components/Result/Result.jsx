@@ -108,21 +108,33 @@ const Result = () => {
             gap: "10px",
           }}
         >
-          {visibleMarkets.map((market) => (
-            <button
-              key={market.marketId}
-              className={`btn ${market.marketId === marketId ? "btn-primary" : "btn-outline-light"}`}
-              onClick={() => handleMarketSelect(market)}
-              style={{
-                fontSize: "16px",
-                borderRadius: "4px",
-                boxShadow: market.marketId === marketId ? "0px 4px 6px rgba(0, 0, 0, 0.2)" : "none",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {market.marketName}
-            </button>
-          ))}
+         {visibleMarkets.length > 0 ? (
+      visibleMarkets.map((market) => (
+        <button
+          key={market.marketId}
+          className={`btn ${market.marketId === marketId ? "btn-primary" : "btn-outline-light"}`}
+          onClick={() => handleMarketSelect(market)}
+          style={{
+            fontSize: "16px",
+            borderRadius: "4px",
+            boxShadow: market.marketId === marketId ? "0px 4px 6px rgba(0, 0, 0, 0.2)" : "none",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {market.marketName}
+        </button>
+      ))
+    ) : (
+      <div
+        style={{
+          color: "#ffffff",
+          fontSize: "16px",
+          fontWeight: "bold",
+        }}
+      >
+        No markets found with result decalared
+      </div>
+    )}
         </div>
 
         {/* Right Arrow */}
