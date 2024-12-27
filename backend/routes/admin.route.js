@@ -6,16 +6,17 @@ import {
   dateWiseMarkets,
   getAllMarkets,
   getInactiveMarket,
-  getLiveMarkets,
   getMarkets,
   getResult,
   getTicketNumbersByMarket,
   getTicketRange,
+  liveLotteries,
+  liveMarkets,
   login,
   updateMarketStatus,
 } from '../controllers/admin.controller.js';
 import { authorize } from '../middlewares/auth.js';
-import { validateAdminLogin, validateAdminPurchaseHistory, validateSearchTickets, validateCreateAdmin, validateDateQuery, validateGetResult, validateMarketId, } from '../utils/commonSchema.js';
+import { validateAdminLogin, validateAdminPurchaseHistory, validateSearchTickets, validateCreateAdmin, validateDateQuery, validateGetResult, validateMarketId, validateLiveLottery, validateLiveMarkets, } from '../utils/commonSchema.js';
 import customErrorHandler from '../utils/customErrorHandler.js';
 import { apiResponseErr, apiResponseSuccess } from '../utils/response.js';
 import { statusCode } from '../utils/statusCodes.js';
@@ -58,8 +59,6 @@ export const adminRoutes = (app) => {
 
   app.get('/api/admin/get-markets', authorize([string.Admin]), getMarkets)
 
-  app.get('/api/get-live-markets', getLiveMarkets)
-
   app.get('/api/get-inactive-markets', authorize([string.Admin]), getInactiveMarket)
 
   app.post('/api/update-market-status', updateMarketStatus)
@@ -67,4 +66,8 @@ export const adminRoutes = (app) => {
   app.get("/api/admin/prize-results", authorize([string.Admin]), getResult);
 
   app.get("/api/admin/ticketRange", getTicketRange)
+
+  app.get('/api/live-markets', validateLiveMarkets, customErrorHandler, authorize([string.Admin]), liveMarkets)
+
+  app.get('/api/live-lotteries/:marketId', validateLiveLottery, customErrorHandler, authorize([string.Admin]), liveLotteries);
 };

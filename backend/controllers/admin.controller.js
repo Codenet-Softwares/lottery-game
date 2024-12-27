@@ -490,43 +490,6 @@ export const getMarkets = async (req, res) => {
   }
 };
 
-export const getLiveMarkets = async (req, res) => {
-  try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const ticketData = await PurchaseLottery.findAll({
-      attributes: ["marketId", "marketName", "gameName"],
-      where: {
-        createdAt: {
-          [Op.gte]: today,
-        },
-        resultAnnouncement: false,
-      },
-    });
-
-    if (!ticketData || ticketData.length === 0) {
-      return apiResponseSuccess([], true, statusCode.success, "No data", res);
-    }
-
-    return apiResponseSuccess(
-      ticketData,
-      true,
-      statusCode.success,
-      "Success",
-      res
-    );
-  } catch (error) {
-    return apiResponseErr(
-      null,
-      false,
-      statusCode.internalServerError,
-      error.message,
-      res
-    );
-  }
-};
-
 export const getTicketRange = async (req, res) => {
   try {
     const today = new Date();
@@ -647,3 +610,123 @@ export const updateMarketStatus = async (req, res) => {
     );
   }
 };
+
+export const liveMarkets = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const offset = (page - 1) * limit;
+
+    const { count, rows: ticketData } = await PurchaseLottery.findAndCountAll({
+      attributes: ["marketId", "marketName", "gameName"],
+      where: {
+        createdAt: {
+          [Op.gte]: today,
+        },
+        resultAnnouncement: false,
+      },
+    });
+
+    if (!ticketData || ticketData.length === 0) {
+      return apiResponseSuccess([], true, statusCode.success, "No data", res);
+    }
+
+    const uniqueData = ticketData.reduce((acc, current) => {
+      const exists = acc.find((item) => item.marketName === current.marketName);
+      if (!exists) {
+        acc.push(current);
+      }
+      return acc;
+    }, []);
+
+    const paginatedData = uniqueData.slice(offset, offset + parseInt(limit));
+
+    const pagination = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages: Math.ceil(uniqueData.length / limit),
+      totalItems: uniqueData.length,
+    };
+
+    return apiResponsePagination(paginatedData, true, statusCode.success, "Success", pagination, res);
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+export const liveLotteries = async (req, res) => {
+  try {
+    const { marketId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const offset = (page - 1) * limit;
+
+    const { count, rows: purchaseLotteries } = await PurchaseLottery.findAndCountAll({
+      where: {
+        marketId,
+        createdAt: { [Op.gte]: today },
+        resultAnnouncement: false,
+      },
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+    });
+
+    if (!purchaseLotteries.length) {
+      return apiResponseSuccess([], true, statusCode.success, "No bet history found", res);
+    }
+
+    const userData = {};
+    for (const purchase of purchaseLotteries) {
+      const { userName, lotteryPrice, group, series, number, sem, marketName, marketId } = purchase;
+
+      if (!userData[userName]) {
+        userData[userName] = {
+          userName,
+          marketName,
+          marketId,
+          amount: 0,
+          details: [],
+        };
+      }
+
+      userData[userName].amount += lotteryPrice;
+
+      const ticketService = new TicketService();
+      const tickets = await ticketService.list(group, series, number, sem, marketId);
+
+      userData[userName].details.push({ sem, tickets });
+    }
+
+    const pagination = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages: Math.ceil(count / limit),
+      totalItems: count,
+    };
+
+    return apiResponsePagination(
+      Object.values(userData),
+      true,
+      statusCode.success,
+      "success",
+      pagination,
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
+  }
+};
+
+
