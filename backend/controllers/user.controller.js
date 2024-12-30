@@ -509,17 +509,56 @@ export const dateWiseMarkets = async (req, res) => {
     const { date } = req.query;
 
     if (!date) {
-      return apiResponseErr(null, false, statusCode.badRequest, "Date is required", res);
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Date is required",
+        res
+      );
     }
 
     const selectedDate = new Date(date);
     if (isNaN(selectedDate)) {
-      return apiResponseErr(null, false, statusCode.badRequest, "Invalid date format", res);
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Invalid date format",
+        res
+      );
     }
 
     selectedDate.setHours(0, 0, 0, 0);
     const nextDay = new Date(selectedDate);
     nextDay.setDate(nextDay.getDate() + 1);
+
+    const revokedMarkets = await LotteryResult.findAll({
+      attributes: ["marketId"],
+      where: {
+        isRevoke: true,
+        createdAt: {
+          [Op.gte]: selectedDate,
+          [Op.lt]: nextDay,
+        },
+      },
+    });
+
+    if (revokedMarkets.length > 0) {
+      const revokedMarketIds = revokedMarkets.map((market) => market.marketId);
+
+      await LotteryResult.destroy({
+        where: {
+          marketId: {
+            [Op.in]: revokedMarketIds,
+          },
+          createdAt: {
+            [Op.gte]: selectedDate,
+            [Op.lt]: nextDay,
+          },
+        },
+      });
+    }
 
     const ticketData = await LotteryResult.findAll({
       attributes: [
@@ -527,6 +566,7 @@ export const dateWiseMarkets = async (req, res) => {
         "marketId",
       ],
       where: {
+        isRevoke: false,
         createdAt: {
           [Op.gte]: selectedDate,
           [Op.lt]: nextDay,
@@ -538,9 +578,21 @@ export const dateWiseMarkets = async (req, res) => {
       return apiResponseSuccess([], true, statusCode.success, "No data", res);
     }
 
-    return apiResponseSuccess(ticketData, true, statusCode.success, "Success", res);
+    return apiResponseSuccess(
+      ticketData,
+      true,
+      statusCode.success,
+      "Success",
+      res
+    );
   } catch (error) {
-    return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
   }
 };
 
