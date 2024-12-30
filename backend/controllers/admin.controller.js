@@ -419,12 +419,40 @@ export const dateWiseMarkets = async (req, res) => {
     const nextDay = new Date(selectedDate);
     nextDay.setDate(nextDay.getDate() + 1);
 
+    const revokedMarkets = await LotteryResult.findAll({
+      attributes: ["marketId"],
+      where: {
+        isRevoke: true,
+        createdAt: {
+          [Op.gte]: selectedDate,
+          [Op.lt]: nextDay,
+        },
+      },
+    });
+
+    if (revokedMarkets.length > 0) {
+      const revokedMarketIds = revokedMarkets.map((market) => market.marketId);
+
+      await LotteryResult.destroy({
+        where: {
+          marketId: {
+            [Op.in]: revokedMarketIds,
+          },
+          createdAt: {
+            [Op.gte]: selectedDate,
+            [Op.lt]: nextDay,
+          },
+        },
+      });
+    }
+
     const ticketData = await LotteryResult.findAll({
       attributes: [
         [Sequelize.fn("DISTINCT", Sequelize.col("marketName")), "marketName"],
         "marketId",
       ],
       where: {
+        isRevoke: false,
         createdAt: {
           [Op.gte]: selectedDate,
           [Op.lt]: nextDay,
