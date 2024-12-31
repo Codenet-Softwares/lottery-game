@@ -76,6 +76,11 @@ const TicketRange = sequelize.define(
       allowNull: false,
       defaultValue: 'Lottery',
     },
+    winReference: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    }
   },
   {
     tableName: 'TicketRange',

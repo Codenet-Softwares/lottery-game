@@ -360,7 +360,10 @@ export const ResultDeclare = async (req, res) => {
         { where: { marketId } }
       );
     }
-    
+    await TicketRange.update(
+      { winReference: true },
+      { where: { marketId } }
+    );
     await PurchaseLottery.update(
       { resultAnnouncement: true, settleTime: new Date() },
       { where: { marketId } }

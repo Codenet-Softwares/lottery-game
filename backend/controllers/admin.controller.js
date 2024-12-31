@@ -523,7 +523,7 @@ export const getInactiveMarket = async (req, res) => {
 
     const totalItems = await TicketRange.count({
       where: {
-        isWin: true
+        winReference: true
       }
     });
 
@@ -534,7 +534,7 @@ export const getInactiveMarket = async (req, res) => {
         "gameName"
       ],
       where: {
-        isWin: true
+        winReference: true
       },
       limit: parseInt(limit),
       offset
