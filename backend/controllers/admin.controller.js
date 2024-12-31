@@ -689,7 +689,7 @@ export const liveLotteries = async (req, res) => {
 
     const userData = {};
     for (const purchase of purchaseLotteries) {
-      const { userName, lotteryPrice, group, series, number, sem, marketName, marketId } = purchase;
+      const { userName, lotteryPrice, group, series, number, sem, marketName, marketId, purchaseId } = purchase;
 
       if (!userData[userName]) {
         userData[userName] = {
@@ -706,7 +706,7 @@ export const liveLotteries = async (req, res) => {
       const ticketService = new TicketService();
       const tickets = await ticketService.list(group, series, number, sem, marketId);
 
-      userData[userName].details.push({ sem, tickets });
+      userData[userName].details.push({ sem, tickets, purchaseId, lotteryPrice });
     }
 
     const pagination = {
