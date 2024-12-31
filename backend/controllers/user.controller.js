@@ -226,6 +226,7 @@ export const PurchaseTickets = async (req, res) => {
     const { group, series, number, sem } = userRange;
 
     await PurchaseLottery.create({
+      purchaseId : uuidv4(),
       generateId,
       userId,
       userName,

@@ -16,6 +16,7 @@ import cron from 'node-cron'
 import { Op } from 'sequelize';
 import moment from 'moment';
 import { revokeGameRoute } from './routes/revoke.route.js';
+import { deleteGameRoute } from './routes/delete.route.js';
 
 dotenv.config();
 const app = express();
@@ -38,6 +39,7 @@ ResultDeclarationModule(app);
 ExternalApiModule(app);
 voidGameRoute(app) 
 revokeGameRoute(app)
+deleteGameRoute(app)
 
 PurchaseLottery.belongsTo(UserRange, {
   foreignKey: 'generateId',
