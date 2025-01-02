@@ -364,3 +364,16 @@ export async function GetVoidMarketData(body = {}, isToast = false) {
     throw error;
   }
 }
+
+export async function GetliveMarketBroadcast(body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.GET, body, isToast);
+    const response = await makeCall(
+      `${urls.allLiveMarketBroadcast}?page=${body.page}&limit=${body.limit}`,
+      callParams,
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}

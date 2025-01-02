@@ -2,8 +2,8 @@ class UrlConstant {
   constructor() {}
   //url was commented
 
-   url_dev = "https://lottery.server.dummydoma.in/api";
-  // url_dev = "http://localhost:8080/api";
+  // url_dev = "https://lottery.server.dummydoma.in/api";
+  url_dev = "http://localhost:8080/api";
 
   admin = "admin";
   login = `${this.url_dev}/login`;
@@ -35,6 +35,7 @@ class UrlConstant {
   isActive = `${this.url_dev}/update-market-status`;
   getIsActive = `${this.url_dev}/get-inactive-markets`;
   isRevoke = `${this.url_dev}/revoke-market-lottery`;
+  allLiveMarketBroadcast = `${this.url_dev}/live-markets`;
 }
 
 const urls = new UrlConstant();

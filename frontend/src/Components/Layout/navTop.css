@@ -84,6 +84,14 @@
 .nav-options .nav-link.void-icon{
   color: rgb(207, 63, 82);
 }
+.nav-options .nav-link.live-market-icon {
+  color: #00bcd4; /* Cyan for Live Markets - Bright and engaging */
+}
+
+/* Trash Icon */
+.nav-options .nav-link.trash-icon {
+  color: #f44336; /* Red for Trash - Bold and clear */
+}
 .nav-options .nav-link.active-icon{
   color: rgb(11, 134, 32);
 }
