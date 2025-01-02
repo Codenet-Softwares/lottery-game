@@ -4,6 +4,7 @@ import { apiResponseErr, apiResponseSuccess } from "../utils/response.js";
 import { statusCode } from "../utils/statusCodes.js";
 import sequelize from "../config/db.js";
 import { v4 as UUIDV4 } from "uuid";
+import jwt from "jsonwebtoken";
 import LotteryTrash from "../models/trash.model.js";
 
 export const deleteliveBet = async (req, res) => {
@@ -44,6 +45,12 @@ export const deleteliveBet = async (req, res) => {
       { headers }
     );
 
+    if (!response.data.success) {
+      return res
+        .status(statusCode.badRequest) 
+        .json(response.data);
+    }
+    
     await LotteryTrash.create(
       {
         trashMarkets: [livePurchaseId.dataValues],
