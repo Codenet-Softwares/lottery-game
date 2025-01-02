@@ -11,7 +11,7 @@ const LiveMarkets = () => {
 
   // Fetch market data from the API
   const fetchMarkets = async (page) => {
-    try {
+    
       const response = await GetliveMarketBroadcast({ page, limit: marketsPerPage });
       if (response.success) {
         setMarkets(response.data || []);
@@ -19,9 +19,7 @@ const LiveMarkets = () => {
       } else {
         console.error("Failed to fetch markets:", response.message);
       }
-    } catch (error) {
-      console.error("Error fetching markets:", error);
-    }
+    
   };
 
   useEffect(() => {
