@@ -142,71 +142,81 @@ export const getLotteryBetHistory = async (req, res) => {
 };
 
 export const lotteryMarketAnalysis = async (req, res) => {
-    try {
-      const { marketId } = req.params;
-      const { page = 1, limit = 10 } = req.query;
-  
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-  
-      const offset = (page - 1) * limit;
-  
-      const { count, rows: purchaseLotteries } = await PurchaseLottery.findAndCountAll({
-        where: {
-          marketId,
-          createdAt: { [Op.gte]: today },
-          resultAnnouncement: false,
-        },
-        limit: parseInt(limit),
-        offset: parseInt(offset),
-      });
-  
-      if (!purchaseLotteries.length) {
-        return apiResponseSuccess([], true, statusCode.success, "No bet history found", res);
-      }
-  
-      const userData = {};
-      for (const purchase of purchaseLotteries) {
-        const { userName, lotteryPrice, group, series, number, sem, marketName, marketId } = purchase;
-  
-        if (!userData[userName]) {
-          userData[userName] = {
-            userName,
-            marketName,
-            marketId,
-            amount: 0,
-            details: [],
-          };
-        }
-  
-        userData[userName].amount += lotteryPrice;
-  
-        const ticketService = new TicketService();
-        const tickets = await ticketService.list(group, series, number, sem, marketId);
-  
-        userData[userName].details.push({ sem, tickets });
-      }
-  
-      const pagination = {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit),
-        totalItems: count,
-      };
-  
-      return apiResponsePagination(
-        Object.values(userData),
-        true,
-        statusCode.success,
-        "success",
-        pagination,
-        res
-      );
-    } catch (error) {
-      return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
+  try {
+    const { marketId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Fetch raw data from the database
+    const rawData = await PurchaseLottery.findAll({
+      where: {
+        marketId,
+        createdAt: { [Op.gte]: today },
+        resultAnnouncement: false,
+      },
+    });
+
+    if (!rawData.length) {
+      return apiResponseSuccess([], true, statusCode.success, "No bet history found", res);
     }
-  };
-  
+
+    // Aggregate user data
+    const userData = {};
+    for (const purchase of rawData) {
+      const { userName, lotteryPrice, group, series, number, sem, marketName, marketId } = purchase;
+
+      if (!userData[userName]) {
+        userData[userName] = {
+          userName,
+          marketName,
+          marketId,
+          amount: 0,
+          details: [],
+        };
+      }
+
+      userData[userName].amount += lotteryPrice;
+
+      const ticketService = new TicketService();
+      const tickets = await ticketService.list(group, series, number, sem, marketId);
+
+      userData[userName].details.push({ sem, tickets, lotteryPrice });
+    }
+
+    // Convert aggregated data to an array
+    const aggregatedData = Object.values(userData);
+
+    // Calculate pagination
+    const totalItems = aggregatedData.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const currentPage = Math.max(1, parseInt(page));
+    const offset = (currentPage - 1) * limit;
+    const paginatedData = aggregatedData.slice(offset, offset + limit);
+
+    // Return the paginated response
+    const pagination = {
+      page: currentPage,
+      limit: parseInt(limit),
+      totalPages,
+      totalItems,
+    };
+
+    return apiResponsePagination(
+      paginatedData,
+      true,
+      statusCode.success,
+      "Success",
+      pagination,
+      res
+    );
+  } catch (error) {
+    console.error("Error:", error);
+    return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
+  }
+};
+
 
 export const getBetHistoryP_L = async (req, res) => {
   try {
