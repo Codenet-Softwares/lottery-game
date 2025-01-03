@@ -11,6 +11,7 @@ import { v4 as UUIDV4 } from "uuid";
 import jwt from "jsonwebtoken";
 import LotteryTrash from "../models/trash.model.js";
 import { Sequelize } from "sequelize";
+import { TicketService } from "../constructor/ticketService.js";
 
 export const deleteliveBet = async (req, res) => {
   const transaction = await sequelize.transaction();
@@ -173,35 +174,48 @@ export const getTrashBetDetails = async (req, res) => {
       ),
     });
 
-    const getData = marketData
-      .map((item) => {
-        const trashMarkets = item.trashMarkets;
+    const ticketService = new TicketService();
 
-        const parsedMarkets = Array.isArray(trashMarkets)
-          ? trashMarkets
-          : JSON.parse(trashMarkets);
+    const getData = await Promise.all(
+      marketData
+        .map((item) => {
+          const trashMarkets = item.trashMarkets;
 
-        return parsedMarkets
-          .filter((data) => data.marketId === marketId)
-          .map((data) => ({
-            marketName: data.marketName,
-            marketId: data.marketId,
-            sem: data.sem,
-            runnerId: data.runnerId,
-            group: data.group,
-            price: data.price,
-            number: data.number,
-            series: data.series,
-            userId: data.userId,
-            userName: data.userName,
-            lotteryPrice: data.lotteryPrice,
-          }));
-      })
-      .flat();
+          const parsedMarkets = Array.isArray(trashMarkets)
+            ? trashMarkets
+            : JSON.parse(trashMarkets);
+
+          return parsedMarkets
+            .filter((data) => data.marketId === marketId)
+            .map(async (data) => {
+              const tickets = await ticketService.list(
+                data.group,
+                data.series,
+                data.number,
+                data.sem,
+                marketId
+              );
+
+              return {
+                marketName: data.marketName,
+                marketId: data.marketId,
+                sem: data.sem,
+                price: data.price,
+                userId: data.userId,
+                userName: data.userName,
+                lotteryPrice: data.lotteryPrice,
+                Tickets: tickets,
+              };
+            });
+        })
+        .flat()
+    );
+
+    const resolvedData = await Promise.all(getData);
 
     const offset = (page - 1) * pageSize;
-    const getAllMarkets = getData.slice(offset, offset + pageSize);
-    const totalItems = getData.length;
+    const getAllMarkets = resolvedData.slice(offset, offset + pageSize);
+    const totalItems = resolvedData.length;
     const totalPages = Math.ceil(totalItems / pageSize);
 
     const paginationData = {
@@ -215,11 +229,10 @@ export const getTrashBetDetails = async (req, res) => {
       getAllMarkets,
       true,
       statusCode.success,
-      "trash bet details fetched successfully!",
+      "Trash bet details fetched successfully!",
       paginationData,
-      res,
+      res
     );
-
   } catch (error) {
     return apiResponseErr(
       null,
@@ -230,4 +243,5 @@ export const getTrashBetDetails = async (req, res) => {
     );
   }
 };
+
 
