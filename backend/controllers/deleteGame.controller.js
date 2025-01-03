@@ -21,7 +21,7 @@ export const deleteliveBet = async (req, res) => {
     const { purchaseId } = req.body;
     const livePurchaseId = await PurchaseLottery.findOne({
       where: { purchaseId },
-      attributes: ["marketId", "userId", "lotteryPrice"],
+      attributes: ["marketId", "userId", "lotteryPrice", "marketName", "marketId", "price"],
     });
     if (!livePurchaseId) {
       return apiResponseErr(
