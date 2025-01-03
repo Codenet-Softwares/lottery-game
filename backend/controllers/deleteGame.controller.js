@@ -129,7 +129,7 @@ export const getTrashMarket = async (req, res) => {
 
     const paginationData = {
       page,
-      pageSize,
+      limit: pageSize,
       totalPages,
       totalItems,
     };
@@ -154,9 +154,7 @@ export const getTrashMarket = async (req, res) => {
 };
 
 export const getTrashBetDetails = async (req, res) => {
-
   try {
-    
     let { page = 1, pageSize = 10 } = req.query;
 
     page = parseInt(page);
@@ -190,12 +188,13 @@ export const getTrashBetDetails = async (req, res) => {
             marketId: data.marketId,
             sem: data.sem,
             runnerId: data.runnerId,
+            group: data.group,
+            price: data.price,
+            number: data.number,
+            series: data.series,
             userId: data.userId,
             userName: data.userName,
-            rate: data.rate,
-            type: data.type,
-            bidAmount: data.bidAmount,
-            value: data.value,
+            lotteryPrice: data.lotteryPrice,
           }));
       })
       .flat();
@@ -207,23 +206,20 @@ export const getTrashBetDetails = async (req, res) => {
 
     const paginationData = {
       page,
-      pageSize,
+      limit: pageSize,
       totalPages,
       totalItems,
     };
 
-    return res
-      .status(statusCode.success)
-      .send(
-        apiResponseSuccess(
-          getAllMarkets,
-          true,
-          statusCode.success,
-          "Market details fetched successfully",
-          paginationData
-        )
-      );
-    
+    return apiResponsePagination(
+      getAllMarkets,
+      true,
+      statusCode.success,
+      "trash bet details fetched successfully!",
+      paginationData,
+      res,
+    );
+
   } catch (error) {
     return apiResponseErr(
       null,
@@ -233,6 +229,5 @@ export const getTrashBetDetails = async (req, res) => {
       res
     );
   }
-
-}
+};
 
