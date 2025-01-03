@@ -1,6 +1,5 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
-import { v4 as uuidv4 } from 'uuid';
 
 const PurchaseLottery = sequelize.define(
   'PurchaseLottery',
@@ -8,7 +7,6 @@ const PurchaseLottery = sequelize.define(
     purchaseId: {
       type: DataTypes.UUID,
       allowNull: false,
-      defaultValue: uuidv4(),
     },
     generateId: {
       type: DataTypes.UUID,
