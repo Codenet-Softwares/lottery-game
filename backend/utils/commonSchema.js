@@ -406,3 +406,9 @@ export const validatedeleteliveBet = [
     .notEmpty().withMessage('Purchase ID is required')
     .isUUID().withMessage('Purchase ID must be a valid UUID'),
 ];
+
+export const validateTrashMarketId = [
+  param("marketId")
+    .isUUID()
+    .withMessage("Invalid marketId. It should be a valid UUID."),
+];

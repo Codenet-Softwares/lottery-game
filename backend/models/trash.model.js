@@ -16,8 +16,8 @@ LotteryTrash.init(
     },
     {
         sequelize,
-        modelName: 'MarketTrash',
-        tableName: 'MarketTrash',
+        modelName: 'LotteryTrash',
+        tableName: 'LotteryTrash',
         timestamps: true,
       },
 );
