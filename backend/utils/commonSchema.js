@@ -401,7 +401,7 @@ export const validateLiveMarkets = [
     .withMessage("Limit must be a positive integer."),
 ];
 
-export const validatedeleteliveBet = [
+export const validateDeleteLiveBet= [
   body('purchaseId')
     .notEmpty().withMessage('Purchase ID is required')
     .isUUID().withMessage('Purchase ID must be a valid UUID'),
