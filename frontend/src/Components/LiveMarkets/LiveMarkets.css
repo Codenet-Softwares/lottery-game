@@ -6,7 +6,6 @@
   position: relative;
   width: 80%;
   max-width: 2000px;
-  /* min-height: 1000px; */
   height: 100%;
   margin: 50px auto;
   perspective: 1000px;
@@ -18,9 +17,12 @@
   border-radius: 15px;
   padding: 20px;
   width: 100%;
-  min-height: 770px;
+  height: 770px; /* Fixed height */
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevents overflow of content */
 }
 
 .live-alert {
@@ -34,12 +36,10 @@
 }
 
 @keyframes blink {
-  0%,
-  50% {
+  0%, 50% {
     opacity: 1;
   }
-  50.1%,
-  100% {
+  50.1%, 100% {
     opacity: 0;
   }
 }
@@ -83,6 +83,7 @@
   transform: rotateX(-15deg);
   margin-top: -10px;
 }
+
 .red-dot {
   display: inline-block;
   width: 10px;
@@ -103,19 +104,10 @@
 }
 
 .antenna-base {
-  width: 50px;
+  width: 200px;
   height: 10px;
   background-color: #333;
-  border-radius: 5px;
-}
-
-.tv-stand {
-  width: 50%;
-  height: 20px;
-  background-color: #333;
-  border-radius: 0 0 15px 15px;
-  transform: rotateX(-15deg);
-  margin-top: -10px;
+  border-radius: 10px;
 }
 
 .pagination-container {
@@ -166,7 +158,31 @@
   text-transform: uppercase;
   color: #ff0000;
   text-shadow: 0px 0px 8px rgba(255, 0, 0, 0.8);
- 
 }
 
+.stats-screen {
+  width: 100%;
+  height: 100%; /* Fill available space without affecting the layout */
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  overflow-y: auto; /* Allows scrolling if content overflows */
+}
 
+.back-button {
+  align-self: flex-start;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  background-color: #4682b4;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background-color: #315f82;
+}

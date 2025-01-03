@@ -36,6 +36,8 @@ class UrlConstant {
   getIsActive = `${this.url_dev}/get-inactive-markets`;
   isRevoke = `${this.url_dev}/revoke-market-lottery`;
   allLiveMarketBroadcast = `${this.url_dev}/live-markets`;
+  allLiveMarketstats = `${this.url_dev}/live-lotteries`;
+  DeleteLiveBets = `${this.url_dev}/delete-liveBet-lottery`
 }
 
 const urls = new UrlConstant();
