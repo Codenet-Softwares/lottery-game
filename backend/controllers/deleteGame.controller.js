@@ -163,7 +163,7 @@ export const getTrashBetDetails = async (req, res) => {
 
     const { marketId } = req.params;
     const marketData = await LotteryTrash.findAll({
-      attributes: ["trashMarkets"],
+      attributes: ["trashMarkets", "trashMarketId"],
       where: Sequelize.where(
         Sequelize.fn(
           "JSON_CONTAINS",
@@ -197,6 +197,7 @@ export const getTrashBetDetails = async (req, res) => {
               );
 
               return {
+                trashMarketId: item.trashMarketId, 
                 marketName: data.marketName,
                 marketId: data.marketId,
                 sem: data.sem,
@@ -261,7 +262,7 @@ export const deleteTrash = async (req, res) => {
     }
     await LotteryTrash.destroy({ where: { trashMarketId } });
     return apiResponseSuccess(null, true, statusCode.success, 'Trash data deleted successfully', res)
-    
+
   } catch (error) {
     return apiResponseErr(
       null,
