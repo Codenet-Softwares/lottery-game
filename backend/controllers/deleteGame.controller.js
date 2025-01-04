@@ -206,7 +206,6 @@ export const getTrashBetDetails = async (req, res) => {
             });
         })
         .flat()
-    );
 
     const resolvedData = await Promise.all(getData);
 
