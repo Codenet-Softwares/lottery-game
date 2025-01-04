@@ -245,3 +245,32 @@ export const getTrashBetDetails = async (req, res) => {
 };
 
 
+export const deleteTrash = async (req, res) => {
+  try {
+    const {trashMarketId} = req.params
+    const trashData = await LotteryTrash.findOne({where: {trashMarketId} });
+
+    if (!trashData) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        'Trash data not found',
+        res
+      );
+    }
+    await LotteryTrash.destroy({ where: { trashMarketId } });
+    return apiResponseSuccess(null, true, statusCode.success, 'Trash data deleted successfully', res)
+    
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+}
+
+

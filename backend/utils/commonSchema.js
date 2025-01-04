@@ -412,3 +412,9 @@ export const validateTrashMarketId = [
     .isUUID()
     .withMessage("Invalid marketId. It should be a valid UUID."),
 ];
+
+export const validateTrashMarket = [
+  param("trashMarketId")
+    .isUUID()
+    .withMessage("Invalid trashMarketId. It should be a valid UUID."),
+];
