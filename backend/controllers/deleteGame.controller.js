@@ -162,7 +162,7 @@ export const getTrashBetDetails = async (req, res) => {
 
     const { marketId } = req.params;
     const marketData = await LotteryTrash.findAll({
-      attributes: ["trashMarkets"],
+      attributes: ["trashMarkets", "trashMarketId"],
       where: Sequelize.where(
         Sequelize.fn(
           "JSON_CONTAINS",
@@ -181,23 +181,34 @@ export const getTrashBetDetails = async (req, res) => {
           ? trashMarkets
           : JSON.parse(trashMarkets);
 
-        return parsedMarkets
-          .filter((data) => data.marketId === marketId)
-          .map((data) => ({
-            marketName: data.marketName,
-            marketId: data.marketId,
-            sem: data.sem,
-            runnerId: data.runnerId,
-            group: data.group,
-            price: data.price,
-            number: data.number,
-            series: data.series,
-            userId: data.userId,
-            userName: data.userName,
-            lotteryPrice: data.lotteryPrice,
-          }));
-      })
-      .flat();
+          return parsedMarkets
+            .filter((data) => data.marketId === marketId)
+            .map(async (data) => {
+              const tickets = await ticketService.list(
+                data.group,
+                data.series,
+                data.number,
+                data.sem,
+                marketId
+              );
+
+              return {
+                trashMarketId: item.trashMarketId, 
+                marketName: data.marketName,
+                marketId: data.marketId,
+                sem: data.sem,
+                price: data.price,
+                userId: data.userId,
+                userName: data.userName,
+                lotteryPrice: data.lotteryPrice,
+                Tickets: tickets,
+              };
+            });
+        })
+        .flat()
+    );
+
+    const resolvedData = await Promise.all(getData);
 
     const offset = (page - 1) * pageSize;
     const getAllMarkets = getData.slice(offset, offset + pageSize);
@@ -230,4 +241,34 @@ export const getTrashBetDetails = async (req, res) => {
     );
   }
 };
+
+
+export const deleteTrash = async (req, res) => {
+  try {
+    const {trashMarketId} = req.params
+    const trashData = await LotteryTrash.findOne({where: {trashMarketId} });
+
+    if (!trashData) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        'Trash data not found',
+        res
+      );
+    }
+    await LotteryTrash.destroy({ where: { trashMarketId } });
+    return apiResponseSuccess(null, true, statusCode.success, 'Trash data deleted successfully', res)
+
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+}
+
 
