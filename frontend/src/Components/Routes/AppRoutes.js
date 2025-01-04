@@ -46,7 +46,7 @@ const AppRoutes = () => {
               </PrivateRoute>
             }
           >
-            <Route path="/dashboard" element={<DashBoard />}></Route>
+            <Route path="/dashboard" element={<DashBoard />}/>
             <Route path="/lottery-markets" element={<CreateMarkets />} />
 
             <Route

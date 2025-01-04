@@ -1,0 +1,184 @@
+/* Full Page Container */
+.trash-container {
+  background: linear-gradient(135deg, #f8fbff, #dde7f0);
+  height: 75vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dustbin Design */
+.dustbin {
+  width: 200px;
+  height: 320px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.small-lid {
+  width: 200px;
+  height: 20px;
+  background: #444;
+  border-radius: 5px;
+  position: absolute;
+  top: -70px;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.lid {
+  width: 1100px;
+  height: 50px;
+  background: #444;
+  border-radius: 10px;
+  position: absolute;
+  top: -50px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.5s ease-in-out;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.lid:hover {
+  background: #555;
+}
+
+.lid-text {
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 1px 1px 2px black;
+}
+
+/* Bin Body with Trapezoid Shape */
+.bin-body {
+  width: 1000px;
+  height: 500px;
+  background: #333;
+  clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 10% 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.4);
+  position: relative;
+  border-radius: 0 0 10px 10px; /* Rounded bottom edges */
+}
+
+.bin-text {
+  font-size: 0.9rem;
+  color: #fff;
+  text-align: center;
+  padding: 0 10px;
+  font-family: "Arial", sans-serif;
+}
+
+/* Crumpled Paper Mode */
+.crumpled-paper {
+    display: flex;
+    flex-direction: row; /* Aligns sidebar and content horizontally */
+  width: 90%;
+  height: 90%;
+  background: url("https://www.creativefabrica.com/wp-content/uploads/2023/01/19/Vintage-Crumpled-Paper-Background-58171796-1.png");
+  background-color: #f9f7f7;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: paperRise 0.8s ease-out forwards;
+  overflow: hidden;
+
+}
+
+.crumpled-paper h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.market-list-custom {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  align-items: flex-start;
+}
+
+.market-item {
+  font-size: 1rem;
+  /* color: */
+  margin: 10px 0;
+  font-family: "Verdana", sans-serif;
+}
+/* Sidebar for Deleted Markets */
+/* Sidebar for Deleted Markets */
+.market-sidebar {
+    width: 300px;
+    height: 100%; /* Occupy full height */
+    background: rgba(255, 255, 255, 0.7); /* Frosted white effect */
+    padding: 20px;
+    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto; /* Enables scrolling for long lists */
+    border-right: 1px solid #ccc; /* Subtle divider between sidebar and content */
+    position: absolute; /* Make it stay on the left */
+    left: 0;
+    top: 0;
+  }
+  
+  /* Content Area for Crumpled Paper */
+  .paper-content {
+    flex-grow: 1; /* Takes up remaining space */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-left: 320px; /* Adjust margin to avoid overlap with sidebar */
+  }
+  
+
+.market-sidebar h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #333;
+  overflow-y: none;
+}
+
+/* Back to Bin Button */
+
+.back-to-bin {
+    position: absolute;
+    top: 5px; /* Adjust as needed */
+    left: 1px; /* Adjust as needed */
+    z-index: 1000; /* Ensure it's on top */
+    padding: 10px 20px;
+    background: #4682b4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s ease;
+  }
+  
+  .back-to-bin:hover {
+    background: #366d99;
+  }
+  
+
+/* Keyframe Animations */
+@keyframes paperRise {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

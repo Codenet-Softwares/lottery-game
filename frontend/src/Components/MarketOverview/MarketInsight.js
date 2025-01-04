@@ -60,7 +60,7 @@ const MarketInsight = () => {
     if (!refresh) {
       setFilteredMarkets(marketTimes); // Reset the filter when not active
     }
-  }, [marketTimes, refresh]);
+  }, [marketTimes]);
   
 
 
@@ -83,7 +83,7 @@ const MarketInsight = () => {
     };
 
     fetchMarketTimings();
-  }, []);
+  }, [refresh]);
   // const fetchMarketData = async (marketId) => {
   //   setLoading(true);
   //   setError(null);
