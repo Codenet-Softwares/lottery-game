@@ -77,7 +77,7 @@ const DashCard = [
     {
       name: "Void",
       description:
-        "Create and manage multiple draw times for lotteries each day for a more dynamic experience!",
+        "By clicking on void, the market will be canceled and all the bets at stake would be returned to main balance!",
       buttonName: "Void",
       buttonLink: "/get-void-market" ,
       cardstyle: {
@@ -86,10 +86,10 @@ const DashCard = [
         boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
         color: "#fff",
       },
-      icon: "fas fa-minus-circle nav-icon", // icon for Lucky Hour
+      icon: "fas fa-file-excel nav-icon", // icon for Lucky Hour
     },
     {
-      name: "Active",
+      name: "Revoke",
       description:
         "Create and manage multiple draw times for lotteries each day for a more dynamic experience!",
       buttonName: "Active",
@@ -100,7 +100,7 @@ const DashCard = [
         boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
         color: "#fff",
       },
-      icon: "fas fa-check-circle nav-icon", // icon for Lucky Hour
+      icon: "fas fa-ban nav-icon", // icon for Lucky Hour
     },
   ];
   export default DashCard;

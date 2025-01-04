@@ -11,7 +11,6 @@ import { v4 as UUIDV4 } from "uuid";
 import jwt from "jsonwebtoken";
 import LotteryTrash from "../models/trash.model.js";
 import { Sequelize } from "sequelize";
-import { TicketService } from "../constructor/ticketService.js";
 
 export const deleteliveBet = async (req, res) => {
   const transaction = await sequelize.transaction();
@@ -163,7 +162,7 @@ export const getTrashBetDetails = async (req, res) => {
 
     const { marketId } = req.params;
     const marketData = await LotteryTrash.findAll({
-      attributes: ["trashMarkets"],
+      attributes: ["trashMarkets", "trashMarketId"],
       where: Sequelize.where(
         Sequelize.fn(
           "JSON_CONTAINS",
@@ -174,16 +173,13 @@ export const getTrashBetDetails = async (req, res) => {
       ),
     });
 
-    const ticketService = new TicketService();
+    const getData = marketData
+      .map((item) => {
+        const trashMarkets = item.trashMarkets;
 
-    const getData = await Promise.all(
-      marketData
-        .map((item) => {
-          const trashMarkets = item.trashMarkets;
-
-          const parsedMarkets = Array.isArray(trashMarkets)
-            ? trashMarkets
-            : JSON.parse(trashMarkets);
+        const parsedMarkets = Array.isArray(trashMarkets)
+          ? trashMarkets
+          : JSON.parse(trashMarkets);
 
           return parsedMarkets
             .filter((data) => data.marketId === marketId)
@@ -197,6 +193,7 @@ export const getTrashBetDetails = async (req, res) => {
               );
 
               return {
+                trashMarketId: item.trashMarketId, 
                 marketName: data.marketName,
                 marketId: data.marketId,
                 sem: data.sem,
@@ -214,8 +211,8 @@ export const getTrashBetDetails = async (req, res) => {
     const resolvedData = await Promise.all(getData);
 
     const offset = (page - 1) * pageSize;
-    const getAllMarkets = resolvedData.slice(offset, offset + pageSize);
-    const totalItems = resolvedData.length;
+    const getAllMarkets = getData.slice(offset, offset + pageSize);
+    const totalItems = getData.length;
     const totalPages = Math.ceil(totalItems / pageSize);
 
     const paginationData = {
@@ -229,10 +226,11 @@ export const getTrashBetDetails = async (req, res) => {
       getAllMarkets,
       true,
       statusCode.success,
-      "Trash bet details fetched successfully!",
+      "trash bet details fetched successfully!",
       paginationData,
-      res
+      res,
     );
+
   } catch (error) {
     return apiResponseErr(
       null,
@@ -243,5 +241,34 @@ export const getTrashBetDetails = async (req, res) => {
     );
   }
 };
+
+
+export const deleteTrash = async (req, res) => {
+  try {
+    const {trashMarketId} = req.params
+    const trashData = await LotteryTrash.findOne({where: {trashMarketId} });
+
+    if (!trashData) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        'Trash data not found',
+        res
+      );
+    }
+    await LotteryTrash.destroy({ where: { trashMarketId } });
+    return apiResponseSuccess(null, true, statusCode.success, 'Trash data deleted successfully', res)
+
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+}
 
 
