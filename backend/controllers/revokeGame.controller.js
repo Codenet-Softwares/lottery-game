@@ -45,9 +45,8 @@ export const revokeMarket = async (req, res) => {
       { headers }
     );
 
-    await TicketRange.update({ isWin: false ,winReference: false}, { where: { marketId } });
+    await TicketRange.update({ isWin: false },{ winReference: false }, { where: { marketId } });
     await PurchaseLottery.update({ resultAnnouncement: false }, { where: { marketId } })
-    await LotteryResult.destroy({  where: { marketId }});
 
     return apiResponseSuccess(
       usersByMarket,
@@ -68,7 +67,7 @@ export const revokeMarket = async (req, res) => {
       );
     }
     else {
-      console.log("Unexpected Error:", error);
+      console.log("Unexpected Error:", error.message);
       return apiResponseErr(
         null,
         false,

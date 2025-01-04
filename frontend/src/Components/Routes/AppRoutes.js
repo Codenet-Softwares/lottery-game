@@ -16,6 +16,8 @@ import PrivateRoute from "../Common/privateRouting";
 import CreateMarkets from "../CreateLottery/CreateMarkets";
 import Void from "../Void/Void";
 import Inactive from "../Pages/Inactive";
+import LiveMarkets from "../LiveMarkets/LiveMarkets";
+import Trash from "../Trash/Trash";
 
 const AppRoutes = () => {
   return (
@@ -44,7 +46,7 @@ const AppRoutes = () => {
               </PrivateRoute>
             }
           >
-            <Route path="/dashboard" element={<DashBoard />}></Route>
+            <Route path="/dashboard" element={<DashBoard />}/>
             <Route path="/lottery-markets" element={<CreateMarkets />} />
 
             <Route
@@ -62,6 +64,8 @@ const AppRoutes = () => {
             <Route path="/inactive" element={<Inactive />} />
 
             <Route path="/Market-overview" element={<MarketInsight />} />
+            <Route path="/Live-markets" element={<LiveMarkets/>} />
+            <Route path="/trash" element={<Trash/>} />
           </Route>
           {/* not found */}
           <Route path="*" element={<NotFound />} />

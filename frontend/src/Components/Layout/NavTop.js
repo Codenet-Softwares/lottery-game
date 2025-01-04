@@ -135,18 +135,39 @@ const NavTop = () => {
                 }`}
                 onClick={() => handleClick("/get-void-market")}
               >
-              <i class="fas fa-minus-circle nav-icon"></i>
+                <i class="fas fa-file-excel nav-icon"></i>
                 <span>Void</span>
               </Link>
               <Link
                 to="/inactive"
                 className={`nav-link active-icon ${
-                  activeLink === "" ? "active-link" : ""
+                  activeLink === "/inactive" ? "active-link" : ""
                 }`}
-                onClick={() => handleClick("")}
+                onClick={() => handleClick("/inactive")}
               >
-             <i class="fas fa-check-circle nav-icon"></i>
-                <span>InActive</span>
+                <i class="	fas fa-ban nav-icon"></i>
+                <span>Revoke</span>
+              </Link>
+              <Link
+                to="/live-markets"
+                className={`nav-link live-market-icon ${
+                  activeLink === "/live-markets" ? "active-link" : ""
+                }`}
+                onClick={() => handleClick("/live-markets")}
+              >
+                <i className="fas fa-broadcast-tower nav-icon"></i>
+                <span>Live Markets</span>
+              </Link>
+
+              <Link
+                to="/trash"
+                className={`nav-link trash-icon ${
+                  activeLink === "/trash" ? "active-link" : ""
+                }`}
+                onClick={() => handleClick("/trash")}
+              >
+                <i className="fas fa-trash-alt nav-icon"></i>
+                <span>Trash</span>
               </Link>
             </div>
 

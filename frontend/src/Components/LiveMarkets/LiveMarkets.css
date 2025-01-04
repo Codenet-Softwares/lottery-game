@@ -1,0 +1,188 @@
+.tv-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 80%;
+  max-width: 2000px;
+  height: 100%;
+  margin: 50px auto;
+  perspective: 1000px;
+}
+
+.tv-screen {
+  background: linear-gradient(to bottom, #2e2e2e, #000000);
+  border: 10px solid #444;
+  border-radius: 15px;
+  padding: 20px;
+  width: 100%;
+  height: 770px; /* Fixed height */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevents overflow of content */
+}
+
+.live-alert {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  color: red;
+  font-weight: bold;
+  font-size: 18px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  50.1%, 100% {
+    opacity: 0;
+  }
+}
+
+.market-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.market-item {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #444;
+  color: #fff;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.live-stats-button {
+  background-color: #ff6600;
+  border: none;
+  padding: 5px 10px;
+  color: white;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.live-stats-button:hover {
+  background-color: #ff3300;
+}
+
+.tv-stand {
+  width: 50%;
+  height: 20px;
+  background-color: #333;
+  border-radius: 0 0 15px 15px;
+  transform: rotateX(-15deg);
+  margin-top: -10px;
+}
+
+.red-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.tv-antenna {
+  position: absolute;
+  top: -10px;
+  width: 200px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.antenna-base {
+  width: 200px;
+  height: 10px;
+  background-color: #333;
+  border-radius: 10px;
+}
+
+.pagination-container {
+  position: absolute;
+  bottom: 0px; /* Ensures the pagination stays at the bottom with padding */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+}
+
+.no-market-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+}
+
+.tv-static {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAUEBA==") repeat;
+  animation: staticNoise 0.2s steps(10) infinite;
+  opacity: 0.7;
+  z-index: 1;
+}
+
+@keyframes staticNoise {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+.no-market-text {
+  position: relative;
+  z-index: 2;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #ff0000;
+  text-shadow: 0px 0px 8px rgba(255, 0, 0, 0.8);
+}
+
+.stats-screen {
+  width: 100%;
+  height: 100%; /* Fill available space without affecting the layout */
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  overflow-y: auto; /* Allows scrolling if content overflows */
+}
+
+.back-button {
+  align-self: flex-start;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  background-color: #4682b4;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background-color: #315f82;
+}

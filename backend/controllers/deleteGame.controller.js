@@ -11,7 +11,6 @@ import { v4 as UUIDV4 } from "uuid";
 import jwt from "jsonwebtoken";
 import LotteryTrash from "../models/trash.model.js";
 import { Sequelize } from "sequelize";
-import { TicketService } from "../constructor/ticketService.js";
 
 export const deleteliveBet = async (req, res) => {
   const transaction = await sequelize.transaction();
@@ -174,16 +173,13 @@ export const getTrashBetDetails = async (req, res) => {
       ),
     });
 
-    const ticketService = new TicketService();
+    const getData = marketData
+      .map((item) => {
+        const trashMarkets = item.trashMarkets;
 
-    const getData = await Promise.all(
-      marketData
-        .map((item) => {
-          const trashMarkets = item.trashMarkets;
-
-          const parsedMarkets = Array.isArray(trashMarkets)
-            ? trashMarkets
-            : JSON.parse(trashMarkets);
+        const parsedMarkets = Array.isArray(trashMarkets)
+          ? trashMarkets
+          : JSON.parse(trashMarkets);
 
           return parsedMarkets
             .filter((data) => data.marketId === marketId)
@@ -215,8 +211,8 @@ export const getTrashBetDetails = async (req, res) => {
     const resolvedData = await Promise.all(getData);
 
     const offset = (page - 1) * pageSize;
-    const getAllMarkets = resolvedData.slice(offset, offset + pageSize);
-    const totalItems = resolvedData.length;
+    const getAllMarkets = getData.slice(offset, offset + pageSize);
+    const totalItems = getData.length;
     const totalPages = Math.ceil(totalItems / pageSize);
 
     const paginationData = {
@@ -230,10 +226,11 @@ export const getTrashBetDetails = async (req, res) => {
       getAllMarkets,
       true,
       statusCode.success,
-      "Trash bet details fetched successfully!",
+      "trash bet details fetched successfully!",
       paginationData,
-      res
+      res,
     );
+
   } catch (error) {
     return apiResponseErr(
       null,
