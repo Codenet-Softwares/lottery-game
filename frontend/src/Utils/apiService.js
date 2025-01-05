@@ -439,3 +439,16 @@ export async function DeletedLiveBetsMarketsDetails(body = {}, isToast = false) 
     throw error;
   }
 }
+
+export async function TrashMarketsDelete(body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.DELETE, body, isToast);
+    const response = await makeCall
+    (`${urls.TrashMarketDetailsDelete}/${body.trashId}`, 
+      
+      callParams, isToast);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
