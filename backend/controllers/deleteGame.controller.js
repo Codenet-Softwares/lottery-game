@@ -102,10 +102,10 @@ export const getTrashMarket = async (req, res) => {
     });
 
     if (allMarkets.length === 0) {
-      return apiResponseErr(
+      return apiResponseSuccess(
         [],
-        false,
-        statusCode.notFound,
+        true,
+        statusCode.success,
         "No markets found",
         res
       );
