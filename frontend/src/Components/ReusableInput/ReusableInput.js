@@ -60,11 +60,11 @@ export const FromToInput = ({
   const debouncedToValue = useDebounce(typedToValue, 300);
 
   useEffect(() => {
-    setTypedFromValue(fromValue);
+    setTypedFromValue(fromValue || "");
   }, [fromValue]);
 
   useEffect(() => {
-    setTypedToValue(toValue);
+    setTypedToValue(toValue || "" );
   }, [toValue]);
 
   useEffect(() => {
@@ -149,8 +149,19 @@ export const FromToInput = ({
     };
   }, []);
 
-  const handleFromChange = (e) => setTypedFromValue(e.target.value);
-  const handleToChange = (e) => setTypedToValue(e.target.value);
+  // const handleFromChange = (e) => setTypedFromValue(e.target.value);
+  // const handleToChange = (e) => setTypedToValue(e.target.value);
+  const handleFromChange = (e) => {
+    const value = e.target.value;
+    setTypedFromValue(value);
+    onChangeFrom({ target: { name: fromName, value } });
+  };
+  
+  const handleToChange = (e) => {
+    const value = e.target.value;
+    setTypedToValue(value);
+    onChangeTo({ target: { name: toName, value } });
+  };
 
   return (
     <div className="form-group mb-3">

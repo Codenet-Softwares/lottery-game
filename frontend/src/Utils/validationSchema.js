@@ -12,7 +12,10 @@ export const validationSchema = Yup.object({
     }),
 
   marketName: Yup.string()
-    .matches(/^[a-zA-Z0-9\s]+$/, "Market name can only contain letters, numbers, and spaces")
+    .matches(
+      /^[a-zA-Z0-9.:\s]+$/,
+      "Market name can only contain letters, numbers,  spaces and dot (.,:)"
+    )
     .required("Market name is required"),
 
   groupFrom: Yup.number().required("Group From is required"),
@@ -73,6 +76,10 @@ export const validationSchema = Yup.object({
       "Number To should be greater than Number From",
       function (value) {
         const { numberFrom } = this.parent;
+        if (!numberFrom) {
+          // If numberFrom is missing, don't run the greater-than validation
+          return true;
+        }
         return value > numberFrom;
       }
     )
@@ -87,18 +94,45 @@ export const validationSchema = Yup.object({
     ),
 
   timerFrom: Yup.string().required("Timer From is required"),
-  timerTo: Yup.string()
-    .required("Timer To is required")
-    .test(
-      "valid-timer-range",
-      "Timer To should be greater than Timer From",
-      function (value) {
-        const { timerFrom } = this.parent;
-        if (!value || !timerFrom) return true;
+  // timerTo: Yup.string()
+  //   .required("Timer To is required")
+  //   .test(
+  //     "valid-timer-range",
+  //     "Timer To should be greater than Timer From",
+  //     function (value) {
+  //       const { timerFrom } = this.parent;
+  //       if (!value || !timerFrom) return true;
 
-        return value > timerFrom; // Ensuring logical range
-      }
-    ),
+  //       return value > timerFrom; // Ensuring logical range
+  //     }
+  //   ),
+
+  timerTo: Yup.string()
+  .required("Timer To is required")
+  .test(
+    "valid-timer-range",
+    "Timer To should be greater than Timer From",
+    function (value) {
+      const { timerFrom } = this.parent;
+
+      if (!value || !timerFrom) return true; // Skip validation if either field is missing
+
+      // Helper function to convert time strings to comparable Date objects
+      const parseTime = (time) => {
+        const [hour, minute, meridian] = time.match(/(\d+):(\d+)\s?(AM|PM)/i).slice(1);
+        let hours = parseInt(hour, 10);
+        if (meridian.toUpperCase() === "PM" && hours !== 12) hours += 12;
+        if (meridian.toUpperCase() === "AM" && hours === 12) hours = 0;
+        return new Date(0, 0, 0, hours, parseInt(minute, 10)); // Date set to a baseline date for comparison
+      };
+
+      const startTime = parseTime(timerFrom);
+      const endTime = parseTime(value);
+
+      // Check if "Timer To" is logically after "Timer From"
+      return endTime > startTime;
+    }
+  ),
 
   priceForEach: Yup.number().required("Price is required"),
 });
