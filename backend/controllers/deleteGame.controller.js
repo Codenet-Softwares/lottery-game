@@ -103,7 +103,7 @@ export const getTrashMarket = async (req, res) => {
 
     if (allMarkets.length === 0) {
       return apiResponseErr(
-        null,
+        [],
         false,
         statusCode.notFound,
         "No markets found",
