@@ -45,7 +45,7 @@ export const revokeMarket = async (req, res) => {
       { headers }
     );
 
-    await TicketRange.update({ isWin: false },{ winReference: false }, { where: { marketId } });
+    await TicketRange.update({ isWin: false , winReference: false }, { where: { marketId } });
     await PurchaseLottery.update({ resultAnnouncement: false }, { where: { marketId } })
 
     return apiResponseSuccess(
@@ -57,24 +57,9 @@ export const revokeMarket = async (req, res) => {
     );
   } catch (error) {
     if (error.response) {
-      console.log("Error Response:", error.response.data);
-      return apiResponseErr(
-        null,
-        false,
-        error.response.status || statusCode.internalServerError,
-        error.response.data.errMessage || "An error occurred while revoking the market",
-        res
-      );
-    }
-    else {
-      console.log("Unexpected Error:", error.message);
-      return apiResponseErr(
-        null,
-        false,
-        statusCode.internalServerError,
-        error.message,
-        res
-      );
+      return apiResponseErr(null, false, error.response.status, error.response.data.message || error.response.data.errMessage, res);
+    } else {
+      return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
     }
   }
 };
