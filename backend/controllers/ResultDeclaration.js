@@ -33,6 +33,31 @@ export const ResultDeclare = async (req, res) => {
       'Fifth Prize': 50,
     };
 
+    const allPrizeCategories = [
+      'First Prize',
+      'Second Prize',
+      'Third Prize',
+      'Fourth Prize',
+      'Fifth Prize'
+    ];
+
+    const providedCategories = prizes.map(prize => prize.prizeCategory);
+
+    // Check if all required categories are present
+    const missingCategories = allPrizeCategories.filter(
+      category => !providedCategories.includes(category)
+    );
+
+    if (missingCategories.length > 0) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        `The following prize categories are missing: ${missingCategories.join(', ')}`,
+        res
+      );
+    }
+
     let generatedTickets = [];
     let lastFiveForFirstPrize = null;
     let lastFourForFirstPrize = null;
@@ -271,7 +296,8 @@ export const ResultDeclare = async (req, res) => {
             const response = await axios.post(`${baseURL}/api/users/update-balance`, {
               userId,
               prizeAmount: totalPrize,
-              marketId
+              marketId,
+              lotteryPrice
             });
 
             const res = await axios.post(`${baseURL}/api/lottery-profit-loss`, {
@@ -333,14 +359,6 @@ export const ResultDeclare = async (req, res) => {
     } else {
       return apiResponseErr(null, false, statusCode.badRequest, 'No valid tickets to save.', res);
     }
-
-    const allPrizeCategories = [
-      'First Prize',
-      'Second Prize',
-      'Third Prize',
-      'Fourth Prize',
-      'Fifth Prize',
-    ];
 
     const declaredPrizes = await LotteryResult.findAll({
       where: { marketId },
