@@ -256,6 +256,7 @@ const PurchasedTickets = () => {
           <tr>
             <th>Serial Number</th>
             <th>Market Name</th>
+            <th>Price</th>
             <th>SEM</th>
             <th>Tickets</th>
             <th>User Name</th>
@@ -276,7 +277,9 @@ const PurchasedTickets = () => {
               <tr key={index}>
                 <td>{startIndex + index}</td>
                 <td>{ticket.marketName || "N/A"}</td>
+                <td>{ticket.price}</td>
                 <td>{ticket.sem}</td>
+
                 <td>
                   <div className="dropdown" style={{ position: "relative" }}>
                     <button
@@ -299,11 +302,13 @@ const PurchasedTickets = () => {
                       }}
                     >
                       {dropdownOpen === index && (
-                        <div style={{
-                          maxHeight: "200px", // Sets the maximum height
-                          overflowY: "auto", // Enables scrolling if necessary
-                          padding: "10px", // Optional: Space inside the dropdown
-                        }}>
+                        <div
+                          style={{
+                            maxHeight: "200px", // Sets the maximum height
+                            overflowY: "auto", // Enables scrolling if necessary
+                            padding: "10px", // Optional: Space inside the dropdown
+                          }}
+                        >
                           <span className="dropdown-item-text">
                             Ticket Numbers:
                           </span>

@@ -33,7 +33,7 @@ const Trashmarketdetails = ({ details, refreshMarkets }) => {
             <th>Price</th>
             <th>Lottery Price</th>
             <th>Tickets</th>
-            <th>Action</th> {/* New column for Action */}
+            <th>Action</th> 
           </tr>
         </thead>
         <tbody>

@@ -6,19 +6,28 @@ import Trashmarketdetails from "./Trashmarketdetails";
 const Trash = () => {
   const [isBinOpen, setIsBinOpen] = useState(false);
   const [markets, setMarkets] = useState([]);
-  const [selectedMarketDetails, setSelectedMarketDetails] = useState(null);
+  const [selectedMarketDetails, setSelectedMarketDetails] = useState([]);
 
   // Function to fetch markets from the API
   const fetchMarkets = async () => {
-    const response = await DeletedLiveBetsMarkets();
-    setMarkets(response.data);
+    try {
+      const response = await DeletedLiveBetsMarkets();
+      if (response.data && response.data.length > 0) {
+        setMarkets(response.data);
+      } else {
+        setMarkets([]); 
+        console.warn("No deleted markets found.");
+      }
+    } catch (error) {
+      console.error("Error fetching markets:", error);
+    }
   };
-
+  
   // Function to fetch market details by marketId
   const fetchMarketDetails = async (marketId) => {
     try {
       const response = await DeletedLiveBetsMarketsDetails({ marketId });
-      setSelectedMarketDetails(response.data);
+      setSelectedMarketDetails(response.data||[]);
     } catch (error) {
       console.error("Error fetching market details:", error);
     }
