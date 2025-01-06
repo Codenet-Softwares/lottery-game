@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Trash.css";
 import { DeletedLiveBetsMarkets, DeletedLiveBetsMarketsDetails } from "../../Utils/apiService";
+import Trashmarketdetails from "./Trashmarketdetails";
 
 const Trash = () => {
   const [isBinOpen, setIsBinOpen] = useState(false);
@@ -32,7 +33,7 @@ const Trash = () => {
   const openCrumpledPaper = () => setIsBinOpen(true);
   const closeCrumpledPaper = () => {
     setIsBinOpen(false);
-    setSelectedMarketDetails(null); // Reset details when closing the bin
+    setSelectedMarketDetails(null); 
   };
 
   return (
@@ -48,20 +49,22 @@ const Trash = () => {
           </div>
         </div>
       )}
-      <button className="back-to-bin" onClick={closeCrumpledPaper}>
-        Back to Trash
-      </button>
+    
       {isBinOpen && (
         <div className="crumpled-paper">
+            <button className="back-to-bin" onClick={closeCrumpledPaper}>
+        Back to Trash
+      </button>
           <div className="market-sidebar">
             <h3>Deleted Markets</h3>
             <ul className="market-list-custom">
               {markets.map((market, index) => (
                 <li
                   key={index}
-                  className="market-item"
+                  className="market-item-custom"
                   onClick={() => fetchMarketDetails(market.marketId)}
                 >
+                 
                   {market.marketName}
                 </li>
               ))}
@@ -69,14 +72,7 @@ const Trash = () => {
           </div>
           <div className="paper-content">
             {selectedMarketDetails ? (
-              <div className="market-details">
-                <h3>Market Details</h3>
-                <p><strong>ID:</strong> {selectedMarketDetails.marketId}</p>
-                <p><strong>Name:</strong> {selectedMarketDetails.marketName}</p>
-                <p><strong>Description:</strong> {selectedMarketDetails.description}</p>
-                <p><strong>Status:</strong> {selectedMarketDetails.status}</p>
-                {/* Add more fields as needed */}
-              </div>
+            <Trashmarketdetails details={selectedMarketDetails}  refreshMarkets={fetchMarkets}  />
             ) : (
               <p>Select a market to view its details</p>
             )}
