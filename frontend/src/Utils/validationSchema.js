@@ -119,7 +119,9 @@ export const validationSchema = Yup.object({
 
       // Helper function to convert time strings to comparable Date objects
       const parseTime = (time) => {
-        const [hour, minute, meridian] = time.match(/(\d+):(\d+)\s?(AM|PM)/i).slice(1);
+        const match = time.match(/(\d+):(\d+)\s?(AM|PM)/i);
+        if (!match) return null; // Return null if the time string is invalid
+        const [hour, minute, meridian] = match.slice(1);
         let hours = parseInt(hour, 10);
         if (meridian.toUpperCase() === "PM" && hours !== 12) hours += 12;
         if (meridian.toUpperCase() === "AM" && hours === 12) hours = 0;
@@ -128,6 +130,8 @@ export const validationSchema = Yup.object({
 
       const startTime = parseTime(timerFrom);
       const endTime = parseTime(value);
+   // Ensure both times are valid before comparing
+      if (!startTime || !endTime) return false;
 
       // Check if "Timer To" is logically after "Timer From"
       return endTime > startTime;
