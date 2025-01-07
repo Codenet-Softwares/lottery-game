@@ -16,7 +16,7 @@ const Win = () => {
     const fetchData = async () => {
       showLoader();
       try {
-        await handleGetAllLotteryMarket(); // Ensure the async function works correctly
+        await handleGetAllLotteryMarket(); 
       } catch (error) {
         console.error("Error fetching lottery markets:", error);
       } finally {
@@ -184,6 +184,8 @@ const Win = () => {
           `API call successful for ${resultArray.prizeCategory}:`,
           response
         );
+         // Refresh the active markets list after a successful submission
+      await handleGetAllLotteryMarket();
       } catch (error) {
         console.error(
           `API call failed for ${resultArray.prizeCategory}:`,
@@ -401,7 +403,7 @@ const Win = () => {
                 <div className="text-center mt-3">
                   <Button
                     variant="primary"
-                    onClick={() => submitPrizes(data.marketName, data.marketId)} // Pass the correct time
+                    onClick={() => submitPrizes(data.marketName, data.marketId)}
                     style={{
                       padding: "10px 20px",
                       borderRadius: "8px",
