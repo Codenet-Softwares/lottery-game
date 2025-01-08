@@ -47,6 +47,7 @@ export const revokeMarket = async (req, res) => {
 
     await TicketRange.update({ isWin: false , winReference: false }, { where: { marketId } });
     await PurchaseLottery.update({ resultAnnouncement: false }, { where: { marketId } })
+    await LotteryResult.destroy({  where: { marketId }});
 
     return apiResponseSuccess(
       usersByMarket,
