@@ -666,19 +666,25 @@ export const liveMarkets = async (req, res) => {
 export const liveLotteries = async (req, res) => {
   try {
     const { marketId } = req.params;
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, search= ""} = req.query;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     const offset = (page - 1) * limit;
 
+    const whereConditions = {
+      marketId,
+      createdAt: { [Op.gte]: today },
+      resultAnnouncement: false,
+    };
+
+    if (search) {
+      whereConditions.userName = { [Op.like]: `%${search}%` };
+    }
+
     const { count, rows: purchaseLotteries } = await PurchaseLottery.findAndCountAll({
-      where: {
-        marketId,
-        createdAt: { [Op.gte]: today },
-        resultAnnouncement: false,
-      },
+      where: whereConditions,
       limit: parseInt(limit),
       offset: parseInt(offset),
     });
@@ -728,5 +734,6 @@ export const liveLotteries = async (req, res) => {
     return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
   }
 };
+
 
 
