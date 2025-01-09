@@ -418,3 +418,8 @@ export const validateTrashMarket = [
     .isUUID()
     .withMessage("Invalid Trash Id. It should be a valid UUID."),
 ];
+
+export const validateRevokeLiveBet = [
+  body('trashMarketId')
+    .notEmpty().withMessage('trashMarketId ID is required')
+];
