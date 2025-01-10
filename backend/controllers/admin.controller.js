@@ -1,4 +1,4 @@
-import Admin from '../models/adminModel.js';
+ import Admin from '../models/adminModel.js';
 import { apiResponseErr, apiResponsePagination, apiResponseSuccess } from '../utils/response.js';
 import { v4 as uuidv4 } from 'uuid';
 import { statusCode } from '../utils/statusCodes.js';
@@ -673,20 +673,12 @@ export const liveLotteries = async (req, res) => {
 
     const offset = (page - 1) * limit;
 
-    const whereConditions = {
-      marketId,
-      createdAt: { [Op.gte]: today },
-      resultAnnouncement: false,
-    };
-
-    if (search) {
-      whereConditions.userName = { [Op.like]: `%${search}%` };
-    }
-
     const { count, rows: purchaseLotteries } = await PurchaseLottery.findAndCountAll({
-      where: whereConditions,
-      limit: parseInt(limit),
-      offset: parseInt(offset),
+      where: {
+        marketId,
+        createdAt: { [Op.gte]: today },
+        resultAnnouncement: false,
+      },
     });
     
     // const { count, rows: purchaseLotteries } = await PurchaseLottery.findAndCountAll({
@@ -763,6 +755,4 @@ export const liveLotteries = async (req, res) => {
     return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
   }
 };
-
-
 
