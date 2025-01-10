@@ -74,14 +74,24 @@ export const geTicketRange = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const ticketData = await TicketRange.findAll({
-      where: {
-        date: {
-          [Op.gte]: today,
-        },
-        isWin: false,
-        isVoid: false,
+    const { marketName } = req.query;
+
+    const whereClause = {
+      date: {
+        [Op.gte]: today,
       },
+      isWin: false,
+      isVoid: false,
+    };
+
+    if (marketName) {
+      whereClause.marketName = {
+        [Op.like]: `%${marketName}%`,
+      };
+    }
+
+    const ticketData = await TicketRange.findAll({
+      where: whereClause,
     });
 
     if (!ticketData || ticketData.length === 0) {
@@ -95,3 +105,4 @@ export const geTicketRange = async (req, res) => {
     return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
   }
 };
+
