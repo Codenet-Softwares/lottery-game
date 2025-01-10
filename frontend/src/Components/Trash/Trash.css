@@ -230,3 +230,16 @@
     transform: translateY(0);
   }
 }
+
+.highlighted-message {
+  color: #ff4500; /* Bright orange for visibility */
+  font-weight: bold;
+  font-size: 1.2em;
+  text-align: center;
+  margin-top: 20px;
+  background-color: #fffbe6; /* Light yellow background */
+  padding: 10px;
+  border: 2px solid #ffa500; /* Matching border */
+  border-radius: 8px;
+}
+

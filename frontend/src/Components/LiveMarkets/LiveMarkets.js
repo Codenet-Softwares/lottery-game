@@ -47,11 +47,30 @@ const LiveMarkets = () => {
           {selectedMarketId ? (
             // Show stats screen
             <div className="stats-screen">
-              <button className="back-button" onClick={handleBack}>
+            <LiveMarketStats 
+              marketId={selectedMarketId} 
+              backButton={<button 
+                className="back-button" 
+                onClick={handleBack} 
+                style={{
+                  padding: '10px 20px', 
+                  fontSize: '1rem', 
+                  backgroundColor: '#4682B4', 
+                  color: 'white', 
+                  border: 'none', 
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  marginRight: '20px',
+                  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+                  width: 'auto', 
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 Back
-              </button>
-              <LiveMarketStats marketId={selectedMarketId} />
-            </div>
+              </button>}
+            />
+          </div>
+          
           ) : (
             // Show market list screen
             <>

@@ -398,7 +398,7 @@ export async function GetMarketStats(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
     const response = await makeCall(
-      `${urls.allLiveMarketstats}/${body.marketId}`,
+      `${urls.allLiveMarketstats}/${body.marketId}?page=${body.page}&limit=${body.limit}&search=${body.search}`,
       callParams
     );
     return response;

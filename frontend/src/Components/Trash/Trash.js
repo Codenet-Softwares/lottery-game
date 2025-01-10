@@ -6,7 +6,7 @@ import Trashmarketdetails from "./Trashmarketdetails";
 const Trash = () => {
   const [isBinOpen, setIsBinOpen] = useState(false);
   const [markets, setMarkets] = useState([]);
-  const [selectedMarketDetails, setSelectedMarketDetails] = useState([]);
+  const [selectedMarketDetails, setSelectedMarketDetails] = useState(null);
 
   // Function to fetch markets from the API
   const fetchMarkets = async () => {
@@ -80,12 +80,13 @@ const Trash = () => {
             </ul>
           </div>
           <div className="paper-content">
-            {selectedMarketDetails ? (
-            <Trashmarketdetails details={selectedMarketDetails}  refreshMarkets={fetchMarkets}  />
-            ) : (
-              <p>Select a market to view its details</p>
-            )}
-          </div>
+  {selectedMarketDetails === null ? (
+    <p className="highlighted-message">Select a market from the left to view its details</p>
+  ) : (
+    <Trashmarketdetails details={selectedMarketDetails} refreshMarkets={fetchMarkets} />
+  )}
+</div>
+
         </div>
       )}
     </div>
