@@ -120,14 +120,21 @@ export const adminSearchTickets = async ({ group, series, number, sem, marketId 
 
 export const adminPurchaseHistory = async (req, res) => {
   try {
-    const { sem, page = 1, limit = 10 } = req.query;
+    const { sem, userName, page = 1, limit = 10 } = req.query;
     const { marketId } = req.params;
     const offset = (page - 1) * parseInt(limit);
 
-    const whereFilter =  { marketId: marketId }
+    const whereFilter = { marketId: marketId };
+
     if (sem) {
       whereFilter['sem'] = sem;
     }
+
+    if (userName) {
+      whereFilter['userName'] = { [Op.like]: `%${userName}%` }; 
+    }
+
+
 
     const purchaseRecords = await PurchaseLottery.findAndCountAll({
       where: { ...whereFilter },
@@ -356,16 +363,28 @@ export const getAllMarkets = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Extract marketName search query if it exists
+    const { marketName } = req.query;
+
+    // Build the where clause
+    const whereClause = {
+      date: {
+        [Op.gte]: today,
+      },
+      isWin: false,
+      isVoid: false,
+    };
+
+    // If marketName is provided, add it to the where clause
+    if (marketName) {
+      whereClause.marketName = {
+        [Op.like]: `%${marketName}%`, // Use LIKE for partial match
+      };
+    }
+
     const ticketData = await TicketRange.findAll({
       attributes: ["marketId", "marketName", "isActive", "isWin", "isVoid"],
-      where: {
-        date: {
-          [Op.gte]: today,
-        },
-        isWin: false,
-        isVoid: false,
-      },
-
+      where: whereClause,
     });
 
     if (!ticketData || ticketData.length === 0) {
@@ -389,6 +408,7 @@ export const getAllMarkets = async (req, res) => {
     );
   }
 };
+
 
 export const dateWiseMarkets = async (req, res) => {
   try {
