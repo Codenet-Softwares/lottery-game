@@ -666,7 +666,7 @@ export const liveMarkets = async (req, res) => {
 export const liveLotteries = async (req, res) => {
   try {
     const { marketId } = req.params;
-    const { page = 1, limit = 10, search= ""} = req.query;
+    const { page = 1, limit = 10, search= "" } = req.query;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -688,6 +688,14 @@ export const liveLotteries = async (req, res) => {
       limit: parseInt(limit),
       offset: parseInt(offset),
     });
+    
+    // const { count, rows: purchaseLotteries } = await PurchaseLottery.findAndCountAll({
+    //   where: {
+    //     marketId,
+    //     createdAt: { [Op.gte]: today },
+    //     resultAnnouncement: false,
+    //   },
+    // });
 
     if (!purchaseLotteries.length) {
       return apiResponseSuccess([], true, statusCode.success, "No bet history found", res);
@@ -695,7 +703,17 @@ export const liveLotteries = async (req, res) => {
 
     const userData = {};
     for (const purchase of purchaseLotteries) {
-      const { userName, lotteryPrice, group, series, number, sem, marketName, marketId, purchaseId } = purchase;
+      const {
+        userName,
+        lotteryPrice,
+        group,
+        series,
+        number,
+        sem,
+        marketName,
+        marketId,
+        purchaseId,
+      } = purchase;
 
       if (!userData[userName]) {
         userData[userName] = {
@@ -712,18 +730,29 @@ export const liveLotteries = async (req, res) => {
       const ticketService = new TicketService();
       const tickets = await ticketService.list(group, series, number, sem, marketId);
 
-      userData[userName].details.push({ sem, tickets, purchaseId, lotteryPrice });
+      userData[userName].details.push({
+        sem,
+        tickets,
+        purchaseId,
+        lotteryPrice,
+      });
     }
+
+    const userDataArray = Object.values(userData);
+
+    const totalItems = userDataArray.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const paginatedData = userDataArray.slice(offset, page * limit);
 
     const pagination = {
       page: parseInt(page),
       limit: parseInt(limit),
-      totalPages: Math.ceil(count / limit),
-      totalItems: count,
+      totalPages,
+      totalItems,
     };
 
     return apiResponsePagination(
-      Object.values(userData),
+      paginatedData,
       true,
       statusCode.success,
       "success",
