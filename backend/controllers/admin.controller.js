@@ -1,4 +1,4 @@
-import Admin from '../models/adminModel.js';
+ import Admin from '../models/adminModel.js';
 import { apiResponseErr, apiResponsePagination, apiResponseSuccess } from '../utils/response.js';
 import { v4 as uuidv4 } from 'uuid';
 import { statusCode } from '../utils/statusCodes.js';
@@ -666,7 +666,7 @@ export const liveMarkets = async (req, res) => {
 export const liveLotteries = async (req, res) => {
   try {
     const { marketId } = req.params;
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, search= ""} = req.query;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
