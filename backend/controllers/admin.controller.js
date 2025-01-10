@@ -666,7 +666,7 @@ export const liveMarkets = async (req, res) => {
 export const liveLotteries = async (req, res) => {
   try {
     const { marketId } = req.params;
-    const { page = 1, limit = 10, search= ""} = req.query;
+    const { page = 1, limit = 10, search= "" } = req.query;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -680,6 +680,14 @@ export const liveLotteries = async (req, res) => {
         resultAnnouncement: false,
       },
     });
+    
+    // const { count, rows: purchaseLotteries } = await PurchaseLottery.findAndCountAll({
+    //   where: {
+    //     marketId,
+    //     createdAt: { [Op.gte]: today },
+    //     resultAnnouncement: false,
+    //   },
+    // });
 
     if (!purchaseLotteries.length) {
       return apiResponseSuccess([], true, statusCode.success, "No bet history found", res);
