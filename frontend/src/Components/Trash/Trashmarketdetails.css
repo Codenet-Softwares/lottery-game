@@ -4,6 +4,11 @@
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
+  .table-container {
+    max-height: 300px; /* Adjust height to fit approx. 5 rows */
+    overflow-y: auto;
+    border: 1px solid #ccc;
+  }
   
   .market-details-title {
     font-size: 1.5rem;
@@ -27,8 +32,11 @@
   }
   
   .frost-table th {
+    position: sticky;
+    top: 0;
     background: rgba(70, 130, 180, 0.8);
     color: white;
+    z-index: 1;
   }
   
   .tickets-button {

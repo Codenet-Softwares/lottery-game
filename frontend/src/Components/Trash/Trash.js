@@ -7,13 +7,33 @@ const Trash = () => {
   const [isBinOpen, setIsBinOpen] = useState(false);
   const [markets, setMarkets] = useState([]);
   const [selectedMarketDetails, setSelectedMarketDetails] = useState(null);
+  //  const [searchTerm, setSearchTerm] = useState("");
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+    const [pagination, setPagination] = useState({
+      page: 1,
+      limit: 10,
+      totalPages: 0,
+      totalItems: 0,
+    });
+
+
+      // Debounce search term
+      // useEffect(() => {
+      //   const timer = setTimeout(() => {
+      //     setDebouncedSearchTerm(searchTerm);
+      //   }, 500);
+    
+      //   return () => clearTimeout(timer);
+      // }, [searchTerm]);
 
   // Function to fetch markets from the API
   const fetchMarkets = async () => {
     try {
+
       const response = await DeletedLiveBetsMarkets();
       if (response.data && response.data.length > 0) {
         setMarkets(response.data);
+    
       } else {
         setMarkets([]); 
         console.warn("No deleted markets found.");
@@ -26,12 +46,37 @@ const Trash = () => {
   // Function to fetch market details by marketId
   const fetchMarketDetails = async (marketId) => {
     try {
-      const response = await DeletedLiveBetsMarketsDetails({ marketId });
+
+       // Reset pagination to page 1 when switching markets
+       setPagination((prev) => ({ ...prev, page:pagination.page }));
+
+      const response = await DeletedLiveBetsMarketsDetails({ 
+        marketId ,
+        page: pagination.page,
+        limit: pagination.limit,
+        search: debouncedSearchTerm,
+      });
       setSelectedMarketDetails(response.data||[]);
+           // Safely handle pagination properties
+           setPagination((prev) => ({
+            page: response.pagination?.page || 1,
+            limit: response.pagination?.limit || 10,
+            totalPages: response.pagination?.totalPages || 0,
+            totalItems: response.pagination?.totalItems || 0,
+          }));
     } catch (error) {
       console.error("Error fetching market details:", error);
     }
   };
+  useEffect(() => {
+    if (selectedMarketDetails?.[0]?.marketId) {
+      const marketId = selectedMarketDetails[0]?.marketId;
+      if (marketId) {
+        fetchMarketDetails(marketId); // Re-fetch market details when the page changes
+      }
+    }
+  }, [pagination.page]);
+  
 
   useEffect(() => {
     if (isBinOpen) {
@@ -44,6 +89,20 @@ const Trash = () => {
     setIsBinOpen(false);
     setSelectedMarketDetails(null); 
   };
+    // Calculate start and end indices for pagination display
+    const startIndex = (pagination.page - 1) * pagination.limit + 1;
+    const endIndex = Math.min(
+      pagination.page * pagination.limit,
+      pagination.totalItems
+    );
+
+  // Handle page change
+const handlePageChange = (newPage) => {
+  setPagination({
+    ...pagination,
+    page: newPage,
+  });
+};
 
   return (
     <div className={`trash-container ${isBinOpen ? "paper-mode" : ""}`}>
@@ -83,7 +142,14 @@ const Trash = () => {
   {selectedMarketDetails === null ? (
     <p className="highlighted-message">Select a market from the left to view its details</p>
   ) : (
-    <Trashmarketdetails details={selectedMarketDetails} refreshMarkets={fetchMarkets} />
+    <Trashmarketdetails details={selectedMarketDetails} refreshMarkets={fetchMarkets}   pagination={pagination}
+    debouncedSearchTerm={debouncedSearchTerm}
+    handlePageChange={handlePageChange} 
+    startIndex={startIndex}
+    endIndex={endIndex}
+    
+    />
+   
   )}
 </div>
 
