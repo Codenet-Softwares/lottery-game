@@ -120,13 +120,17 @@ export const adminSearchTickets = async ({ group, series, number, sem, marketId 
 
 export const adminPurchaseHistory = async (req, res) => {
   try {
-    const { sem, page = 1, limit = 10 } = req.query;
+    const { sem, page = 1, limit = 10, search = "" } = req.query;
     const { marketId } = req.params;
     const offset = (page - 1) * parseInt(limit);
 
     const whereFilter =  { marketId: marketId }
     if (sem) {
       whereFilter['sem'] = sem;
+    }
+
+    if (search) {
+      whereFilter.userName = { [Op.like]: `%${search}%` };
     }
 
     const purchaseRecords = await PurchaseLottery.findAndCountAll({
