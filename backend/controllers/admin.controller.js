@@ -683,20 +683,10 @@ export const liveLotteries = async (req, res) => {
       whereConditions.userName = { [Op.like]: `%${search}%` };
     }
 
-    const { count, rows: purchaseLotteries } = await PurchaseLottery.findAndCountAll({
+    const  purchaseLotteries  = await PurchaseLottery.findAll({
       where: whereConditions,
-      limit: parseInt(limit),
-      offset: parseInt(offset),
     });
     
-    // const { count, rows: purchaseLotteries } = await PurchaseLottery.findAndCountAll({
-    //   where: {
-    //     marketId,
-    //     createdAt: { [Op.gte]: today },
-    //     resultAnnouncement: false,
-    //   },
-    // });
-
     if (!purchaseLotteries.length) {
       return apiResponseSuccess([], true, statusCode.success, "No bet history found", res);
     }
