@@ -88,7 +88,7 @@ export const deleteliveBet = async (req, res) => {
 
 export const getTrashMarket = async (req, res) => {
   try {
-    
+    const  search  = req.query.search || "";
     const existingMarket = await LotteryTrash.findAll({
       attributes: ["trashMarkets"],
     });
@@ -120,8 +120,22 @@ export const getTrashMarket = async (req, res) => {
       ).values(),
     ];
 
+    const filteredMarkets = search ? uniqueMarkets.filter((market) =>
+        market.marketName.toLowerCase().includes(search.toLowerCase())
+      ) : uniqueMarkets;
+
+      if (filteredMarkets.length === 0) {
+        return apiResponseSuccess(
+          [],
+          true,
+          statusCode.success,
+          "No matching markets found",
+          res
+        );
+      }
+
     return apiResponseSuccess(
-      uniqueMarkets,
+      filteredMarkets,
       true,
       statusCode.success,
       "Markets fetch successfully",
@@ -140,7 +154,7 @@ export const getTrashMarket = async (req, res) => {
 
 export const getTrashBetDetails = async (req, res) => {
   try {
-    let { page = 1, pageSize = 10 } = req.query;
+    let { page = 1, pageSize = 10, search = '' } = req.query;
 
     page = parseInt(page);
     pageSize = parseInt(pageSize);
@@ -197,11 +211,24 @@ export const getTrashBetDetails = async (req, res) => {
     );
 
     const resolvedData = await Promise.all(getData);
+    const filteredData = resolvedData.filter((data) =>
+      data.userName.toLowerCase().includes(search.toLowerCase())
+    );
+
+    if (filteredData.length === 0) {
+      return apiResponseSuccess(
+        [],
+        true,
+        statusCode.success,
+        "No matching markets found",
+        res
+      );
+    }
 
     const offset = (page - 1) * pageSize;
-    const getAllMarkets = resolvedData.slice(offset, offset + pageSize);
     const totalItems = resolvedData.length;
     const totalPages = Math.ceil(totalItems / pageSize);
+    const getAllMarkets = filteredData.slice(offset, offset + pageSize);
 
     const paginationData = {
       page,
