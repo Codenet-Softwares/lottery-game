@@ -467,10 +467,38 @@ export const dateWiseMarkets = async (req, res) => {
 
 export const getMarkets = async (req, res) => {
   try {
+    const { date } = req.query;
+    let selectedDate, nextDay;
+
+    if (date) {
+      selectedDate = new Date(date);
+      if (isNaN(selectedDate)) {
+        return apiResponseErr(
+          null,
+          false,
+          statusCode.badRequest,
+          "Invalid date format",
+          res
+        );
+      }
+    } else {
+      selectedDate = new Date();
+    }
+
+    selectedDate.setHours(0, 0, 0, 0);
+
+    nextDay = new Date(selectedDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+  
+    
     const ticketData = await PurchaseLottery.findAll({
       attributes: ["marketId", "marketName"],
       where: {
         hidePurchase: false,
+        createdAt: {
+          [Op.gte]: selectedDate,
+          [Op.lt]: nextDay,
+        },
       },
     });
 
