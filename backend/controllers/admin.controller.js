@@ -768,9 +768,7 @@ export const liveLotteries = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   const { userName, oldPassword, newPassword } = req.body;
-
   try {
-    // Step 1: Validate the inputs
     if (!userName || !oldPassword || !newPassword) {
       return apiResponseErr(
         null,
@@ -781,7 +779,6 @@ export const resetPassword = async (req, res) => {
       );
     }
 
-    // Step 2: Find the admin by userName
     const admin = await Admin.findOne({ where: { userName } });
 
     if (!admin) {
@@ -794,7 +791,6 @@ export const resetPassword = async (req, res) => {
       );
     }
 
-    // Step 3: Verify the old password
     const isOldPasswordValid = await bcrypt.compare(oldPassword, admin.password);
 
     if (!isOldPasswordValid) {
@@ -807,16 +803,13 @@ export const resetPassword = async (req, res) => {
       );
     }
 
-    // Step 4: Hash the new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Step 5: Update the password in the database
     await Admin.update(
       { password: hashedPassword },
       { where: { userName } }
     );
 
-    // Step 6: Respond to the client
     return apiResponseSuccess(
       null,
       true,
@@ -825,7 +818,6 @@ export const resetPassword = async (req, res) => {
       res
     );
   } catch (error) {
-    // Handle errors
     return apiResponseErr(
       null,
       false,
