@@ -403,19 +403,10 @@ export const getAllMarkets = async (req, res) => {
 export const dateWiseMarkets = async (req, res) => {
   try {
     const { date } = req.query;
-
-    if (!date) {
-      return apiResponseErr(
-        null,
-        false,
-        statusCode.badRequest,
-        "Date is required",
-        res
-      );
-    }
-
-    const selectedDate = new Date(date);
-    if (isNaN(selectedDate)) {
+    let selectedDate, nextDay
+    if(date){
+     selectedDate = new Date(date);
+     if (isNaN(selectedDate)) {
       return apiResponseErr(
         null,
         false,
@@ -424,9 +415,14 @@ export const dateWiseMarkets = async (req, res) => {
         res
       );
     }
+    }
+    else{
+     selectedDate = new Date();
 
+    }
+   
     selectedDate.setHours(0, 0, 0, 0);
-    const nextDay = new Date(selectedDate);
+     nextDay = new Date(selectedDate);
     nextDay.setDate(nextDay.getDate() + 1);
 
     const ticketData = await LotteryResult.findAll({
