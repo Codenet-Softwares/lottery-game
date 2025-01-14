@@ -121,13 +121,17 @@ export const adminSearchTickets = async ({ group, series, number, sem, marketId 
 
 export const adminPurchaseHistory = async (req, res) => {
   try {
-    const { sem, page = 1, limit = 10 } = req.query;
+    const { sem, page = 1, limit = 10, search = "" } = req.query;
     const { marketId } = req.params;
     const offset = (page - 1) * parseInt(limit);
 
     const whereFilter =  { marketId: marketId }
     if (sem) {
       whereFilter['sem'] = sem;
+    }
+
+    if (search) {
+      whereFilter.userName = { [Op.like]: `%${search}%` };
     }
 
     const purchaseRecords = await PurchaseLottery.findAndCountAll({
@@ -357,16 +361,22 @@ export const getAllMarkets = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    const { search = "" } = req.query;
+    const whereCondition = {
+      date: {
+        [Op.gte]: today,
+      },
+      isWin: false,
+      isVoid: false,
+    };
+    if (search) {
+      whereCondition.marketName = {
+        [Op.like]: `%${search}%`, 
+      };
+    }
     const ticketData = await TicketRange.findAll({
       attributes: ["marketId", "marketName", "isActive", "isWin", "isVoid"],
-      where: {
-        date: {
-          [Op.gte]: today,
-        },
-        isWin: false,
-        isVoid: false,
-      },
-
+      where : whereCondition
     });
 
     if (!ticketData || ticketData.length === 0) {
@@ -394,19 +404,10 @@ export const getAllMarkets = async (req, res) => {
 export const dateWiseMarkets = async (req, res) => {
   try {
     const { date } = req.query;
-
-    if (!date) {
-      return apiResponseErr(
-        null,
-        false,
-        statusCode.badRequest,
-        "Date is required",
-        res
-      );
-    }
-
-    const selectedDate = new Date(date);
-    if (isNaN(selectedDate)) {
+    let selectedDate, nextDay
+    if(date){
+     selectedDate = new Date(date);
+     if (isNaN(selectedDate)) {
       return apiResponseErr(
         null,
         false,
@@ -415,9 +416,14 @@ export const dateWiseMarkets = async (req, res) => {
         res
       );
     }
+    }
+    else{
+     selectedDate = new Date();
 
+    }
+   
     selectedDate.setHours(0, 0, 0, 0);
-    const nextDay = new Date(selectedDate);
+     nextDay = new Date(selectedDate);
     nextDay.setDate(nextDay.getDate() + 1);
 
     const ticketData = await LotteryResult.findAll({
@@ -458,10 +464,38 @@ export const dateWiseMarkets = async (req, res) => {
 
 export const getMarkets = async (req, res) => {
   try {
+    const { date } = req.query;
+    let selectedDate, nextDay;
+
+    if (date) {
+      selectedDate = new Date(date);
+      if (isNaN(selectedDate)) {
+        return apiResponseErr(
+          null,
+          false,
+          statusCode.badRequest,
+          "Invalid date format",
+          res
+        );
+      }
+    } else {
+      selectedDate = new Date();
+    }
+
+    selectedDate.setHours(0, 0, 0, 0);
+
+    nextDay = new Date(selectedDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+  
+    
     const ticketData = await PurchaseLottery.findAll({
       attributes: ["marketId", "marketName"],
       where: {
         hidePurchase: false,
+        createdAt: {
+          [Op.gte]: selectedDate,
+          [Op.lt]: nextDay,
+        },
       },
     });
 
@@ -684,20 +718,10 @@ export const liveLotteries = async (req, res) => {
       whereConditions.userName = { [Op.like]: `%${search}%` };
     }
 
-    const { count, rows: purchaseLotteries } = await PurchaseLottery.findAndCountAll({
+    const  purchaseLotteries  = await PurchaseLottery.findAll({
       where: whereConditions,
-      limit: parseInt(limit),
-      offset: parseInt(offset),
     });
     
-    // const { count, rows: purchaseLotteries } = await PurchaseLottery.findAndCountAll({
-    //   where: {
-    //     marketId,
-    //     createdAt: { [Op.gte]: today },
-    //     resultAnnouncement: false,
-    //   },
-    // });
-
     if (!purchaseLotteries.length) {
       return apiResponseSuccess([], true, statusCode.success, "No bet history found", res);
     }

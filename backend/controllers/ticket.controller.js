@@ -74,14 +74,22 @@ export const geTicketRange = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const ticketData = await TicketRange.findAll({
-      where: {
-        date: {
-          [Op.gte]: today,
-        },
-        isWin: false,
-        isVoid: false,
+    const { search = "" } = req.query;
+    const whereCondition = {
+      date: {
+        [Op.gte]: today,
       },
+      isWin: false,
+      isVoid: false,
+    };
+
+    if (search) {
+      whereCondition.marketName = {
+        [Op.like]: `%${search}%`, 
+      };
+    }
+    const ticketData = await TicketRange.findAll({
+      where: whereCondition,
     });
 
     if (!ticketData || ticketData.length === 0) {

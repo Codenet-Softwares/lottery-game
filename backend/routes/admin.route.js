@@ -56,9 +56,9 @@ export const adminRoutes = (app) => {
 
   app.get('/api/admin/getAll-markets', authorize([string.Admin]), getAllMarkets)
 
-  app.get('/api/admin/dateWise-markets', validateDateQuery, customErrorHandler, authorize([string.Admin]), dateWiseMarkets)
+  app.get('/api/admin/dateWise-markets',authorize([string.Admin]), dateWiseMarkets)
 
-  app.get('/api/admin/get-markets', authorize([string.Admin]), getMarkets)
+  app.get('/api/admin/get-markets', authorize([string.Admin]), getMarkets)//worked in date filter
 
   app.get('/api/get-inactive-markets', authorize([string.Admin]), getInactiveMarket)
 
