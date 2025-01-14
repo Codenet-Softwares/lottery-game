@@ -648,12 +648,14 @@ export const updateMarketStatus = async (req, res) => {
 
 export const liveMarkets = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, search } = req.query;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     const offset = (page - 1) * limit;
+
+    const searchCondition = search ? { marketName: { [Op.like]: `%${search}%` } } : {};
 
     const { count, rows: ticketData } = await PurchaseLottery.findAndCountAll({
       attributes: ["marketId", "marketName", "gameName"],
@@ -662,6 +664,7 @@ export const liveMarkets = async (req, res) => {
           [Op.gte]: today,
         },
         resultAnnouncement: false,
+        ...searchCondition
       },
     });
 
