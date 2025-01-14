@@ -768,17 +768,8 @@ export const liveLotteries = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   const { userName, oldPassword, newPassword } = req.body;
-  try {
-    if (!userName || !oldPassword || !newPassword) {
-      return apiResponseErr(
-        null,
-        false,
-        statusCode.badRequest,
-        'userName, oldPassword, and newPassword are required',
-        res
-      );
-    }
 
+  try {
     const admin = await Admin.findOne({ where: { userName } });
 
     if (!admin) {
@@ -827,4 +818,5 @@ export const resetPassword = async (req, res) => {
     );
   }
 };
+
 
