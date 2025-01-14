@@ -1,4 +1,22 @@
 /* Full Page Container */
+.main-container-trash{
+
+  display: flex;
+  flex-direction: row;
+  width: 100%; /* Full width to allow space distribution */
+  height: 100%;
+  background: url("https://www.creativefabrica.com/wp-content/uploads/2023/01/19/Vintage-Crumpled-Paper-Background-58171796-1.png");
+  background-color: #f9f7f7;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  gap: 20px; /* Space between sidebar and content */
+
+
+
+}
+
 .trash-container {
   background: linear-gradient(135deg, #f8fbff, #dde7f0);
   height: 75vh;
@@ -77,9 +95,9 @@
 }
 
 /* Crumpled Paper Mode */
-.crumpled-paper {
+/* .crumpled-paper {
     display: flex;
-    flex-direction: row; /* Aligns sidebar and content horizontally */
+    flex-direction: row; 
   width: 90%;
   height: 90%;
   background: url("https://www.creativefabrica.com/wp-content/uploads/2023/01/19/Vintage-Crumpled-Paper-Background-58171796-1.png");
@@ -94,6 +112,22 @@
   animation: paperRise 0.8s ease-out forwards;
   overflow: hidden;
 
+} */
+
+
+/* Adjust container for sidebar and content separation */
+.crumpled-paper {
+  display: flex;
+  flex-direction: row;
+  width: 100%; /* Full width to allow space distribution */
+  height: 100%;
+  background: url("https://www.creativefabrica.com/wp-content/uploads/2023/01/19/Vintage-Crumpled-Paper-Background-58171796-1.png");
+  background-color: #f9f7f7;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  gap: 20px; /* Space between sidebar and content */
 }
 
 .crumpled-paper h3 {
@@ -183,29 +217,48 @@
 
 
 /* Sidebar for Deleted Markets */
-.market-sidebar {
+/* .market-sidebar {
     width: 300px;
-    height: 100%; /* Occupy full height */
-    background: rgba(255, 255, 255, 0.7); /* Frosted white effect */
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7); 
     padding: 20px;
     box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.1);
-    overflow-y: auto; /* Enables scrolling for long lists */
-    border-right: 1px solid #ccc; /* Subtle divider between sidebar and content */
-    position: absolute; /* Make it stay on the left */
+    overflow-y: auto; 
+    border-right: 1px solid #ccc; 
+    position: absolute; 
     left: 0;
     top: 0;
   }
-  
+   */
+
+   /* Sidebar styling */
+.market-sidebar {
+  flex: 1; 
+  max-width: 300px; 
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  padding: 20px;
+  position: absolute;
+  overflow-y: auto; 
+  box-shadow: inset 0px 4px 10px rgba(0, 0, 0, 0.2);
+  height: 100%;
+  left: 0;
+  top: 0;
+}
   /* Content Area for Crumpled Paper */
   .paper-content {
-    flex-grow: 1; /* Takes up remaining space */
-    display: flex;
+    flex-grow: 1; 
+    /* display: flex; */
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-left: 320px; /* Adjust margin to avoid overlap with sidebar */
+    margin-left: 350px; 
+    margin-right: 320px; 
+   margin-top: 5vw;
+   /* border: 2px solid red; */
   }
-  
+
+
 
 .market-sidebar h3 {
   font-size: 1.5rem;
@@ -213,6 +266,8 @@
   color: #333;
   overflow-y: none;
 }
+
+
 
 
 
@@ -242,4 +297,26 @@
   border: 2px solid #ffa500; /* Matching border */
   border-radius: 8px;
 }
+
+.no-markets-message {
+  text-align: center;
+  font-size: 18px;
+  color: #d9534f; /* Red color to highlight the message */
+  font-weight: bold;
+  background-color: #f8d7da; /* Light red background */
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.no-markets-message i {
+  margin-right: 10px; /* Space between icon and text */
+}
+
+
+
 

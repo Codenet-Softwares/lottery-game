@@ -12,7 +12,12 @@ import moment from "moment";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css"; // Import Bootstrap icons
 import "./MarketInsight.css";
-import { GetMarketTimings, GetPurchaseOverview,voidMarket, isActiveLottery } from "../../Utils/apiService";
+import {
+  GetMarketTimings,
+  GetPurchaseOverview,
+  voidMarket,
+  isActiveLottery,
+} from "../../Utils/apiService";
 import { useAppContext } from "../../contextApi/context";
 import { toast } from "react-toastify";
 const MarketInsight = () => {
@@ -24,8 +29,19 @@ const MarketInsight = () => {
   const [loading, setLoading] = useState(true);
   const [marketData, setMarketData] = useState([]);
   const [error, setError] = useState(null);
-  const [refresh, setRefresh] = useState(false)
+  const [refresh, setRefresh] = useState(false);
   const [filteredMarkets, setFilteredMarkets] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   // Updated function for toggling market status
   const handleMarketStatusToggle = async () => {
@@ -33,7 +49,10 @@ const MarketInsight = () => {
 
     try {
       showLoader();
-      const response = await isActiveLottery({ status: newStatus, marketId: selectedMarket.marketId }, true);
+      const response = await isActiveLottery(
+        { status: newStatus, marketId: selectedMarket.marketId },
+        true
+      );
       if (response.success) {
         setRefresh((prev) => !prev);
         setSelectedMarket((prevState) => ({
@@ -51,26 +70,21 @@ const MarketInsight = () => {
       hideLoader();
     }
   };
-  
-
-
-
 
   useEffect(() => {
     if (!refresh) {
       setFilteredMarkets(marketTimes); // Reset the filter when not active
     }
   }, [marketTimes]);
-  
 
-
-
-  console.log("refresh",refresh)
+  console.log("refresh", refresh);
   useEffect(() => {
     const fetchMarketTimings = async () => {
       showLoader();
       try {
-        const response = await GetMarketTimings();
+        const response = await GetMarketTimings({
+          search: debouncedSearchTerm
+        });
         if (response.success) {
           setMarketTimes(response.data);
         }
@@ -83,7 +97,13 @@ const MarketInsight = () => {
     };
 
     fetchMarketTimings();
-  }, [refresh]);
+  }, [refresh,debouncedSearchTerm]);
+
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+   
+  };
   // const fetchMarketData = async (marketId) => {
   //   setLoading(true);
   //   setError(null);
@@ -131,7 +151,6 @@ const MarketInsight = () => {
     }
   };
 
-
   // useEffect(() => {
   //   const marketId = "a0587cfe-5600-4675-8d13-00aff76246c1";
   //   fetchMarketData(marketId);
@@ -159,19 +178,20 @@ const MarketInsight = () => {
 
       fetchPurchasedTickets();
     }
-
-  }, [selectedMarket,refresh]); // Runs when selectedMarket changes
+  }, [selectedMarket, refresh]); // Runs when selectedMarket changes
 
   const handleisActive = async (id, status) => {
     try {
-      const response = await isActiveLottery({ status: status, marketId: id }, true);
-      setRefresh((prev) => !prev)
+      const response = await isActiveLottery(
+        { status: status, marketId: id },
+        true
+      );
+      setRefresh((prev) => !prev);
       console.log("Response:", response);
     } catch (error) {
       console.error("Error activating/deactivating lottery:", error);
     }
   };
-
 
   const handleMarketClick = (market) => {
     setSelectedMarket(market);
@@ -199,18 +219,17 @@ const MarketInsight = () => {
                 onClick={() => handleMarketClick(market)}
               >
                 <Card.Body>
-                
                   <Card.Title>{market.marketName}</Card.Title>
                   {market.isActive ? (
-                        <Badge bg="success" className="ms-2">
-                          Active
-                        </Badge>
-                      ) : (
-                        <Button variant="secondary" size="sm" className="ms-2">
-                          Inactive
-                        </Button>
-                      )}
-                 
+                    <Badge bg="success" className="ms-2">
+                      Active
+                    </Badge>
+                  ) : (
+                    <Button variant="secondary" size="sm" className="ms-2">
+                      Inactive
+                    </Button>
+                  )}
+
                   {/* <Badge bg="light" text="dark" className="mb-2">
                     {`ID: ${market.marketId.slice(-6).toUpperCase()}`}
                   </Badge> */}
@@ -235,17 +254,26 @@ const MarketInsight = () => {
         </div>
       </aside>
 
-
       {/* Main Content */}
       <main className="alt-main-content p-4">
+        {/* Search Bar */}
+        <div className="search-bar-container-custom d-flex justify-content-center mb-5">
+          <input
+            type="text"
+            className="form-control w-80"
+            placeholder="Search for a Lottery market..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+        </div>
 
         {showStats && selectedMarket ? (
           <div className="stats-popup">
             <h3 className="market-title text-center mb-4">
               {selectedMarket.marketName} Stats
             </h3>
-    {/* Switch for Market Status Filter */}
-    <div className="d-flex justify-content-end mb-3">
+            {/* Switch for Market Status Filter */}
+            <div className="d-flex justify-content-end mb-3">
               <div className="form-check form-switch">
                 <input
                   className="form-check-input"
@@ -254,7 +282,10 @@ const MarketInsight = () => {
                   checked={selectedMarket.isActive}
                   onChange={handleMarketStatusToggle}
                 />
-                <label className="form-check-label" htmlFor="flexSwitchCheckActive">
+                <label
+                  className="form-check-label"
+                  htmlFor="flexSwitchCheckActive"
+                >
                   {selectedMarket.isActive ? "Active" : "Inactive"}
                 </label>
               </div>
@@ -327,8 +358,8 @@ const MarketInsight = () => {
                         Start:{" "}
                         {selectedMarket.start_time
                           ? moment
-                            .utc(selectedMarket.start_time)
-                            .format("HH:mm")
+                              .utc(selectedMarket.start_time)
+                              .format("HH:mm")
                           : "N/A"}
                         | End:{" "}
                         {selectedMarket.end_time
@@ -383,7 +414,6 @@ const MarketInsight = () => {
                   Void
                 </button>
                 {/* {selectedMarket.isActive ? <button className="btn btn-danger" onClick={() => handleisActive(selectedMarket.marketId, false)}>Suspend</button> : <button className="btn btn-success" onClick={() => handleisActive(selectedMarket.marketId, true)}> Active</button>} */}
-                
               </div>
             </Row>
 

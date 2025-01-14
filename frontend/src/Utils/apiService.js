@@ -262,7 +262,7 @@ export async function AllActiveLotteryMarkets(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
     const response = await makeCall(
-      urls.allActiveLotteryMarket,
+     ` ${urls.allActiveLotteryMarket}?search=${body.search}`,
       callParams,
       isToast
     );
@@ -275,7 +275,12 @@ export async function AllActiveLotteryMarkets(body = {}, isToast = false) {
 export async function GetMarketTimings(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
-    const response = await makeCall(urls.getMarketTime, callParams, isToast);
+    const response = await makeCall(
+      
+     ` ${urls.getMarketTime}?search=${body.search}`, 
+      
+      
+      callParams, isToast);
     return response;
   } catch (error) {
     throw error;
@@ -420,7 +425,12 @@ export async function DeleteLiveBets(body = {}, isToast = false) {
 export async function DeletedLiveBetsMarkets(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
-    const response = await makeCall(urls.DeletedLiveBetsMarkets, callParams, isToast);
+    const response = await makeCall(
+      
+      `${urls.DeletedLiveBetsMarkets}?search=${body.search}`, 
+      
+      
+      callParams, isToast);
     return response;
   } catch (error) {
     throw error;
