@@ -11,6 +11,7 @@ import { Op, Sequelize } from 'sequelize';
 import UserRange from '../models/user.model.js';
 import PurchaseLottery from '../models/purchase.model.js';
 import LotteryResult from '../models/resultModel.js';
+import bcrypt from 'bcrypt';
 dotenv.config();
 
 export const createAdmin = async (req, res) => {
@@ -788,5 +789,58 @@ export const liveLotteries = async (req, res) => {
   }
 };
 
+
+export const resetPassword = async (req, res) => {
+  const { userName, oldPassword, newPassword } = req.body;
+
+  try {
+    const admin = await Admin.findOne({ where: { userName } });
+
+    if (!admin) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        'Admin with this username not found',
+        res
+      );
+    }
+
+    const isOldPasswordValid = await bcrypt.compare(oldPassword, admin.password);
+
+    if (!isOldPasswordValid) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        'Old password is incorrect',
+        res
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await Admin.update(
+      { password: hashedPassword },
+      { where: { userName } }
+    );
+
+    return apiResponseSuccess(
+      null,
+      true,
+      statusCode.success,
+      'Password reset successfully',
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
 
 
