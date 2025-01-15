@@ -165,7 +165,7 @@ export const lotteryMarketAnalysis = async (req, res) => {
     // Aggregate user data
     const userData = {};
     for (const purchase of rawData) {
-      const { userName, lotteryPrice, group, series, number, sem, marketName, marketId } = purchase;
+      const { userName, lotteryPrice, group, series, number, sem, marketName, marketId, purchaseId } = purchase;
 
       if (!userData[userName]) {
         userData[userName] = {
@@ -182,7 +182,7 @@ export const lotteryMarketAnalysis = async (req, res) => {
       const ticketService = new TicketService();
       const tickets = await ticketService.list(group, series, number, sem, marketId);
 
-      userData[userName].details.push({ sem, tickets, lotteryPrice });
+      userData[userName].details.push({ purchaseId, sem, tickets, lotteryPrice });
     }
 
     // Convert aggregated data to an array
