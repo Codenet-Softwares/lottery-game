@@ -38,7 +38,7 @@ ticketRoute(app);
 userRoute(app);
 ResultDeclarationModule(app);
 ExternalApiModule(app);
-voidGameRoute(app) 
+voidGameRoute(app)
 revokeGameRoute(app)
 deleteGameRoute(app)
 
@@ -128,6 +128,7 @@ sequelize
 
         for (const market of activeMarkets) {
           market.isActive = true;
+          market.hideMarketUser = true
           const response = await market.save();
           updateMarket.push(JSON.parse(JSON.stringify(response)));
         }
