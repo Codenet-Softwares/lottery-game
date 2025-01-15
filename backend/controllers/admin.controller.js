@@ -657,6 +657,13 @@ export const liveMarkets = async (req, res) => {
 
     const searchCondition = search ? { marketName: { [Op.like]: `%${search}%` } } : {};
 
+    const activeTicketData = await TicketRange.findAll({
+      attributes: ["marketId", "marketName", "gameName"],
+      where: {
+        isVoid: false,    
+      },
+    })
+    const marketIds = activeTicketData.map((data) => data.marketId);
     const { count, rows: ticketData } = await PurchaseLottery.findAndCountAll({
       attributes: ["marketId", "marketName", "gameName"],
       where: {
@@ -664,7 +671,8 @@ export const liveMarkets = async (req, res) => {
           [Op.gte]: today,
         },
         resultAnnouncement: false,
-        ...searchCondition
+        ...searchCondition,
+        marketId:marketIds
       },
     });
 
