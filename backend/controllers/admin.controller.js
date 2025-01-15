@@ -11,6 +11,7 @@ import { Op, Sequelize } from 'sequelize';
 import UserRange from '../models/user.model.js';
 import PurchaseLottery from '../models/purchase.model.js';
 import LotteryResult from '../models/resultModel.js';
+import bcrypt from 'bcrypt';
 dotenv.config();
 
 export const createAdmin = async (req, res) => {
@@ -403,19 +404,10 @@ export const getAllMarkets = async (req, res) => {
 export const dateWiseMarkets = async (req, res) => {
   try {
     const { date } = req.query;
-
-    if (!date) {
-      return apiResponseErr(
-        null,
-        false,
-        statusCode.badRequest,
-        "Date is required",
-        res
-      );
-    }
-
-    const selectedDate = new Date(date);
-    if (isNaN(selectedDate)) {
+    let selectedDate, nextDay
+    if(date){
+     selectedDate = new Date(date);
+     if (isNaN(selectedDate)) {
       return apiResponseErr(
         null,
         false,
@@ -424,9 +416,14 @@ export const dateWiseMarkets = async (req, res) => {
         res
       );
     }
+    }
+    else{
+     selectedDate = new Date();
 
+    }
+   
     selectedDate.setHours(0, 0, 0, 0);
-    const nextDay = new Date(selectedDate);
+     nextDay = new Date(selectedDate);
     nextDay.setDate(nextDay.getDate() + 1);
 
     const ticketData = await LotteryResult.findAll({
@@ -651,13 +648,22 @@ export const updateMarketStatus = async (req, res) => {
 
 export const liveMarkets = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, search } = req.query;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     const offset = (page - 1) * limit;
 
+    const searchCondition = search ? { marketName: { [Op.like]: `%${search}%` } } : {};
+
+    const activeTicketData = await TicketRange.findAll({
+      attributes: ["marketId", "marketName", "gameName"],
+      where: {
+        isVoid: false,    
+      },
+    })
+    const marketIds = activeTicketData.map((data) => data.marketId);
     const { count, rows: ticketData } = await PurchaseLottery.findAndCountAll({
       attributes: ["marketId", "marketName", "gameName"],
       where: {
@@ -665,6 +671,8 @@ export const liveMarkets = async (req, res) => {
           [Op.gte]: today,
         },
         resultAnnouncement: false,
+        ...searchCondition,
+        marketId:marketIds
       },
     });
 
@@ -792,5 +800,58 @@ export const liveLotteries = async (req, res) => {
   }
 };
 
+
+export const resetPassword = async (req, res) => {
+  const { userName, oldPassword, newPassword } = req.body;
+
+  try {
+    const admin = await Admin.findOne({ where: { userName } });
+
+    if (!admin) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        'Admin with this username not found',
+        res
+      );
+    }
+
+    const isOldPasswordValid = await bcrypt.compare(oldPassword, admin.password);
+
+    if (!isOldPasswordValid) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        'Old password is incorrect',
+        res
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await Admin.update(
+      { password: hashedPassword },
+      { where: { userName } }
+    );
+
+    return apiResponseSuccess(
+      null,
+      true,
+      statusCode.success,
+      'Password reset successfully',
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
 
 

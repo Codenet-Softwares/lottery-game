@@ -17,6 +17,7 @@ import { Op } from 'sequelize';
 import moment from 'moment';
 import { revokeGameRoute } from './routes/revoke.route.js';
 import { deleteGameRoute } from './routes/delete.route.js';
+import { getISTTime } from './utils/commonMethods.js';
 
 dotenv.config();
 const app = express();
@@ -37,7 +38,7 @@ ticketRoute(app);
 userRoute(app);
 ResultDeclarationModule(app);
 ExternalApiModule(app);
-voidGameRoute(app) 
+voidGameRoute(app)
 revokeGameRoute(app)
 deleteGameRoute(app)
 
@@ -53,34 +54,36 @@ UserRange.hasMany(PurchaseLottery, {
   as: 'purchases',
 });
 
+const clients = new Set();
+
 // SSE endpoint
-// const clients = [];
-// app.get('/events', (req, res) => {
-//   console.log("Client connected to events");
+app.get('/events', (req, res) => {
+  console.log("[SSE] Client connected to events");
 
-//   res.setHeader('Content-Type', 'text/event-stream');
-//   res.setHeader('Cache-Control', 'no-cache');
-//   res.setHeader('Connection', 'keep-alive');
-//   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-//   res.flushHeaders(); // Ensure headers are sent immediately
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000'); // change with server URl when deploy
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.flushHeaders();
 
-//   // Add the connected client to the list
-//   clients.push(res);
+  clients.add(res);
+  console.log(`[SSE] Connected clients: ${clients.size}`);
 
-//   // Send an initial message
-//   const initialMessage = { message: "SSE service is connected successfully!" };
-//   res.write(`data: ${JSON.stringify(initialMessage)}\n\n`);
+  const initialMessage = { message: "SSE service is connected successfully!" };
+  res.write(`data: ${JSON.stringify(initialMessage)}\n\n`);
 
-//   // Handle client disconnection
-//   req.on('close', () => {
-//     console.log('Client disconnected');
-//     const index = clients.indexOf(res);
-//     if (index !== -1) {
-//       clients.splice(index, 1); // Remove the client from the list
-//     }
-//     res.end(); // End the response
-//   });
-// });
+  const heartbeatInterval = setInterval(() => {
+    res.write(':\n\n'); // Keep the connection alive
+  }, 2000);
+
+  req.on('close', () => {
+    console.log('[SSE] Client disconnected');
+    clearInterval(heartbeatInterval);
+    clients.delete(res);
+  });
+});
 
 
 sequelize
@@ -92,44 +95,57 @@ sequelize
     });
 
     // Function to get current time in IST
-    // const getISTTime = () => {
-    //   const currentTime = new Date();
-    //   const istOffset = 5 * 60 + 30; // IST is UTC + 5:30
-    //   const localTime = new Date(currentTime.getTime() + istOffset * 60 * 1000);
-    //   return localTime;
-    // };
 
-    // cron.schedule('*/2 * * * * *', async () => {
-    //   try {
-    //     const currentTime = getISTTime();
+    cron.schedule('*/2 * * * * *', async () => {
+      try {
+        const currentTime = getISTTime();
 
-    //     const markets = await TicketRange.findAll({
-    //       where: {
-    //         isActive: true,
-    //       },
-    //     });
+        const suspendMarkets = await TicketRange.findAll({
+          where: {
+            isActive : true,
+            [Op.or]: [
+              { start_time: { [Op.gt]: currentTime } }, 
+              { end_time: { [Op.lt]: currentTime } }   
+            ]
+          },
+        });
 
-    //     let updateMarket = [];
-    //     for (const market of markets) {
-    //       if (currentTime >= new Date(market.end_time)) {
-    //         market.isActive = false; // Deactivate market if the time has passed
-    //         const response = await market.save();
-    //         console.log("Markets Inactivated:", JSON.stringify(response, null, 2));
-    //         console.log(`Market ${response.marketName} has been deactivated.`);
-    //         updateMarket.push(JSON.parse(JSON.stringify(response)));
-    //       }
-    //     }
-    //     // Optionally send a message to clients if needed
-    //     clients.forEach((client) => {
-    //       client.write(`data: ${JSON.stringify(updateMarket)}\n\n`);
-    //     });
+        const updateMarket = [];
 
-    //     console.log(`Message sent: ${JSON.stringify(updateMarket)}\n`);
+        for (const market of suspendMarkets) {
+          market.isActive = false;
+          const response = await market.save();
+          updateMarket.push(JSON.parse(JSON.stringify(response)));
+        }
 
-    //   } catch (error) {
-    //     console.error('Error checking market statuses:', error);
-    //   }
-    // });
+        const activeMarkets = await TicketRange.findAll({
+          where: {
+            isActive : false,
+            start_time: { [Op.lte]: currentTime },
+            end_time: { [Op.gte]: currentTime },
+          },
+        });
+
+        for (const market of activeMarkets) {
+          market.isActive = true;
+          market.hideMarketUser = true
+          const response = await market.save();
+          updateMarket.push(JSON.parse(JSON.stringify(response)));
+        }
+
+        clients.forEach((client) => {
+          try {
+            client.write(`data: ${JSON.stringify(updateMarket)}\n\n`);
+          } catch (err) {
+            console.error('[SSE] Error sending data to client:', err);
+          }
+        });
+
+        console.log(`[SSE] Updates broadcasted: ${JSON.stringify(updateMarket)}`);
+      } catch (error) {
+        console.error('Error checking market statuses:', error);
+      }
+    });
 
   })  
   .catch((err) => {

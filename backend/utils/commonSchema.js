@@ -37,18 +37,36 @@ export const validateTicketRange = [
       }
       return true;
     }),
-  body('series')
-  .notEmpty().withMessage('Series is required')
+    body('series')
+    .notEmpty()
+    .withMessage('Series is required')
     .custom((series) => {
+      const invalidLetters = ['I', 'F', 'O'];
       const seriesStartCode = series.start.charCodeAt(0);
       const seriesEndCode = series.end.charCodeAt(0);
-      const seriesRange = seriesEndCode - seriesStartCode + 1;
 
-      if (seriesRange < 10) {
-        throw new Error('Series must have a minimum range of 10');
+      if (
+        series.start < 'A' || 
+        series.start > 'Z' || 
+        series.end < 'A' || 
+        series.end > 'Z'
+      ) {
+        throw new Error('Series must include uppercase letters only (A-Z) excluding I,F,O.');
       }
+
+      if (invalidLetters.includes(series.start) || invalidLetters.includes(series.end)) {
+        throw new Error(`Series cannot include the letters ${invalidLetters.join(', ')}.`);
+      }
+
+      const seriesRange = seriesEndCode - seriesStartCode + 1;
+      if (seriesRange < 10) {
+        throw new Error('Series must have a minimum range of 10 letters.');
+      }
+
       return true;
-    }).withMessage('Series must have a start and end range'),
+    }),
+
+
   
   body('number.min').notEmpty().withMessage('Number min is required')
     .isLength({ min: 5, max: 5 })
@@ -422,4 +440,22 @@ export const validateTrashMarket = [
 export const validateRevokeLiveBet = [
   body('trashMarketId')
     .notEmpty().withMessage('trashMarketId ID is required')
+];
+
+export const validateResetPassword = [
+  body('userName')
+    .notEmpty()
+    .withMessage('Username is required')
+    .isLength({ min: 3 })
+    .withMessage('Username must be at least 3 characters long'),
+  
+  body('oldPassword')
+    .notEmpty()
+    .withMessage('Old password is required'),
+  
+  body('newPassword')
+    .notEmpty()
+    .withMessage('New password is required')
+    .isLength({ min: 8 })
+    .withMessage('New password must be at least 8 characters long')
 ];
