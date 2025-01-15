@@ -39,7 +39,7 @@ const PurchasedTickets = () => {
 
   useEffect(() => {
     const fetchMarketData = async () => {
-      try {
+   
         const response = await GetPurchaseHistoryMarketTimings();
 
         if (response?.success) {
@@ -58,10 +58,7 @@ const PurchasedTickets = () => {
           console.error("Failed to fetch markets");
           // Handle unsuccessful fetch scenario here, if needed
         }
-      } catch (error) {
-        console.error("Error fetching markets:", error);
-        // Handle fetch failure scenario here, if needed
-      }
+    
     };
 
     fetchMarketData();
@@ -70,8 +67,9 @@ const PurchasedTickets = () => {
   // Create debounced fetchPurchasedLotteryTickets function
   const fetchPurchasedLotteryTickets = useCallback(
     debounce(async (searchTerm) => {
-      setLoader(true);
-      try {
+      if (!selectedMarketId) return; 
+      // setLoader(true);
+  
         const response = await PurchasedTicketsHistory({
           marketId: selectedMarketId,
           page: pagination.page,
@@ -82,10 +80,10 @@ const PurchasedTickets = () => {
         if (response?.success) {
           setPurchasedTickets(response.data || []);
           setPagination({
-            page: response.pagination.page,
-            limit: response.pagination.limit,
-            totalPages: response.pagination.totalPages,
-            totalItems: response.pagination.totalItems,
+            page: response?.pagination?.page || 1,
+            limit: response?.pagination?.limit || 10 ,
+            totalPages: response?.pagination?.totalPages,
+            totalItems: response?.pagination?.totalItems,
           });
           dispatch({
             type: "PURCHASED_LOTTERY_TICKETS",
@@ -94,9 +92,7 @@ const PurchasedTickets = () => {
         } else {
           console.error("Failed to fetch purchased tickets");
         }
-      } catch (error) {
-        console.error("Error fetching purchased tickets:", error);
-      }
+      
       setLoader(false);
     }, 500),
     [selectedMarketId, pagination.page, pagination.limit, dispatch]
@@ -104,6 +100,7 @@ const PurchasedTickets = () => {
 
   // Effect for fetching purchased tickets when selectedMarketId, pagination, or searchTerm changes
   useEffect(() => {
+    // if (!selectedMarketId) return; 
     const fetchData = async () => {
       setLoading(true);
       showLoader();
@@ -173,9 +170,9 @@ const PurchasedTickets = () => {
     pagination.totalItems
   );
 
-  if (loading) {
-    return null;
-  }
+  // if (loading) {
+  //   return null;
+  // }
 
   return (
     <div
@@ -267,8 +264,8 @@ const PurchasedTickets = () => {
             <tr>
               <td colSpan="6">
                 <div className="d-flex justify-content-center align-items-center">
-                  <Spinner animation="border" variant="primary" />
-                  <span className="ms-2">Loading tickets...</span>
+                  {/* <Spinner animation="border" variant="primary" /> */}
+                  <span className="ms-2">No Tickets Found As There Are No Markets Are Available </span>
                 </div>
               </td>
             </tr>
@@ -341,14 +338,22 @@ const PurchasedTickets = () => {
           )}
         </tbody>
       </Table>
-      <Pagination
-        currentPage={pagination.page}
-        totalPages={pagination.totalPages}
-        handlePageChange={handlePageChange}
-        startIndex={startIndex}
-        endIndex={endIndex}
-        totalData={pagination.totalItems}
-      />
+
+      
+      {purchasedTickets.length > 0 && (
+  <Pagination
+  currentPage={pagination.page}
+  totalPages={pagination.totalPages}
+  handlePageChange={handlePageChange}
+  startIndex={startIndex}
+  endIndex={endIndex}
+  totalData={pagination.totalItems}
+/>
+
+
+
+      )}
+    
     </div>
   );
 };
