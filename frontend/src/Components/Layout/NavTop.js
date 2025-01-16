@@ -71,17 +71,6 @@ const NavTop = () => {
                 <span>Market Overview</span>
               </Link>
 
-              {/* <Link
-                to="/lucky-hour"
-                className={`nav-link lucky-hour ${
-                  activeLink === "/lucky-hour" ? "active-link" : ""
-                }`}
-                onClick={() => handleClick("/lucky-hour")}
-              >
-                <i className="fas fa-clock nav-icon" />
-                <span>Lucky Hour</span>
-              </Link> */}
-
               <Link
                 to="/results"
                 className={`nav-link results ${
@@ -168,6 +157,17 @@ const NavTop = () => {
               >
                 <i className="fas fa-trash-alt nav-icon"></i>
                 <span>Trash</span>
+              </Link>
+
+              <Link
+                to="/reset-password"
+                className={`nav-link reset-icon ${
+                  activeLink === "/reset-password" ? "active-link" : ""
+                }`}
+                onClick={() => handleClick("/reset-password")}
+              >
+                <i className="fas fa-key nav-icon"></i>
+                <span>Reset Password</span>
               </Link>
             </div>
 

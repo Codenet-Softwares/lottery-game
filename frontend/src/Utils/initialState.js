@@ -14,3 +14,12 @@ export const initialCreateMarketFormStates = {
     seriesOptions: [], // Add seriesOptions
     numberOptions: [], // Add numberOptions
 };
+
+export const getAdminResetPasswordInitialState = (body = {}) => {
+    return {
+      userName: body.userName || "", 
+      oldPassword: body.oldPassword || "", 
+      newPassword: body.newPassword || "", 
+      confirmPassword: body.confirmPassword || "", 
+    };
+  };

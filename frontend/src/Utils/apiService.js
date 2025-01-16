@@ -489,3 +489,19 @@ export async function RevokeMarketsDelete(body = {}, isToast = false) {
     throw error;
   }
 }
+
+
+export async function ResetAdminPassword(body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.POST, body, isToast);
+    const response = await makeCall(
+      urls.resetPasswordAdmin,
+
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}

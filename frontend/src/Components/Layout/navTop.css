@@ -92,6 +92,10 @@
 .nav-options .nav-link.trash-icon {
   color: #f44336; /* Red for Trash - Bold and clear */
 }
+
+.nav-options .nav-link.reset-icon {
+  color: hsl(238, 91%, 65%); /* Red for Trash - Bold and clear */
+}
 .nav-options .nav-link.active-icon{
   color: rgb(11, 134, 32);
 }
