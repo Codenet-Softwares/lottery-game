@@ -9,19 +9,19 @@ import Trashmarketdetails from "./Trashmarketdetails";
 const Trash = () => {
   const [isBinOpen, setIsBinOpen] = useState(false);
   const [markets, setMarkets] = useState([]);
-  const [selectedMarketId, setSelectedMarketId] = useState(null); // Track selected marketId
+  const [selectedMarketId, setSelectedMarketId] = useState(null);
   const [selectedMarketDetails, setSelectedMarketDetails] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchMarketTerm, setSearchMarketTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-   const [debouncedSearchMarketTerm, setDebouncedSearchMarketTerm] = useState("");
+  const [debouncedSearchMarketTerm, setDebouncedSearchMarketTerm] = useState("");
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
     totalPages: 0,
     totalItems: 0,
   });
-  const [noMarketsFound, setNoMarketsFound] = useState(false)
+  const [noMarketsFound, setNoMarketsFound] = useState(false); // State to track no markets found
 
   // Debounce search term
   useEffect(() => {
@@ -32,21 +32,20 @@ const Trash = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchMarketTerm(searchMarketTerm);
+    }, 500);
 
-   useEffect(() => {
-      const timer = setTimeout(() => {
-        setDebouncedSearchMarketTerm(searchMarketTerm);
-      }, 500);
-  
-      return () => clearTimeout(timer);
-    }, [searchMarketTerm]);
+    return () => clearTimeout(timer);
+  }, [searchMarketTerm]);
 
-    const handleSearchMarketChange = (e) => {
-      setSearchMarketTerm(e.target.value); // Update the market list search term
-    };
+  const handleSearchMarketChange = (e) => {
+    setSearchMarketTerm(e.target.value);
+  };
 
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value); // Update the search term
+    setSearchTerm(e.target.value);
   };
 
   // Fetch markets from the API
@@ -57,11 +56,10 @@ const Trash = () => {
       });
       if (response.data && response.data.length > 0) {
         setMarkets(response.data);
-        setNoMarketsFound(false)
+        setNoMarketsFound(false); // Reset no markets found state
       } else {
         setMarkets([]);
-        setNoMarketsFound(true)
-        console.warn("No deleted markets found.");
+        setNoMarketsFound(true); // Set no markets found state
       }
     } catch (error) {
       console.error("Error fetching markets:", error);
@@ -70,7 +68,7 @@ const Trash = () => {
 
   // Fetch market details based on selected marketId, search and pagination
   const fetchMarketDetails = async (marketId) => {
-    if (!marketId) return; // Exit if no marketId is selected
+    if (!marketId) return;
 
     try {
       const response = await DeletedLiveBetsMarketsDetails({
@@ -103,17 +101,19 @@ const Trash = () => {
     pagination.page,
     pagination.limit,
   ]);
+
   // Refetch markets if search term is cleared
   useEffect(() => {
     if (debouncedSearchMarketTerm === "") {
-      fetchMarkets(); // Ensure markets are fetched if no market list search term
+      fetchMarkets();
     }
   }, [debouncedSearchMarketTerm]);
+
   // Refetch markets if search term is cleared
   useEffect(() => {
     if (debouncedSearchTerm === "") {
       if (selectedMarketId !== null) {
-        fetchMarketDetails(selectedMarketId); // Ensure details are fetched if no search term
+        fetchMarketDetails(selectedMarketId);
       }
     }
   }, [debouncedSearchTerm]);
@@ -123,15 +123,15 @@ const Trash = () => {
     if (isBinOpen) {
       fetchMarkets();
     } else {
-      setSelectedMarketDetails(null); // Reset selected details when the bin is closed
+      setSelectedMarketDetails(null);
     }
-  }, [isBinOpen,debouncedSearchMarketTerm]);
+  }, [isBinOpen, debouncedSearchMarketTerm]);
 
   const openCrumpledPaper = () => setIsBinOpen(true);
   const closeCrumpledPaper = () => {
     setIsBinOpen(false);
-    setSelectedMarketDetails(null); // Reset details on closing the bin
-    setSelectedMarketId(null); // Reset the selected market ID
+    setSelectedMarketDetails(null);
+    setSelectedMarketId(null);
   };
 
   const startIndex = (pagination.page - 1) * pagination.limit + 1;
@@ -164,17 +164,17 @@ const Trash = () => {
             className="search-bar-container-shrink-2"
             style={{
               position: "absolute",
-              top: "-10px", // Adjust the distance from the top as needed
+              top: "-10px",
               left: "50%",
-              transform: "translateX(-50%)", // This centers it horizontally
-              width: "50%", // Take up a larger width but still centered
-              zIndex: 10, // Ensures it’s on top
-              display: "flex", // Flexbox for better control
-              justifyContent: "center", // Centers the content inside the div
-              backgroundColor: "#f1f7ff", // Light background color for the 'merged' effect
-              padding: "10px", // Padding around the search bar
-              borderRadius: "50px", // Pill shape
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Adds subtle shadow for a more refined look
+              transform: "translateX(-50%)",
+              width: "50%",
+              zIndex: 10,
+              display: "flex",
+              justifyContent: "center",
+              backgroundColor: "#f1f7ff",
+              padding: "10px",
+              borderRadius: "50px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
             }}
           >
             <input
@@ -184,19 +184,19 @@ const Trash = () => {
               value={searchMarketTerm}
               onChange={handleSearchMarketChange}
               style={{
-                width: "100%", // Full width of the container
-                padding: "10px 20px", // Adds more padding for a pill shape
-                borderRadius: "50px", // Pill shape
-                border: "1px solid #4682B4", // Steel Blue border
-                backgroundColor: "#f1f7ff", // Light blue background for a professional look
-                color: "#4682B4", // Text color matches the button color
-                fontSize: "16px", // Adjust text size
-                outline: "none", // Removes default focus outline
-                boxShadow: "none", // Removes shadow from input
-                transition: "all 0.3s ease-in-out", // Smooth transition for hover and focus
+                width: "100%",
+                padding: "10px 20px",
+                borderRadius: "50px",
+                border: "1px solid #4682B4",
+                backgroundColor: "#f1f7ff",
+                color: "#4682B4",
+                fontSize: "16px",
+                outline: "none",
+                boxShadow: "none",
+                transition: "all 0.3s ease-in-out",
               }}
-              onFocus={(e) => (e.target.style.borderColor = "#1e5c8a")} // Focus color change
-              onBlur={(e) => (e.target.style.borderColor = "#4682B4")} // Reverts border on blur
+              onFocus={(e) => (e.target.style.borderColor = "#1e5c8a")}
+              onBlur={(e) => (e.target.style.borderColor = "#4682B4")}
             />
           </div>
           <div className="crumpled-paper">
@@ -211,8 +211,8 @@ const Trash = () => {
                     key={index}
                     className="market-item-custom"
                     onClick={() => {
-                      setSelectedMarketId(market.marketId); // Set the selected marketId
-                      fetchMarketDetails(market.marketId); // Fetch details immediately
+                      setSelectedMarketId(market.marketId);
+                      fetchMarketDetails(market.marketId);
                     }}
                   >
                     {market.marketName}
@@ -220,9 +220,7 @@ const Trash = () => {
                 ))}
               </ul>
               {noMarketsFound && (
-                 <div className="no-markets-message">
-                 <i className="fas fa-exclamation-circle"></i> No markets with this name exist.
-               </div>
+                <p className="no-markets-found">No markets with this name exist.</p>
               )}
             </aside>
             <div className="paper-content">

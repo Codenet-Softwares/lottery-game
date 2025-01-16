@@ -1,12 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import Search from '../../Search/Search';
+import React, { useEffect, useState } from "react";
+import Search from "../../Search/Search";
 import "./searchLottery.css";
-import { Card, Container } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { getLotteryRange } from '../../../Utils/getInitialState';
-import { LotteryRange } from '../../../Utils/apiService';
-import { generateGroups, generateNumbers, generateSeries } from '../../../Utils/helper';
-import { useAppContext } from '../../../contextApi/context';
+import { Card, Container } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { getLotteryRange } from "../../../Utils/getInitialState";
+import { LotteryRange } from "../../../Utils/apiService";
+import {
+  generateGroups,
+  generateNumbers,
+  generateSeries,
+} from "../../../Utils/helper";
+import { useAppContext } from "../../../contextApi/context";
 
 const SearchLottery = () => {
   const [lotteryRange, setLotteryRange] = useState(getLotteryRange);
@@ -16,10 +20,14 @@ const SearchLottery = () => {
   const [filteredGroups, setFilteredGroups] = useState([]);
   const [filteredSeries, setFilteredSeries] = useState([]);
   const { showLoader, hideLoader, isLoading } = useAppContext();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
   // Function to handle fetching and setting lottery range and market data
   const handleLotteryRange = async () => {
-    const data = await LotteryRange();
+    const data = await LotteryRange({
+      search: debouncedSearchTerm,
+    });
     SetAllActiveMarket(data?.data);
     setFilteredMarket(data?.data[0]);
     setLotteryRange({
@@ -32,9 +40,28 @@ const SearchLottery = () => {
     });
 
     // Initialize the filtered numbers based on the fetched range
-        setFilteredNumbers(generateNumbers(data.data[0]?.number_start, data.data[0]?.number_end));
-        setFilteredGroups(generateGroups(data.data[0]?.group_start, data.data[0]?.group_end));
-        setFilteredSeries(generateSeries(data.data[0]?.series_start, data.data[0]?.series_end));
+    setFilteredNumbers(
+      generateNumbers(data.data[0]?.number_start, data.data[0]?.number_end)
+    );
+    setFilteredGroups(
+      generateGroups(data.data[0]?.group_start, data.data[0]?.group_end)
+    );
+    setFilteredSeries(
+      generateSeries(data.data[0]?.series_start, data.data[0]?.series_end)
+    );
+  };
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
   };
 
   useEffect(() => {
@@ -49,7 +76,7 @@ const SearchLottery = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [debouncedSearchTerm]);
 
   const handleMarketClick = (market) => {
     // Filter the selected market object from allActiveMarket
@@ -67,16 +94,25 @@ const SearchLottery = () => {
     });
 
     // Initialize the filtered numbers based on the fetched range
-        setFilteredNumbers(generateNumbers(filteredObject.number_start, filteredObject.number_end));
-        setFilteredGroups(generateGroups(filteredObject.group_start, filteredObject.group_end));
-        setFilteredSeries(generateSeries(filteredObject.series_start, filteredObject.series_end));
+    setFilteredNumbers(
+      generateNumbers(filteredObject.number_start, filteredObject.number_end)
+    );
+    setFilteredGroups(
+      generateGroups(filteredObject.group_start, filteredObject.group_end)
+    );
+    setFilteredSeries(
+      generateSeries(filteredObject.series_start, filteredObject.series_end)
+    );
   };
 
   return (
     <Container fluid className="alt-dashboard-container">
       {/* Sidebar */}
       <aside className="alt-sidebar p-4">
-                <h5 className="text-center text-white" style={{ fontWeight: "800", letterSpacing: "1px" }}>
+        <h5
+          className="text-center text-white"
+          style={{ fontWeight: "800", letterSpacing: "1px" }}
+        >
           Lottery Markets
         </h5>
         <div className="market-card-grid">
@@ -85,7 +121,11 @@ const SearchLottery = () => {
               <Card
                 key={market.id}
                 className="market-card"
-                onClick={() => handleMarketClick(market)}
+                onClick={() => {
+                  handleMarketClick(market);
+                  setFilteredMarket(null); // Reset filtered market
+                  setTimeout(() => setFilteredMarket(market), 0); // Simulate reload
+                }}
               >
                 <Card.Body>
                   <Card.Title>{market.marketName}</Card.Title>
@@ -97,7 +137,10 @@ const SearchLottery = () => {
               className="d-flex justify-content-center align-items-center"
               style={{ minHeight: "480px", width: "100%" }}
             >
-                            <h4 className="text-center bg-white p-5 rounded-5" style={{ color: "#2b3a67", fontWeight: "900" }}>
+              <h4
+                className="text-center bg-white p-5 rounded-5"
+                style={{ color: "#2b3a67", fontWeight: "900" }}
+              >
                 No <br />
                 Market <br />
                 Available
@@ -109,12 +152,34 @@ const SearchLottery = () => {
 
       {/* Main Content */}
       <main className="alt-main-content p-4">
+        <div className="search-bar-container-custom d-flex justify-content-center "
+           style={{
+            position: "relative",
+            zIndex: "3",
+          }}
+        >
+          <input
+            type="text"
+            className="form-control w-80"
+            placeholder="Search for a Lottery markets for lottery Tickets..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+        </div>
         {filteredMarket ? (
-          <Card className="welcome-card shadow-sm">
+          <Card className="welcome-card shadow-sm"
+          style={{
+            marginTop: "-40px",
+            borderRadius: "0 0 20px 20px",
+            zIndex: "1",
+            position: "relative",
+          }}
+          
+          >
             <Card.Body>
               {/* Display Market Name Above the Form */}
               <div className="text-center mb-4">
-                <h2
+                {/* <h2
                   className="mb-1"
                   style={{
                     color: "#4682B4",
@@ -123,12 +188,21 @@ const SearchLottery = () => {
                   }}
                 >
                   🔍 Search Lottery Tickets for {filteredMarket.marketName}
-                </h2>
+                </h2> */}
               </div>
-
+              <h2
+                className="mb-1"
+                style={{
+                  color: "#4682B4",
+                  fontWeight: "bold",
+                  letterSpacing: "1px",
+                }}
+              >
+                🔍 Search Lottery Tickets for {filteredMarket.marketName}
+              </h2>
               {/* Pass filtered market and other props to Search component */}
               <Search
-                marketId={filteredMarket.marketId} 
+                marketId={filteredMarket.marketId}
                 filteredNumbers={filteredNumbers}
                 filteredGroups={filteredGroups}
                 filteredSeries={filteredSeries}

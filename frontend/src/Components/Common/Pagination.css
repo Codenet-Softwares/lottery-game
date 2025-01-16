@@ -1,0 +1,70 @@
+.white_box {
+  background: hsl(200, 18%, 46%);         
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-custom .page-item {
+  margin: 0 5px;
+}
+
+.pagination-custom .page-link {
+  border: none;
+  border-radius: 20px;
+  color: #fff;
+  padding: 8px 16px;
+  font-size: 14px;
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+  transition: all 0.3s ease;
+}
+
+.pagination-custom .page-link.btn-gradient:hover {
+  background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%);
+  transform: scale(1.05);
+}
+
+.pagination-custom .page-link:disabled {
+  background: #d3d3d3;
+  color: #8a8a8a;
+  cursor: not-allowed;
+}
+
+.text-muted {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.shadow {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .pagination-custom .page-link {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+.entries-info {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2c3e50; /* Darker text for contrast */
+  background: hsl(213, 8%, 74%); /* Slightly lighter background for readability */
+  padding: 12px 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 10px; /* Add some spacing from other elements */
+}
+
+.entries-info:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.entries-highlight {
+  color: #2575fc; /* Maintain the blue highlight for emphasis */
+  font-weight: bold;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Enhanced shadow effect for visibility */
+}

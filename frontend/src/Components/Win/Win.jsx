@@ -3,20 +3,33 @@ import { Accordion, Button, Form } from "react-bootstrap";
 import { useAppContext } from "../../contextApi/context";
 import { AllActiveLotteryMarkets, CustomWining } from "../../Utils/apiService";
 import strings from "../../Utils/constant/stringConstant";
+import "./Win.css";
 
 const Win = () => {
-  const { store, dispatch, showLoader, hideLoader, isLoading } = useAppContext();
+  const { store, dispatch, showLoader, hideLoader, isLoading } =
+    useAppContext();
   const drawTimes = store.drawTimes || [];
   // const [loading, setLoading] = useState(true);
 
   const [prizes, setPrizes] = useState({});
   const [allActiveMarket, setAllActiveMarket] = useState([]);
   const [errors, setErrors] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   useEffect(() => {
     const fetchData = async () => {
       showLoader();
       try {
-        await handleGetAllLotteryMarket(); 
+        await handleGetAllLotteryMarket();
       } catch (error) {
         console.error("Error fetching lottery markets:", error);
       } finally {
@@ -25,7 +38,7 @@ const Win = () => {
     };
 
     fetchData();
-  }, []);
+  }, [debouncedSearchTerm]);
   useEffect(() => {
     if (allActiveMarket.length > 0) {
       const initialPrizes = allActiveMarket.reduce((acc, market) => {
@@ -46,7 +59,9 @@ const Win = () => {
 
   const handleGetAllLotteryMarket = async () => {
     try {
-      const allmarket = await AllActiveLotteryMarkets();
+      const allmarket = await AllActiveLotteryMarkets({
+        search: debouncedSearchTerm
+      });
       console.log("allmarket", allmarket);
       setAllActiveMarket(allmarket.data);
     } catch (error) {
@@ -56,9 +71,14 @@ const Win = () => {
 
   console.log("prizeData", prizes);
 
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+   
+  };
+
   // Validation function to check for special characters
   const validateInput = (value) => {
-    const invalidCharacters = /[-*#+=@_]/; 
+    const invalidCharacters = /[-*#+=@_]/;
     return !invalidCharacters.test(value);
   };
 
@@ -184,8 +204,8 @@ const Win = () => {
           `API call successful for ${resultArray.prizeCategory}:`,
           response
         );
-         // Refresh the active markets list after a successful submission
-      await handleGetAllLotteryMarket();
+        // Refresh the active markets list after a successful submission
+        await handleGetAllLotteryMarket();
       } catch (error) {
         console.error(
           `API call failed for ${resultArray.prizeCategory}:`,
@@ -232,7 +252,7 @@ const Win = () => {
           boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <h2
+        {/* <h2
           className="mb-1"
           style={{
             color: "#4682B4",
@@ -242,7 +262,16 @@ const Win = () => {
           }}
         >
           🎉 Lottery Draw Times and Rankings 🎉
-        </h2>
+        </h2> */}
+        <div className="search-bar-container-win d-flex justify-content-center mb-2">
+          <input
+            type="text"
+            className="form-control w-80"
+            placeholder="Search for Win Lottery market..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+        </div>
       </div>
 
       <div

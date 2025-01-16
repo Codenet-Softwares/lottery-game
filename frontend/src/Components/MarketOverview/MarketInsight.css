@@ -178,3 +178,26 @@
 .ticket-number:hover {
   background-color: #cce4f7;
 }
+
+.search-bar-container-custom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* border: 2px solid red; */
+  
+}
+
+.search-bar-container-custom input {
+  font-size: 1rem;
+  padding: 0.75rem;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  width: 170%;
+  max-width: 2000px;
+  top: 20px;
+}
+
+.search-bar-container-custom input:focus {
+  border-color: #3f4a85;
+  box-shadow: 0 0 5px rgba(63, 74, 133, 0.5);
+}

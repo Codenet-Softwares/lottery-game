@@ -2,11 +2,8 @@ class UrlConstant {
   constructor() {}
   //url was commented
 
-  //url_dev = "https://lottery.server.dummydoma.in/api";
-
- // url_dev = "https://lottery.server.dummydoma.in/api";
-
-   url_dev = "http://localhost:8080/api";
+  // url_dev = "https://lottery.server.dummydoma.in/api";
+  url_dev = "http://localhost:8080/api";
 
   admin = "admin";
   login = `${this.url_dev}/login`;
@@ -43,7 +40,8 @@ class UrlConstant {
   DeleteLiveBets = `${this.url_dev}/delete-liveBet-lottery`;
   DeletedLiveBetsMarkets= `${this.url_dev}/get-trash-market`;
   LiveBetsMarketsDetailsDeleted=`${this.url_dev}/get-trash-bet`;
-  TrashMarketDetailsDelete = `${this.url_dev}/delete-trash`
+  TrashMarketDetailsDelete = `${this.url_dev}/delete-trash`;
+  RevokeDelete =  `${this.url_dev}/revoke-live-market`
 }
 
 const urls = new UrlConstant();

@@ -1,78 +1,158 @@
 .market-details-container {
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .market-details-title {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-    text-align: center;
-    color: #4682b4;
-  }
-  
-  .frost-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    
-  }
-  
-  .frost-table th,
-  .frost-table td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: center;
-  }
-  
-  .frost-table th {
-    background: rgba(70, 130, 180, 0.8);
-    color: white;
-  }
-  
-  .tickets-button {
-    background-color: #4682b4;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-  
-  .tickets-button:hover {
-    background-color: #356889;
-  }
-  
-  .tickets-dropdown-container {
-    background: rgba(255, 255, 255, 0.9);
-  }
-  
-  .tickets-dropdown {
-    max-height: 100px;
-    overflow-y: scroll;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background: #f0f8ff;
-  }
-  
-  .ticket-item {
-    padding: 5px 0;
-  }
-  
-  .ticket-item:not(:last-child) {
-    border-bottom: 1px solid #ddd;
-  }
-  .delete-icon {
-    color: #ff4d4f;
-    cursor: pointer;
-    font-size: 20px;
-    transition: color 0.3s ease;
-  }
-  
-  .delete-icon:hover {
-    color: #d9363e;
-  }
-  
-  
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  /* border: 10px solid red; */
+}
+.table-container {
+  max-height: 300px; 
+  overflow-y: auto;
+  border: 1px solid #ccc;
+}
+
+.market-details-title {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #4682b4;
+}
+
+.frost-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.frost-table th,
+.frost-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+}
+
+.frost-table th {
+  position: sticky;
+  top: 0;
+  background: rgba(70, 130, 180, 0.8);
+  color: white;
+  z-index: 1;
+}
+
+.tickets-button {
+  background-color: #4682b4;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.tickets-button:hover {
+  background-color: #356889;
+}
+
+.tickets-dropdown-container {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.tickets-dropdown {
+  max-height: 100px;
+  overflow-y: scroll;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: #f0f8ff;
+}
+
+.ticket-item {
+  padding: 5px 0;
+}
+
+.ticket-item:not(:last-child) {
+  border-bottom: 1px solid #ddd;
+}
+.delete-icon {
+  color: #ff4d4f;
+  cursor: pointer;
+  font-size: 20px;
+  transition: color 0.3s ease;
+}
+
+.delete-icon:hover {
+  color: #d9363e;
+}
+.search-container {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+/* .search-bar {
+  width: 450px;
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: 2px solid #2575fc;
+  background: linear-gradient(145deg, #6a11cb, #2575fc);
+  color: white;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-bar::placeholder {
+  color: #dcdcdc;
+  font-style: italic;
+}
+
+.search-bar:focus {
+  border-color: #2575fc;
+  box-shadow: 0px 0px 15px rgba(37, 117, 252, 0.5);
+  background: linear-gradient(145deg, #2575fc, #6a11cb);
+}
+
+.search-bar:hover {
+  transform: scale(1.05);
+}
+
+.search-bar:focus::placeholder {
+  color: #fff;
+} */
+.search-container {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.search-bar {
+  width: 450px;
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: 2px solid #e6f7ff; /* Light frosty white border */
+  background: #ffffff; /* Frosty white background */
+  color: #333333; /* Dark text for good readability */
+  font-size: 14px;
+  font-family: 'Helvetica Neue', sans-serif; /* Elegant font */
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 8px rgba(0, 0, 0, 0.1); /* Soft shadow effect */
+}
+
+.search-bar::placeholder {
+  color: #cfcfcf; /* Subtle light gray for placeholder */
+  font-style: italic;
+}
+
+.search-bar:focus {
+  border-color: #a1c4fd; /* Light blue border on focus for a calm touch */
+  background: #f5faff; /* Very light frosty blue background on focus */
+  box-shadow: 0 6px 12px rgba(161, 196, 253, 0.4); /* Glowing shadow on focus */
+}
+
+.search-bar:hover {
+  transform: scale(1.02); /* Slight zoom effect on hover */
+  box-shadow: 0 4px 16px rgba(161, 196, 253, 0.3); /* Subtle hover glow */
+}
+
+.search-bar:focus::placeholder {
+  color: #a1c4fd; /* Blue placeholder color when focused */
+}
+

@@ -8,6 +8,8 @@ import { Table, Spinner } from "react-bootstrap";
 import debounce from "lodash.debounce";
 import { useParams, useNavigate } from "react-router-dom";
 import Pagination from "../../Common/Pagination";
+import { format } from "date-fns";
+import "./PurchasedTickets.css";
 
 const PurchasedTickets = () => {
   const { dispatch, showLoader, hideLoader } = useAppContext();
@@ -23,7 +25,7 @@ const PurchasedTickets = () => {
     totalPages: 0,
     totalItems: 0,
   });
-
+  const [selectedDate, setSelectedDate] = useState(""); //for date filter
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [markets, setMarkets] = useState([]);
@@ -37,90 +39,97 @@ const PurchasedTickets = () => {
     setDropdownOpen(dropdownOpen === id ? null : id);
   };
 
-  useEffect(() => {
-    const fetchMarketData = async () => {
-      try {
-        const response = await GetPurchaseHistoryMarketTimings();
+  const fetchMarketData = async () => {
+    const response = await GetPurchaseHistoryMarketTimings({ date: selectedDate});
 
-        if (response?.success) {
-          const marketsData = response.data || [];
-          setMarkets(marketsData);
+    if (response?.success) {
+      const marketsData = response.data || [];
+      setMarkets(marketsData);
 
-          if (!paramMarketId && marketsData.length > 0) {
-            const firstMarketId = marketsData[0].marketId;
-            navigate(`/purchase-history/${firstMarketId}`, { replace: true });
-            setSelectedMarketId(firstMarketId);
-          } else if (marketsData.length === 0) {
-            console.error("Market Not Found");
-            // No markets to handle further, do nothing or add specific fallback logic
-          }
-        } else {
-          console.error("Failed to fetch markets");
-          // Handle unsuccessful fetch scenario here, if needed
-        }
-      } catch (error) {
-        console.error("Error fetching markets:", error);
-        // Handle fetch failure scenario here, if needed
+      if (!paramMarketId && marketsData.length > 0) {
+        const firstMarketId = marketsData[0].marketId;
+        navigate(`/purchase-history/${firstMarketId}`, { replace: true });
+        setSelectedMarketId(firstMarketId);
+      } else if (marketsData.length === 0) {
+        console.error("Market Not Found");
+        // No markets to handle further, do nothing or add specific fallback logic
       }
-    };
+    } else {
+      console.error("Failed to fetch markets");
+      // Handle unsuccessful fetch scenario here, if needed
+    }
+  };
+
+  useEffect(() => {
+  
 
     fetchMarketData();
-  }, [paramMarketId, navigate]);
+    // fetchData();
+
+    
+  }, [paramMarketId, navigate, selectedDate]);
+
+  const handleDateChange = (event) => {
+    const newDate = event.target.value;
+    const formattedDate = format(new Date(newDate), "yyyy-MM-dd");
+    setSelectedDate(formattedDate);
+    fetchData();
+  };
 
   // Create debounced fetchPurchasedLotteryTickets function
   const fetchPurchasedLotteryTickets = useCallback(
     debounce(async (searchTerm) => {
+      if (!selectedMarketId) return;
       setLoader(true);
-      try {
-        const response = await PurchasedTicketsHistory({
-          marketId: selectedMarketId,
-          page: pagination.page,
-          limit: pagination.limit,
-          searchBySem: searchTerm,
-        });
 
-        if (response?.success) {
-          setPurchasedTickets(response.data || []);
-          setPagination({
-            page: response.pagination.page,
-            limit: response.pagination.limit,
-            totalPages: response.pagination.totalPages,
-            totalItems: response.pagination.totalItems,
-          });
-          dispatch({
-            type: "PURCHASED_LOTTERY_TICKETS",
-            payload: response.data,
-          });
-        } else {
-          console.error("Failed to fetch purchased tickets");
-        }
-      } catch (error) {
-        console.error("Error fetching purchased tickets:", error);
+      const response = await PurchasedTicketsHistory({
+        marketId: selectedMarketId,
+        page: pagination.page,
+        limit: pagination.limit,
+        searchBySem: searchTerm,
+      });
+
+      if (response?.success) {
+        setPurchasedTickets(response.data || []);
+        setPagination({
+          page: response?.pagination?.page || 1,
+          limit: response?.pagination?.limit || 10,
+          totalPages: response?.pagination?.totalPages,
+          totalItems: response?.pagination?.totalItems,
+        });
+        dispatch({
+          type: "PURCHASED_LOTTERY_TICKETS",
+          payload: response.data,
+        });
+      } else {
+        console.error("Failed to fetch purchased tickets");
       }
+
       setLoader(false);
     }, 500),
     [selectedMarketId, pagination.page, pagination.limit, dispatch]
   );
-
+  const fetchData = async () => {
+    setLoading(true);
+    showLoader();
+    try {
+      await fetchPurchasedLotteryTickets(searchTerm);
+    } catch (error) {
+      console.error("Error fetching lottery markets:", error);
+    } finally {
+      hideLoader();
+      setLoading(false);
+    }
+  };
   // Effect for fetching purchased tickets when selectedMarketId, pagination, or searchTerm changes
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      showLoader();
-      try {
-        await fetchPurchasedLotteryTickets(searchTerm);
-      } catch (error) {
-        console.error("Error fetching lottery markets:", error);
-      } finally {
-        hideLoader();
-        setLoading(false);
-      }
-    };
+    if (!selectedMarketId) return;
+ 
 
     fetchData();
 
     return () => {
-      fetchPurchasedLotteryTickets.cancel(); // Clean up debounced function on unmount
+      fetchPurchasedLotteryTickets.cancel(); 
     };
   }, [
     selectedMarketId,
@@ -133,7 +142,7 @@ const PurchasedTickets = () => {
   // Handle search input change
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
-    setPagination((prev) => ({ ...prev, page: 1 })); // Reset pagination on search change
+    setPagination((prev) => ({ ...prev, page: 1 })); 
   };
 
   // Handle pagination page change
@@ -173,9 +182,9 @@ const PurchasedTickets = () => {
     pagination.totalItems
   );
 
-  if (loading) {
-    return null;
-  }
+  // if (loading) {
+  //   return null;
+  // }
 
   return (
     <div
@@ -186,6 +195,19 @@ const PurchasedTickets = () => {
         boxShadow: "0 0 15px rgba(0,0,0,0.1)",
       }}
     >
+      {/* Date Filter UI */}
+      <div className="date-filter-container">
+        <label htmlFor="date-filter" className="date-filter-label">
+          Select Date:
+        </label>
+        <input
+          type="date"
+          id="date-filter"
+          className="date-filter-input"
+          value={selectedDate}
+          onChange={handleDateChange}
+        />
+      </div>
       {/* Top Navigation for Markets */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4 className="fw-bold">Markets</h4>
@@ -268,11 +290,13 @@ const PurchasedTickets = () => {
               <td colSpan="6">
                 <div className="d-flex justify-content-center align-items-center">
                   <Spinner animation="border" variant="primary" />
-                  <span className="ms-2">Loading tickets...</span>
+                  <span className="ms-2">
+                    Loading Tickets....{" "}
+                  </span>
                 </div>
               </td>
             </tr>
-          ) : purchasedTickets.length > 0 ? (
+          ) : purchasedTickets.length > 0 && visibleMarkets.length > 0 ? (
             purchasedTickets.map((ticket, index) => (
               <tr key={index}>
                 <td>{startIndex + index}</td>
@@ -334,21 +358,24 @@ const PurchasedTickets = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="5" className="text-center">
+              <td colSpan="6" className="text-center">
                 No tickets found.
               </td>
             </tr>
           )}
         </tbody>
       </Table>
-      <Pagination
-        currentPage={pagination.page}
-        totalPages={pagination.totalPages}
-        handlePageChange={handlePageChange}
-        startIndex={startIndex}
-        endIndex={endIndex}
-        totalData={pagination.totalItems}
-      />
+
+      {purchasedTickets?.length > 0 && visibleMarkets?.length > 0 && (
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          handlePageChange={handlePageChange}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          totalData={pagination.totalItems}
+        />
+      )}
     </div>
   );
 };
