@@ -829,6 +829,11 @@ export const resetPassword = async (req, res) => {
       );
     }
 
+    const passwordIsDuplicate = await bcrypt.compare(newPassword, admin.password);
+    if (passwordIsDuplicate) {
+        return apiResponseErr(null, false, statusCode.badRequest, 'New Password Cannot Be The Same As Existing Password', res);
+    }
+
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     await Admin.update(
