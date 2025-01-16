@@ -4,7 +4,7 @@ import ReusableModal from "../Reusables/ReusableModal";
 import "./LiveMarketStats.css";
 import Pagination from "../Common/Pagination";
 
-const LiveMarketStats = ({ marketId, backButton }) => {
+const LiveMarketStats = ({ marketId, backButton,refresh }) => {
   const [stats, setStats] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const [modalContent, setModalContent] = useState({ title: "", body: "" });
@@ -28,8 +28,6 @@ const LiveMarketStats = ({ marketId, backButton }) => {
   }, [searchTerm]);
 
   // Fetch market stats based on pagination and search term
-
-  useEffect(() => {
     const fetchMarketStats = async () => {
       try {
         const response = await GetMarketStats({
@@ -56,6 +54,9 @@ const LiveMarketStats = ({ marketId, backButton }) => {
         console.error("Error fetching market stats:", error);
       }
     };
+
+  useEffect(() => {
+  
 
     if (marketId) {
       fetchMarketStats();
@@ -118,6 +119,7 @@ const LiveMarketStats = ({ marketId, backButton }) => {
       try {
         const response = await DeleteLiveBets({ purchaseId }, false);
         if (response.success) {
+          fetchMarketStats ()
           alert("Live bet deleted successfully!");
           setStats((prevStats) =>
             prevStats.map((user) => ({
@@ -130,6 +132,10 @@ const LiveMarketStats = ({ marketId, backButton }) => {
               })),
             }))
           );
+          // refresh();
+          fetchMarketStats();
+          setModalShow(false)
+
         } else {
           alert("Failed to delete live bet. Please try again.");
         }

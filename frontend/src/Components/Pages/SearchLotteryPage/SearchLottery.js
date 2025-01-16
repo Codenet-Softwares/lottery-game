@@ -26,7 +26,7 @@ const SearchLottery = () => {
   // Function to handle fetching and setting lottery range and market data
   const handleLotteryRange = async () => {
     const data = await LotteryRange({
-      search: debouncedSearchTerm
+      search: debouncedSearchTerm,
     });
     SetAllActiveMarket(data?.data);
     setFilteredMarket(data?.data[0]);
@@ -121,7 +121,11 @@ const SearchLottery = () => {
               <Card
                 key={market.id}
                 className="market-card"
-                onClick={() => handleMarketClick(market)}
+                onClick={() => {
+                  handleMarketClick(market);
+                  setFilteredMarket(null); // Reset filtered market
+                  setTimeout(() => setFilteredMarket(market), 0); // Simulate reload
+                }}
               >
                 <Card.Body>
                   <Card.Title>{market.marketName}</Card.Title>
@@ -148,8 +152,30 @@ const SearchLottery = () => {
 
       {/* Main Content */}
       <main className="alt-main-content p-4">
+        <div className="search-bar-container-custom d-flex justify-content-center "
+           style={{
+            position: "relative",
+            zIndex: "3",
+          }}
+        >
+          <input
+            type="text"
+            className="form-control w-80"
+            placeholder="Search for a Lottery markets for lottery Tickets..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+        </div>
         {filteredMarket ? (
-          <Card className="welcome-card shadow-sm">
+          <Card className="welcome-card shadow-sm"
+          style={{
+            marginTop: "-40px",
+            borderRadius: "0 0 20px 20px",
+            zIndex: "1",
+            position: "relative",
+          }}
+          
+          >
             <Card.Body>
               {/* Display Market Name Above the Form */}
               <div className="text-center mb-4">
@@ -163,17 +189,17 @@ const SearchLottery = () => {
                 >
                   🔍 Search Lottery Tickets for {filteredMarket.marketName}
                 </h2> */}
-                <div className="search-bar-container-custom d-flex justify-content-center mb-5">
-                  <input
-                    type="text"
-                    className="form-control w-80"
-                    placeholder="Search for a Lottery markets for lottery Tickets..."
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                  />
-                </div>
               </div>
-
+              <h2
+                className="mb-1"
+                style={{
+                  color: "#4682B4",
+                  fontWeight: "bold",
+                  letterSpacing: "1px",
+                }}
+              >
+                🔍 Search Lottery Tickets for {filteredMarket.marketName}
+              </h2>
               {/* Pass filtered market and other props to Search component */}
               <Search
                 marketId={filteredMarket.marketId}

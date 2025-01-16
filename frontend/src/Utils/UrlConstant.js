@@ -40,7 +40,8 @@ class UrlConstant {
   DeleteLiveBets = `${this.url_dev}/delete-liveBet-lottery`;
   DeletedLiveBetsMarkets= `${this.url_dev}/get-trash-market`;
   LiveBetsMarketsDetailsDeleted=`${this.url_dev}/get-trash-bet`;
-  TrashMarketDetailsDelete = `${this.url_dev}/delete-trash`
+  TrashMarketDetailsDelete = `${this.url_dev}/delete-trash`;
+  RevokeDelete =  `${this.url_dev}/revoke-live-market`
 }
 
 const urls = new UrlConstant();

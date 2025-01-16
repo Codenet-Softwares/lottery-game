@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./Trashmarketdetails.css";
-import { TrashMarketsDelete } from "../../Utils/apiService";
+import { TrashMarketsDelete,RevokeMarketsDelete } from "../../Utils/apiService";
 import Pagination from "../Common/Pagination";
 
 const Trashmarketdetails = ({
@@ -24,7 +24,7 @@ const Trashmarketdetails = ({
   const handleDelete = async (trashId,selectedMarketId) => {
     if (window.confirm("Are you sure you want to delete this market?")) {
       try {
-        await TrashMarketsDelete({ trashId });
+        await TrashMarketsDelete({ trashMarketId:trashId });
         alert("Market deleted successfully!");
         // Call the refreshMarkets and also refetch market details after deletion
         refreshMarkets(); // Refresh markets list
@@ -33,6 +33,29 @@ const Trashmarketdetails = ({
         console.error("Error deleting market:", error);
         alert("Failed to delete the market. Please try again.");
       }
+    }
+  };
+
+  const handleRevoke = async (trashId, selectedMarketId) => {
+    console.log(trashId)
+    if (window.confirm("Are you sure you want to revoke this market?")) {
+      const requestBody = {
+        trashMarketId:trashId
+
+      }
+      
+        const response = await RevokeMarketsDelete(requestBody);
+
+        if (response.success){
+          alert("Market revoked successfully!");
+        refreshMarkets(); // Refresh the markets list after revoke
+        fetchMarketDetails( selectedMarketId)
+
+        }else {
+
+          alert ("Error Revoking")
+        }
+        
     }
   };
 
@@ -110,6 +133,7 @@ const Trashmarketdetails = ({
                         className="bi bi-arrow-counterclockwise undo-icon"
                         title="Revoke"
                         style={{ marginLeft: "8px" }}
+                        onClick={() => handleRevoke(detail.trashMarketId, detail.marketId)}
                       ></i>
                     </td>
                   </tr>

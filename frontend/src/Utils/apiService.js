@@ -252,11 +252,11 @@ export async function LotteryRange(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
     const response = await makeCall(
-      
-      `${urls.lotteryRange}?search=${body.search}`, 
-      
-      
-      callParams, isToast);
+      `${urls.lotteryRange}?search=${body.search}`,
+
+      callParams,
+      isToast
+    );
     return response;
   } catch (error) {
     throw error;
@@ -267,7 +267,7 @@ export async function AllActiveLotteryMarkets(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
     const response = await makeCall(
-     ` ${urls.allActiveLotteryMarket}?search=${body.search}`,
+      ` ${urls.allActiveLotteryMarket}?search=${body.search}`,
       callParams,
       isToast
     );
@@ -281,11 +281,11 @@ export async function GetMarketTimings(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
     const response = await makeCall(
-      
-     ` ${urls.getMarketTime}?search=${body.search}`, 
-      
-      
-      callParams, isToast);
+      ` ${urls.getMarketTime}?search=${body.search}`,
+
+      callParams,
+      isToast
+    );
     return response;
   } catch (error) {
     throw error;
@@ -325,7 +325,7 @@ export async function GetPurchaseHistoryMarketTimings(
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
     const response = await makeCall(
-      urls.getPurchaseMarketTime,
+      `${urls.getPurchaseMarketTime}?date=${body.date}`,
       callParams,
       isToast
     );
@@ -395,7 +395,7 @@ export async function GetliveMarketBroadcast(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
     const response = await makeCall(
-      `${urls.allLiveMarketBroadcast}?page=${body.page}&limit=${body.limit}`,
+      `${urls.allLiveMarketBroadcast}?page=${body.page}&limit=${body.limit}&search=${body.search}`,
       callParams
     );
     return response;
@@ -431,24 +431,29 @@ export async function DeletedLiveBetsMarkets(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
     const response = await makeCall(
-      
-      `${urls.DeletedLiveBetsMarkets}?search=${body.search}`, 
-      
-      
-      callParams, isToast);
+      `${urls.DeletedLiveBetsMarkets}?search=${body.search}`,
+
+      callParams,
+      isToast
+    );
     return response;
   } catch (error) {
     throw error;
   }
 }
 
-export async function DeletedLiveBetsMarketsDetails(body = {}, isToast = false) {
+export async function DeletedLiveBetsMarketsDetails(
+  body = {},
+  isToast = false
+) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
-    const response = await makeCall
-    (`${urls.LiveBetsMarketsDetailsDeleted}/${body.marketId}?page=${body.page}&limit=${body.limit}&search=${body.search}`, 
-      
-      callParams, isToast);
+    const response = await makeCall(
+      `${urls.LiveBetsMarketsDetailsDeleted}/${body.marketId}?page=${body.page}&limit=${body.limit}&search=${body.search}`,
+
+      callParams,
+      isToast
+    );
     return response;
   } catch (error) {
     throw error;
@@ -458,10 +463,27 @@ export async function DeletedLiveBetsMarketsDetails(body = {}, isToast = false) 
 export async function TrashMarketsDelete(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.DELETE, body, isToast);
-    const response = await makeCall
-    (`${urls.TrashMarketDetailsDelete}/${body.trashId}`, 
-      
-      callParams, isToast);
+    const response = await makeCall(
+      `${urls.TrashMarketDetailsDelete}/${body.trashId}`,
+
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function RevokeMarketsDelete(body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.POST, body, isToast);
+    const response = await makeCall(
+      urls.RevokeDelete,
+
+      callParams,
+      isToast
+    );
     return response;
   } catch (error) {
     throw error;
