@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAppContext } from "../../contextApi/context";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -6,16 +6,25 @@ import "./navTop.css";
 
 const NavTop = () => {
   const { store, dispatch } = useAppContext();
-  const [activeLink, setActiveLink] = useState(
-    store.activeLink || "/dashboard"
-  );
   const navigate = useNavigate();
   const location = useLocation();
+  const menuRef = useRef(null);
 
   useEffect(() => {
-    // Update active link when location changes
-    setActiveLink(location.pathname);
-  }, [location]);
+    const handleScroll = () => {
+      const menuItems = document.querySelectorAll(".nav-link");
+      const centerIndex = Math.floor(menuItems.length / 2);
+      menuItems.forEach((item, index) => {
+        if (index === centerIndex) {
+          item.classList.add("center-active");
+        } else {
+          item.classList.remove("center-active");
+        }
+      });
+    };
+    menuRef.current.addEventListener("scroll", handleScroll);
+    return () => menuRef.current?.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleLogout = () => {
     const confirmLogout = window.confirm("Are you sure you want to log out?");
@@ -28,170 +37,96 @@ const NavTop = () => {
     }
   };
 
-  const handleClick = (link) => {
-    setActiveLink(link);
+  const scrollMenu = (direction) => {
+    if (menuRef.current) {
+      menuRef.current.scrollBy({
+        left: direction === "right" ? 100 : -100,
+        behavior: "smooth",
+      });
+  
+      // Check if at the start or end of the menu
+      const isAtStart = menuRef.current.scrollLeft === 0;
+      const isAtEnd =
+        Math.ceil(menuRef.current.scrollLeft + menuRef.current.offsetWidth) >=
+        menuRef.current.scrollWidth;
+  
+      // Hide left arrow if at the start
+      document.querySelector(".left-arrow").style.display = isAtStart
+        ? "none"
+        : "block";
+  
+      // Hide right arrow if at the end
+      document.querySelector(".right-arrow").style.display = isAtEnd
+        ? "none"
+        : "block";
+    }
   };
+  
+  // Initial arrow visibility based on location
+  useEffect(() => {
+    if (location.pathname === "/dashboard") {
+      document.querySelector(".left-arrow").style.display = "none";
+    } else if (location.pathname === "/reset-password") {
+      document.querySelector(".right-arrow").style.display = "none";
+    }
+  }, [location]);
+  
+
+  const navItems = [
+    { to: "/dashboard", icon: "fas fa-tachometer-alt", label: "Dashboard" },
+    { to: "/lottery-markets", icon: "fas fa-ticket-alt", label: "Create Lottery" },
+    { to: "/Market-overview", icon: "fas fa-chart-line", label: "Market Overview" },
+    { to: "/results", icon: "fas fa-trophy", label: "Results" },
+    { to: "/win", icon: "fas fa-money-bill-wave", label: "Win" },
+    { to: "/purchase-history", icon: "fas fa-history", label: "Purchase History" },
+    { to: "/search-lottery", icon: "fas fa-search", label: "Search Lottery" },
+    { to: "/get-void-market", icon: "fas fa-file-excel", label: "Void" },
+    { to: "/inactive", icon: "fas fa-ban", label: "Revoke" },
+    { to: "/live-markets", icon: "fas fa-broadcast-tower", label: "Live Markets" },
+    { to: "/trash", icon: "fas fa-trash-alt", label: "Trash" },
+    { to: "/reset-password", icon: "fas fa-key", label: "Reset Password" },
+  ];
 
   return (
-    <div className="container-fluid g-0 navtop-container">
-      <div className="row">
-        <div className="col-lg-12 p-0">
-          <div className="nav-wrapper d-flex justify-content-between align-items-center">
-            <div className="nav-options d-flex justify-content-center">
-              <Link
-                to="/dashboard"
-                className={`nav-link dashboard ${
-                  activeLink === "/dashboard" ? "active-link" : ""
-                }`}
-                onClick={() => handleClick("/dashboard")}
-              >
-                <i className="fas fa-tachometer-alt nav-icon" />
-                <span>Dashboard</span>
-              </Link>
-
-              <Link
-                to="/lottery-markets"
-                className={`nav-link create-lottery ${
-                  activeLink === "/lottery-markets" ? "active-link" : ""
-                }`}
-                onClick={() => handleClick("/lottery-markets")}
-              >
-                <i className="fas fa-ticket-alt nav-icon" />
-                <span>Create Lottery</span>
-              </Link>
-              {/* New LuckyHour link */}
-              <Link
-                to="/Market-overview"
-                className={`nav-link market-overview ${
-                  activeLink === "/Market-overview" ? "active-link" : ""
-                }`}
-                onClick={() => handleClick("/Market-overview")}
-              >
-                <i className="fas fa-chart-line nav-icon" />
-                <span>Market Overview</span>
-              </Link>
-
-              <Link
-                to="/results"
-                className={`nav-link results ${
-                  activeLink.startsWith("/results") ? "active-link" : ""
-                }`}
-                onClick={() => handleClick("/results")}
-              >
-                <i className="fas fa-trophy nav-icon" />
-                <span>Results</span>
-              </Link>
-
-              <Link
-                to="/win"
-                className={`nav-link win ${
-                  activeLink === "/win" ? "active-link" : ""
-                }`}
-                onClick={() => handleClick("/win")}
-              >
-                <i className="fas fa-money-bill-wave nav-icon" />
-                <span>Win</span>
-              </Link>
-
-              <Link
-                to="/purchase-history"
-                className={`nav-link purchase-history ${
-                  activeLink.startsWith("/purchase-history")
-                    ? "active-link"
-                    : ""
-                }`}
-                onClick={() => handleClick("/purchase-history")}
-              >
-                <i className="fas fa-history nav-icon" />
-                <span>Purchase History</span>
-              </Link>
-
-              <Link
-                to="/search-lottery"
-                className={`nav-link search-lottery ${
-                  activeLink === "/search-lottery" ? "active-link" : ""
-                }`}
-                onClick={() => handleClick("/search-lottery")}
-              >
-                <i className="fas fa-search nav-icon" />
-                <span>Search Lottery</span>
-              </Link>
-
-              <Link
-                to="/get-void-market"
-                className={`nav-link void-icon ${
-                  activeLink === "/get-void-market" ? "active-link" : ""
-                }`}
-                onClick={() => handleClick("/get-void-market")}
-              >
-                <i class="fas fa-file-excel nav-icon"></i>
-                <span>Void</span>
-              </Link>
-              <Link
-                to="/inactive"
-                className={`nav-link active-icon ${
-                  activeLink === "/inactive" ? "active-link" : ""
-                }`}
-                onClick={() => handleClick("/inactive")}
-              >
-                <i class="	fas fa-ban nav-icon"></i>
-                <span>Revoke</span>
-              </Link>
-              <Link
-                to="/live-markets"
-                className={`nav-link live-market-icon ${
-                  activeLink === "/live-markets" ? "active-link" : ""
-                }`}
-                onClick={() => handleClick("/live-markets")}
-              >
-                <i className="fas fa-broadcast-tower nav-icon"></i>
-                <span>Live Markets</span>
-              </Link>
-
-              <Link
-                to="/trash"
-                className={`nav-link trash-icon ${
-                  activeLink === "/trash" ? "active-link" : ""
-                }`}
-                onClick={() => handleClick("/trash")}
-              >
-                <i className="fas fa-trash-alt nav-icon"></i>
-                <span>Trash</span>
-              </Link>
-
-              <Link
-                to="/reset-password"
-                className={`nav-link reset-icon ${
-                  activeLink === "/reset-password" ? "active-link" : ""
-                }`}
-                onClick={() => handleClick("/reset-password")}
-              >
-                <i className="fas fa-key nav-icon"></i>
-                <span>Reset Password</span>
-              </Link>
+    <div className="container-fluid g-4 navtop-container ">
+      <div className="row d-flex justify-content-center align-items-center">
+        {/* <div className="col-lg-6 p-0 "> */}
+          <div className="nav-wrapper justify-content-center align-items-center">
+            <button
+              className="scroll-arrow left-arrow"
+              onClick={() => scrollMenu("left")}
+            >
+                &lt;
+            </button>
+            <div ref={menuRef} className="nav-options">
+              {navItems.map(({ to, icon, label }) => (
+                <Link key={to} to={to} className="nav-link mt-2">
+                  <i className={`nav-icon ${icon}`} />
+                  <span className="text-info text-nowrap">{label}</span>
+                </Link>
+              ))}
             </div>
-
-            <div className="profile_info d-flex align-items-center mx-4">
-              <i
-                className="fas fa-user-circle"
-                style={{ fontSize: "30px", color: "#4682B4" }}
-                aria-hidden="true"
-              />
-              <div className="profile_info_iner">
-                <div className="profile_author_name">
-                  <p>Role: {store.admin.roles}</p>
-                  <h5>{store.admin.userName}</h5>
-                </div>
-                <div className="profile_info_details">
-                  <a href="#" onClick={handleLogout}>
-                    Log Out
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
+            <button
+              className="scroll-arrow right-arrow"
+              onClick={() => scrollMenu("right")}
+            >
+                &gt;
+            </button>
+          
+         
+          {/* </div> */}
         </div>
+      
       </div>
+      <div className=" profile_info ">
+              <i
+                className="fas fa-sign-out-alt"
+                // aria-hidden="true"
+                onClick={handleLogout}
+                title="logout"
+                
+              />
+            </div>
     </div>
   );
 };

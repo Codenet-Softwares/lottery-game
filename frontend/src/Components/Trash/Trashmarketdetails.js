@@ -22,9 +22,10 @@ const Trashmarketdetails = ({
   };
 
   const handleDelete = async (trashId,selectedMarketId) => {
+    console.log(trashId)
     if (window.confirm("Are you sure you want to delete this market?")) {
       try {
-        await TrashMarketsDelete({ trashMarketId:trashId });
+        await TrashMarketsDelete({trashId:trashId });
         alert("Market deleted successfully!");
         // Call the refreshMarkets and also refetch market details after deletion
         refreshMarkets(); // Refresh markets list
