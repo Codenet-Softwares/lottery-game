@@ -49,6 +49,7 @@ const Inactive = () => {
         try {
             const res = await isRevokeLottery({ marketId: marketId });
             if (res) {
+                toast.success(res.message);
                 setRefresh((prev) => !prev)
             }
         } catch (err) {
