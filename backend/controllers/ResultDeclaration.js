@@ -281,8 +281,19 @@ export const ResultDeclare = async (req, res) => {
         });
 
         if (matchedTickets.length > 0) {
+          const userProfitLossMap = {};
+
+          matchedTickets.forEach(({ userId, lotteryPrice }) => {
+            if (!userProfitLossMap[userId]) {
+              userProfitLossMap[userId] = { totalProfitLoss: 0, totalPrice: 0 };
+            }
+            userProfitLossMap[userId].totalPrice += Number(lotteryPrice);
+          });
+          console.log("userProfitLossMap", userProfitLossMap)
           for (const ticket of matchedTickets) {
+
             const { userId, sem, userName, marketName, number, lotteryPrice } = ticket;
+
             const totalPrize =
               prizeCategory === 'First Prize'
                 ? prizeAmount
@@ -292,12 +303,23 @@ export const ResultDeclare = async (req, res) => {
             // if (matchedTicketLastFive === lastFiveForFirstPrize) {
             //   totalPrize += complementaryPrize; 
             // }
+
+            const userProfitLoss = userProfitLossMap[ticket.userId];
+
+            console.log("userProfitLoss", userProfitLoss)
+
+            if (!userProfitLoss) continue;
+
+            const { totalPrice } = userProfitLoss;
+
+            console.log("totalPrice", totalPrice)
+
             const baseURL = process.env.COLOR_GAME_URL;
             const response = await axios.post(`${baseURL}/api/users/update-balance`, {
               userId,
               prizeAmount: totalPrize,
               marketId,
-              lotteryPrice
+              lotteryPrice: totalPrice
             });
 
             const res = await axios.post(`${baseURL}/api/lottery-profit-loss`, {
