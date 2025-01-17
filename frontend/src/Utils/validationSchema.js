@@ -140,3 +140,16 @@ export const validationSchema = Yup.object({
 
   priceForEach: Yup.number().required("Price is required"),
 });
+
+
+export const resetPasswordSchema = Yup.object().shape({
+  oldPassword: Yup.string()
+    .required("Old password is required"),
+  newPassword: Yup.string()
+    .required("New password is required")
+    .notOneOf([Yup.ref("oldPassword"), null], "New password cannot be the same as the old password"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
+    .required("Confirm password is required"),
+});
+

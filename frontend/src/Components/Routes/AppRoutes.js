@@ -18,6 +18,7 @@ import Void from "../Void/Void";
 import Inactive from "../Pages/Inactive";
 import LiveMarkets from "../LiveMarkets/LiveMarkets";
 import Trash from "../Trash/Trash";
+import ResetPassword from "../ResetPassword/ResetPassword";
 
 const AppRoutes = () => {
   return (
@@ -46,13 +47,14 @@ const AppRoutes = () => {
               </PrivateRoute>
             }
           >
-            <Route path="/dashboard" element={<DashBoard />}/>
+            <Route path="/dashboard" element={<DashBoard />} />
             <Route path="/lottery-markets" element={<CreateMarkets />} />
 
             <Route
               path="/purchase-history/:marketId"
               element={<PurchasedTickets />}
             />
+
             <Route path="/purchase-history" element={<PurchasedTickets />} />
             <Route path="/results/:marketId" element={<Result />} />
             <Route path="/results" element={<Result />} />
@@ -64,8 +66,9 @@ const AppRoutes = () => {
             <Route path="/inactive" element={<Inactive />} />
 
             <Route path="/Market-overview" element={<MarketInsight />} />
-            <Route path="/Live-markets" element={<LiveMarkets/>} />
-            <Route path="/trash" element={<Trash/>} />
+            <Route path="/Live-markets" element={<LiveMarkets />} />
+            <Route path="/trash" element={<Trash />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
           </Route>
           {/* not found */}
           <Route path="*" element={<NotFound />} />

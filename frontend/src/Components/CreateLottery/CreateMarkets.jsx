@@ -9,8 +9,11 @@ import {
   generateTimerOptions,
 } from "../../Utils/helper";
 import { generateLotteryNumber } from "../../Utils/apiService";
+import { useAppContext } from "../../contextApi/context";
 
 const CreateMarkets = () => {
+
+
   const formik = useFormik({
     initialValues: initialCreateMarketFormStates,
     validationSchema: validationSchema,

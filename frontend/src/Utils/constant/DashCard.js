@@ -77,7 +77,7 @@ const DashCard = [
     {
       name: "Void",
       description:
-        "By clicking on void, the market will be canceled and all the bets at stake would be returned to main balance!",
+        "By clicking on void, the market will be canceled and all the bets at stake would be returned to main balance!",
       buttonName: "Void",
       buttonLink: "/get-void-market" ,
       cardstyle: {
@@ -101,6 +101,49 @@ const DashCard = [
         color: "#fff",
       },
       icon: "fas fa-ban nav-icon", // icon for Lucky Hour
+    },
+    {
+      name: "Live Markets",
+      description:
+        "Create and manage multiple draw times for lotteries each day for a more dynamic experience!",
+      buttonName: "Live Markets",
+      buttonLink: "/live-markets" ,
+      cardstyle: {
+        borderRadius: "20px",
+        backgroundColor: "rgb(11, 134, 32)",
+        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+        color: "#fff",
+      },
+      icon: "fas fa-broadcast-tower", // icon for Lucky Hour
+    },
+    {
+      name: "Trash",
+      description:
+        "Create and manage multiple draw times for lotteries each day for a more dynamic experience!",
+      buttonName: "Trash",
+      buttonLink: "/trash" ,
+      cardstyle: {
+        borderRadius: "20px",
+        backgroundColor: "rgb(11, 134, 32)",
+        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+        color: "#fff",
+      },
+      icon: "fas fa-trash-alt", // icon for Lucky Hour
+    },
+
+    {
+      name: "ResetPassword",
+      description:
+        "Create and manage multiple draw times for lotteries each day for a more dynamic experience!",
+      buttonName: "Reset Password",
+      buttonLink: "/reset-password" ,
+      cardstyle: {
+        borderRadius: "20px",
+        backgroundColor: "rgb(11, 134, 32)",
+        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+        color: "#fff",
+      },
+      icon: "fas fa-key", // icon for Lucky Hour
     },
   ];
   export default DashCard;
