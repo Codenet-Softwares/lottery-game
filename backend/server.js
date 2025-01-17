@@ -19,6 +19,14 @@ import { revokeGameRoute } from './routes/revoke.route.js';
 import { deleteGameRoute } from './routes/delete.route.js';
 import { getISTTime } from './utils/commonMethods.js';
 
+if (process.env.NODE_ENV === 'production') {
+  dotenv.config({ path: '.env.production' });
+} else {
+  dotenv.config({ path: '.env' });
+}
+
+console.log('Running in environment:', process.env.NODE_ENV);
+
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -30,7 +38,11 @@ app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send('Status : OK');
+  if (process.env.NODE_ENV === 'production') {
+    res.send('Production environment is running.');
+  } else {
+    res.send('Development environment is running.');
+  }
 });
 
 adminRoutes(app);
