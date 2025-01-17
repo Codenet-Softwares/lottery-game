@@ -57,7 +57,7 @@ UserRange.hasMany(PurchaseLottery, {
 const clients = new Set();
 
 // SSE endpoint
-app.get('/events', (req, res) => {
+app.get('/lottery-events', (req, res) => {
   console.log("[SSE] Client connected to events");
 
   res.setHeader('Content-Type', 'text/event-stream');
@@ -94,43 +94,52 @@ sequelize
       console.log(`App is running on - http://localhost:${process.env.PORT || 7000}`);
     });
 
-    // Function to get current time in IST
+    const updatedMarketsCache = new Map(); 
 
-    cron.schedule('*/2 * * * * *', async () => {
+    // Function to get current time in IST
+    cron.schedule('* * * * * * *', async () => {
       try {
         const currentTime = getISTTime();
 
         const suspendMarkets = await TicketRange.findAll({
           where: {
-            isActive : true,
+            isActive: true,
             [Op.or]: [
-              { start_time: { [Op.gt]: currentTime } }, 
-              { end_time: { [Op.lt]: currentTime } }   
+              { start_time: { [Op.gt]: currentTime } },
+              { end_time: { [Op.lt]: currentTime } }
             ]
           },
         });
 
-        const updateMarket = [];
-
-        for (const market of suspendMarkets) {
-          market.isActive = false;
-          const response = await market.save();
-          updateMarket.push(JSON.parse(JSON.stringify(response)));
-        }
-
         const activeMarkets = await TicketRange.findAll({
           where: {
-            isActive : false,
+            isActive: false,
             start_time: { [Op.lte]: currentTime },
             end_time: { [Op.gte]: currentTime },
           },
         });
 
+        const updateMarket = [];
+
+        // Update active markets
         for (const market of activeMarkets) {
-          market.isActive = true;
-          market.hideMarketUser = true
-          const response = await market.save();
-          updateMarket.push(JSON.parse(JSON.stringify(response)));
+          if (!updatedMarketsCache.has(market.marketId) || updatedMarketsCache.get(market.marketId).isActive !== true) {
+            market.isActive = true;
+            market.hideMarketUser = true
+            const response = await market.save();
+            updateMarket.push(response.toJSON());
+            updatedMarketsCache.set(market.marketId, response.toJSON());
+          }
+        }
+
+        // Update suspend markets
+        for (const market of suspendMarkets) {
+          if (!updatedMarketsCache.has(market.marketId) || updatedMarketsCache.get(market.marketId).isActive !== false) {
+            market.isActive = false;
+            const response = await market.save();
+            updateMarket.push(response.toJSON());
+            updatedMarketsCache.set(market.marketId, response.toJSON());
+          }
         }
 
         clients.forEach((client) => {
@@ -142,12 +151,12 @@ sequelize
         });
 
         console.log(`[SSE] Updates broadcasted: ${JSON.stringify(updateMarket)}`);
+
       } catch (error) {
         console.error('Error checking market statuses:', error);
       }
     });
-
-  })  
+  })
   .catch((err) => {
     console.error('Unable to create tables:', err);
   });
