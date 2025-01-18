@@ -252,6 +252,7 @@ export const ResultDeclare = async (req, res) => {
         attributes: ['sem', 'group', 'series', 'number'],
         where: { marketId },
       });
+
       if (marketData) {
         const { sem, group, series, number } = marketData;
 
@@ -282,6 +283,7 @@ export const ResultDeclare = async (req, res) => {
 
         if (matchedTickets.length > 0) {
           const userProfitLossMap = {};
+          const processedUsers = new Set(); // Track processed users
 
           matchedTickets.forEach(({ userId, lotteryPrice }) => {
             if (!userProfitLossMap[userId]) {
@@ -289,35 +291,43 @@ export const ResultDeclare = async (req, res) => {
             }
             userProfitLossMap[userId].totalPrice += Number(lotteryPrice);
           });
-          console.log("userProfitLossMap", userProfitLossMap)
-          for (const ticket of matchedTickets) {
 
+          console.log("userProfitLossMap", userProfitLossMap);
+
+          for (const ticket of matchedTickets) {
             const { userId, sem, userName, marketName, number, lotteryPrice } = ticket;
+
+            // Skip processing if the user has already been processed
+            if (processedUsers.has(userId)) {
+              console.log(`Skipping userId ${userId} as it's already processed.`);
+              continue;
+            }
 
             const totalPrize =
               prizeCategory === 'First Prize'
                 ? prizeAmount
-                : sem * prizeAmount
-
-            // const matchedTicketLastFive = ticket.ticketNumber.slice(-5);
-            // if (matchedTicketLastFive === lastFiveForFirstPrize) {
-            //   totalPrize += complementaryPrize; 
-            // }
+                : sem * prizeAmount;
 
             const userProfitLoss = userProfitLossMap[ticket.userId];
 
-            console.log("userProfitLoss", userProfitLoss)
+            console.log("userProfitLoss", userProfitLoss);
 
             if (!userProfitLoss) continue;
 
             const { totalPrice } = userProfitLoss;
 
-            console.log("totalPrice", totalPrice)
+            console.log("totalPrice", totalPrice);
 
+            // Mark the user as processed
+            processedUsers.add(userId);
+
+            const totalPrizeForUser = totalPrize * matchedTickets.filter(t => t.userId === userId).length;
+            console.log("totalPrizeForUser", totalPrizeForUser)
+            
             const baseURL = process.env.COLOR_GAME_URL;
             const response = await axios.post(`${baseURL}/api/users/update-balance`, {
               userId,
-              prizeAmount: totalPrize,
+              prizeAmount: totalPrizeForUser,
               marketId,
               lotteryPrice: totalPrice
             });
@@ -330,7 +340,7 @@ export const ResultDeclare = async (req, res) => {
               ticketNumber: number,
               price: lotteryPrice,
               sem,
-              profitLoss: totalPrize,
+              profitLoss: totalPrizeForUser,
             });
 
             if (!response.data.success) {
@@ -345,10 +355,12 @@ export const ResultDeclare = async (req, res) => {
 
             console.log(`Balance updated for userId ${userId}:`, response.data);
           }
-        } else {
+        }
+
+         else if (matchedTickets.length === 0) {
           const usersWithPurchases = await PurchaseLottery.findAll({
             where: { marketId },
-            attributes: ['userId', 'marketName'],
+            attributes: ['userId', 'marketName', 'marketId'],
           });
 
           const userIds = [...new Set(usersWithPurchases.map((user) => user.userId))];
