@@ -382,7 +382,7 @@ export async function GetVoidMarketData(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
     const response = await makeCall(
-      `${urls.allVoidMarketData}?page=${body.page}&limit=${body.limit}&searchByMarketName=${body.searchTerm}`,
+      `${urls.allVoidMarketData}?page=${body.page}&limit=${body.limit}&search=${body.search}`,
       callParams
     );
     return response;

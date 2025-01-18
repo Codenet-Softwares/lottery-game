@@ -186,8 +186,13 @@ const PurchasedTickets = () => {
   // if (loading) {
   //   return null;
   // }
-
+  // Get today's date in "yyyy-MM-dd" format
+  const today = format(new Date(), "yyyy-MM-dd");
   return (
+    <div
+    className="d-flex align-items-center justify-content-center"
+    style={{ background: "#f0f0f0", minHeight: "75vh" }}
+  >
     <div
       className="container mt-5 p-3"
       style={{
@@ -207,6 +212,7 @@ const PurchasedTickets = () => {
           className="date-filter-input"
           value={selectedDate}
           onChange={handleDateChange}
+          max={today} // Prevent selecting future dates
         />
       </div>
       {/* Top Navigation for Markets */}
@@ -251,7 +257,7 @@ const PurchasedTickets = () => {
       </div>
 
       {/* Purchased Tickets Table */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      {/* <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="fw-bold" style={{ color: "#4682B4" }}>
           Purchased Lottery Tickets
         </h2>
@@ -365,7 +371,162 @@ const PurchasedTickets = () => {
             </tr>
           )}
         </tbody>
-      </Table>
+      </Table> */}
+         {visibleMarkets.length > 0 ? (
+              <>
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <h2 className="fw-bold" style={{ color: "#4682B4" }}>
+                    Purchased Lottery Tickets
+                  </h2>
+                  <div className="w-50">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Search purchased tickets by SEM.."
+                      aria-label="Search tickets"
+                      value={searchTerm}
+                      onChange={handleSearchChange}
+                    />
+                  </div>
+                </div>
+      
+                <Table striped hover responsive bordered className="table-sm">
+                  <thead
+                    style={{
+                      backgroundColor: "#4682B4",
+                      color: "#fff",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    <tr>
+                      <th>Serial Number</th>
+                      <th>Market Name</th>
+                      <th>Price</th>
+                      <th>SEM</th>
+                      <th>Tickets</th>
+                      <th>User Name</th>
+                    </tr>
+                  </thead>
+                  <tbody style={{ textAlign: "center" }}>
+                    {loader ? (
+                      <tr>
+                        <td colSpan="6">
+                          <div className="d-flex justify-content-center align-items-center">
+                            <Spinner animation="border" variant="primary" />
+                            <span className="ms-2">Loading Tickets....</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : purchasedTickets.length > 0 ? (
+                      purchasedTickets.map((ticket, index) => (
+                        <tr key={index}>
+                          <td>{startIndex + index}</td>
+                          <td>{ticket.marketName || "N/A"}</td>
+                          <td>{ticket.price}</td>
+                          <td>{ticket.sem}</td>
+                          <td>
+                            <div className="dropdown" style={{ position: "relative" }}>
+                              <button
+                                className="btn btn-link dropdown-toggle"
+                                type="button"
+                                onClick={() => toggleDropdown(index)}
+                              >
+                                View Tickets
+                              </button>
+                              <div
+                                className="custom-dropdown-content"
+                                style={{
+                                  maxHeight: dropdownOpen === index ? "200px" : "0",
+                                  overflow: "hidden",
+                                  transition: "max-height 0.3s ease",
+                                  background: "white",
+                                  border: "1px solid #ccc",
+                                  borderRadius: "4px",
+                                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                                }}
+                              >
+                                {dropdownOpen === index && (
+                                  <div
+                                    style={{
+                                      maxHeight: "200px",
+                                      overflowY: "auto",
+                                      padding: "10px",
+                                    }}
+                                  >
+                                    <span className="dropdown-item-text">
+                                      Ticket Numbers:
+                                    </span>
+                                    <div className="dropdown-divider" />
+                                    {ticket.tickets.length > 0 ? (
+                                      ticket.tickets.map((number, i) => (
+                                        <span key={i} className="dropdown-item">
+                                          {number}
+                                        </span>
+                                      ))
+                                    ) : (
+                                      <span className="dropdown-item text-muted">
+                                        No ticket numbers available
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                          <td>{ticket.userName || "N/A"}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="6" className="text-center">
+                          No tickets found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </Table>
+              </>
+            ) : (
+              <div className="d-flex flex-column align-items-center mt-5">
+                <h3 className="fw-bold" style={{ color: "#4682B4" }}>
+                  No Markets Yet!
+                </h3>
+                <p
+                  className="text-muted"
+                  style={{
+                    fontSize: "1.2rem",
+                    maxWidth: "600px",
+                    textAlign: "center",
+                  }}
+                >
+                  Explore available markets or check back later to view your purchase
+                  history.
+                </p>
+                <div
+                  className="d-flex justify-content-center align-items-center mt-3"
+                  style={{
+                    background: "#e6f7ff",
+                    padding: "20px",
+                    borderRadius: "10px",
+                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  {/* <img
+                    src="https://via.placeholder.com/150"
+                    alt="No Markets"
+                    style={{ width: "150px", marginRight: "20px" }}
+                  /> */}
+                  <div>
+                    <h5 className="text-secondary text-center">No purchases to display</h5>
+                    <p className="mb-0 text-muted">
+                      Your purchase history will appear here once available markets
+                      are added.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
       {purchasedTickets?.length > 0 && visibleMarkets?.length > 0 && (
         <Pagination
@@ -377,6 +538,7 @@ const PurchasedTickets = () => {
           totalData={pagination.totalItems}
         />
       )}
+    </div>
     </div>
   );
 };
