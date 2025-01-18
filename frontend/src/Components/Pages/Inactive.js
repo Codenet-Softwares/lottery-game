@@ -196,7 +196,8 @@ const Inactive = () => {
                                                                 )
                                                             }
                                                         >
-                                                            {`Revoke Announcement of ${game.marketName}`}
+                                                            {/* {`Revoke Announcement of ${game.marketName}`} */}
+                                                            Revoke 
                                                         </button>
                                                     </td>
                                                 </tr>
