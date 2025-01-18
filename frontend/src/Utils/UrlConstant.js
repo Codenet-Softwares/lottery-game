@@ -2,8 +2,7 @@ class UrlConstant {
   constructor() {}
   //url was commented
 
-  url_dev = "https://lottery.server.dummydoma.in/api";
-  //url_dev = "http://localhost:8080/api";
+  url_dev = process.env.REACT_APP_API_URL;
 
   admin = "admin";
   login = `${this.url_dev}/login`;
