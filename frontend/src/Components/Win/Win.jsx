@@ -2,14 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Accordion, Button, Form } from "react-bootstrap";
 import { useAppContext } from "../../contextApi/context";
 import { AllActiveLotteryMarkets, CustomWining } from "../../Utils/apiService";
-import strings from "../../Utils/constant/stringConstant";
 import "./Win.css";
+import { validatePrizes } from "../../Utils/helper";
 
 const Win = () => {
-  const { store, dispatch, showLoader, hideLoader, isLoading } =
-    useAppContext();
-  const drawTimes = store.drawTimes || [];
-  // const [loading, setLoading] = useState(true);
+  const { showLoader, hideLoader, isLoading } = useAppContext();
 
   const [prizes, setPrizes] = useState({});
   const [allActiveMarket, setAllActiveMarket] = useState([]);
@@ -60,7 +57,7 @@ const Win = () => {
   const handleGetAllLotteryMarket = async () => {
     try {
       const allmarket = await AllActiveLotteryMarkets({
-        search: debouncedSearchTerm
+        search: debouncedSearchTerm,
       });
       console.log("allmarket", allmarket);
       setAllActiveMarket(allmarket.data);
@@ -73,7 +70,6 @@ const Win = () => {
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
-   
   };
 
   // Validation function to check for special characters
@@ -149,6 +145,11 @@ const Win = () => {
   };
 
   const submitPrizes = async (time, id) => {
+    const validationErrors = validatePrizes({ [time]: prizes[time] });
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return; // Stop submission if there are validation errors
+    }
     // Check if the provided time exists as a key in the prizes object
     if (prizes.hasOwnProperty(time)) {
       // Store the data for the matching time into a variable
@@ -330,8 +331,19 @@ const Win = () => {
                                   borderRadius: "8px",
                                   fontSize: "0.95rem",
                                   marginBottom: "15px",
+                                  borderColor: errors[data.marketName]?.[key]
+                                    ?.amount
+                                    ? "red"
+                                    : "#ced4da",
                                 }}
                               />
+                              {errors[data.marketName]?.[key]?.amount && (
+                                <div className="text-danger">
+                                  <small>
+                                    {errors[data.marketName][key].amount}
+                                  </small>
+                                </div>
+                              )}
                               <Form.Label
                                 style={{ color: "#555", fontSize: "0.9rem" }}
                               >
@@ -399,6 +411,7 @@ const Win = () => {
                                   prizes[data.marketName]?.[key]
                                     ?.ticketNumbers || []
                                 ).map((ticket, idx) => (
+                              
                                   <Form.Control
                                     key={idx}
                                     type="text"
@@ -417,8 +430,20 @@ const Win = () => {
                                       borderRadius: "8px",
                                       fontSize: "0.85rem",
                                       width: "calc(20% - 10px)",
+                                      borderColor:
+                                      errors[data.marketName]?.[key]?.ticketNumbers?.[idx]
+                                        ? "red"
+                                        : "#ced4da",
                                     }}
                                   />
+                              //        {errors[data.marketName]?.[key]?.ticketNumbers?.[idx] && (
+                              //   <div className="text-danger">
+                              //     <small>
+                              //       {errors[data.marketName][key].ticketNumbers[idx]}
+                              //     </small>
+                              //   </div>
+                              // )}
+                          
                                 ))}
                               </div>
                             </div>
