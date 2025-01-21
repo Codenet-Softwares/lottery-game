@@ -262,7 +262,7 @@ export const PurchaseTickets = async (req, res) => {
 export const purchaseHistory = async (req, res) => {
   try {
     const { userId } = req.body;
-    const { sem, page = 1, limit = 10 } = req.query;
+    const { sem, page = 1, limit = 10,date  } = req.query;
     const { marketId } = req.params;
     const offset = (page - 1) * parseInt(limit);
 
@@ -278,6 +278,14 @@ export const purchaseHistory = async (req, res) => {
       limit: parseInt(limit),
       offset,
     };
+
+    if (date) {
+      const targetDate = new Date(date);
+      purchaseFilter.where.createdAt = {
+        [Sequelize.Op.gte]: new Date(targetDate.setUTCHours(0, 0, 0, 0)), 
+        [Sequelize.Op.lt]: new Date(targetDate.setUTCHours(23, 59, 59, 999)),
+      };
+    }
 
     const purchaseRecords = await PurchaseLottery.findAndCountAll(
       purchaseFilter

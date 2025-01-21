@@ -271,6 +271,7 @@ export const ResultDeclare = async (req, res) => {
           })
         );
 
+        console.log("ticketConditions",ticketConditions)
         const matchedTickets = await PurchaseLottery.findAll({
           where: {
             marketId,
@@ -338,7 +339,7 @@ export const ResultDeclare = async (req, res) => {
               marketId,
               marketName,
               ticketNumber: number,
-              price: lotteryPrice,
+              price: totalPrice,
               sem,
               profitLoss: totalPrizeForUser,
             });

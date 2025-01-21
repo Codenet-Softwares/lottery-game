@@ -553,13 +553,21 @@ export const getTicketRange = async (req, res) => {
 
 export const getInactiveMarket = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10,search = "" } = req.query;
     const offset = (page - 1) * parseInt(limit);
 
+    const whereClause = {
+      winReference: true,
+    };
+
+    if (search) {
+      whereClause.marketName = {
+        [Sequelize.Op.like]: `%${search}%`, 
+      };
+    }
+
     const totalItems = await TicketRange.count({
-      where: {
-        winReference: true
-      }
+      where: whereClause,
     });
 
     const ticketData = await TicketRange.findAll({
@@ -568,9 +576,8 @@ export const getInactiveMarket = async (req, res) => {
         "marketName",
         "gameName"
       ],
-      where: {
-        winReference: true
-      },
+      where:whereClause
+      ,
       limit: parseInt(limit),
       offset
     });
