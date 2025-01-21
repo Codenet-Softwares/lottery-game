@@ -12,8 +12,8 @@ import { format } from "date-fns";
 import "./PurchasedTickets.css";
 
 const PurchasedTickets = () => {
-  const { dispatch, showLoader, hideLoader,store } = useAppContext();
-  console.log('store',store)
+  const { dispatch, showLoader, hideLoader, store } = useAppContext();
+  console.log("store", store);
   const { marketId: paramMarketId } = useParams();
   const navigate = useNavigate();
 
@@ -26,7 +26,9 @@ const PurchasedTickets = () => {
     totalPages: 0,
     totalItems: 0,
   });
-  const [selectedDate, setSelectedDate] = useState(""); //for date filter
+  // Get today's date in "yyyy-MM-dd" format
+  const today = format(new Date(), "yyyy-MM-dd");
+  const [selectedDate, setSelectedDate] = useState(today); //for date filter
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [markets, setMarkets] = useState([]);
@@ -41,7 +43,9 @@ const PurchasedTickets = () => {
   };
 
   const fetchMarketData = async () => {
-    const response = await GetPurchaseHistoryMarketTimings({ date: selectedDate});
+    const response = await GetPurchaseHistoryMarketTimings({
+      date: selectedDate,
+    });
 
     if (response?.success) {
       const marketsData = response.data || [];
@@ -62,12 +66,8 @@ const PurchasedTickets = () => {
   };
 
   useEffect(() => {
-  
-
     fetchMarketData();
     // fetchData();
-
-    
   }, [paramMarketId, navigate, selectedDate]);
 
   const handleDateChange = (event) => {
@@ -125,12 +125,11 @@ const PurchasedTickets = () => {
   // Effect for fetching purchased tickets when selectedMarketId, pagination, or searchTerm changes
   useEffect(() => {
     if (!selectedMarketId) return;
- 
 
     fetchData();
 
     return () => {
-      fetchPurchasedLotteryTickets.cancel(); 
+      fetchPurchasedLotteryTickets.cancel();
     };
   }, [
     selectedMarketId,
@@ -143,7 +142,7 @@ const PurchasedTickets = () => {
   // Handle search input change
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
-    setPagination((prev) => ({ ...prev, page: 1 })); 
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   // Handle pagination page change
@@ -186,359 +185,335 @@ const PurchasedTickets = () => {
   // if (loading) {
   //   return null;
   // }
-  // Get today's date in "yyyy-MM-dd" format
-  const today = format(new Date(), "yyyy-MM-dd");
+
   return (
     <div
-    className="d-flex align-items-center justify-content-center"
-    style={{ background: "#f0f0f0", minHeight: "75vh" }}
-  >
-    <div
-      className="container mt-5 p-3"
-      style={{
-        background: "#e6f7ff",
-        borderRadius: "10px",
-        boxShadow: "0 0 15px rgba(0,0,0,0.1)",
-      }}
+      className="d-flex align-items-center justify-content-center"
+      style={{ background: "#f0f0f0", minHeight: "75vh" }}
     >
-      {/* Date Filter UI */}
-      <div className="date-filter-container">
-        <label htmlFor="date-filter" className="date-filter-label">
-          Select Date:
-        </label>
-        <input
-          type="date"
-          id="date-filter"
-          className="date-filter-input"
-          value={selectedDate}
-          onChange={handleDateChange}
-          max={today} // Prevent selecting future dates
-        />
-      </div>
-      {/* Top Navigation for Markets */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="fw-bold">Markets</h4>
-        <div className="d-flex align-items-center">
-          <button
-            className="btn btn-sm btn-outline-secondary me-2"
-            onClick={handleLeftClick}
-            disabled={visibleStartIndex === 0}
-          >
-            &lt;
-          </button>
-          <div className="d-flex flex-wrap">
-            {visibleMarkets.length > 0 ? (
-              visibleMarkets.map((market) => (
-                <span
-                  key={market.marketId}
-                  className={`badge me-2 ${
-                    selectedMarketId === market.marketId
-                      ? "bg-success"
-                      : "bg-primary"
-                  }`}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => handleMarketClick(market.marketId)}
-                >
-                  {market.marketName}
-                </span>
-              ))
-            ) : (
-              <span>No markets available</span>
-            )}
+      <div
+        className="container mt-5 p-3"
+        style={{
+          background: "#e6f7ff",
+          borderRadius: "10px",
+          boxShadow: "0 0 15px rgba(0,0,0,0.1)",
+        }}
+      >
+        {/* Date Filter UI */}
+        <div className="date-filter-container">
+          <div>
+            <label htmlFor="date-filter" className="date-filter-label">
+              <i
+                className="fas fa-calendar-alt me-2"
+                style={{ color: "#4682B4" }}
+              ></i>
+              Select Lottery Market Date:
+            </label>
+            <p className="date-filter-description">
+              Please choose a date to view past available lottery markets.
+            </p>
           </div>
-          <button
-            className="btn btn-sm btn-outline-secondary ms-2"
-            onClick={handleRightClick}
-            disabled={visibleStartIndex + visibleCount >= markets.length}
-          >
-            &gt;
-          </button>
-        </div>
-      </div>
-
-      {/* Purchased Tickets Table */}
-      {/* <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="fw-bold" style={{ color: "#4682B4" }}>
-          Purchased Lottery Tickets
-        </h2>
-        <div className="w-50">
           <input
-            type="text"
-            className="form-control"
-            placeholder="Search purchased tickets by SEM.."
-            aria-label="Search tickets"
-            value={searchTerm}
-            onChange={handleSearchChange}
+            type="date"
+            id="date-filter"
+            className="date-filter-input"
+            value={selectedDate}
+            onChange={handleDateChange}
+            max={today} // Prevent selecting future dates
           />
         </div>
-      </div>
 
-      <Table striped hover responsive bordered className="table-sm">
-        <thead
+        {/* Top Navigation for Markets */}
+        <div
+          className="d-flex justify-content-between align-items-center mb-3 p-2 rounded shadow"
           style={{
-            backgroundColor: "#4682B4",
-            color: "#fff",
-            fontWeight: "bold",
-            textAlign: "center",
+            backgroundColor: "#f9f9f9",
+            border: "1px solid #ddd",
           }}
         >
-          <tr>
-            <th>Serial Number</th>
-            <th>Market Name</th>
-            <th>Price</th>
-            <th>SEM</th>
-            <th>Tickets</th>
-            <th>User Name</th>
-          </tr>
-        </thead>
-        <tbody style={{ textAlign: "center" }}>
-          {loader ? (
-            <tr>
-              <td colSpan="6">
-                <div className="d-flex justify-content-center align-items-center">
-                  <Spinner animation="border" variant="primary" />
-                  <span className="ms-2">
-                    Loading Tickets....{" "}
-                  </span>
-                </div>
-              </td>
-            </tr>
-          ) : purchasedTickets.length > 0 && visibleMarkets.length > 0 ? (
-            purchasedTickets.map((ticket, index) => (
-              <tr key={index}>
-                <td>{startIndex + index}</td>
-                <td>{ticket.marketName || "N/A"}</td>
-                <td>{ticket.price}</td>
-                <td>{ticket.sem}</td>
-
-                <td>
-                  <div className="dropdown" style={{ position: "relative" }}>
-                    <button
-                      className="btn btn-link dropdown-toggle"
-                      type="button"
-                      onClick={() => toggleDropdown(index)}
-                    >
-                      View Tickets
-                    </button>
-                    <div
-                      className="custom-dropdown-content"
-                      style={{
-                        maxHeight: dropdownOpen === index ? "200px" : "0", // Adjust to your desired max-height
-                        overflow: "hidden", // Hide overflow initially
-                        transition: "max-height 0.3s ease", // Smooth transition when opening
-                        background: "white",
-                        border: "1px solid #ccc",
-                        borderRadius: "4px",
-                        boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-                      }}
-                    >
-                      {dropdownOpen === index && (
-                        <div
-                          style={{
-                            maxHeight: "200px", // Sets the maximum height
-                            overflowY: "auto", // Enables scrolling if necessary
-                            padding: "10px", // Optional: Space inside the dropdown
-                          }}
-                        >
-                          <span className="dropdown-item-text">
-                            Ticket Numbers:
-                          </span>
-                          <div className="dropdown-divider" />
-                          {ticket.tickets.length > 0 ? (
-                            ticket.tickets.map((number, i) => (
-                              <span key={i} className="dropdown-item">
-                                {number}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="dropdown-item text-muted">
-                              No ticket numbers available
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </td>
-                <td>{ticket.userName || "N/A"}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="6" className="text-center">
-                No tickets found.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </Table> */}
-         {visibleMarkets.length > 0 ? (
-              <>
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h2 className="fw-bold" style={{ color: "#4682B4" }}>
-                    Purchased Lottery Tickets
-                  </h2>
-                  <div className="w-50">
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Search purchased tickets by SEM.."
-                      aria-label="Search tickets"
-                      value={searchTerm}
-                      onChange={handleSearchChange}
-                    />
-                  </div>
-                </div>
-      
-                <Table striped hover responsive bordered className="table-sm">
-                  <thead
-                    style={{
-                      backgroundColor: "#4682B4",
-                      color: "#fff",
-                      fontWeight: "bold",
-                      textAlign: "center",
-                    }}
-                  >
-                    <tr>
-                      <th>Serial Number</th>
-                      <th>Market Name</th>
-                      <th>Price</th>
-                      <th>SEM</th>
-                      <th>Tickets</th>
-                      <th>User Name</th>
-                    </tr>
-                  </thead>
-                  <tbody style={{ textAlign: "center" }}>
-                    {loader ? (
-                      <tr>
-                        <td colSpan="6">
-                          <div className="d-flex justify-content-center align-items-center">
-                            <Spinner animation="border" variant="primary" />
-                            <span className="ms-2">Loading Tickets....</span>
-                          </div>
-                        </td>
-                      </tr>
-                    ) : purchasedTickets.length > 0 ? (
-                      purchasedTickets.map((ticket, index) => (
-                        <tr key={index}>
-                          <td>{startIndex + index}</td>
-                          <td>{ticket.marketName || "N/A"}</td>
-                          <td>{ticket.price}</td>
-                          <td>{ticket.sem}</td>
-                          <td>
-                            <div className="dropdown" style={{ position: "relative" }}>
-                              <button
-                                className="btn btn-link dropdown-toggle"
-                                type="button"
-                                onClick={() => toggleDropdown(index)}
-                              >
-                                View Tickets
-                              </button>
-                              <div
-                                className="custom-dropdown-content"
-                                style={{
-                                  maxHeight: dropdownOpen === index ? "200px" : "0",
-                                  overflow: "hidden",
-                                  transition: "max-height 0.3s ease",
-                                  background: "white",
-                                  border: "1px solid #ccc",
-                                  borderRadius: "4px",
-                                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-                                }}
-                              >
-                                {dropdownOpen === index && (
-                                  <div
-                                    style={{
-                                      maxHeight: "200px",
-                                      overflowY: "auto",
-                                      padding: "10px",
-                                    }}
-                                  >
-                                    <span className="dropdown-item-text">
-                                      Ticket Numbers:
-                                    </span>
-                                    <div className="dropdown-divider" />
-                                    {ticket.tickets.length > 0 ? (
-                                      ticket.tickets.map((number, i) => (
-                                        <span key={i} className="dropdown-item">
-                                          {number}
-                                        </span>
-                                      ))
-                                    ) : (
-                                      <span className="dropdown-item text-muted">
-                                        No ticket numbers available
-                                      </span>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </td>
-                          <td>{ticket.userName || "N/A"}</td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="6" className="text-center">
-                          No tickets found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </Table>
-              </>
-            ) : (
-              <div className="d-flex flex-column align-items-center mt-5">
-                <h3 className="fw-bold" style={{ color: "#4682B4" }}>
-                  No Markets Yet!
-                </h3>
-                <p
-                  className="text-muted"
+          {visibleMarkets.length > 0 ? (
+            <>
+              <h4
+                className="fw-bold"
+                style={{
+                  color: "#4682B4",
+                }}
+              >
+                Lottery Markets
+              </h4>
+              <div className="d-flex align-items-center">
+                {/* Left Navigation Button */}
+                <button
+                  className="btn btn-sm btn-outline-primary me-3"
+                  onClick={handleLeftClick}
+                  disabled={visibleStartIndex === 0}
                   style={{
-                    fontSize: "1.2rem",
-                    maxWidth: "600px",
+                    borderRadius: "50%",
+                    width: "35px",
+                    height: "35px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: 0,
+                  }}
+                >
+                  <span style={{ fontSize: "16px", fontWeight: "bold" }}>
+                    &lt;
+                  </span>
+                </button>
+
+                {/* Visible Markets */}
+                <div className="d-flex flex-wrap justify-content-center">
+                  {visibleMarkets.map((market) => (
+                    <span
+                      key={market.marketId}
+                      className={`badge text-white me-2 mb-2 ${
+                        selectedMarketId === market.marketId
+                          ? "bg-success"
+                          : "bg-primary"
+                      }`}
+                      style={{
+                        cursor: "pointer",
+                        padding: "10px 15px",
+                        fontSize: "14px",
+                        borderRadius: "20px",
+                        transition: "all 0.3s ease-in-out",
+                      }}
+                      onClick={() => handleMarketClick(market.marketId)}
+                    >
+                      {market.marketName}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Right Navigation Button */}
+                <button
+                  className="btn btn-sm btn-outline-primary ms-3"
+                  onClick={handleRightClick}
+                  disabled={visibleStartIndex + visibleCount >= markets.length}
+                  style={{
+                    borderRadius: "50%",
+                    width: "35px",
+                    height: "35px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: 0,
+                  }}
+                >
+                  <span style={{ fontSize: "16px", fontWeight: "bold" }}>
+                    &gt;
+                  </span>
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center w-100">
+              <h4
+                style={{
+                  color: "#FF6347",
+                  fontWeight: "bold",
+                  // marginBottom: "10px",
+                }}
+              >
+                No Markets Available
+              </h4>
+              <p style={{ color: "#6c757d" }}>
+                Please try again later or check your purchases.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {visibleMarkets.length > 0 ? (
+          <>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h2 className="fw-bold" style={{ color: "#4682B4" }}>
+                Purchased Lottery Tickets
+              </h2>
+              <div className="w-50">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search purchased tickets by SEM.."
+                  aria-label="Search tickets"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+              </div>
+            </div>
+            <div
+              style={{
+                maxHeight: "300px", // Limit the container height
+                overflowY: "auto", // Enable vertical scrolling
+              }}
+              className="custom-scrollbar"
+            >
+              <table
+                className="table table-striped table-bordered table-hover"
+                style={{
+                  borderCollapse: "collapse",
+                  width: "100%",
+                }}
+              >
+                <thead
+                  style={{
+                    position: "sticky",
+                    top: 0,
+                    zIndex: 2,
+                    backgroundColor: "#4682B4",
+                    color: "#fff",
+                    fontWeight: "bold",
                     textAlign: "center",
                   }}
                 >
-                  Explore available markets or check back later to view your purchase
-                  history.
-                </p>
-                <div
-                  className="d-flex justify-content-center align-items-center mt-3"
-                  style={{
-                    background: "#e6f7ff",
-                    padding: "20px",
-                    borderRadius: "10px",
-                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                  }}
-                >
-                  {/* <img
+                  <tr>
+                    <th>Serial Number</th>
+                    <th>Market Name</th>
+                    <th>Price</th>
+                    <th>SEM</th>
+                    <th>Tickets</th>
+                    <th>User Name</th>
+                  </tr>
+                </thead>
+                <tbody style={{ textAlign: "center" }}>
+                  {loader ? (
+                    <tr>
+                      <td colSpan="6">
+                        <div className="d-flex justify-content-center align-items-center">
+                          <Spinner animation="border" variant="primary" />
+                          <span className="ms-2">Loading Tickets....</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : purchasedTickets.length > 0 ? (
+                    purchasedTickets.map((ticket, index) => (
+                      <tr key={index}>
+                        <td>{startIndex + index}</td>
+                        <td>{ticket.marketName || "N/A"}</td>
+                        <td>{ticket.price}</td>
+                        <td>{ticket.sem}</td>
+                        <td>
+                          <div
+                            className="dropdown"
+                            style={{ position: "relative" }}
+                          >
+                            <button
+                              className="btn btn-link dropdown-toggle"
+                              type="button"
+                              onClick={() => toggleDropdown(index)}
+                            >
+                              View Tickets
+                            </button>
+                            <div
+                              className="custom-dropdown-content"
+                              style={{
+                                maxHeight:
+                                  dropdownOpen === index ? "200px" : "0",
+                                overflow: "hidden",
+                                transition: "max-height 0.3s ease",
+                                background: "white",
+                                border: "1px solid #ccc",
+                                borderRadius: "4px",
+                                boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                              }}
+                            >
+                              {dropdownOpen === index && (
+                                <div
+                                  style={{
+                                    maxHeight: "200px",
+                                    overflowY: "auto",
+                                    padding: "10px",
+                                  }}
+                                >
+                                  <span className="dropdown-item-text">
+                                    Ticket Numbers:
+                                  </span>
+                                  <div className="dropdown-divider" />
+                                  {ticket.tickets.length > 0 ? (
+                                    ticket.tickets.map((number, i) => (
+                                      <span key={i} className="dropdown-item">
+                                        {number}
+                                      </span>
+                                    ))
+                                  ) : (
+                                    <span className="dropdown-item text-muted">
+                                      No ticket numbers available
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td>{ticket.userName || "N/A"}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="6" className="text-center">
+                        No tickets found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        ) : (
+          <div className="d-flex flex-column align-items-center mt-5">
+            {/* <h3 className="fw-bold" style={{ color: "#4682B4" }}>
+              No Markets Yet!
+            </h3>
+            <p
+              className="text-muted"
+              style={{
+                fontSize: "1.2rem",
+                maxWidth: "600px",
+                textAlign: "center",
+              }}
+            >
+              Explore available markets or check back later to view your
+              purchase history.
+            </p> */}
+            <div
+              className="d-flex justify-content-center align-items-center mt-3"
+              style={{
+                background: "#e6f7ff",
+                padding: "20px",
+                borderRadius: "10px",
+                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              {/* <img
                     src="https://via.placeholder.com/150"
                     alt="No Markets"
                     style={{ width: "150px", marginRight: "20px" }}
                   /> */}
-                  <div>
-                    <h5 className="text-secondary text-center">No purchases to display</h5>
-                    <p className="mb-0 text-muted">
-                      Your purchase history will appear here once available markets
-                      are added.
-                    </p>
-                  </div>
-                </div>
+              <div>
+                <h5 className="text-secondary text-center">
+                  No purchases to display
+                </h5>
+                <p className="mb-0 text-muted">
+                  Your purchase history will appear here once available markets
+                  are added.
+                </p>
               </div>
-            )}
+            </div>
+          </div>
+        )}
 
-      {purchasedTickets?.length > 0 && visibleMarkets?.length > 0 && (
-        <Pagination
-          currentPage={pagination.page}
-          totalPages={pagination.totalPages}
-          handlePageChange={handlePageChange}
-          startIndex={startIndex}
-          endIndex={endIndex}
-          totalData={pagination.totalItems}
-        />
-      )}
-    </div>
+        {purchasedTickets?.length > 0 && visibleMarkets?.length > 0 && (
+          <Pagination
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+            handlePageChange={handlePageChange}
+            startIndex={startIndex}
+            endIndex={endIndex}
+            totalData={pagination.totalItems}
+          />
+        )}
+      </div>
     </div>
   );
 };

@@ -349,7 +349,7 @@ export async function getIsActiveLottery(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
     const response = await makeCall(
-      `${urls.getIsActive}?page=${body.page}&limitPerPage=${body.limit}`,
+      `${urls.getIsActive}?page=${body.page}&limitPerPage=${body.limit}&search=${body.search}`,
       callParams,
       isToast
     );

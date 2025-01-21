@@ -3,7 +3,7 @@ import { Accordion, Button, Form } from "react-bootstrap";
 import { useAppContext } from "../../contextApi/context";
 import { AllActiveLotteryMarkets, CustomWining } from "../../Utils/apiService";
 import "./Win.css";
-import { validatePrizes } from "../../Utils/helper";
+// import { validatePrizes } from "../../Utils/helper";
 
 const Win = () => {
   const { showLoader, hideLoader, isLoading } = useAppContext();
@@ -145,11 +145,7 @@ const Win = () => {
   };
 
   const submitPrizes = async (time, id) => {
-    const validationErrors = validatePrizes({ [time]: prizes[time] });
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return; // Stop submission if there are validation errors
-    }
+  
     // Check if the provided time exists as a key in the prizes object
     if (prizes.hasOwnProperty(time)) {
       // Store the data for the matching time into a variable
