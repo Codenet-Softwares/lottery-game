@@ -3,7 +3,7 @@ import { Accordion, Button, Form } from "react-bootstrap";
 import { useAppContext } from "../../contextApi/context";
 import { AllActiveLotteryMarkets, CustomWining } from "../../Utils/apiService";
 import "./Win.css";
-// import { validatePrizes } from "../../Utils/helper";
+import { generatePrizes, validateAllInputs } from "../../Utils/helper";
 
 const Win = () => {
   const { showLoader, hideLoader, isLoading } = useAppContext();
@@ -145,7 +145,12 @@ const Win = () => {
   };
 
   const submitPrizes = async (time, id) => {
-  
+    const validationErrors = validateAllInputs({ [time]: prizes[time] });
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors((prevErrors) => ({ ...prevErrors, ...validationErrors }));
+      return;
+    }
+
     // Check if the provided time exists as a key in the prizes object
     if (prizes.hasOwnProperty(time)) {
       // Store the data for the matching time into a variable
@@ -217,6 +222,24 @@ const Win = () => {
     }
   };
 
+  const handleGeneratePrizes = (marketName) => {
+    const generatedPrizes = generatePrizes(); // Use the helper to generate prizes
+    console.log('line 227',generatedPrizes)
+    setPrizes((prevPrizes) => ({
+      ...prevPrizes,
+      [marketName]: {
+        ...prevPrizes[marketName],
+        ...Object.entries(generatedPrizes).reduce((acc, [rank, tickets]) => {
+          acc[rank] = {
+            ...prevPrizes[marketName]?.[rank],
+            ticketNumbers: tickets,
+          };
+          return acc;
+        }, {}),
+      },
+    }));
+  };
+
   const prizeData = {
     1: { rank: "1st", description: "Top prize for the winner" },
     2: { rank: "2nd", description: "Prize for 10 winners" },
@@ -286,10 +309,12 @@ const Win = () => {
                 <h4 style={{ color: "#007bb5", fontWeight: "bold" }}>
                   {data.marketName}
                 </h4>
-
-                {/* {errors[time] && (
-                  <div className="text-danger mb-2">{errors[time]}</div>
-                )} */}
+                {/* <Form.Check
+                  type="switch"
+                  id={`switch-${index}`}
+                  label="Generate Numbers"
+                  onChange={() => handleGeneratePrizes(data.marketName)}
+                /> */}
 
                 <Accordion defaultActiveKey="0">
                   {Object.entries(prizeData).map(
@@ -327,18 +352,13 @@ const Win = () => {
                                   borderRadius: "8px",
                                   fontSize: "0.95rem",
                                   marginBottom: "15px",
-                                  borderColor: errors[data.marketName]?.[key]
-                                    ?.amount
-                                    ? "red"
-                                    : "#ced4da",
                                 }}
                               />
-                              {errors[data.marketName]?.[key]?.amount && (
-                                <div className="text-danger">
-                                  <small>
-                                    {errors[data.marketName][key].amount}
-                                  </small>
-                                </div>
+                              {errors[data.marketName]?.[key]
+                                ?.ticketNumber0 && (
+                                <small className="text-danger">
+                                  {errors[data.marketName][key].ticketNumber0}
+                                </small>
                               )}
                               <Form.Label
                                 style={{ color: "#555", fontSize: "0.9rem" }}
@@ -365,6 +385,15 @@ const Win = () => {
                                   marginBottom: "15px",
                                 }}
                               />
+                              {errors[data.marketName]?.[key]
+                                ?.complementaryAmount && (
+                                <small className="text-danger">
+                                  {
+                                    errors[data.marketName][key]
+                                      .complementaryAmount
+                                  }
+                                </small>
+                              )}
                             </div>
                           )}
 
@@ -392,7 +421,11 @@ const Win = () => {
                               marginBottom: "15px",
                             }}
                           />
-
+                          {errors[data.marketName]?.[key]?.amount && (
+                            <small className="text-danger">
+                              {errors[data.marketName][key].amount}
+                            </small>
+                          )}
                           {/* Ticket Numbers Input for other prizes */}
                           {!["1"].includes(key) && (
                             <div>
@@ -407,39 +440,40 @@ const Win = () => {
                                   prizes[data.marketName]?.[key]
                                     ?.ticketNumbers || []
                                 ).map((ticket, idx) => (
-                              
-                                  <Form.Control
+                                  <Form.Group
                                     key={idx}
-                                    type="text"
-                                    value={ticket}
-                                    onChange={(e) =>
-                                      handleTicketChange(
-                                        data.marketName,
-                                        key,
-                                        idx,
-                                        e.target.value,
-                                        prizeData[key].rank
-                                      )
-                                    }
-                                    placeholder={`Ticket ${idx + 1}`}
                                     style={{
-                                      borderRadius: "8px",
-                                      fontSize: "0.85rem",
-                                      width: "calc(20% - 10px)",
-                                      borderColor:
-                                      errors[data.marketName]?.[key]?.ticketNumbers?.[idx]
-                                        ? "red"
-                                        : "#ced4da",
+                                      width: "calc(20% - 10px)", // Same width as before
                                     }}
-                                  />
-                              //        {errors[data.marketName]?.[key]?.ticketNumbers?.[idx] && (
-                              //   <div className="text-danger">
-                              //     <small>
-                              //       {errors[data.marketName][key].ticketNumbers[idx]}
-                              //     </small>
-                              //   </div>
-                              // )}
-                          
+                                  >
+                                    <Form.Control
+                                      key={idx}
+                                      type="text"
+                                      value={ticket}
+                                      onChange={(e) =>
+                                        handleTicketChange(
+                                          data.marketName,
+                                          key,
+                                          idx,
+                                          e.target.value,
+                                          prizeData[key].rank
+                                        )
+                                      }
+                                      placeholder={`Ticket ${idx + 1}`}
+                                    />
+
+                                    {errors[data.marketName]?.[key]?.[
+                                      `ticketNumber${idx}`
+                                    ] && (
+                                      <small className="text-danger">
+                                        {
+                                          errors[data.marketName][key][
+                                            `ticketNumber${idx}`
+                                          ]
+                                        }
+                                      </small>
+                                    )}
+                                  </Form.Group>
                                 ))}
                               </div>
                             </div>
