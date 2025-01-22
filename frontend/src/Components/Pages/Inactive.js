@@ -8,7 +8,7 @@ import { getIsActiveLottery, isRevokeLottery } from "../../Utils/apiService";
 import SingleCard from "../Common/SingleCard";
 
 const Inactive = () => {
-  const { store } = useAppContext;
+  const { store,showLoader, hideLoader } = useAppContext();
   const [inactiveGames, setInactiveGames] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -56,6 +56,7 @@ const Inactive = () => {
   const handleRevokeAnnouncement = async (marketId) => {
     console.log("first", marketId);
     try {
+      showLoader(); // Show the loader before the API call starts
       const res = await isRevokeLottery({ marketId: marketId });
       if (res) {
         toast.success(res.message);
@@ -63,6 +64,8 @@ const Inactive = () => {
       }
     } catch (err) {
       console.error("Error fetching inactive games:", err);
+    } finally {
+      hideLoader(); // Hide the loader after the API call finishes
     }
   };
 

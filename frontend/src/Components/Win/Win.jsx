@@ -199,6 +199,9 @@ const Win = () => {
       // Log the structured array
       console.log(JSON.stringify(resultArray, null, 2));
 
+        // Show loader before making the API call
+    showLoader();
+
       // Send each result to the CustomWining API
       try {
         const response = await CustomWining({ resultArray, marketId: id });
@@ -213,6 +216,9 @@ const Win = () => {
           `API call failed for ${resultArray.prizeCategory}:`,
           error
         );
+      }finally {
+        // Hide loader after the API call completes
+        hideLoader();
       }
 
       return resultArray;
@@ -222,23 +228,6 @@ const Win = () => {
     }
   };
 
-  const handleGeneratePrizes = (marketName) => {
-    const generatedPrizes = generatePrizes(); // Use the helper to generate prizes
-    console.log('line 227',generatedPrizes)
-    setPrizes((prevPrizes) => ({
-      ...prevPrizes,
-      [marketName]: {
-        ...prevPrizes[marketName],
-        ...Object.entries(generatedPrizes).reduce((acc, [rank, tickets]) => {
-          acc[rank] = {
-            ...prevPrizes[marketName]?.[rank],
-            ticketNumbers: tickets,
-          };
-          return acc;
-        }, {}),
-      },
-    }));
-  };
 
   const prizeData = {
     1: { rank: "1st", description: "Top prize for the winner" },
@@ -356,9 +345,11 @@ const Win = () => {
                               />
                               {errors[data.marketName]?.[key]
                                 ?.ticketNumber0 && (
-                                <small className="text-danger">
-                                  {errors[data.marketName][key].ticketNumber0}
-                                </small>
+                                  <div>
+                                  <small className="text-danger">
+                                    {errors[data.marketName][key].ticketNumber0}
+                                  </small>
+                                </div>
                               )}
                               <Form.Label
                                 style={{ color: "#555", fontSize: "0.9rem" }}

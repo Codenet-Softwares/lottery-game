@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./Trashmarketdetails.css";
 import { TrashMarketsDelete,RevokeMarketsDelete } from "../../Utils/apiService";
 import Pagination from "../Common/Pagination";
+import { useAppContext } from "../../contextApi/context";
 
 const Trashmarketdetails = ({
   details,
@@ -15,50 +16,94 @@ const Trashmarketdetails = ({
   fetchMarketDetails, // pass the fetchMarketDetails function from the parent
 }) => {
   console.log("details", details);
+  const { showLoader, hideLoader } = useAppContext();
   const [expandedTickets, setExpandedTickets] = useState(null);
 
   const toggleTicketsDropdown = (index) => {
     setExpandedTickets(expandedTickets === index ? null : index);
   };
 
-  const handleDelete = async (trashId,selectedMarketId) => {
-    console.log(trashId)
+  // const handleDelete = async (trashId,selectedMarketId) => {
+  //   console.log(trashId)
+  //   if (window.confirm("Are you sure you want to delete this market?")) {
+  //     try {
+  //       await TrashMarketsDelete({trashId:trashId });
+  //       alert("Market deleted successfully!");
+  //       // Call the refreshMarkets and also refetch market details after deletion
+  //       refreshMarkets(); // Refresh markets list
+  //       fetchMarketDetails( selectedMarketId); // Refetch the market details
+  //     } catch (error) {
+  //       console.error("Error deleting market:", error);
+  //       alert("Failed to delete the market. Please try again.");
+  //     }
+  //   }
+  // };
+
+  // const handleRevoke = async (trashId, selectedMarketId) => {
+  //   console.log(trashId)
+  //   if (window.confirm("Are you sure you want to revoke this market?")) {
+  //     const requestBody = {
+  //       trashMarketId:trashId
+
+  //     }
+      
+  //       const response = await RevokeMarketsDelete(requestBody);
+
+  //       if (response.success){
+  //         alert("Market revoked successfully!");
+  //       refreshMarkets(); // Refresh the markets list after revoke
+  //       fetchMarketDetails( selectedMarketId)
+
+  //       }else {
+
+  //         alert ("Error Revoking")
+  //       }
+        
+  //   }
+  // };
+
+  const handleDelete = async (trashId, selectedMarketId) => {
+    console.log(trashId);
     if (window.confirm("Are you sure you want to delete this market?")) {
       try {
-        await TrashMarketsDelete({trashId:trashId });
+        showLoader(); // Show loader before the request
+        await TrashMarketsDelete({ trashId: trashId });
         alert("Market deleted successfully!");
-        // Call the refreshMarkets and also refetch market details after deletion
         refreshMarkets(); // Refresh markets list
-        fetchMarketDetails( selectedMarketId); // Refetch the market details
+        fetchMarketDetails(selectedMarketId); // Refetch the market details
       } catch (error) {
         console.error("Error deleting market:", error);
         alert("Failed to delete the market. Please try again.");
+      } finally {
+        hideLoader(); // Hide loader after the request
       }
     }
   };
-
+  
   const handleRevoke = async (trashId, selectedMarketId) => {
-    console.log(trashId)
+    console.log(trashId);
     if (window.confirm("Are you sure you want to revoke this market?")) {
-      const requestBody = {
-        trashMarketId:trashId
-
-      }
-      
+      try {
+        showLoader(); // Show loader before the request
+        const requestBody = { trashMarketId: trashId };
         const response = await RevokeMarketsDelete(requestBody);
-
-        if (response.success){
+  
+        if (response.success) {
           alert("Market revoked successfully!");
-        refreshMarkets(); // Refresh the markets list after revoke
-        fetchMarketDetails( selectedMarketId)
-
-        }else {
-
-          alert ("Error Revoking")
+          refreshMarkets(); // Refresh the markets list after revoke
+          fetchMarketDetails(selectedMarketId);
+        } else {
+          alert("Error revoking market.");
         }
-        
+      } catch (error) {
+        console.error("Error revoking market:", error);
+        alert("Failed to revoke the market. Please try again.");
+      } finally {
+        hideLoader(); // Hide loader after the request
+      }
     }
   };
+  
 
   // Handle "No results found" scenario
   const isNoResultsFound = details.length === 0;

@@ -91,7 +91,7 @@ const DashCard = [
     {
       name: "Revoke",
       description:
-        "Create and manage multiple draw times for lotteries each day for a more dynamic experience!",
+      "Revoke a market to restore its initial state with the original price when the ticket was created.",
       buttonName: "Active",
       buttonLink: "/inactive" ,
       cardstyle: {
@@ -105,7 +105,7 @@ const DashCard = [
     {
       name: "Live Markets",
       description:
-        "Create and manage multiple draw times for lotteries each day for a more dynamic experience!",
+      "View user bets with detailed stats, including amounts and ticket counts, and delete individual tickets.",
       buttonName: "Live Markets",
       buttonLink: "/live-markets" ,
       cardstyle: {
@@ -119,7 +119,7 @@ const DashCard = [
     {
       name: "Trash",
       description:
-        "Create and manage multiple draw times for lotteries each day for a more dynamic experience!",
+       "Access deleted tickets by market, with options to revoke or permanently delete them.",
       buttonName: "Trash",
       buttonLink: "/trash" ,
       cardstyle: {
@@ -134,7 +134,7 @@ const DashCard = [
     {
       name: "ResetPassword",
       description:
-        "Create and manage multiple draw times for lotteries each day for a more dynamic experience!",
+       "Admins can reset passwords securely to ensure safety and meet specific needs.",
       buttonName: "Reset Password",
       buttonLink: "/reset-password" ,
       cardstyle: {

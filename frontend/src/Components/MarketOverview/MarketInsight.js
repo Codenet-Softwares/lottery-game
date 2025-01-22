@@ -83,7 +83,7 @@ const MarketInsight = () => {
       showLoader();
       try {
         const response = await GetMarketTimings({
-          search: debouncedSearchTerm
+          search: debouncedSearchTerm,
         });
         if (response.success) {
           setMarketTimes(response.data);
@@ -97,34 +97,15 @@ const MarketInsight = () => {
     };
 
     fetchMarketTimings();
-  }, [refresh,debouncedSearchTerm]);
-
+  }, [refresh, debouncedSearchTerm]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
-   
   };
-  // const fetchMarketData = async (marketId) => {
-  //   setLoading(true);
-  //   setError(null);
-  //   try {
-  //     const response = await voidMarket({ marketId });
-  //     if (response.success) {
-  //       setMarketData(response.data);
-  //     } else {
-  //       setError(response.message);
-  //     }
-  //   } catch (err) {
-  //     setError("Error fetching market data");
-  //     console.error(err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-  const handleVoidMarket = async (marketId) => {
-    try {
-      showLoader();
 
+  const handleVoidMarket = async (marketId) => {
+    showLoader();
+    try {
       const requestBody = { marketId };
       const response = await voidMarket(requestBody);
 
