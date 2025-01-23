@@ -1,0 +1,98 @@
+/* General Styling for Input Fields */
+.form-control {
+  background: rgba(0, 0, 0, 0.6); /* Black background with transparency */
+  border: 2px solid transparent; /* Transparent border for clean look */
+  border-radius: 10px; /* Rounded corners */
+  color: #00d4ff; /* Neon blue text */
+  font-family: "Orbitron", sans-serif; /* Futuristic font */
+  font-size: 1rem; /* Readable font size */
+  transition: all 0.3s ease-in-out; /* Smooth transitions */
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.6); /* Initial glow */
+}
+
+/* Hover State */
+.form-control:hover {
+  background: rgba(0, 0, 0, 0.8); /* Darker black background */
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.8); /* Brighter glow on hover */
+  border: 2px solid #00d4ff; /* Blue border on hover */
+}
+
+/* Focus State */
+.form-control:focus {
+  background: rgba(0, 0, 0, 0.9); /* Almost opaque black background */
+  color: #8dd9f6; /* Slightly brighter neon blue text on focus */
+  border: 2px solid #00d4ff; /* Glowing blue border */
+  box-shadow: 0 0 20px rgba(0, 212, 255, 1); /* Strong glow effect */
+  outline: none; /* Remove default focus outline */
+}
+
+/* Filled State (With Text) */
+.form-control:not(:placeholder-shown) {
+  /* background: rgba(0, 0, 0, 0.7); Maintain black background with glow */
+  color: #00d4ff; /* Keep text in neon blue */
+}
+
+/* Placeholder Styling */
+.form-control::placeholder {
+  color: #8dd9f6; /* Neon blue for placeholder */
+  opacity: 1; /* Fully visible placeholder */
+  transition: color 0.3s ease-in-out; /* Smooth color transition */
+}
+
+/* Error State */
+.form-control.is-invalid {
+  /* background: rgba(0, 0, 0, 0.6); */
+  box-shadow: 0 0 10px rgba(255, 71, 87, 0.6); /* Red glow for error */
+  border: 2px solid #ff4757; /* Red border for error */
+  color: #ff4757; /* Red text for error state */
+}
+
+.form-control.is-invalid:focus {
+  box-shadow: 0 0 20px rgba(255, 71, 87, 1); /* Stronger red glow */
+  border: 2px solid #ff4757; /* Glowing red border */
+}
+
+/* Placeholder for Invalid Input */
+.form-control.is-invalid::placeholder {
+  color: #ff4757; /* Red placeholder for errors */
+}
+
+.sci-fi-grid {
+  background: radial-gradient(
+    circle,
+    rgba(15, 32, 39, 0.9),
+    rgba(0, 0, 0, 0.8)
+  );
+  border: 2px solid rgba(41, 128, 185, 0.6);
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.sci-fi-cell {
+  animation: pulse 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.8;
+    box-shadow: 0 4px 8px rgba(41, 128, 185, 0.4),
+      inset 0 2px 6px rgba(41, 128, 185, 0.7);
+  }
+  100% {
+    opacity: 1;
+    box-shadow: 0 6px 12px rgba(52, 152, 219, 0.6),
+      inset 0 4px 10px rgba(41, 128, 185, 0.9);
+  }
+}
+
+.custom-grid {
+  background: radial-gradient(
+    circle,
+    rgba(15, 32, 39, 0.9),
+    rgba(0, 0, 0, 0.8)
+  );
+  /* border: rgba(41, 128, 185, 0.6); */
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
