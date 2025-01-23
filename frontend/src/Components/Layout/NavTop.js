@@ -90,31 +90,33 @@ const NavTop = () => {
   return (
     <div className="container-fluid g-4 navtop-container ">
       <div className="row d-flex justify-content-center align-items-center">
-        {/* <div className="col-lg-6 p-0 "> */}
-          <div className="nav-wrapper justify-content-center align-items-center">
-            <button
-              className="scroll-arrow left-arrow"
-              onClick={() => scrollMenu("left")}
-            >
-                &lt;
-            </button>
-            <div ref={menuRef} className="nav-options">
-              {navItems.map(({ to, icon, label }) => (
-                <Link key={to} to={to} className="nav-link mt-2">
-                  <i className={`nav-icon ${icon}`} />
-                  <span className="text-info text-nowrap">{label}</span>
-                </Link>
-              ))}
-            </div>
-            <button
-              className="scroll-arrow right-arrow"
-              onClick={() => scrollMenu("right")}
-            >
-                &gt;
-            </button>
-          
-         
-          {/* </div> */}
+        <div className="nav-wrapper justify-content-center align-items-center">
+          <button
+            className="scroll-arrow left-arrow"
+            onClick={() => scrollMenu("left")}
+          >
+            &lt;
+          </button>
+          <div ref={menuRef} className="nav-options">
+            {navItems.map(({ to, icon, label }) => (
+              <Link
+                key={to}
+                to={to}
+                className={`nav-link mt-2 ${
+                  location.pathname === to || location.pathname.startsWith(to)? "active-link" : ""
+                }`}
+              >
+                <i className={`nav-icon ${icon}`} />
+                <span className="text-info text-nowrap">{label}</span>
+              </Link>
+            ))}
+          </div>
+          <button
+            className="scroll-arrow right-arrow"
+            onClick={() => scrollMenu("right")}
+          >
+            &gt;
+          </button>
         </div>
       
       </div>

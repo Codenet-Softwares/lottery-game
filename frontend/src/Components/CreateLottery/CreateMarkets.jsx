@@ -34,13 +34,18 @@ const CreateMarkets = () => {
         end_time: endTimeISO,
         price: parseFloat(values.priceForEach),
       };
-
-      const response = await generateLotteryNumber(requestBody);
-      if (response.success) {
-        console.log("Market created successfully!");
-        formik.resetForm();
-      } else {
-        console.error("Error creating market:", response.message);
+      try {
+        const response = await generateLotteryNumber(requestBody);
+        if (response.success) {
+          console.log("Market created successfully!");
+          formik.resetForm();
+        } else {
+          console.error("Error creating market:", response.message);
+        }
+      } catch (error) {
+        console.error("Error during the API request:", error);
+      } finally {
+        hideLoader(); // Hide loader after the request completes
       }
     },
   });
@@ -59,7 +64,6 @@ const CreateMarkets = () => {
     []
   );
   const timerOptions = useMemo(() => generateTimerOptions(), []);
-
 
   useEffect(() => {
     formik.setFieldValue("groupOptions", groupOptions);
@@ -103,19 +107,32 @@ const CreateMarkets = () => {
   return (
     <div
       className="d-flex align-items-center justify-content-center"
-      style={{ background: "#f0f0f0", minHeight: "75vh" }}
+      style={{
+        background: "linear-gradient(135deg, #0f2027, #203a43, #2c5364)",
+        minHeight: "75vh",
+      }}
     >
       <div
         className="container mt-3 p-4 shadow rounded"
         style={{
-          background: "#fff",
-          border: "2px solid black",
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
+          background: "linear-gradient(145deg, #1a2a3b, #222f3d)",
+          border: "2px solid #00bcd4",
+          boxShadow: "0px 4px 20px rgba(0, 188, 212, 0.7)",
           maxWidth: "900px",
           position: "relative",
+          borderRadius: "20px",
         }}
       >
-        <h3 className="text-center mb-4">Create Lottery Markets</h3>
+        <h3
+          className="text-center mb-4"
+          style={{
+            color: "#00bcd4",
+            textShadow: "0 0 10px #00bcd4, 0 0 20px #00bcd4",
+            fontFamily: "Orbitron, sans-serif",
+          }}
+        >
+          Create Lottery Markets
+        </h3>
         <form onSubmit={formik.handleSubmit}>
           {inputConfig.map((input) => (
             <ReusableInput
@@ -125,7 +142,7 @@ const CreateMarkets = () => {
               name={input.name}
               value={formik.values[input.name]}
               onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
+              // onBlur={formik.handleBlur}
               error={formik.touched[input.name] && formik.errors[input.name]}
             />
           ))}
@@ -151,24 +168,30 @@ const CreateMarkets = () => {
             />
           ))}
 
-          <div
-            className="text-center mt-3"
-            style={
-              {
-                // position: "relative",
-              }
-            }
-          >
+          <div className="text-center mt-3">
             <button
               type="submit"
-              className="btn btn-primary px-4"
+              className="btn btn-primary px-5"
               style={{
-                background: "#4682B4",
-                position: "absolute",
-                bottom: "-20px",
-                left: "50%",
-                transform: "translateX(-50%)",
+                background: "linear-gradient(145deg, #007ac1, #00bcd4)",
+                color: "#fff",
+                textShadow: "0 0 10px #007ac1",
+                boxShadow: "0px 4px 20px rgba(0, 188, 212, 0.7)",
+                borderRadius: "30px",
+                border: "none",
+                padding: "10px 30px",
+                fontFamily: "Orbitron, sans-serif",
+                fontSize: "16px",
+                transition: "all 0.3s ease-in-out",
               }}
+              onMouseEnter={(e) =>
+                (e.target.style.boxShadow =
+                  "0px 6px 30px rgba(0, 188, 212, 1)")
+              }
+              onMouseLeave={(e) =>
+                (e.target.style.boxShadow =
+                  "0px 4px 20px rgba(0, 188, 212, 0.7)")
+              }
             >
               Create Market
             </button>

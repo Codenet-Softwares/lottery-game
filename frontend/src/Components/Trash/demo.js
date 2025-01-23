@@ -32,6 +32,27 @@ const Trash = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  const handleMarketStatusToggle = async () => {
+    const newStatus = !selectedMarket.isActive;
+
+    try {
+      showLoader();
+      const response = await isActiveLottery(
+        { status: newStatus, marketId: selectedMarket.marketId },
+        true
+      );
+      if (response.success) {
+        toast.success(`Market is now ${newStatus ? "Active" : "Inactive"}`);
+      } else {
+        toast.error("Failed to update market status");
+      }
+    } catch (error) {
+      console.error("Error activating/deactivating lottery:", error);
+    } finally {
+      hideLoader();
+    }
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchMarketTerm(searchMarketTerm);
