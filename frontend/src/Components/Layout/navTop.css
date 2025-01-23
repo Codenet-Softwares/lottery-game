@@ -176,3 +176,16 @@
 .profile_info i:hover {
   color: #ff4d4d;
 }
+
+
+.nav-link.active-link {
+  color: #00e5ff; /* Active text color */
+  font-weight: bold;
+  text-shadow: 0 0 10px #46c1ff, 0 0 15px #5ae1ff;
+}
+
+.nav-link.active-link .nav-icon {
+  color: #5ae1ff; /* Active icon color */
+  transform: scale(1.2); /* Slightly larger icon */
+}
+

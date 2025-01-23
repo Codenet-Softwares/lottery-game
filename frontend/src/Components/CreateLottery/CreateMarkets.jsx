@@ -12,12 +12,13 @@ import { generateLotteryNumber } from "../../Utils/apiService";
 import { useAppContext } from "../../contextApi/context";
 
 const CreateMarkets = () => {
-
+  const { showLoader, hideLoader } = useAppContext();
 
   const formik = useFormik({
     initialValues: initialCreateMarketFormStates,
     validationSchema: validationSchema,
     onSubmit: async (values) => {
+      showLoader(); // Show loader before the request
       const startTimeISO = convertTimeToISO(values.timerFrom, values.date);
       const endTimeISO = convertTimeToISO(values.timerTo, values.date);
 
@@ -34,14 +35,21 @@ const CreateMarkets = () => {
         end_time: endTimeISO,
         price: parseFloat(values.priceForEach),
       };
+try {
 
-      const response = await generateLotteryNumber(requestBody);
-      if (response.success) {
-        console.log("Market created successfully!");
-        formik.resetForm();
-      } else {
-        console.error("Error creating market:", response.message);
-      }
+  const response = await generateLotteryNumber(requestBody);
+  if (response.success) {
+    console.log("Market created successfully!");
+    formik.resetForm();
+  } else {
+    console.error("Error creating market:", response.message);
+  }
+}catch (error) {
+  console.error("Error during the API request:", error);
+} finally {
+  hideLoader(); // Hide loader after the request completes
+}
+     
     },
   });
 
