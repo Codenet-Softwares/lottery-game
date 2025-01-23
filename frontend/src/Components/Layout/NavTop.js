@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useAppContext } from "../../contextApi/context";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import "./navTop.css";
+import "./NavTop.css";
 
 const NavTop = () => {
   const { store, dispatch } = useAppContext();
@@ -43,34 +43,37 @@ const NavTop = () => {
         left: direction === "right" ? 100 : -100,
         behavior: "smooth",
       });
-  
-      // Check if at the start or end of the menu
+
       const isAtStart = menuRef.current.scrollLeft === 0;
       const isAtEnd =
         Math.ceil(menuRef.current.scrollLeft + menuRef.current.offsetWidth) >=
         menuRef.current.scrollWidth;
-  
-      // Hide left arrow if at the start
+
       document.querySelector(".left-arrow").style.display = isAtStart
         ? "none"
         : "block";
-  
-      // Hide right arrow if at the end
+
       document.querySelector(".right-arrow").style.display = isAtEnd
         ? "none"
         : "block";
     }
   };
-  
-  // Initial arrow visibility based on location
+
   useEffect(() => {
-    if (location.pathname === "/dashboard") {
-      document.querySelector(".left-arrow").style.display = "none";
-    } else if (location.pathname === "/reset-password") {
-      document.querySelector(".right-arrow").style.display = "none";
+    const leftArrow = document.querySelector(".left-arrow");
+    const rightArrow = document.querySelector(".right-arrow");
+
+    if (leftArrow && rightArrow) {
+      if (location.pathname === "/dashboard") {
+        leftArrow.style.display = "none";
+      } else if (location.pathname === "/reset-password") {
+        rightArrow.style.display = "none";
+      } else {
+        leftArrow.style.display = "block";
+        rightArrow.style.display = "block";
+      }
     }
   }, [location]);
-  
 
   const navItems = [
     { to: "/dashboard", icon: "fas fa-tachometer-alt", label: "Dashboard" },
@@ -88,7 +91,7 @@ const NavTop = () => {
   ];
 
   return (
-    <div className="container-fluid g-4 navtop-container ">
+    <div className="container-fluid g-4 navtop-container">
       <div className="row d-flex justify-content-center align-items-center">
         <div className="nav-wrapper justify-content-center align-items-center">
           <button
@@ -118,19 +121,19 @@ const NavTop = () => {
             &gt;
           </button>
         </div>
-      
       </div>
-      <div className=" profile_info ">
-              <i
-                className="fas fa-sign-out-alt"
-                // aria-hidden="true"
-                onClick={handleLogout}
-                title="logout"
-                
-              />
-            </div>
+      <div className="profile_info">
+        <i
+          className="fas fa-sign-out-alt"
+          onClick={handleLogout}
+          title="logout"
+        />
+      </div>
     </div>
   );
 };
 
 export default NavTop;
+
+
+

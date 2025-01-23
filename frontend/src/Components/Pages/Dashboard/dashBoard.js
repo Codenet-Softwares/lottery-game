@@ -4,23 +4,22 @@ import DashCard from "../../../Utils/constant/DashCard";
 import "./DashBoard.css"; // Import the CSS for styling
 
 const Dashboard = () => {
-   const cardsRef = useRef(null);
- 
-   const scroll = (direction) => {
-     const cardWidth = 300; // Width of a single card
-     const gap = 20; // Gap between cards
-     const scrollDistance = cardWidth + gap;
-     cardsRef.current.scrollBy({
-       left: direction === "left" ? -scrollDistance : scrollDistance,
-       behavior: "smooth",
-     });
-   };
+  const cardsRef = useRef(null);
+
+  const scroll = (direction) => {
+    const cardWidth = 300; // Width of a single card
+    const gap = 20; // Gap between cards
+    const scrollDistance = cardWidth + gap;
+    cardsRef.current.scrollBy({
+      left: direction === "left" ? -scrollDistance : scrollDistance,
+      behavior: "smooth",
+    });
+  };
 
   return (
     <div className="dashboard-container">
       <div className="welcome-section">
         <h1> Welcome To The Lottery Game Admin Dashboard </h1>
-        <p>This web application is still under development</p>
       </div>
 
       <div className="cards-container">
@@ -54,8 +53,8 @@ const Dashboard = () => {
 
       <div className="footer-section">
         <p>
-          Unlock endless possibilities – create dynamic lottery experiences
-          like never before!
+          Unlock endless possibilities – create dynamic lottery experiences like
+          never before!
         </p>
       </div>
     </div>

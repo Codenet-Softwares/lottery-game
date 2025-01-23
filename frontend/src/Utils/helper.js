@@ -138,4 +138,120 @@ export function compareDigitsByPlace(num1, num2) {
   }
 
   return result.reverse(); // Reverse back to match original number order
-}
+};
+
+export const validateAllInputs = (prizes) => {
+  const errors = {};
+
+  Object.keys(prizes).forEach((marketName) => {
+    const marketPrizes = prizes[marketName];
+    const marketErrors = {};
+
+    // Create maps to track duplicates
+    const ticketMap = new Map();
+    const amountMap = new Map();
+
+    Object.keys(marketPrizes).forEach((rank) => {
+      const { amount, complementaryAmount, ticketNumbers } = marketPrizes[rank];
+      const rankErrors = {};
+
+      // Validate amount
+      if (!amount) {
+        rankErrors.amount = "Prize amount is required.";
+      } else {
+        // Check for duplicate amounts
+        if (amountMap.has(amount)) {
+          rankErrors.amount = `Prize amount matches with rank ${amountMap.get(amount)}.`;
+        } else {
+          amountMap.set(amount, rank);
+        }
+      }
+
+      // Validate complementary amount for rank 1
+      if (rank === "1" && !complementaryAmount) {
+        rankErrors.complementaryAmount = "Complementary amount is required.";
+      }
+
+      // Validate ticket numbers
+      ticketNumbers.forEach((ticket, index) => {
+        if (!ticket.trim()) {
+          rankErrors[`ticketNumber${index}`] = `Ticket ${index + 1} is required.`;
+        } else {
+          // Check for duplicate tickets
+          if (ticketMap.has(ticket)) {
+            const duplicateRank = ticketMap.get(ticket).rank;
+            const duplicateIndex = ticketMap.get(ticket).index;
+            rankErrors[`ticketNumber${index}`] = `Ticket ${ticket} matches with rank ${duplicateRank}, ticket ${duplicateIndex + 1}.`;
+          } else {
+            ticketMap.set(ticket, { rank, index });
+          }
+        }
+      });
+
+      // Add rank errors if any
+      if (Object.keys(rankErrors).length > 0) {
+        marketErrors[rank] = rankErrors;
+      }
+    });
+
+    // Add market errors if any
+    if (Object.keys(marketErrors).length > 0) {
+      errors[marketName] = marketErrors;
+    }
+  });
+
+  return errors;
+};
+
+export const generateUniqueNumbers = (existingNumbers, length, count) => {
+  const numbers = new Set(existingNumbers);
+  const results = [];
+
+  while (results.length < count) {
+    const randomNum = Array.from({ length }, () =>
+      Math.floor(Math.random() * 10)
+    ).join("");
+    if (!numbers.has(randomNum)) {
+      numbers.add(randomNum);
+      results.push(randomNum);
+    }
+  }
+
+  return results;
+};
+
+export const generate1stPrizeNumber = () => {
+  const twoDigits = Math.floor(Math.random() * 90 + 10); // Two random digits (10-99)
+  const letter = "A"; // Constant letter
+  const fiveDigits = Array.from({ length: 5 }, () =>
+    Math.floor(Math.random() * 10)
+  ).join(""); // Five random digits
+  return `${twoDigits} ${letter} ${fiveDigits}`;
+};
+
+export const generatePrizes = () => {
+  const existingNumbers = new Set();
+
+  // Generate 1st Prize
+  const firstPrize = generate1stPrizeNumber();
+  existingNumbers.add(firstPrize);
+
+  // Generate 2nd Prize
+  const secondPrize = generateUniqueNumbers(existingNumbers, 5, 5);
+  secondPrize.forEach((num) => existingNumbers.add(num));
+
+  // Generate 3rd, 4th, 5th Prizes
+  const otherPrizes = ["3rd", "4th", "5th"].reduce((acc, rank) => {
+    const prizeNumbers = generateUniqueNumbers(existingNumbers, 4, 4);
+    prizeNumbers.forEach((num) => existingNumbers.add(num));
+    acc[rank] = prizeNumbers;
+    return acc;
+  }, {});
+
+  return {
+    "1st": [firstPrize],
+    "2nd": secondPrize,
+    ...otherPrizes,
+  };
+};
+

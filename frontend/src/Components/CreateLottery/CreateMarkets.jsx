@@ -12,12 +12,13 @@ import { generateLotteryNumber } from "../../Utils/apiService";
 import { useAppContext } from "../../contextApi/context";
 
 const CreateMarkets = () => {
-
+  const { showLoader, hideLoader } = useAppContext();
 
   const formik = useFormik({
     initialValues: initialCreateMarketFormStates,
     validationSchema: validationSchema,
     onSubmit: async (values) => {
+      showLoader(); // Show loader before the request
       const startTimeISO = convertTimeToISO(values.timerFrom, values.date);
       const endTimeISO = convertTimeToISO(values.timerTo, values.date);
 

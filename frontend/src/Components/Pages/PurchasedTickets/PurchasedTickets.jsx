@@ -12,8 +12,8 @@ import { format } from "date-fns";
 import "./PurchasedTickets.css";
 
 const PurchasedTickets = () => {
-  const { dispatch, showLoader, hideLoader,store } = useAppContext();
-  console.log('store',store)
+  const { dispatch, showLoader, hideLoader, store } = useAppContext();
+  console.log("store", store);
   const { marketId: paramMarketId } = useParams();
   const navigate = useNavigate();
 
@@ -26,7 +26,9 @@ const PurchasedTickets = () => {
     totalPages: 0,
     totalItems: 0,
   });
-  const [selectedDate, setSelectedDate] = useState(""); //for date filter
+  // Get today's date in "yyyy-MM-dd" format
+  const today = format(new Date(), "yyyy-MM-dd");
+  const [selectedDate, setSelectedDate] = useState(today); //for date filter
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [markets, setMarkets] = useState([]);
@@ -41,7 +43,9 @@ const PurchasedTickets = () => {
   };
 
   const fetchMarketData = async () => {
-    const response = await GetPurchaseHistoryMarketTimings({ date: selectedDate});
+    const response = await GetPurchaseHistoryMarketTimings({
+      date: selectedDate,
+    });
 
     if (response?.success) {
       const marketsData = response.data || [];
@@ -62,12 +66,8 @@ const PurchasedTickets = () => {
   };
 
   useEffect(() => {
-  
-
     fetchMarketData();
     // fetchData();
-
-    
   }, [paramMarketId, navigate, selectedDate]);
 
   const handleDateChange = (event) => {
@@ -125,12 +125,11 @@ const PurchasedTickets = () => {
   // Effect for fetching purchased tickets when selectedMarketId, pagination, or searchTerm changes
   useEffect(() => {
     if (!selectedMarketId) return;
- 
 
     fetchData();
 
     return () => {
-      fetchPurchasedLotteryTickets.cancel(); 
+      fetchPurchasedLotteryTickets.cancel();
     };
   }, [
     selectedMarketId,
@@ -143,7 +142,7 @@ const PurchasedTickets = () => {
   // Handle search input change
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
-    setPagination((prev) => ({ ...prev, page: 1 })); 
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   // Handle pagination page change
@@ -186,119 +185,124 @@ const PurchasedTickets = () => {
   // if (loading) {
   //   return null;
   // }
-  // Get today's date in "yyyy-MM-dd" format
-  const today = format(new Date(), "yyyy-MM-dd");
+
   return (
     <div
-    className="d-flex align-items-center justify-content-center"
-    style={{ background: "#f0f0f0", minHeight: "75vh" }}
-  >
-    <div
-      className="container mt-5 p-3"
-      style={{
-        background: "#e6f7ff",
-        borderRadius: "10px",
-        boxShadow: "0 0 15px rgba(0,0,0,0.1)",
-      }}
+      className="d-flex align-items-center justify-content-center"
+      style={{ background: "#f0f0f0", minHeight: "75vh" }}
     >
-      {/* Date Filter UI */}
-      <div className="date-filter-container">
-        <label htmlFor="date-filter" className="date-filter-label">
-          Select Date:
-        </label>
-        <input
-          type="date"
-          id="date-filter"
-          className="date-filter-input"
-          value={selectedDate}
-          onChange={handleDateChange}
-          max={today} // Prevent selecting future dates
-        />
-      </div>
-      {/* Top Navigation for Markets */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="fw-bold">Markets</h4>
-        <div className="d-flex align-items-center">
-          <button
-            className="btn btn-sm btn-outline-secondary me-2"
-            onClick={handleLeftClick}
-            disabled={visibleStartIndex === 0}
-          >
-            &lt;
-          </button>
-          <div className="d-flex flex-wrap">
-            {visibleMarkets.length > 0 ? (
-              visibleMarkets.map((market) => (
-                <span
-                  key={market.marketId}
-                  className={`badge me-2 ${
-                    selectedMarketId === market.marketId
-                      ? "bg-success"
-                      : "bg-primary"
-                  }`}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => handleMarketClick(market.marketId)}
-                >
-                  {market.marketName}
-                </span>
-              ))
-            ) : (
-              <span>No markets available</span>
-            )}
+      <div
+        className="container mt-5 p-3"
+        style={{
+          background: "#e6f7ff",
+          borderRadius: "10px",
+          boxShadow: "0 0 15px rgba(0,0,0,0.1)",
+        }}
+      >
+        {/* Date Filter UI */}
+        <div className="date-filter-container">
+          <div>
+            <label htmlFor="date-filter" className="date-filter-label">
+              <i
+                className="fas fa-calendar-alt me-2"
+                style={{ color: "#4682B4" }}
+              ></i>
+              Select Lottery Market Date:
+            </label>
+            <p className="date-filter-description">
+              Please choose a date to view past available lottery markets.
+            </p>
           </div>
-          <button
-            className="btn btn-sm btn-outline-secondary ms-2"
-            onClick={handleRightClick}
-            disabled={visibleStartIndex + visibleCount >= markets.length}
-          >
-            &gt;
-          </button>
-        </div>
-      </div>
-
-      {/* Purchased Tickets Table */}
-      {/* <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="fw-bold" style={{ color: "#4682B4" }}>
-          Purchased Lottery Tickets
-        </h2>
-        <div className="w-50">
           <input
-            type="text"
-            className="form-control"
-            placeholder="Search purchased tickets by SEM.."
-            aria-label="Search tickets"
-            value={searchTerm}
-            onChange={handleSearchChange}
+            type="date"
+            id="date-filter"
+            className="date-filter-input"
+            value={selectedDate}
+            onChange={handleDateChange}
+            max={today} // Prevent selecting future dates
           />
         </div>
-      </div>
 
-      <Table striped hover responsive bordered className="table-sm">
-        <thead
+        {/* Top Navigation for Markets */}
+        <div
+          className="d-flex justify-content-between align-items-center mb-3 p-2 rounded shadow"
           style={{
-            backgroundColor: "#4682B4",
-            color: "#fff",
-            fontWeight: "bold",
-            textAlign: "center",
+            backgroundColor: "#f9f9f9",
+            border: "1px solid #ddd",
           }}
         >
-          <tr>
-            <th>Serial Number</th>
-            <th>Market Name</th>
-            <th>Price</th>
-            <th>SEM</th>
-            <th>Tickets</th>
-            <th>User Name</th>
-          </tr>
-        </thead>
-        <tbody style={{ textAlign: "center" }}>
-          {loader ? (
-            <tr>
-              <td colSpan="6">
-                <div className="d-flex justify-content-center align-items-center">
-                  <Spinner animation="border" variant="primary" />
-                  <span className="ms-2">
-                    Loading Tickets....{" "}
+          {visibleMarkets.length > 0 ? (
+            <>
+              <h4
+                className="fw-bold"
+                style={{
+                  color: "#4682B4",
+                }}
+              >
+                Lottery Markets
+              </h4>
+              <div className="d-flex align-items-center">
+                {/* Left Navigation Button */}
+                <button
+                  className="btn btn-sm btn-outline-primary me-3"
+                  onClick={handleLeftClick}
+                  disabled={visibleStartIndex === 0}
+                  style={{
+                    borderRadius: "50%",
+                    width: "35px",
+                    height: "35px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: 0,
+                  }}
+                >
+                  <span style={{ fontSize: "16px", fontWeight: "bold" }}>
+                    &lt;
+                  </span>
+                </button>
+
+                {/* Visible Markets */}
+                <div className="d-flex flex-wrap justify-content-center">
+                  {visibleMarkets.map((market) => (
+                    <span
+                      key={market.marketId}
+                      className={`badge text-white me-2 mb-2 ${
+                        selectedMarketId === market.marketId
+                          ? "bg-success"
+                          : "bg-primary"
+                      }`}
+                      style={{
+                        cursor: "pointer",
+                        padding: "10px 15px",
+                        fontSize: "14px",
+                        borderRadius: "20px",
+                        transition: "all 0.3s ease-in-out",
+                      }}
+                      onClick={() => handleMarketClick(market.marketId)}
+                    >
+                      {market.marketName}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Right Navigation Button */}
+                <button
+                  className="btn btn-sm btn-outline-primary ms-3"
+                  onClick={handleRightClick}
+                  disabled={visibleStartIndex + visibleCount >= markets.length}
+                  style={{
+                    borderRadius: "50%",
+                    width: "35px",
+                    height: "35px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: 0,
+                  }}
+                >
+                  <span style={{ fontSize: "16px", fontWeight: "bold" }}>
+                    &gt;
                   </span>
                 </button>
               </div>
@@ -330,7 +334,7 @@ const PurchasedTickets = () => {
               <div className="w-50">
                 <input
                   type="text"
-                  className="w-100 border-rounded"
+                  className="form-control"
                   placeholder="Search purchased tickets by SEM.."
                   aria-label="Search tickets"
                   value={searchTerm}
@@ -486,28 +490,30 @@ const PurchasedTickets = () => {
                     alt="No Markets"
                     style={{ width: "150px", marginRight: "20px" }}
                   /> */}
-                  <div>
-                    <h5 className="text-secondary text-center">No purchases to display</h5>
-                    <p className="mb-0 text-muted">
-                      Your purchase history will appear here once available markets
-                      are added.
-                    </p>
-                  </div>
-                </div>
+              <div>
+                <h5 className="text-secondary text-center">
+                  No purchases to display
+                </h5>
+                <p className="mb-0 text-muted">
+                  Your purchase history will appear here once available markets
+                  are added.
+                </p>
               </div>
-            )}
+            </div>
+          </div>
+        )}
 
-      {purchasedTickets?.length > 0 && visibleMarkets?.length > 0 && (
-        <Pagination
-          currentPage={pagination.page}
-          totalPages={pagination.totalPages}
-          handlePageChange={handlePageChange}
-          startIndex={startIndex}
-          endIndex={endIndex}
-          totalData={pagination.totalItems}
-        />
-      )}
-    </div>
+        {purchasedTickets?.length > 0 && visibleMarkets?.length > 0 && (
+          <Pagination
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+            handlePageChange={handlePageChange}
+            startIndex={startIndex}
+            endIndex={endIndex}
+            totalData={pagination.totalItems}
+          />
+        )}
+      </div>
     </div>
   );
 };

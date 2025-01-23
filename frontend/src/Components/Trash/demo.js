@@ -1,29 +1,19 @@
-import React, { useEffect, useState } from "react";
-import "./Trash.css";
-import {
-  DeletedLiveBetsMarkets,
-  DeletedLiveBetsMarketsDetails,
-} from "../../Utils/apiService";
-import Trashmarketdetails from "./Trashmarketdetails";
+import React, { useState, useEffect } from "react";
+import { Accordion, Button, Form } from "react-bootstrap";
+import { useAppContext } from "../../contextApi/context";
+import { AllActiveLotteryMarkets, CustomWining } from "../../Utils/apiService";
+import "./Win.css";
+import { validateAllInputs } from "../../Utils/helper";
 
-const Trash = () => {
-  const [isBinOpen, setIsBinOpen] = useState(false);
-  const [markets, setMarkets] = useState([]);
-  const [selectedMarketId, setSelectedMarketId] = useState(null);
-  const [selectedMarketDetails, setSelectedMarketDetails] = useState(null);
+const Win = () => {
+  const { showLoader, hideLoader, isLoading } = useAppContext();
+
+  const [prizes, setPrizes] = useState({});
+  const [allActiveMarket, setAllActiveMarket] = useState([]);
+  const [errors, setErrors] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchMarketTerm, setSearchMarketTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [debouncedSearchMarketTerm, setDebouncedSearchMarketTerm] = useState("");
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 10,
-    totalPages: 0,
-    totalItems: 0,
-  });
-  const [noMarketsFound, setNoMarketsFound] = useState(false); // State to track no markets found
 
-  // Debounce search term
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -54,220 +44,392 @@ const Trash = () => {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchMarketTerm(searchMarketTerm);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchMarketTerm]);
-
-  const handleSearchMarketChange = (e) => {
-    setSearchMarketTerm(e.target.value);
-  };
-
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  // Fetch markets from the API
-  const fetchMarkets = async () => {
-    try {
-      const response = await DeletedLiveBetsMarkets({
-        search: debouncedSearchMarketTerm,
-      });
-      if (response.data && response.data.length > 0) {
-        setMarkets(response.data);
-        setNoMarketsFound(false); // Reset no markets found state
-      } else {
-        setMarkets([]);
-        setNoMarketsFound(true); // Set no markets found state
+    const fetchData = async () => {
+      showLoader();
+      try {
+        await handleGetAllLotteryMarket();
+      } catch (error) {
+        console.error("Error fetching lottery markets:", error);
+      } finally {
+        hideLoader();
       }
-    } catch (error) {
-      console.error("Error fetching markets:", error);
-    }
-  };
+    };
 
-  // Fetch market details based on selected marketId, search and pagination
-  const fetchMarketDetails = async (marketId) => {
-    if (!marketId) return;
-
-    try {
-      const response = await DeletedLiveBetsMarketsDetails({
-        marketId,
-        page: pagination.page,
-        limit: pagination.limit,
-        search: debouncedSearchTerm,
-      });
-
-      setSelectedMarketDetails(response.data || []);
-      setPagination({
-        page: response.pagination?.page || 1,
-        limit: response.pagination?.limit || 10,
-        totalPages: response.pagination?.totalPages || 0,
-        totalItems: response.pagination?.totalItems || 0,
-      });
-    } catch (error) {
-      console.error("Error fetching market details:", error);
-    }
-  };
-
-  // Refetch market details when selectedMarketId or debouncedSearchTerm changes
-  useEffect(() => {
-    if (selectedMarketId !== null) {
-      fetchMarketDetails(selectedMarketId);
-    }
-  }, [
-    selectedMarketId,
-    debouncedSearchTerm,
-    pagination.page,
-    pagination.limit,
-  ]);
-
-  // Refetch markets if search term is cleared
-  useEffect(() => {
-    if (debouncedSearchMarketTerm === "") {
-      fetchMarkets();
-    }
-  }, [debouncedSearchMarketTerm]);
-
-  // Refetch markets if search term is cleared
-  useEffect(() => {
-    if (debouncedSearchTerm === "") {
-      if (selectedMarketId !== null) {
-        fetchMarketDetails(selectedMarketId);
-      }
-    }
+    fetchData();
   }, [debouncedSearchTerm]);
 
-  // Fetch markets when the bin is opened and reset details when the bin is closed
   useEffect(() => {
-    if (isBinOpen) {
-      fetchMarkets();
-    } else {
-      setSelectedMarketDetails(null);
+    if (allActiveMarket.length > 0) {
+      const initialPrizes = allActiveMarket.reduce((acc, market) => {
+        acc[market.marketName] = {
+          1: { amount: "", complementaryAmount: "", ticketNumbers: [""] },
+          2: { amount: "", ticketNumbers: Array(10).fill("") },
+          3: { amount: "", ticketNumbers: Array(10).fill("") },
+          4: { amount: "", ticketNumbers: Array(10).fill("") },
+          5: { amount: "", ticketNumbers: Array(50).fill("") },
+        };
+        return acc;
+      }, {});
+      setPrizes(initialPrizes);
     }
-  }, [isBinOpen, debouncedSearchMarketTerm]);
+  }, [allActiveMarket]);
 
-  const openCrumpledPaper = () => setIsBinOpen(true);
-  const closeCrumpledPaper = () => {
-    setIsBinOpen(false);
-    setSelectedMarketDetails(null);
-    setSelectedMarketId(null);
+  const handleGetAllLotteryMarket = async () => {
+    try {
+      const allmarket = await AllActiveLotteryMarkets({
+        search: debouncedSearchTerm,
+      });
+      setAllActiveMarket(allmarket.data);
+    } catch (error) {
+      console.error("Error fetching lottery markets:", error);
+    }
   };
 
-  const startIndex = (pagination.page - 1) * pagination.limit + 1;
-  const endIndex = Math.min(
-    pagination.page * pagination.limit,
-    pagination.totalItems
-  );
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
 
-  const handlePageChange = (newPage) => {
-    setPagination({ ...pagination, page: newPage });
+  const handlePrizeChange = (time, rank, value) => {
+    setPrizes((prevPrizes) => ({
+      ...prevPrizes,
+      [time]: {
+        ...prevPrizes[time],
+        [rank]: { ...prevPrizes[time][rank], amount: value },
+      },
+    }));
+  };
+
+  const handleTicketChange = (time, rank, index, value) => {
+    setPrizes((prevPrizes) => {
+      const updatedTickets = [...(prevPrizes[time][rank]?.ticketNumbers || [])];
+      updatedTickets[index] = value;
+      return {
+        ...prevPrizes,
+        [time]: {
+          ...prevPrizes[time],
+          [rank]: {
+            ...prevPrizes[time][rank],
+            ticketNumbers: updatedTickets,
+          },
+        },
+      };
+    });
+  };
+
+  const handleComplementaryChange = (time, rank, value) => {
+    setPrizes((prevPrizes) => ({
+      ...prevPrizes,
+      [time]: {
+        ...prevPrizes[time],
+        [rank]: { ...prevPrizes[time][rank], complementaryAmount: value },
+      },
+    }));
+  };
+
+  const submitPrizes = async (time, id) => {
+    const validationErrors = validateAllInputs({ [time]: prizes[time] });
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors((prevErrors) => ({ ...prevErrors, ...validationErrors }));
+      return;
+    }
+
+    const timeData = prizes[time];
+    const resultArray = [];
+
+    for (let rank in timeData) {
+      const { amount, complementaryAmount, ticketNumbers } = timeData[rank];
+      if (amount) {
+        const prizeCategory =
+          rank === "1"
+            ? "First Prize"
+            : rank === "2"
+            ? "Second Prize"
+            : rank === "3"
+            ? "Third Prize"
+            : rank === "4"
+            ? "Fourth Prize"
+            : "Fifth Prize";
+
+        const validTickets = ticketNumbers
+          .map((ticket) => ticket.trim())
+          .filter((ticket) => ticket !== "");
+
+        if (validTickets.length > 0) {
+          const requestBody = {
+            prizeCategory,
+            prizeAmount: parseFloat(amount) || 0,
+            ticketNumber: validTickets,
+          };
+
+          if (rank === "1" && complementaryAmount) {
+            requestBody.complementaryPrize =
+              parseFloat(complementaryAmount) || 0;
+          }
+
+          resultArray.push(requestBody);
+        }
+      }
+    }
+
+    try {
+      const response = await CustomWining({ resultArray, marketId: id });
+      console.log("API call successful:", response);
+      await handleGetAllLotteryMarket();
+    } catch (error) {
+      console.error("API call failed:", error);
+    }
+  };
+
+  const prizeData = {
+    1: { rank: "1st", description: "Top prize for the winner" },
+    2: { rank: "2nd", description: "Prize for 10 winners" },
+    3: { rank: "3rd", description: "Prize for 10 winners" },
+    4: { rank: "4th", description: "Prize for 10 winners" },
+    5: { rank: "5th", description: "Prize for 50 winners" },
   };
 
   return (
-    <div className={`trash-container ${isBinOpen ? "paper-mode" : ""}`}>
-      {!isBinOpen && (
-        <div className="dustbin">
-          <div className="small-lid"></div>
-          <div className="lid" onClick={openCrumpledPaper}>
-            <span className="lid-text">Open Me to see deleted markets</span>
-          </div>
-          <div className="bin-body">
-            <p className="bin-text">Use me for deleting markets to store!</p>
-          </div>
+    <div
+      className="container-fluid d-flex flex-column align-items-center"
+      style={{
+        backgroundColor: "#f4f9fd",
+        minHeight: "100vh",
+        padding: "20px",
+      }}
+    >
+      <div
+        className="text-center w-100"
+        style={{
+          backgroundColor: "#e6f7ff",
+          padding: "20px 0",
+          borderBottom: "3px solid #4682B4",
+          borderBottomLeftRadius: "15px",
+          borderBottomRightRadius: "15px",
+          marginBottom: "20px",
+          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <div className="search-bar-container-win d-flex justify-content-center mb-2">
+          <input
+            type="text"
+            className="form-control w-80"
+            placeholder="Search for Win Lottery market..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
         </div>
-      )}
+      </div>
 
-      {isBinOpen && (
-        <div className="main-container-trash">
-          <div
-            className="search-bar-container-shrink-2"
-            style={{
-              position: "absolute",
-              top: "-10px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: "50%",
-              zIndex: 10,
-              display: "flex",
-              justifyContent: "center",
-              backgroundColor: "#f1f7ff",
-              padding: "10px",
-              borderRadius: "50px",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            <input
-              type="text"
-              className="search-bar-shrink-1"
-              placeholder="Search deleted markets..."
-              value={searchMarketTerm}
-              onChange={handleSearchMarketChange}
-              style={{
-                width: "100%",
-                padding: "10px 20px",
-                borderRadius: "50px",
-                border: "1px solid #4682B4",
-                backgroundColor: "#f1f7ff",
-                color: "#4682B4",
-                fontSize: "16px",
-                outline: "none",
-                boxShadow: "none",
-                transition: "all 0.3s ease-in-out",
-              }}
-              onFocus={(e) => (e.target.style.borderColor = "#1e5c8a")}
-              onBlur={(e) => (e.target.style.borderColor = "#4682B4")}
-            />
-          </div>
-          <div className="crumpled-paper">
-            <button className="back-to-bin" onClick={closeCrumpledPaper}>
-              Back to Trash
-            </button>
-            <aside className="market-sidebar">
-              <h3>Deleted Markets</h3>
-              <ul className="market-list-custom">
-                {markets.map((market, index) => (
-                  <li
-                    key={index}
-                    className="market-item-custom"
-                    onClick={() => {
-                      setSelectedMarketId(market.marketId);
-                      fetchMarketDetails(market.marketId);
+      <div
+        className="border border-3 rounded-4 shadow-lg p-4"
+        style={{ width: "90%", maxWidth: "1000px", backgroundColor: "#ffffff" }}
+      >
+        {allActiveMarket.length > 0 ? (
+          <div>
+            {allActiveMarket.map((data, index) => (
+              <div
+                key={index}
+                className="mb-4 p-3 rounded-3 shadow-sm"
+                style={{ backgroundColor: "#e6f7ff" }}
+              >
+                <h4 style={{ color: "#007bb5", fontWeight: "bold" }}>
+                  {data.marketName}
+                </h4>
+
+                <Accordion defaultActiveKey="0">
+                  {Object.entries(prizeData).map(
+                    ([key, { rank, description }]) => (
+                      <Accordion.Item eventKey={key} key={key}>
+                        <Accordion.Header>
+                          {rank} Prize - {description}
+                        </Accordion.Header>
+                        <Accordion.Body>
+                          {/* For the 1st Prize, include ticket number input */}
+                          {key === "1" && (
+                            <div>
+                              <Form.Label
+                                style={{ color: "#555", fontSize: "0.9rem" }}
+                              >
+                                Enter Ticket Number:
+                              </Form.Label>
+                              <Form.Control
+                                type="text"
+                                value={
+                                  prizes[data.marketName]?.[key]
+                                    ?.ticketNumbers[0] || ""
+                                }
+                                onChange={(e) =>
+                                  handleTicketChange(
+                                    data.marketName,
+                                    key,
+                                    0,
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Enter ticket number"
+                                style={{
+                                  borderRadius: "8px",
+                                  fontSize: "0.95rem",
+                                  marginBottom: "15px",
+                                }}
+                              />
+                              {errors[data.marketName]?.[key]
+                                ?.ticketNumber0 && (
+                                <small className="text-danger">
+                                  {errors[data.marketName][key].ticketNumber0}
+                                </small>
+                              )}
+
+                              <Form.Label
+                                style={{ color: "#555", fontSize: "0.9rem" }}
+                              >
+                                Enter Complementary Amount:
+                              </Form.Label>
+                              <Form.Control
+                                type="text"
+                                value={
+                                  prizes[data.marketName]?.[key]
+                                    ?.complementaryAmount || ""
+                                }
+                                onChange={(e) =>
+                                  handleComplementaryChange(
+                                    data.marketName,
+                                    key,
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Enter complementary amount"
+                                style={{
+                                  borderRadius: "8px",
+                                  fontSize: "0.95rem",
+                                  marginBottom: "15px",
+                                }}
+                              />
+                              {errors[data.marketName]?.[key]
+                                ?.complementaryAmount && (
+                                <small className="text-danger">
+                                  {
+                                    errors[data.marketName][key]
+                                      .complementaryAmount
+                                  }
+                                </small>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Prize Amount Input */}
+                          <Form.Label
+                            style={{ color: "#555", fontSize: "0.9rem" }}
+                          >
+                            Enter Prize Amount:
+                          </Form.Label>
+                          <Form.Control
+                            type="text"
+                            value={prizes[data.marketName]?.[key]?.amount || ""}
+                            onChange={(e) =>
+                              handlePrizeChange(
+                                data.marketName,
+                                key,
+                                e.target.value
+                              )
+                            }
+                            placeholder="Enter amount"
+                            style={{
+                              borderRadius: "8px",
+                              fontSize: "0.95rem",
+                              marginBottom: "15px",
+                            }}
+                          />
+                          {errors[data.marketName]?.[key]?.amount && (
+                            <small className="text-danger">
+                              {errors[data.marketName][key].amount}
+                            </small>
+                          )}
+
+                          {/* Ticket Numbers Input for other prizes */}
+                          {key !== "1" && (
+                            <div>
+                              <Form.Label
+                                style={{ color: "#555", fontSize: "0.9rem" }}
+                              >
+                                Enter Ticket Numbers (
+                                {prizeData[key].description}):
+                              </Form.Label>
+                              <div className="d-flex flex-wrap gap-2 mt-1">
+                                {(
+                                  prizes[data.marketName]?.[key]
+                                    ?.ticketNumbers || []
+                                ).map((ticket, idx) => (
+                                  <Form.Group
+                                    key={idx}
+                                    style={{
+                                      width: "calc(20% - 10px)", // Same width as before
+                                    }}
+                                  >
+                                    <Form.Control
+                                      type="text"
+                                      value={ticket}
+                                      onChange={(e) =>
+                                        handleTicketChange(
+                                          data.marketName,
+                                          key,
+                                          idx,
+                                          e.target.value,
+                                          prizeData[key].rank
+                                        )
+                                      }
+                                      placeholder={`Ticket ${idx + 1}`}
+                                      style={{
+                                        borderRadius: "8px",
+                                        fontSize: "0.85rem",
+                                      }}
+                                    />
+                                    {errors[data.marketName]?.[key]?.[
+                                      `ticketNumber${idx}`
+                                    ] && (
+                                      <small className="text-danger">
+                                        {
+                                          errors[data.marketName][key][
+                                            `ticketNumber${idx}`
+                                          ]
+                                        }
+                                      </small>
+                                    )}
+                                  </Form.Group>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </Accordion.Body>
+                      </Accordion.Item>
+                    )
+                  )}
+                </Accordion>
+
+                <div className="text-center mt-3">
+                  <Button
+                    variant="primary"
+                    onClick={() => submitPrizes(data.marketName, data.marketId)}
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: "8px",
+                      fontSize: "1rem",
                     }}
                   >
-                    {market.marketName}
-                  </li>
-                ))}
-              </ul>
-              {noMarketsFound && (
-                <p className="no-markets-found">No markets with this name exist.</p>
-              )}
-            </aside>
-            <div className="paper-content">
-              {selectedMarketDetails === null ? (
-                <p className="highlighted-message">
-                  Select a market from the left to view its details
-                </p>
-              ) : (
-                <Trashmarketdetails
-                  details={selectedMarketDetails}
-                  refreshMarkets={fetchMarkets}
-                  pagination={pagination}
-                  SearchTerm={searchTerm}
-                  handlePageChange={handlePageChange}
-                  handleSearchChange={handleSearchChange}
-                  startIndex={startIndex}
-                  endIndex={endIndex}
-                  fetchMarketDetails={fetchMarketDetails}
-                />
-              )}
-            </div>
+                    Submit Prizes for {data.marketName}
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="container-fluid d-flex justify-content-center">
+            {!isLoading && <div>No draw times available.</div>}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default Trash;
+export default Win;

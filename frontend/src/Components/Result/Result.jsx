@@ -5,74 +5,100 @@ import { format } from "date-fns";
 import "./Result.css";
 
 const Result = () => {
-  const { marketId } = useParams(); 
-  const navigate = useNavigate(); 
+  const { marketId } = useParams(); // Extract current marketId from URL
+  const navigate = useNavigate();
   const [markets, setMarkets] = useState([]);
-  const [results, setResults] = useState([]); 
-  const [error, setError] = useState(null); 
-  const [scrollIndex, setScrollIndex] = useState(0); 
+  const [results, setResults] = useState([]);
+  const [error, setError] = useState(null);
+  const [scrollIndex, setScrollIndex] = useState(0);
+  const today = format(new Date(), "yyyy-MM-dd");
+  const [selectedDate, setSelectedDate] = useState(today); // For date filter
 
-  const maxVisibleMarkets = 5;
+  const maxVisibleMarkets = 3;
   const visibleMarkets = markets.slice(scrollIndex, scrollIndex + maxVisibleMarkets);
 
-  // Fetch markets using the API
-  useEffect(() => {
-    const fetchMarkets = async () => {
-      try {
-        const response = await GetResultMarket({ date: new Date().toISOString().slice(0, 10) });
-        if (response && response.success && response.data) {
-          setMarkets(response.data);
-          // If no marketId in URL, default to the first market
+  // Fetch markets based on the selected date
+  const fetchMarkets = async () => {
+    try {
+      const response = await GetResultMarket({ date: selectedDate });
+      if (response && response.success && response.data) {
+        setMarkets(response.data);
+        if (response.data.length > 0) {
+          // If markets exist for this day and no marketId is in URL, navigate to the first market of the selected date
           if (!marketId) {
+            navigate(`/results/${response.data[0].marketId}`);
+          } else if (!response.data.some((m) => m.marketId === marketId)) {
+            // If the current marketId is not in the list, navigate to the first market of the day
             navigate(`/results/${response.data[0].marketId}`);
           }
         } else {
-          setError("Failed to fetch markets or no data available.");
+          // No markets found for the selected date
+          setError("No markets found for the selected date.");
+          setResults([]); // Ensure no results are displayed
+          navigate(`/results`); // Navigate to results without marketId
         }
-      } catch (err) {
-        setError("No markets has been declared with any prizes yet so far.");
+      } else {
+        setError("Failed to fetch markets or no data available.");
+        setResults([]); // Ensure no results are displayed
+        navigate(`/results`); // Navigate to results without marketId
       }
-    };
+    } catch (err) {
+      setError("Error fetching markets.");
+      setResults([]); // Ensure no results are displayed
+      navigate(`/results`); // Navigate to results without marketId
+    }
+  };
 
-    fetchMarkets();
-  }, [marketId, navigate]);
-
-  // Fetch results based on the selected marketId from the URL
-  useEffect(() => {
+  // Fetch results for the selected marketId
+  const fetchResults = async () => {
     if (!marketId) return;
-
-    const fetchResults = async () => {
-      try {
-        const response = await GetWiningResult({ marketId });
-        if (response && response.success) {
-          setResults(response.data || []);
-          setError(null);
-        } else {
-          setResults([]);
-          setError("No prize data available.");
-        }
-      } catch (err) {
-        setError("Error fetching results.");
+    try {
+      const response = await GetWiningResult({ marketId });
+      if (response && response.success) {
+        setResults(response.data || []);
+        setError(null); // Clear any existing error
+      } else {
+        setResults([]);
+        setError("No prize data available.");
       }
-    };
+    } catch (err) {
+      setError("Error fetching results.");
+      setResults([]);
+    }
+  };
 
-    fetchResults();
+  // Fetch markets when the selected date changes
+  useEffect(() => {
+    fetchMarkets();
+  }, [selectedDate]);
+
+  // Fetch results when marketId changes (either due to initial load or when a user selects a market)
+  useEffect(() => {
+    if (marketId) {
+      fetchResults();
+    }
   }, [marketId]);
 
+  // Handle date change
+  const handleDateChange = (event) => {
+    const newDate = event.target.value;
+    const formattedDate = format(new Date(newDate), "yyyy-MM-dd");
+    setSelectedDate(formattedDate);
+  };
+
+  // Handle market scrolling
   const handleScrollLeft = () => {
     if (scrollIndex > 0) setScrollIndex(scrollIndex - 1);
   };
 
   const handleScrollRight = () => {
-    if (scrollIndex + maxVisibleMarkets < markets.length) setScrollIndex(scrollIndex + 1);
+    if (scrollIndex + maxVisibleMarkets < markets.length)
+      setScrollIndex(scrollIndex + 1);
   };
 
+  // Handle market selection
   const handleMarketSelect = (market) => {
     navigate(`/results/${market.marketId}`); // Update URL when selecting a market
-  };
-
-  const handleOldResults = () => {
-    alert("This portion is under development.");
   };
 
   return (
