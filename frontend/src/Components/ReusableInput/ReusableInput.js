@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import useDebounce from "../../Utils/customHook/useDebounce ";
 import { FixedSizeGrid as Grid } from "react-window";
-
+import "./ReusableInput.css";
 export const ReusableInput = ({
   placeholder,
   name,
@@ -20,6 +20,7 @@ export const ReusableInput = ({
       value={value}
       onChange={onChange}
       onBlur={onBlur}
+     
     />
     <div
       className="text-danger d-flex align-items-center  mt-1"
@@ -101,40 +102,82 @@ export const FromToInput = ({
         option.toString().includes(debouncedToValue)
       );
 
+  // const Row = ({ columnIndex, rowIndex, style }) => {
+  //   const index = rowIndex * 3 + columnIndex; // 3 columns per row
+  //   if (index >= filteredOptions.length) return null;
+
+  //   return (
+  //     <button
+  //       style={{
+  //         ...style,
+  //         display: "block",
+  //         margin: "0",
+  //         padding: "8px",
+  //         textAlign: "left",
+  //         border: "1px solid #ddd",
+  //         borderRadius: "4px",
+  //         backgroundColor: "#f8f9fa",
+  //         transition: "background-color 0.3s",
+  //       }}
+  //       className="btn btn-light btn-sm text-start"
+  //       onClick={() => {
+  //         handleOptionClick(filteredOptions[index], activeInput);
+  //       }}
+  //       onKeyUp={() => {
+  //         console.log("filteredOptions[index]:", filteredOptions[index]);
+  //         console.log("activeInput:", activeInput);
+  //         handleOptionClick(filteredOptions[index], activeInput);
+  //       }}
+  //     onMouseEnter={(e) => (e.target.style.backgroundColor = "#e6f7ff")}
+  //     onMouseLeave={(e) => (e.target.style.backgroundColor = "#f8f9fa")}
+  //     >
+  //       {filteredOptions[index]}
+  //     </button>
+  //   );
+  // };
+
   const Row = ({ columnIndex, rowIndex, style }) => {
     const index = rowIndex * 3 + columnIndex; // 3 columns per row
     if (index >= filteredOptions.length) return null;
-
+  
     return (
-      <button
+      <div
         style={{
           ...style,
-          display: "block",
-          margin: "0",
-          padding: "8px",
-          textAlign: "left",
-          border: "1px solid #ddd",
-          borderRadius: "4px",
-          backgroundColor: "#f8f9fa",
-          transition: "background-color 0.3s",
+          padding: "10px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: "10px",
+          background: "linear-gradient(145deg, #0f2027, #203a43)",
+          color: "#e6f7ff",
+          textAlign: "center",
+          boxShadow:
+            "0 4px 8px rgba(41, 128, 185, 0.4), inset 0 2px 6px rgba(41, 128, 185, 0.7)",
+          fontFamily: "'Orbitron', sans-serif",
+          fontWeight: "bold",
+          textTransform: "uppercase",
+          transition: "transform 0.3s, box-shadow 0.3s",
+          cursor: "pointer",
         }}
-        className="btn btn-light btn-sm text-start"
-        onClick={() => {
-          handleOptionClick(filteredOptions[index], activeInput);
+        className="sci-fi-cell"
+        onClick={() => handleOptionClick(filteredOptions[index], activeInput)}
+        onMouseEnter={(e) => {
+          e.target.style.boxShadow =
+            "0 6px 12px rgba(52, 152, 219, 0.6), inset 0 4px 10px rgba(41, 128, 185, 0.9)";
+          e.target.style.transform = "scale(1.05)";
         }}
-        onKeyUp={() => {
-          console.log("filteredOptions[index]:", filteredOptions[index]);
-          console.log("activeInput:", activeInput);
-          handleOptionClick(filteredOptions[index], activeInput);
+        onMouseLeave={(e) => {
+          e.target.style.boxShadow =
+            "0 4px 8px rgba(41, 128, 185, 0.4), inset 0 2px 6px rgba(41, 128, 185, 0.7)";
+          e.target.style.transform = "scale(1)";
         }}
-      onMouseEnter={(e) => (e.target.style.backgroundColor = "#e6f7ff")}
-      onMouseLeave={(e) => (e.target.style.backgroundColor = "#f8f9fa")}
       >
         {filteredOptions[index]}
-      </button>
+      </div>
     );
   };
-
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -219,6 +262,7 @@ export const FromToInput = ({
                   rowCount={Math.ceil(filteredOptions.length / 3)}
                   rowHeight={40}
                   width={containerWidth}
+                  className="custom-grid"
                 >
                   {Row}
                 </Grid>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { GetResultMarket, GetWiningResult } from "../../Utils/apiService";
 import { useNavigate, useParams } from "react-router-dom";
+import { format } from "date-fns";
+import "./Result.css";
 
 const Result = () => {
   const { marketId } = useParams(); 
@@ -74,158 +76,117 @@ const Result = () => {
   };
 
   return (
-    <div style={{ fontFamily: "Arial, sans-serif", margin: "20px" }}>
-      {/* Top Navigation Bar */}
-      <div
-        className="d-flex align-items-center"
-        style={{
-          backgroundColor: "#4682B4",
-          padding: "10px",
-          borderRadius: "8px",
-          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        {/* Left Arrow */}
-        <button
-          className="btn btn-light"
-          style={{
-            padding: "5px 10px",
-            fontSize: "18px",
-            borderRadius: "50%",
-            marginRight: "10px",
-          }}
-          onClick={handleScrollLeft}
-          disabled={scrollIndex === 0}
-        >
-          &#8249;
-        </button>
-
-        {/* Market Buttons */}
-        <div
-          className="d-flex flex-nowrap justify-content-center"
-          style={{
-            overflow: "hidden",
-            gap: "10px",
-          }}
-        >
-         {visibleMarkets.length > 0 ? (
-      visibleMarkets.map((market) => (
-        <button
-          key={market.marketId}
-          className={`btn ${market.marketId === marketId ? "btn-primary" : "btn-outline-light"}`}
-          onClick={() => handleMarketSelect(market)}
-          style={{
-            fontSize: "16px",
-            borderRadius: "4px",
-            boxShadow: market.marketId === marketId ? "0px 4px 6px rgba(0, 0, 0, 0.2)" : "none",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {market.marketName}
-        </button>
-      ))
-    ) : (
-      <div
-        style={{
-          color: "#ffffff",
-          fontSize: "16px",
-          fontWeight: "bold",
-        }}
-      >
-        No markets found with result decalared
-      </div>
-    )}
+    <div className="refined-sci-fi-container">
+    {/* Header Section */}
+    <header className="refined-sci-fi-header">
+      {/* Market Selection and Date Selection */}
+      <div className="refined-sci-fi-market-date-selector">
+        {/* Market Selection */}
+        <div className="refined-sci-fi-market-selector">
+          <label htmlFor="market-select" className="refined-sci-fi-market-label">
+            Select Market:
+          </label>
+          <select
+            id="market-select"
+            className="refined-sci-fi-market-input"
+            value={marketId}
+            onChange={(e) => handleMarketSelect(e.target.value)}
+          >
+            {visibleMarkets.length > 0 ? (
+              visibleMarkets.map((market) => (
+                <option key={market.marketId} value={market.marketId}>
+                  {market.marketName}
+                </option>
+              ))
+            ) : (
+              <option value="" disabled>No markets available for this date</option>
+            )}
+          </select>
         </div>
-
-        {/* Right Arrow */}
-        <button
-          className="btn btn-light"
-          style={{
-            padding: "5px 10px",
-            fontSize: "18px",
-            borderRadius: "50%",
-            marginLeft: "10px",
-          }}
-          onClick={handleScrollRight}
-          disabled={scrollIndex + maxVisibleMarkets >= markets.length}
-        >
-          &#8250;
-        </button>
-
-        {/* Old Results Button */}
-        <button
-          className="btn btn-warning"
-          onClick={handleOldResults}
-          style={{
-            marginLeft: "auto",
-            borderRadius: "20px",
-            padding: "5px 15px",
-            fontWeight: "bold",
-            fontSize: "14px",
-          }}
-        >
-          Old Results
-        </button>
+  
+        {/* Date Selector */}
+        <div className="refined-sci-fi-date-selector">
+          <label htmlFor="date-filter" className="refined-sci-fi-date-label">
+            Select Date:
+          </label>
+          <input
+            type="date"
+            id="date-filter"
+            className="refined-sci-fi-date-input"
+            value={selectedDate}
+            onChange={handleDateChange}
+            max={today}
+          />
+        </div>
       </div>
-
-      {/* Market Result Display */}
-      <div className="mt-4">
-        <h2 className="text-center" style={{ color: "#3b6e91" }}>
-          Results for <span style={{ color: "#4682B4" }}>{markets.find((m) => m.marketId === marketId)?.marketName || "Selected Market"}</span>
-        </h2>
-
-        {/* Error Message */}
-        {error && (
-          <p className="text-danger text-center">
-            {error}
-          </p>
-        )}
-
-        {/* Prize Distribution */}
-        {results.length === 0 && !error ? (
-          <p className="text-center text-muted">No prize declared yet.</p>
-        ) : (
-          <div className="accordion mt-4" id="prizeAccordion">
-            {results.map((result, index) => (
-              <div className="accordion-item" key={result.resultId}>
-                <h2 className="accordion-header" id={`heading${index}`}>
-                  <button
-                    className="accordion-button collapsed"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target={`#collapse${index}`}
-                    aria-expanded="false"
-                    aria-controls={`collapse${index}`}
-                  >
-                    {result.prizeCategory} - Amount: ₹{result.prizeAmount}
-                    {result.complementaryPrize > 0 && (
-                      <span className="badge bg-success ms-2">
-                        Complementary Prize: ₹{result.complementaryPrize}
-                      </span>
-                    )}
-                  </button>
-                </h2>
-                <div
-                  id={`collapse${index}`}
-                  className="accordion-collapse collapse"
-                  aria-labelledby={`heading${index}`}
-                  data-bs-parent="#prizeAccordion"
+    </header>
+  
+    {/* Results Section */}
+    <section className="refined-sci-fi-results">
+      <h2 className="refined-sci-fi-results-title">
+        Results for{" "}
+        <span className="highlight">
+          {markets.find((m) => m.marketId === marketId)?.marketName || "Market"}
+        </span>
+      </h2>
+  
+      {/* Error or No Results */}
+      {error && <p className="refined-sci-fi-error">{error}</p>}
+      {results.length === 0 && !error ? (
+        <p className="refined-sci-fi-no-results">No results declared yet.</p>
+      ) : (
+        <div className="accordion refined-sci-fi-accordion" id="prizeAccordion">
+          {results.map((result, index) => (
+            <div className="accordion-item refined-sci-fi-accordion-item" key={result.resultId}>
+              <h2 className="accordion-header refined-sci-fi-accordion-header" id={`heading${index}`}>
+                <button
+                  className="accordion-button refined-sci-fi-accordion-btn collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target={`#collapse${index}`}
+                  aria-expanded="false"
+                  aria-controls={`collapse${index}`}
                 >
-                  <div className="accordion-body">
-                    <strong>Winning Ticket Numbers:</strong>
-                    <ul>
-                      {result.ticketNumber.map((ticket, idx) => (
-                        <li key={idx}>{ticket}</li>
-                      ))}
-                    </ul>
+                  {result.prizeCategory} - ₹{result.prizeAmount}
+                  {result.complementaryPrize > 0 && (
+                    <span className="refined-sci-fi-complementary">
+                      Complementary: ₹{result.complementaryPrize}
+                    </span>
+                  )}
+                </button>
+              </h2>
+              <div
+                id={`collapse${index}`}
+                className="accordion-collapse collapse"
+                aria-labelledby={`heading${index}`}
+                data-bs-parent="#prizeAccordion"
+              >
+                <div className="accordion-body refined-sci-fi-accordion-body">
+                  <p className="refined-sci-fi-winning-title">Winning Tickets:</p>
+                  <div className="refined-sci-fi-tickets">
+                    {result.ticketNumber.map((ticket, idx) => (
+                      <div className="refined-sci-fi-ticket" key={idx}>
+                        {ticket}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
   );
 };
 

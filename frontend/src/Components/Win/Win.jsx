@@ -266,7 +266,7 @@ const Win = () => {
         <div className="search-bar-container-win d-flex justify-content-center mb-2">
           <input
             type="text"
-            className="form-control w-80"
+            className=" w-80"
             placeholder="Search for Win Lottery market..."
             value={searchTerm}
             onChange={handleSearchChange}

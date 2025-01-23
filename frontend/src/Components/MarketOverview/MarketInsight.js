@@ -201,50 +201,36 @@ const MarketInsight = () => {
     return null;
   }
   return (
-    <Container fluid className="alt-dashboard-container">
+    <Container fluid className="sci-fi-dashboard">
       {/* Sidebar */}
-      <aside className="alt-sidebar p-4">
-        <h5
-          className="text-center text-white"
-          style={{ fontWeight: "800", letterSpacing: "1px" }}
-        >
-          Lottery Markets
-        </h5>
-        <div className="market-card-grid">
+      <aside className="sci-fi-sidebar p-4">
+        <h5 className="sidebar-title">Lottery Markets</h5>
+        <div className="sci-fi-market-grid">
           {marketTimes.length > 0 ? (
             marketTimes.map((market) => (
               <Card
                 key={market.marketId}
-                className="market-card shadow"
+                className="sci-fi-market-card"
                 onClick={() => handleMarketClick(market)}
               >
                 <Card.Body>
-                  <Card.Title>{market.marketName}</Card.Title>
-                  {market.isActive ? (
-                    <Badge bg="success" className="ms-2">
-                      Active
-                    </Badge>
-                  ) : (
-                    <Button variant="secondary" size="sm" className="ms-2">
-                      Inactive
-                    </Button>
-                  )}
+                  <Card.Title className="sci-fi-market-title">
+                    {market.marketName}
+                  </Card.Title>
 
-                  {/* <Badge bg="light" text="dark" className="mb-2">
-                    {`ID: ${market.marketId.slice(-6).toUpperCase()}`}
-                  </Badge> */}
+                  <Badge
+                    className={`market-status ${
+                      market.isActive ? "active" : "inactive"
+                    }`}
+                  >
+                    {market.isActive ? "Active" : "Inactive"}
+                  </Badge>
                 </Card.Body>
               </Card>
             ))
           ) : (
-            <div
-              className="d-flex justify-content-center align-items-center "
-              style={{ minHeight: "480px", width: "100%" }}
-            >
-              <h4
-                className="text-center bg-white p-5 rounded-5"
-                style={{ color: "#2b3a67", fontWeight: "900" }}
-              >
+            <div className="no-market-available">
+              <h4 className="text-center p-5 rounded-5">
                 No <br />
                 Market <br />
                 Available
@@ -255,12 +241,12 @@ const MarketInsight = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="alt-main-content p-4">
+      <main className="sci-fi-main-content">
         {/* Search Bar */}
-        <div className="search-bar-container-custom d-flex justify-content-center mb-5">
+        <div className="sci-fi-search-bar">
           <input
             type="text"
-            className="form-control w-80"
+            className="sci-fi-search-input"
             placeholder="Search for a Lottery market..."
             value={searchTerm}
             onChange={handleSearchChange}
@@ -268,8 +254,8 @@ const MarketInsight = () => {
         </div>
 
         {showStats && selectedMarket ? (
-          <div className="stats-popup">
-            <h3 className="market-title text-center mb-4">
+          <div className="sci-fi-stats-popup">
+            <h3 className="sci-fi-stats-title">
               {selectedMarket.marketName} Stats
             </h3>
             {/* Switch for Market Status Filter */}
@@ -293,7 +279,7 @@ const MarketInsight = () => {
             <Row>
               {/* Group Range Card */}
               <Col md={6} className="mb-3">
-                <Card className="stat-card group-card shadow">
+                <Card className="sci-fi-stats-card">
                   <Card.Body className="d-flex align-items-center">
                     <i className="bi bi-people-fill stat-icon me-3"></i>
                     <div>
@@ -311,7 +297,7 @@ const MarketInsight = () => {
 
               {/* Series Range Card */}
               <Col md={6} className="mb-3">
-                <Card className="stat-card series-card shadow">
+                <Card className="sci-fi-stats-card">
                   <Card.Body className="d-flex align-items-center">
                     <i className="bi bi-bar-chart-fill stat-icon me-3"></i>
                     <div>
@@ -329,7 +315,7 @@ const MarketInsight = () => {
 
               {/* Number Range Card */}
               <Col md={6} className="mb-3">
-                <Card className="stat-card number-card shadow">
+                <Card className="sci-fi-stats-card">
                   <Card.Body className="d-flex align-items-center">
                     <i className="bi bi-123 stat-icon me-3"></i>
                     <div>
@@ -347,7 +333,7 @@ const MarketInsight = () => {
 
               {/* Time Range Card */}
               <Col md={6} className="mb-3">
-                <Card className="stat-card time-card shadow">
+                <Card className="sci-fi-stats-card">
                   <Card.Body className="d-flex align-items-center">
                     <i className="bi bi-clock-fill stat-icon me-3"></i>
                     <div>
@@ -373,7 +359,7 @@ const MarketInsight = () => {
 
               {/* Date Card */}
               <Col md={6} className="mb-3">
-                <Card className="stat-card time-card shadow">
+                <Card className="sci-fi-stats-card">
                   <Card.Body className="d-flex align-items-center">
                     <i className="bi bi-calendar-plus-fill stat-icon me-3"></i>
                     <div>
@@ -392,7 +378,7 @@ const MarketInsight = () => {
 
               {/* Date Card */}
               <Col md={6} className="mb-3">
-                <Card className="stat-card time-card shadow">
+                <Card className="sci-fi-stats-card">
                   <Card.Body className="d-flex align-items-center">
                     <i className="bi bi-currency-rupee stat-icon me-5"></i>
                     <div>
@@ -406,71 +392,38 @@ const MarketInsight = () => {
               </Col>
               <div className="d-flex justify-content-evenly">
                 <button
-                  className="btn btn-danger"
+                  className="void-button"
                   onClick={() =>
                     selectedMarket && handleVoidMarket(selectedMarket.marketId)
                   }
                 >
                   Void
                 </button>
-                {/* {selectedMarket.isActive ? <button className="btn btn-danger" onClick={() => handleisActive(selectedMarket.marketId, false)}>Suspend</button> : <button className="btn btn-success" onClick={() => handleisActive(selectedMarket.marketId, true)}> Active</button>} */}
               </div>
             </Row>
 
-            {/* Accordion for Purchased Tickets */}
-
-            {/* <Accordion defaultActiveKey="0" className="mt-4">
-              <Accordion.Item eventKey="0">
-                <Accordion.Header>Purchased Tickets</Accordion.Header>
-                <Accordion.Body>
-                  {purchasedTickets.length > 0 ? (
-                    <div className="ticket-grid">
-                      {purchasedTickets.map((ticket, index) => (
-                        <div key={index} className="ticket-card">
-                          <Card className="ticket-card-item shadow-sm">
-                            <Card.Body>
-                             
-                              <div className="ticket-numbers">
-                                {ticket.ticketList.map((ticketNumber, idx) => (
-                                  <span key={idx} className="ticket-number">
-                                    {ticketNumber}
-                                  </span>
-                                ))}
-                              </div>
-                            </Card.Body>
-                          </Card>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p>No purchased tickets available for this market.</p>
-                  )}
-                </Accordion.Body>
-              </Accordion.Item>
-            </Accordion> */}
-
             <Button
               variant="outline-primary"
-              className="close-btn mt-4"
+              className="sci-fi-close-btn"
               onClick={() => setShowStats(false)}
             >
               Close Details
             </Button>
           </div>
         ) : (
-          <Card className="welcome-card shadow-sm">
+          <Card className="welcome-card">
             <Card.Body>
               <Card.Title className="welcome-title">
                 Welcome to the Lottery Market Overview!
               </Card.Title>
-              <Card.Text className="welcome-text">
+              <Card.Text className="sci-fi-welcome-text">
                 Select a market from the left sidebar to view its details.
               </Card.Text>
               {marketTimes.length === 0 && !showStats && (
-                <div className="d-flex justify-content-center align-items-center">
+                <div className="no-market-available">
                   <h4
-                    className="text-center"
-                    style={{ color: "#2b3a67", fontWeight: "800" }}
+                  // className="text-center"
+                  // style={{ color: "#2b3a67", fontWeight: "800" }}
                   >
                     No Market Available
                   </h4>

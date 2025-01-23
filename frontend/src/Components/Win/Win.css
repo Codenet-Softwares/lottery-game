@@ -1,23 +1,117 @@
-.search-bar-container-win {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* border: 2px solid red; */
-    
-  }
-  
-  .search-bar-container-win input {
-    font-size: 1rem;
-    padding: 0.75rem;
-    border-radius: 20px;
-    border: 1px solid #ccc;
-    width: 170%;
-    max-width: 2000px;
-    top: 20px;
-  }
-  
-  .search-bar-container-win input:focus {
-    border-color: #3f4a85;
-    box-shadow: 0 0 5px rgba(63, 74, 133, 0.5);
-  }
-  
+/* Container */
+.refined-sci-fi-container {
+  font-family: "Exo 2", sans-serif;
+  background: linear-gradient(145deg, #0f1b26, #2b3a47);
+  color: #d1d8e0;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  border-radius: 20px;
+  box-shadow: 0px 4px 20px rgba(0, 255, 255, 0.2);
+}
+
+/* Header Section */
+.refined-sci-fi-header {
+  background: linear-gradient(145deg, #2a3a47, #0f1b26);
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.refined-sci-fi-search-input {
+  font-size: 1.2rem;
+  padding: 12px;
+  border-radius: 20px;
+  border: 2px solid #4682b4;
+  width: 100%;
+  background-color: #e6f7ff;
+  color: #4682b4;
+  box-shadow: 0 0 10px rgba(70, 130, 180, 0.4);
+  transition: 0.3s ease;
+}
+
+.refined-sci-fi-search-input:focus {
+  border-color: #00e1ff;
+  box-shadow: 0 0 10px rgba(0, 225, 255, 0.5);
+}
+
+/* Main Content */
+.refined-sci-fi-main-content {
+  width: 90%;
+  max-width: 1000px;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Market Cards */
+.refined-sci-fi-market-card {
+  background: linear-gradient(145deg, #1e2b35, #2a3a47);
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.refined-sci-fi-market-title {
+  color: #4682b4;
+  font-weight: bold;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+/* Accordion */
+.refined-sci-fi-accordion-header {
+  background: transparent;
+  color: #a3c8d7;
+  font-weight: bold;
+  text-shadow: 0 0 10px #00e1ff;
+  border: none;
+}
+
+.refined-sci-fi-accordion-body {
+  background: #112240;
+  color: #a3c8d7;
+  padding: 15px;
+}
+
+.refined-sci-fi-accordion-btn {
+  background: transparent;
+  color: #a3c8d7;
+  font-weight: bold;
+  text-shadow: 0 0 10px #00e1ff;
+  transition: 0.3s ease;
+}
+
+.refined-sci-fi-accordion-btn:hover {
+  background-color: #4682b4;
+  color: #ffffff;
+}
+
+/* Submit Button */
+.refined-sci-fi-submit-btn {
+  padding: 12px 25px;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: linear-gradient(145deg, #4682b4, #00e1ff);
+  color: #ffffff;
+  box-shadow: 0px 0px 12px rgba(0, 225, 255, 0.3);
+  border: none;
+  transition: 0.3s ease;
+}
+
+.refined-sci-fi-submit-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 0px 20px rgba(0, 225, 255, 0.6);
+}
+
+/* No Market Available */
+.refined-sci-fi-no-market {
+  color: #c5e4f3;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
