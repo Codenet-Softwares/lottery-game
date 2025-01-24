@@ -262,7 +262,7 @@ export const PurchaseTickets = async (req, res) => {
 export const purchaseHistory = async (req, res) => {
   try {
     const { userId } = req.body;
-    const { sem, page = 1, limit = 10,date  } = req.query;
+    const { sem, page = 1, limit = 10 } = req.query;
     const { marketId } = req.params;
     const offset = (page - 1) * parseInt(limit);
 
@@ -278,14 +278,6 @@ export const purchaseHistory = async (req, res) => {
       limit: parseInt(limit),
       offset,
     };
-
-    if (date) {
-      const targetDate = new Date(date);
-      purchaseFilter.where.createdAt = {
-        [Sequelize.Op.gte]: new Date(targetDate.setUTCHours(0, 0, 0, 0)), 
-        [Sequelize.Op.lt]: new Date(targetDate.setUTCHours(23, 59, 59, 999)),
-      };
-    }
 
     const purchaseRecords = await PurchaseLottery.findAndCountAll(
       purchaseFilter
@@ -609,12 +601,38 @@ export const dateWiseMarkets = async (req, res) => {
 export const getMarkets = async (req, res) => {
   try {
     const userId = req.user.userId;
+    const { date } = req.query;
+    let selectedDate, nextDay;
+
+    if (date) {
+      selectedDate = new Date(date);
+      if (isNaN(selectedDate)) {
+        return apiResponseErr(
+          null,
+          false,
+          statusCode.badRequest,
+          "Invalid date format",
+          res
+        );
+      }
+    } else {
+      selectedDate = new Date();
+    }
+
+    selectedDate.setHours(0, 0, 0, 0);
+
+    nextDay = new Date(selectedDate);
+    nextDay.setDate(nextDay.getDate() + 1);
 
     const ticketData = await PurchaseLottery.findAll({
       where: { userId },
       attributes: ["marketId", "marketName"],
       where: {
         hidePurchase: false,
+        createdAt: {
+          [Op.gte]: selectedDate,
+          [Op.lt]: nextDay,
+        },
       },
     });
 
