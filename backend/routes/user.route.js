@@ -9,7 +9,7 @@ import {
   searchTickets,
 } from '../controllers/user.controller.js';
 import { authenticateUser } from '../middlewares/colorgameAuth.js';
-import { purchaseTicketValidation, validateSearchTickets, validatePurchaseHistory, validateGetResult, validateDateQuery } from '../utils/commonSchema.js';
+import { purchaseTicketValidation, validateSearchTickets, validatePurchaseHistory, validateGetResult } from '../utils/commonSchema.js';
 import customErrorHandler from '../utils/customErrorHandler.js';
 import { apiResponseErr, apiResponseSuccess } from '../utils/response.js';
 import { statusCode } from '../utils/statusCodes.js';
@@ -44,7 +44,7 @@ export const userRoute = (app) => {
 
   app.get('/api/prize-results', validateGetResult, customErrorHandler, authenticateUser, getResult);
 
-  app.get('/api/user/dateWise-markets', validateDateQuery, customErrorHandler, authenticateUser, dateWiseMarkets)
+  app.get('/api/user/dateWise-markets', authenticateUser, dateWiseMarkets)
 
   app.get('/api/user/get-markets', authenticateUser, getMarkets)
 

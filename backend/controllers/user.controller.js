@@ -509,17 +509,10 @@ export const dateWiseMarkets = async (req, res) => {
   try {
     const { date } = req.query;
 
-    if (!date) {
-      return apiResponseErr(
-        null,
-        false,
-        statusCode.badRequest,
-        "Date is required",
-        res
-      );
-    }
+    const currentDate = new Date();
+    const selectedDate = date ? new Date(date) : new Date(currentDate.toISOString().split("T")[0]);
 
-    const selectedDate = new Date(date);
+    // Check if the date is valid
     if (isNaN(selectedDate)) {
       return apiResponseErr(
         null,
@@ -530,9 +523,11 @@ export const dateWiseMarkets = async (req, res) => {
       );
     }
 
+    // Set start and end of the day
     selectedDate.setHours(0, 0, 0, 0);
     const nextDay = new Date(selectedDate);
     nextDay.setDate(nextDay.getDate() + 1);
+    
 
     const revokedMarkets = await LotteryResult.findAll({
       attributes: ["marketId"],
