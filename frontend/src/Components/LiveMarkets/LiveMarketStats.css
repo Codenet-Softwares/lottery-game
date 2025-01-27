@@ -49,9 +49,3 @@
     overflow-y: auto;
     padding: 15px;
   }
-  
-  /* Optional: If you'd like to add smooth scrolling */
-  .modal-body-container {
-    scroll-behavior: smooth;
-  }
-  
