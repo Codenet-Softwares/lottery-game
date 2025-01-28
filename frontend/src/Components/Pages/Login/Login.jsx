@@ -12,7 +12,7 @@ import { useLocation } from "react-router-dom";
 import "./Login.css";
 
 const Login = () => {
-  const { dispatch, store } = useAppContext();
+  const { dispatch, store, showLoader, hideLoader } = useAppContext();
   const [error, setError] = useState(""); // For error handling
   const navigate = useNavigate();
   const location = useLocation();
@@ -27,6 +27,24 @@ const Login = () => {
     }
   }, []);
 
+  // const {
+  //   values,
+  //   errors,
+  //   touched,
+  //   handleBlur,
+  //   handleChange,
+  //   handleSubmit,
+  //   resetForm,
+  // } = useFormik({
+  //   initialValues: getInitialValues(),
+  //   validationSchema: LoginSchema,
+  //   onSubmit: async (values, action) => {
+  //     console.log("Submitted values:", values);
+  //     await loginHandler(values);
+  //     resetForm();
+  //   },
+  //   enableReinitialize: true,
+  // });
   const {
     values,
     errors,
@@ -40,12 +58,19 @@ const Login = () => {
     validationSchema: LoginSchema,
     onSubmit: async (values, action) => {
       console.log("Submitted values:", values);
-      await loginHandler(values);
-      resetForm();
+      showLoader(); // Show loader before starting the async operation
+      try {
+        await loginHandler(values);
+        resetForm();
+      } catch (error) {
+        console.error("Error during login:", error);
+      } finally {
+        hideLoader(); // Hide loader in the finally block
+      }
     },
     enableReinitialize: true,
   });
-
+  
   async function loginHandler(values) {
     const response = await adminLogin(values);
     console.log("Response from login:", response);
