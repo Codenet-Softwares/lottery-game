@@ -123,7 +123,7 @@ try {
           position: "relative",
         }}
       >
-        <h3 className="text-center mb-4">Create Lottery Markets</h3>
+        <h3 className="text-center mb-4">CREATE LOTTERY MARKETS</h3>
         <form onSubmit={formik.handleSubmit}>
           {inputConfig.map((input) => (
             <ReusableInput
