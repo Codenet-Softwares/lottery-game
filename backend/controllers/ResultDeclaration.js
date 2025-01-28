@@ -358,7 +358,7 @@ export const ResultDeclare = async (req, res) => {
           }
         }
 
-        else if (matchedTickets.length === 0) {
+        else {
           const usersWithPurchases = await PurchaseLottery.findAll({
             where: { marketId },
             attributes: ['userId', 'marketName', 'marketId'],
