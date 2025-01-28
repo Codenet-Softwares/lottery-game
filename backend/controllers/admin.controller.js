@@ -121,21 +121,20 @@ export const adminSearchTickets = async ({ group, series, number, sem, marketId 
 
 export const adminPurchaseHistory = async (req, res) => {
   try {
-    const { sem, page = 1, limit = 10, search = "" } = req.query;
+    const { page = 1, limit = 10, search = "" } = req.query;
     const { marketId } = req.params;
     const offset = (page - 1) * parseInt(limit);
-
-    const whereFilter =  { marketId: marketId }
-    if (sem) {
-      whereFilter['sem'] = sem;
-    }
-
+    const whereFilter = { marketId };
     if (search) {
-      whereFilter.userName = { [Op.like]: `%${search}%` };
+      whereFilter[Op.or] = [
+        { userName: { [Op.like]: `%${search}%` } },
+        { sem: search }, 
+      ];
     }
+    
 
     const purchaseRecords = await PurchaseLottery.findAndCountAll({
-      where: { ...whereFilter },
+      where: whereFilter ,
       limit: parseInt(limit),
       offset,
     });
@@ -151,9 +150,6 @@ export const adminPurchaseHistory = async (req, res) => {
             generateId: purchase.generateId,
           },
         };
-        if (sem) {
-          userRangeQuery.where.sem = sem;
-        }
 
         const userRange = await UserRange.findOne(userRangeQuery);
 

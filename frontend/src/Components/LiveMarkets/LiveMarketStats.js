@@ -3,8 +3,10 @@ import { DeleteLiveBets, GetMarketStats } from "../../Utils/apiService";
 import ReusableModal from "../Reusables/ReusableModal";
 import "./LiveMarketStats.css";
 import Pagination from "../Common/Pagination";
+import { useAppContext } from "../../contextApi/context";
 
-const LiveMarketStats = ({ marketId, backButton,refresh }) => {
+const LiveMarketStats = ({ marketId, backButton, refresh }) => {
+  const { showLoader, hideLoader } = useAppContext();
   const [stats, setStats] = useState(null);
   const [modalShow, setModalShow] = useState(false);
   const [modalContent, setModalContent] = useState({ title: "", body: "" });
@@ -28,36 +30,34 @@ const LiveMarketStats = ({ marketId, backButton,refresh }) => {
   }, [searchTerm]);
 
   // Fetch market stats based on pagination and search term
-    const fetchMarketStats = async () => {
-      try {
-        const response = await GetMarketStats({
-          marketId,
-          page: pagination.page,
-          limit: pagination.limit,
-          search: debouncedSearchTerm,
-        });
+  const fetchMarketStats = async () => {
+    try {
+      const response = await GetMarketStats({
+        marketId,
+        page: pagination.page,
+        limit: pagination.limit,
+        search: debouncedSearchTerm,
+      });
 
-        if (response.success) {
-          setStats(response.data);
+      if (response.success) {
+        setStats(response.data);
 
-          // Safely handle pagination properties
-          setPagination((prev) => ({
-            page: response.pagination?.page || prev.page,
-            limit: response.pagination?.limit || prev.limit,
-            totalPages: response.pagination?.totalPages || 0,
-            totalItems: response.pagination?.totalItems || 0,
-          }));
-        } else {
-          console.error("Failed to fetch market stats:", response.message);
-        }
-      } catch (error) {
-        console.error("Error fetching market stats:", error);
+        // Safely handle pagination properties
+        setPagination((prev) => ({
+          page: response.pagination?.page || prev.page,
+          limit: response.pagination?.limit || prev.limit,
+          totalPages: response.pagination?.totalPages || 0,
+          totalItems: response.pagination?.totalItems || 0,
+        }));
+      } else {
+        console.error("Failed to fetch market stats:", response.message);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching market stats:", error);
+    }
+  };
 
   useEffect(() => {
-  
-
     if (marketId) {
       fetchMarketStats();
     }
@@ -81,16 +81,21 @@ const LiveMarketStats = ({ marketId, backButton,refresh }) => {
 
   const handleShowTickets = (details) => {
     const ticketsBody = details.map((detail) => (
-      <div key={detail.sem} className="mb-4">
-        <h6 className="text-primary fw-bold">
-          SEM: {detail.sem} | Amount: ₹{detail.lotteryPrice}
-        </h6>
-        <button
-          className="btn btn-danger btn-sm"
-          onClick={() => handleDeleteTicket(detail.purchaseId)}
-        >
-          <i className="bi bi-trash"></i> Delete
-        </button>
+      <div key={detail.sem} className="mb-4 ticket-section">
+        <div>
+        <div className="ticket-header d-flex justify-content-between align-items-center">
+          <h6 className="text-primary fw-bold mb-0">
+            SEM: {detail.sem} | Amount: ₹{detail.lotteryPrice}
+          </h6>
+          <button
+            className="btn btn-danger btn-sm"
+            onClick={() => handleDeleteTicket(detail.purchaseId)}
+          >
+            <i className="bi bi-trash"></i> Delete
+          </button>
+        </div>
+        </div>
+        <div className="ticket-scroll-container">
         <ul className="list-group">
           {detail.tickets.map((ticket, idx) => (
             <li
@@ -101,25 +106,66 @@ const LiveMarketStats = ({ marketId, backButton,refresh }) => {
             </li>
           ))}
         </ul>
+        </div>
       </div>
     ));
 
     setModalContent({
       title: "Purchased Tickets",
-      body: <div>{ticketsBody}</div>,
+      body: (
+      <div className="modal-body-container">
+        {ticketsBody}
+      </div>
+    ),
     });
     setModalShow(true);
   };
+
+  // const handleDeleteTicket = async (purchaseId) => {
+  //   const confirmDeletion = window.confirm(
+  //     "Are you sure you want to delete this live bet? This action is irreversible."
+  //   );
+  //   if (confirmDeletion) {
+  //     try {
+  //       const response = await DeleteLiveBets({ purchaseId }, false);
+  //       if (response.success) {
+  //         fetchMarketStats ()
+  //         alert("Live bet deleted successfully!");
+  //         setStats((prevStats) =>
+  //           prevStats.map((user) => ({
+  //             ...user,
+  //             details: user.details.map((detail) => ({
+  //               ...detail,
+  //               tickets: detail.tickets.filter(
+  //                 (ticket) => ticket.purchaseId !== purchaseId
+  //               ),
+  //             })),
+  //           }))
+  //         );
+  //         // refresh();
+  //         fetchMarketStats();
+  //         setModalShow(false)
+
+  //       } else {
+  //         alert("Failed to delete live bet. Please try again.");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error deleting live bet:", error);
+  //       alert("An error occurred while deleting live bet.");
+  //     }
+  //   }
+  // };
 
   const handleDeleteTicket = async (purchaseId) => {
     const confirmDeletion = window.confirm(
       "Are you sure you want to delete this live bet? This action is irreversible."
     );
+
     if (confirmDeletion) {
       try {
+        showLoader(); // Show loader before the request
         const response = await DeleteLiveBets({ purchaseId }, false);
         if (response.success) {
-          fetchMarketStats ()
           alert("Live bet deleted successfully!");
           setStats((prevStats) =>
             prevStats.map((user) => ({
@@ -132,26 +178,27 @@ const LiveMarketStats = ({ marketId, backButton,refresh }) => {
               })),
             }))
           );
-          // refresh();
           fetchMarketStats();
-          setModalShow(false)
-
+          setModalShow(false);
         } else {
           alert("Failed to delete live bet. Please try again.");
         }
       } catch (error) {
         console.error("Error deleting live bet:", error);
-        alert("An error occurred while deleting live bet.");
+        alert("An error occurred while deleting the live bet.");
+      } finally {
+        hideLoader(); // Hide loader after the request, regardless of success or failure
       }
     }
   };
+
   const filteredStats = stats?.filter((user) =>
     user.userName.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
   );
 
   return (
     <div className="container" style={{ overflow: "hidden" }}>
-      {stats  ? (
+      {stats ? (
         <div className="container " style={{ overflow: "hidden" }}>
           <div className="d-flex justify-content-between align-items-center mb-4">
             {/* Back button outside the main container but in the same row */}
@@ -264,44 +311,41 @@ const LiveMarketStats = ({ marketId, backButton,refresh }) => {
             >
               <table className="table table-striped table-bordered table-hover shadow m-0">
                 <tbody>
-                {filteredStats?.length > 0 ? (
-                  filteredStats.map((user, idx) => (
-                    <tr key={idx} style={{ border: "none" }}>
-                      <td>{startIndex + idx}</td>
-                      <td
-                        className="fw-bold text-secondary"
-                        style={{ width: "30%", textAlign: "center" }}
-                      >
-                        {user.userName}
-                      </td>
-                      <td
-                        className="fw-bold text-success"
-                        style={{ width: "30%", textAlign: "center" }}
-                      >
-                        ₹{user.amount}
-                      </td>
-                      <td style={{ width: "30%", textAlign: "center" }}>
-                        <button
-                          className="btn btn-info"
-                          onClick={() => handleShowTickets(user.details)}
+                  {filteredStats?.length > 0 ? (
+                    filteredStats.map((user, idx) => (
+                      <tr key={idx} style={{ border: "none" }}>
+                        <td>{startIndex + idx}</td>
+                        <td
+                          className="fw-bold text-secondary"
+                          style={{ width: "30%", textAlign: "center" }}
                         >
-                          <i className="bi bi-ticket-detailed"></i> Show Tickets
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-
+                          {user.userName}
+                        </td>
+                        <td
+                          className="fw-bold text-success"
+                          style={{ width: "30%", textAlign: "center" }}
+                        >
+                          ₹{user.amount}
+                        </td>
+                        <td style={{ width: "30%", textAlign: "center" }}>
+                          <button
+                            className="btn btn-info"
+                            onClick={() => handleShowTickets(user.details)}
+                          >
+                            <i className="bi bi-ticket-detailed"></i> Show
+                            Tickets
+                          </button>
+                        </td>
+                      </tr>
+                    ))
                   ) : (
                     <tr>
-                    <td colSpan="4" className="text-center text-danger">
-                      The search you are trying to search does not exist. Search existing live markets.
-                    </td>
-                  </tr>
-
-
+                      <td colSpan="4" className="text-center text-danger">
+                        The search you are trying to search does not exist.
+                        Search existing live markets.
+                      </td>
+                    </tr>
                   )}
-                  
-      
                 </tbody>
               </table>
             </div>

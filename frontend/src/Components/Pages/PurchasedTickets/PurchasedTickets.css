@@ -1,49 +1,48 @@
-/* @keyframes pulse {
-    0% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.05);
-    }
-    100% {
-      transform: scale(1);
-    }
-  } */
-
-  /* DateFilter.css */
+/* DateFilter.css */
 .date-filter-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 15px;
+  /* gap: 1px; */
   padding: 10px 20px;
-  background-color: #ffffff;
+  background: linear-gradient(135deg, #e6f7ff, #ffffff);
   border: 1px solid #d1d1d1;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  margin: 20px auto;
-  max-width: 600px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  margin:5px auto;
+  max-width: 500px;
 }
 
 .date-filter-label {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: bold;
   color: #333333;
+  display: flex;
+  align-items: center;
+}
+
+.date-filter-description {
+  margin-top: 5px;
+  font-size: 0.9rem;
+  color: #666666;
+  text-align: center;
 }
 
 .date-filter-input {
-  padding: 8px 12px;
+  padding: 12px 15px;
   font-size: 1rem;
   color: #333333;
-  border: 1px solid #cccccc;
-  border-radius: 6px;
+  border: 2px solid #cccccc;
+  border-radius: 8px;
   transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  width: 100%;
 }
 
 .date-filter-input:focus {
   outline: none;
   border-color: #4682b4;
-  box-shadow: 0 0 8px rgba(70, 130, 180, 0.5);
+  box-shadow: 0 0 10px rgba(70, 130, 180, 0.4);
 }
 
 .date-filter-input:hover {
@@ -52,17 +51,43 @@
 
 @media (max-width: 768px) {
   .date-filter-container {
-    flex-direction: column;
-    gap: 10px;
-    padding: 15px;
+    padding: 20px;
+    gap: 15px;
   }
 
   .date-filter-label {
-    font-size: 0.9rem;
+    font-size: 1rem;
+  }
+
+  .date-filter-description {
+    font-size: 0.8rem;
   }
 
   .date-filter-input {
-    font-size: 0.9rem;
-    width: 100%;
+    font-size: 0.95rem;
+    padding: 10px;
   }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px; /* Width of the vertical scrollbar */
+  height: 8px; /* Height of the horizontal scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #4682b4; /* Scrollbar color */
+  border-radius: 4px; /* Rounded corners */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #315f82; /* Darker color on hover */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #e6f7ff; /* Track color */
+  border-radius: 4px; /* Rounded corners for the track */
+}
+
+.custom-scrollbar::-webkit-scrollbar-corner {
+  background: #e6f7ff; /* Corner color (where horizontal and vertical meet) */
 }

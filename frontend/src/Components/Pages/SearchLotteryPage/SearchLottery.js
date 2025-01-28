@@ -113,7 +113,7 @@ const SearchLottery = () => {
           className="text-center text-white"
           style={{ fontWeight: "800", letterSpacing: "1px" }}
         >
-          Lottery Markets
+        LOTTERY MARKETS
         </h5>
         <div className="market-card-grid">
           {allActiveMarket.length > 0 ? (
