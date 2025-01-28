@@ -239,7 +239,7 @@ const PurchasedTickets = () => {
                   color: "#4682B4",
                 }}
               >
-                Lottery Markets
+                LOTTERY MARKETS
               </h4>
               <div className="d-flex align-items-center">
                 {/* Left Navigation Button */}
@@ -329,7 +329,7 @@ const PurchasedTickets = () => {
           <>
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h2 className="fw-bold" style={{ color: "#4682B4" }}>
-                Purchased Lottery Tickets
+                PURCHASED LOTTERY TICKETS
               </h2>
               <div className="w-50">
                 <input

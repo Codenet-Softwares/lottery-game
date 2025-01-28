@@ -88,7 +88,7 @@ const Inactive = () => {
           className="card-header d-flex align-items-center justify-content-between p-3"
           style={{ backgroundColor: "#0E1A35", color: "#FFFFFF" }}
         >
-          <h3 className="mb-0 fw-bold fs-5">Announced Game List</h3>
+          <h3 className="mb-0 fw-bold fs-5">ANNOUNCED GAME LIST</h3>
           <input
             type="text"
             className="search-bar-shrink-1"
