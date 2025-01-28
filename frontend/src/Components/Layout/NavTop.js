@@ -106,7 +106,7 @@ const NavTop = () => {
                 key={to}
                 to={to}
                 className={`nav-link mt-2 ${
-                  location.pathname === to ? "active-link" : ""
+                  location.pathname === to|| location.pathname.startsWith(to)  ? "active-link" : ""
                 }`}
               >
                 <i className={`nav-icon ${icon}`} />

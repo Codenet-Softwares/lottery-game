@@ -189,4 +189,25 @@
     transform: scale(1.2); /* Slightly larger icon */
   }
   
-  
+  .nav-link.active-link span::before,
+.nav-link.active-link span::after {
+  content: "";
+  position: absolute;
+  width: 100%; /* Ensure underline spans the entire text */
+  height: 3px;
+  background: linear-gradient(90deg, #46c1ff, #5ae1ff);
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.nav-link.active-link span::before {
+  top: 0;
+  left: 0;
+  transform: translateX(0); /* Fully visible */
+}
+
+.nav-link.active-link span::after {
+  bottom: 0;
+  right: 0;
+  transform: translateX(0); /* Fully visible */
+}
