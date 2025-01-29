@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+ import React, { useState, useEffect } from "react";
 import {
   Card,
   Col,
@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 import moment from "moment";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css"; // Import Bootstrap icons
+import "bootstrap-icons/font/bootstrap-icons.css"; 
 import "./MarketInsight.css";
 import {
   GetMarketTimings,
@@ -77,7 +77,7 @@ const MarketInsight = () => {
     }
   }, [marketTimes]);
 
-  console.log("refresh", refresh);
+
   useEffect(() => {
     const fetchMarketTimings = async () => {
       showLoader();

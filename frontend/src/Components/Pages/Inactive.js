@@ -8,7 +8,7 @@ import { getIsActiveLottery, isRevokeLottery } from "../../Utils/apiService";
 import SingleCard from "../Common/SingleCard";
 
 const Inactive = () => {
-  const { store,showLoader, hideLoader } = useAppContext();
+  const { store, showLoader, hideLoader } = useAppContext();
   const [inactiveGames, setInactiveGames] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -39,7 +39,6 @@ const Inactive = () => {
         search: debouncedSearchTerm,
       });
       const gamesData = res?.data || [];
-      console.log("gamesData", res.data);
 
       setInactiveGames(gamesData);
       setTotalData(res?.pagination?.totalItems);
@@ -54,7 +53,6 @@ const Inactive = () => {
   };
 
   const handleRevokeAnnouncement = async (marketId) => {
-    console.log("first", marketId);
     try {
       showLoader(); // Show the loader before the API call starts
       const res = await isRevokeLottery({ marketId: marketId });
@@ -145,7 +143,6 @@ const Inactive = () => {
                 <tbody>
                   {inactiveGames.length > 0 ? (
                     inactiveGames.map((game, index) => {
-                      console.log("game", game);
                       return (
                         <tr>
                           <td>{index + 1}</td>
