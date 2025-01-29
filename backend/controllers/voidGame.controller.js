@@ -67,7 +67,6 @@ export const voidMarket = async (req, res) => {
       res
     );
   } catch (error) {
-    console.log("err", error);
     return apiResponseErr(
       null,
       false,

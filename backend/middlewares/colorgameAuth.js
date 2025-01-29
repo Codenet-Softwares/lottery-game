@@ -18,9 +18,7 @@ export const authenticateUser = (req, res, next) => {
     }
 
     const role = string.User;
-    console.log('role', role);
     const userRole = decoded.roles;
-    console.log('userRole', userRole);
 
     if (!role.includes(userRole)) {
       return apiResponseErr(null, false, statusCode.unauthorize, 'Unauthorized Access', res);

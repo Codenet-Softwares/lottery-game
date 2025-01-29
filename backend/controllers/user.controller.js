@@ -22,8 +22,6 @@ export const getAllMarkets = async (req, res) => {
 
     const currentTime = getISTTime();
 
-    console.log("currentTime",currentTime)
-
     await TicketRange.update(
       { isActive: false },
       {
@@ -208,7 +206,6 @@ export const PurchaseTickets = async (req, res) => {
     if (currentTime >= new Date(ticketRange.end_time)) {
       ticketRange.isActive = false;
       const response = await ticketRange.save();
-      console.log("Markets Inactivated:", JSON.stringify(response, null, 2));
       return apiResponseSuccess(null, false, statusCode.success, "Market's time ended", res);
     }
 
@@ -248,7 +245,6 @@ export const PurchaseTickets = async (req, res) => {
       res
     );
   } catch (error) {
-    console.log("error", error.message);
     return apiResponseErr(
       null,
       false,
@@ -345,7 +341,6 @@ export const purchaseHistory = async (req, res) => {
       res
     );
   } catch (error) {
-    console.error("Error retrieving purchase history:", error);
     return apiResponseErr(
       null,
       false,

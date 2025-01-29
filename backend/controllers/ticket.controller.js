@@ -98,8 +98,6 @@ export const geTicketRange = async (req, res) => {
 
     return apiResponseSuccess(ticketData, true, statusCode.success, 'Success', res);
   } catch (error) {
-    console.error('Error saving ticket range:', error);
-
     return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
   }
 };
@@ -117,7 +115,6 @@ export const getIsactiveMarket = async (req, res) => {
     return apiResponseSuccess(ticketData, true, statusCode.success, 'Success', res);
 
   } catch (error) {
-    console.error('Error saving ticket range:', error);
     return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
   }
 };
