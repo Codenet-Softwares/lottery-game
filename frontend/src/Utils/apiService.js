@@ -173,7 +173,7 @@ export async function PurchasedTicketsHistory(body, isToast = false) {
     const callParams = await getAuthCallParams(strings.GET, null, isToast);
     let url = `${urls.PurchasedLotteryHistory}/${body.marketId}?page=${body.page}&limitPerPage=${body.limit}`;
     if (body.searchBySem) {
-      url = url + `&sem=${body.searchBySem}`;
+      url = url + `&search=${body.searchBySem}`;
     }
     // console.log("search lottery", url);
     const response = await makeCall(url, callParams, isToast);
