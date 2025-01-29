@@ -11,7 +11,7 @@ export const generateSeries = (seriesStart, seriesEnd) => {
   const startIndex = letters.indexOf(seriesStart);
   const endIndex = letters.indexOf(seriesEnd);
 
-  console.log("start", startIndex, endIndex, seriesStart, seriesEnd);
+
 
   // Check if start or end index is invalid or if startIndex is greater than endIndex
   if (startIndex === -1 || endIndex === -1 || startIndex > endIndex) {

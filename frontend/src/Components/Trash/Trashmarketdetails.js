@@ -15,7 +15,7 @@ const Trashmarketdetails = ({
   handleSearchChange,
   fetchMarketDetails, // pass the fetchMarketDetails function from the parent
 }) => {
-  console.log("details", details);
+
   const { showLoader, hideLoader } = useAppContext();
   const [expandedTickets, setExpandedTickets] = useState(null);
 
@@ -24,7 +24,7 @@ const Trashmarketdetails = ({
   };
 
   // const handleDelete = async (trashId,selectedMarketId) => {
-  //   console.log(trashId)
+ 
   //   if (window.confirm("Are you sure you want to delete this market?")) {
   //     try {
   //       await TrashMarketsDelete({trashId:trashId });
@@ -40,7 +40,7 @@ const Trashmarketdetails = ({
   // };
 
   // const handleRevoke = async (trashId, selectedMarketId) => {
-  //   console.log(trashId)
+  //  
   //   if (window.confirm("Are you sure you want to revoke this market?")) {
   //     const requestBody = {
   //       trashMarketId:trashId
@@ -63,7 +63,7 @@ const Trashmarketdetails = ({
   // };
 
   const handleDelete = async (trashId, selectedMarketId) => {
-    console.log(trashId);
+ 
     if (window.confirm("Are you sure you want to delete this market?")) {
       try {
         showLoader(); // Show loader before the request
@@ -81,7 +81,7 @@ const Trashmarketdetails = ({
   };
   
   const handleRevoke = async (trashId, selectedMarketId) => {
-    console.log(trashId);
+
     if (window.confirm("Are you sure you want to revoke this market?")) {
       try {
         showLoader(); // Show loader before the request

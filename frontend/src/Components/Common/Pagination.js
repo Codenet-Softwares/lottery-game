@@ -9,7 +9,6 @@ const Pagination = ({
   endIndex,
   totalData,
 }) => {
-  console.log(currentPage);
 
   const renderPageNumbers = () => {
     const pageNumbers = [];
