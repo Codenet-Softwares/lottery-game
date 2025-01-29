@@ -26,12 +26,7 @@ marketId,
   setFilteredSeries,
   lotteryRange,
 }) => {
-  console.log(
-    "filteredNumbers",
-    filteredNumbers,
-    filteredGroups,
-    filteredSeries
-  );
+
   const [sem, setSem] = useState("");
   const [group, setGroup] = useState("");
   const [series, setSeries] = useState("");

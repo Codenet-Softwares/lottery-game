@@ -10,7 +10,7 @@ import { useAppContext } from "../../contextApi/context";
 
 const ResetPassword = () => {
   const {  store } = useAppContext();
-  console.log("store", store.admin.userName);
+
   const navigate = useNavigate();
   const location = useLocation();
   const state = location?.state || {};

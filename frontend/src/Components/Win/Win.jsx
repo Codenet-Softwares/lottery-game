@@ -52,21 +52,21 @@ const Win = () => {
     }
   }, [allActiveMarket]);
 
-  console.log("prizes", prizes);
+
 
   const handleGetAllLotteryMarket = async () => {
     try {
       const allmarket = await AllActiveLotteryMarkets({
         search: debouncedSearchTerm,
       });
-      console.log("allmarket", allmarket);
+  
       setAllActiveMarket(allmarket.data);
     } catch (error) {
       console.error("Error fetching lottery markets:", error);
     }
   };
 
-  console.log("prizeData", prizes);
+
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -196,8 +196,7 @@ const Win = () => {
         }
       }
 
-      // Log the structured array
-      console.log(JSON.stringify(resultArray, null, 2));
+  
 
         // Show loader before making the API call
     showLoader();
@@ -205,10 +204,7 @@ const Win = () => {
       // Send each result to the CustomWining API
       try {
         const response = await CustomWining({ resultArray, marketId: id });
-        console.log(
-          `API call successful for ${resultArray.prizeCategory}:`,
-          response
-        );
+      
         // Refresh the active markets list after a successful submission
         await handleGetAllLotteryMarket();
       } catch (error) {
@@ -223,7 +219,7 @@ const Win = () => {
 
       return resultArray;
     } else {
-      console.log(`No data found for the specified time: ${time}`);
+
       return [];
     }
   };

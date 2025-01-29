@@ -69,7 +69,7 @@ export const getAuthCallParams = async (methodType, body) => {
 
 export async function makeCall(callName, callParams, isToast = true) {
   try {
-    console.log("API Call Initiated:", { callName, callParams }); // Debugging logs
+
        // Ensure no toast messages for GET requests
     const isGetRequest = callParams.method === "GET";
     if (isGetRequest) isToast = false;
