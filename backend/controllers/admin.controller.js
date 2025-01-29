@@ -193,7 +193,6 @@ export const adminPurchaseHistory = async (req, res) => {
 
     return apiResponsePagination(filteredHistoryWithTickets, true, statusCode.success, 'Success', pagination, res);
   } catch (error) {
-    console.error('Error fetching purchase history:', error);
     apiResponseErr(
       error.data ?? null,
       false,
@@ -541,8 +540,6 @@ export const getTicketRange = async (req, res) => {
 
     return apiResponseSuccess(ticketData, true, statusCode.success, 'Success', res);
   } catch (error) {
-    console.error('Error saving ticket range:', error);
-
     return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
   }
 }

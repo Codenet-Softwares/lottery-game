@@ -5,5 +5,4 @@ class CustomError extends Error {
     this.responseCode = responseCode;
   }
 }
-
 export default CustomError;

@@ -212,7 +212,6 @@ export const lotteryMarketAnalysis = async (req, res) => {
       res
     );
   } catch (error) {
-    console.error("Error:", error);
     return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
   }
 };

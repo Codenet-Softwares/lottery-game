@@ -4,7 +4,6 @@ import { statusCode } from './statusCodes.js';
 const customErrorHandler = function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors);
     const formattedErrors = errors.array().map(function (error) {
       return {
         type: 'field',

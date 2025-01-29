@@ -425,7 +425,6 @@ export const ResultDeclare = async (req, res) => {
     return apiResponseSuccess(savedResults, true, statusCode.create, 'Lottery results saved successfully.', res);
 
   } catch (error) {
-    console.log("error", error);
     return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
   }
 };
@@ -450,7 +449,6 @@ export const getLotteryResults = async (req, res) => {
 
     return apiResponseSuccess(results, true, statusCode.success, 'Lottery results fetched successfully.', res);
   } catch (error) {
-    console.log("Error fetching results:", error);
     return apiResponseErr(
       null,
       false,
