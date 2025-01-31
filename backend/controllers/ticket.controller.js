@@ -89,7 +89,7 @@ export const geTicketRange = async (req, res) => {
       };
     }
     const ticketData = await TicketRange.findAll({
-      where: whereCondition,
+      where: whereCondition, order : [["createdAt", "DESC"]],
     });
 
     if (!ticketData || ticketData.length === 0) {
@@ -107,7 +107,7 @@ export const geTicketRange = async (req, res) => {
 export const getIsactiveMarket = async (req, res) => {
   try {
 
-    const ticketData = await TicketRange.findAll({where : {isActive : true}})
+    const ticketData = await TicketRange.findAll({where : {isActive : true}, order : [["createdAt","DESC"]]})
     if(!ticketData){
     return apiResponseErr(null, false, statusCode.badRequest, 'Ticket not Found', res);
     }
