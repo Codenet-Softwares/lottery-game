@@ -45,7 +45,7 @@ export const getAllMarkets = async (req, res) => {
     );
 
     const ticketData = await TicketRange.findAll({
-      attributes: ["marketId", "marketName", "isActive", "isWin", "isVoid", "hideMarketUser", "start_time", "end_time"],
+      attributes: ["marketId", "marketName", "isActive", "isWin", "isVoid", "hideMarketUser", "start_time", "end_time", "createdAt"],
       where: {
         date: {
           [Op.gte]: today,
@@ -55,6 +55,9 @@ export const getAllMarkets = async (req, res) => {
         hideMarketUser: true
       },
     });
+
+    ticketData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); 
+
 
     if (!ticketData || ticketData.length === 0) {
       return apiResponseSuccess([], true, statusCode.success, "No data", res);

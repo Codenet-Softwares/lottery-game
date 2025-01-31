@@ -371,7 +371,7 @@ export const getAllMarkets = async (req, res) => {
     }
     const ticketData = await TicketRange.findAll({
       attributes: ["marketId", "marketName", "isActive", "isWin", "isVoid"],
-      where : whereCondition
+      where : whereCondition, order : [["createdAt", "DESC"]],
     });
 
     if (!ticketData || ticketData.length === 0) {
