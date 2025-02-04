@@ -279,6 +279,7 @@ export const getLiveMarkets = async (req, res) => {
         },
         resultAnnouncement: false,
       },
+      order: [["createdAt", "DESC"]], 
     });
 
     if (!ticketData || ticketData.length === 0) {
