@@ -14,7 +14,10 @@ const Result = () => {
   const [selectedDate, setSelectedDate] = useState(today); // For date filter
 
   const maxVisibleMarkets = 3;
-  const visibleMarkets = markets.slice(scrollIndex, scrollIndex + maxVisibleMarkets);
+  const visibleMarkets = markets.slice(
+    scrollIndex,
+    scrollIndex + maxVisibleMarkets
+  );
 
   // Fetch markets based on the selected date
   const fetchMarkets = async () => {
@@ -155,7 +158,9 @@ const Result = () => {
                 <button
                   key={market.marketId}
                   className={`btn ${
-                    market.marketId === marketId ? "btn-primary" : "btn-outline-light"
+                    market.marketId === marketId
+                      ? "btn-primary"
+                      : "btn-outline-light"
                   }`}
                   onClick={() => handleMarketSelect(market)}
                   style={{
@@ -203,11 +208,15 @@ const Result = () => {
           <div className="date-filter-container">
             <div>
               <label htmlFor="date-filter" className="date-filter-label">
-                <i className="fas fa-calendar-alt me-2" style={{ color: "#4682B4" }}></i>
+                <i
+                  className="fas fa-calendar-alt me-2"
+                  style={{ color: "#4682B4" }}
+                ></i>
                 Select Declared Result Lottery Market Date:
               </label>
               <p className="date-filter-description">
-                Please choose a date to view past available results of lottery markets.
+                Please choose a date to view past available results of lottery
+                markets.
               </p>
             </div>
             <input
@@ -217,6 +226,8 @@ const Result = () => {
               value={selectedDate}
               onChange={handleDateChange}
               max={today} // Prevent selecting future dates
+              readonly // Prevent manual typing
+              onKeyDown={(e) => e.preventDefault()} // Block manual input from keyboard
             />
           </div>
         </div>
@@ -226,7 +237,8 @@ const Result = () => {
           <h2 className="text-center" style={{ color: "#3b6e91" }}>
             Results for{" "}
             <span style={{ color: "#4682B4" }}>
-              {markets.find((m) => m.marketId === marketId)?.marketName || "Selected Market"}
+              {markets.find((m) => m.marketId === marketId)?.marketName ||
+                "Selected Market"}
             </span>
           </h2>
 
@@ -283,7 +295,8 @@ const Result = () => {
                       <div
                         style={{
                           display: "grid",
-                          gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+                          gridTemplateColumns:
+                            "repeat(auto-fit, minmax(120px, 1fr))",
                           gap: "15px",
                           backgroundColor: "#f8faff",
                           padding: "20px",
@@ -306,15 +319,18 @@ const Result = () => {
                               color: "#555",
                               textAlign: "center",
                               boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                              transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                              transition:
+                                "transform 0.3s ease, box-shadow 0.3s ease",
                             }}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.transform = "scale(1.1)";
-                              e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.2)";
+                              e.currentTarget.style.boxShadow =
+                                "0 4px 12px rgba(0, 0, 0, 0.2)";
                             }}
                             onMouseLeave={(e) => {
                               e.currentTarget.style.transform = "scale(1)";
-                              e.currentTarget.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.1)";
+                              e.currentTarget.style.boxShadow =
+                                "0 2px 5px rgba(0, 0, 0, 0.1)";
                             }}
                           >
                             {ticket}
