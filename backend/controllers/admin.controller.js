@@ -432,6 +432,7 @@ export const dateWiseMarkets = async (req, res) => {
           [Op.lt]: nextDay,
         },
       },
+      order : [["createdAt", "DESC"]],
     });
 
     if (!ticketData || ticketData.length === 0) {
@@ -492,6 +493,7 @@ export const getMarkets = async (req, res) => {
           [Op.lt]: nextDay,
         },
       },
+      order: [["createdAt", "DESC"]],
     });
 
     if (!ticketData || ticketData.length === 0) {
@@ -572,7 +574,8 @@ export const getInactiveMarket = async (req, res) => {
       where:whereClause
       ,
       limit: parseInt(limit),
-      offset
+      offset,
+      order : [["createdAt", "DESC"]],
     });
 
     if (!ticketData || ticketData.length === 0) {
@@ -672,8 +675,9 @@ export const liveMarkets = async (req, res) => {
         },
         resultAnnouncement: false,
         ...searchCondition,
-        marketId:marketIds
+        marketId:marketIds,
       },
+      order: [["createdAt", "DESC"]],
     });
 
     if (!ticketData || ticketData.length === 0) {
