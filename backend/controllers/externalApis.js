@@ -77,6 +77,7 @@ export const getLotteryBetHistory = async (req, res) => {
         where: queryConditions,
         limit: pageSize,
         offset,
+        order: [["createdAt", "DESC"]],
       });
 
     if (purchaseLotteries.length === 0) {
@@ -109,6 +110,7 @@ export const getLotteryBetHistory = async (req, res) => {
           marketId: purchase.marketId,
           amount: purchase.lotteryPrice,
           ticketPrice: purchase.price,
+          date : purchase.settleTime,
           tickets,
           sem,
         };

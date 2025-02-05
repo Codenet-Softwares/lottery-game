@@ -91,6 +91,7 @@ export const getTrashMarket = async (req, res) => {
     const  search  = req.query.search || "";
     const existingMarket = await LotteryTrash.findAll({
       attributes: ["trashMarkets"],
+      order: [["createdAt", "DESC"]],
     });
 
     const allMarkets = [];

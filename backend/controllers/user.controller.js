@@ -627,6 +627,7 @@ export const getMarkets = async (req, res) => {
           [Op.lt]: nextDay,
         },
       },
+      order : [["createdAt", "DESC"]],
     });
 
     if (!ticketData || ticketData.length === 0) {
