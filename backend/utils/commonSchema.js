@@ -138,6 +138,63 @@ export const validateTicketRange = [
     .withMessage('Price must be greater than 0'),
 ];
 
+export const updateMarketValidation = [
+  body('group')
+    .optional()
+    .custom((value) => {
+      if (value && (!value.min || !value.max)) {
+        throw new Error('Group must include both min and max values.');
+      }
+      if (value && value.min >= value.max) {
+        throw new Error('Group min must be less than max.');
+      }
+      if (value && value.max - value.min < 20) {
+        throw new Error('Group range must include at least 20 numbers.');
+      }
+      return true;
+    }),
+
+  body('series')
+    .optional()
+    .custom((value) => {
+      if (value && (!value.start || !value.end)) {
+        throw new Error('Series must include both start and end values.');
+      }
+      const invalidLetters = ['I', 'F', 'O'];
+      if (value && 
+        (value.start < 'A' || value.start > 'Z' || 
+        value.end < 'A' || value.end > 'Z')
+      ) {
+        throw new Error('Series must include uppercase letters only (A-Z) excluding I,F,O.');
+      }
+      if (value && (invalidLetters.includes(value.start) || invalidLetters.includes(value.end))) {
+        throw new Error(`Series cannot include the letters ${invalidLetters.join(', ')}.`);
+      }
+      if (value && value.end.charCodeAt(0) - value.start.charCodeAt(0) + 1 < 10) {
+        throw new Error('Series range must be at least 10 letters.');
+      }
+      return true;
+    }),
+
+  body('number')
+    .optional()
+    .custom((value) => {
+      if (value && (!value.min || !value.max)) {
+        throw new Error('Number must include both min and max values.');
+      }
+      if (value && value.min >= value.max) {
+        throw new Error('Number min must be less than max.');
+      }
+      return true;
+    }),
+  body('start_time').optional().isString().withMessage('Start time must be a string.'),
+  body('end_time').optional().isString().withMessage('End time must be a string.'),
+  body('marketName').optional().isString().withMessage('Market Name must be a string.'),
+  body('price').optional().isNumeric().withMessage('Price must be a number.')
+];
+
+
+
 
 export const validateSearchTickets = [
   body('group').notEmpty().withMessage('Group is required').isInt({ min: 0 }).withMessage('Group must be a positive integer'),
