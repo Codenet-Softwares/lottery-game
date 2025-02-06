@@ -287,23 +287,23 @@ export const ResultDeclare = async (req, res) => {
             [Op.or]: ticketConditions,
           },
         });
-        
+
         const firstPrizeTickets = await PurchaseLottery.findAll({
           where: {
             marketId,
             createdAt: {
               [Op.between]: [todayStart, todayEnd],
             },
-            [Op.or]: ticketConditions.filter((condition) => condition.group), 
+            [Op.or]: ticketConditions.filter((condition) => condition.group),
           },
         });
-        
+
         const firstPrizeTicketMap = new Set(
           firstPrizeTickets.map(
             (ticket) => `${ticket.group}-${ticket.series}-${ticket.number}`
           )
         );
-        
+
         const matchComplementaryTicket = await PurchaseLottery.findAll({
           where: {
             marketId,
@@ -312,37 +312,47 @@ export const ResultDeclare = async (req, res) => {
             },
           },
         });
-        
+
         const filteredComplementaryTickets = matchComplementaryTicket.filter((ticket) => {
           const isFirstPrizeWinner = firstPrizeTicketMap.has(`${ticket.group}-${ticket.series}-${ticket.number}`);
-          
+
           if (isFirstPrizeWinner) {
             console.log(`User ${ticket.userId} excluded from complementary prize (First Prize Winner)`);
           } else {
             console.log(`User ${ticket.userId} is eligible for complementary prize`);
           }
-        
+
           return !isFirstPrizeWinner;
         });
-        
+
         for (const ticket of filteredComplementaryTickets) {
-          const { userId, number, lotteryPrice } = ticket;
-        
+          const { userId, sem, userName, marketName, number, lotteryPrice  } = ticket;
+
           try {
             const baseURL = process.env.COLOR_GAME_URL;
-            const response = await axios.post(`${baseURL}/api/users/update-balance`, {
+            await axios.post(`${baseURL}/api/users/update-balance`, {
               userId,
               prizeAmount: complementaryPrize,
               marketId,
               lotteryPrice: lotteryPrice,
             });
-        
-            console.log(`Balance updated successfully for userId ${userId}:`, response.data);
+
+            await axios.post(`${baseURL}/api/lottery-profit-loss`, {
+              userId,
+              userName,
+              marketId,
+              marketName,
+              ticketNumber: number,
+              price: lotteryPrice,
+              sem,
+              profitLoss: complementaryPrize,
+            });
+
           } catch (error) {
             console.error(`Error updating balance for userId ${userId}:`, error.message);
           }
         }
-        
+
 
         if (matchedTickets.length > 0) {
           const userProfitLossMap = {};
@@ -481,7 +491,7 @@ export const ResultDeclare = async (req, res) => {
     return apiResponseSuccess(savedResults, true, statusCode.create, 'Lottery results saved successfully.', res);
 
   } catch (error) {
-    console.log("error",error)
+    console.log("error", error)
     return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
   }
 };
