@@ -69,6 +69,74 @@ export const saveTicketRange = async (req, res) => {
   }
 };
 
+export const updateMarket = async (req, res) => {
+  try {
+    const { marketId } = req.params;
+    const updatedFields = req.body;
+
+    const ticketRange = await TicketRange.findOne({ where: { marketId } });
+
+    if (!ticketRange) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.notFound,
+        'Market not found with the provided marketId.',
+        res
+      );
+    }
+
+const allowedFields = ['group', 'series', 'number', 'start_time', 'end_time', 'marketName', 'date', 'price'];
+const updates = {};
+
+for (const [key, value] of Object.entries(updatedFields)) {
+  if (!allowedFields.includes(key)) continue;
+
+  if (['group', 'number'].includes(key)) {
+    const { min, max } = value || {};
+    if (min === undefined || max === undefined) {
+      return apiResponseErr(null, false, statusCode.badRequest, `${key} must have both min and max values.`, res);
+    }
+    updates[`${key}_start`] = min;
+    updates[`${key}_end`] = max;
+  } else if (key === 'series') {
+    const { start, end } = value || {};
+    if (start === undefined || end === undefined) {
+      return apiResponseErr(null, false, statusCode.badRequest, 'Series must have both start and end values.', res);
+    }
+    updates[`${key}_start`] = start;
+    updates[`${key}_end`] = end;
+  } else {
+    updates[key] = value;
+  }
+}
+
+if (Object.keys(updates).length === 0) {
+  return apiResponseErr(null, false, statusCode.badRequest, 'No valid fields provided for update.', res);
+}
+
+await ticketRange.update(updates);
+
+
+    return apiResponseSuccess(
+      ticketRange,
+      true,
+      statusCode.success,
+      'Lottery market updated successfully.',
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+
 export const geTicketRange = async (req, res) => {
   try {
     const today = new Date();
