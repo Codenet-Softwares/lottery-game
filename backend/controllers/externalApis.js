@@ -14,7 +14,7 @@ export const getLotteryBetHistory = async (req, res) => {
     const pageSize = parseInt(req.query.pageSize) || 10;
     const page = parseInt(req.query.page) || 1;
     const offset = (page - 1) * pageSize;
-    const { dataType } = req.query;
+    const { dataType, type } = req.query;
 
     let startDate, endDate;
 
@@ -65,10 +65,16 @@ export const getLotteryBetHistory = async (req, res) => {
     }
 
     const queryConditions = {
+      isVoid: false,
       createdAt: {
         [Op.between]: [new Date(startDate), new Date(endDate)],
       },
     };
+
+    if (type === "void") {
+      queryConditions.isVoid = true;
+    }
+
     if (userId) queryConditions.userId = userId;
     if (userName) queryConditions.userName = userName;
 
@@ -281,7 +287,7 @@ export const getLiveMarkets = async (req, res) => {
         },
         resultAnnouncement: false,
       },
-      order: [["createdAt", "DESC"]], 
+      order: [["createdAt", "DESC"]],
     });
 
     if (!ticketData || ticketData.length === 0) {

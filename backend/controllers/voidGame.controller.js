@@ -32,6 +32,11 @@ export const voidMarket = async (req, res) => {
       );
     }
 
+    await PurchaseLottery.update(
+      { isVoid: true },
+      { where: { marketId } }
+    );
+
     market.isVoid = true;
     await market.save();
 

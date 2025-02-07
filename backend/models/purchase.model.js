@@ -69,7 +69,11 @@ const PurchaseLottery = sequelize.define(
     settleTime : {
       type: DataTypes.DATE,
       allowNull: true,
-    }
+    },
+    isVoid: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     tableName: "PurchaseLottery",
