@@ -14,6 +14,7 @@ import "./Login.css";
 const Login = () => {
   const { dispatch, store, showLoader, hideLoader } = useAppContext();
   const [error, setError] = useState(""); // For error handling
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -27,24 +28,6 @@ const Login = () => {
     }
   }, []);
 
-  // const {
-  //   values,
-  //   errors,
-  //   touched,
-  //   handleBlur,
-  //   handleChange,
-  //   handleSubmit,
-  //   resetForm,
-  // } = useFormik({
-  //   initialValues: getInitialValues(),
-  //   validationSchema: LoginSchema,
-  //   onSubmit: async (values, action) => {
-  //     console.log("Submitted values:", values);
-  //     await loginHandler(values);
-  //     resetForm();
-  //   },
-  //   enableReinitialize: true,
-  // });
   const {
     values,
     errors,
@@ -70,7 +53,7 @@ const Login = () => {
     },
     enableReinitialize: true,
   });
-  
+
   async function loginHandler(values) {
     const response = await adminLogin(values);
     console.log("Response from login:", response);
@@ -106,6 +89,20 @@ const Login = () => {
         overflow: "hidden",
       }}
     >
+      <style>
+        {`
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.8);
+      text-shadow: 0 0 5px rgba(255, 255, 255, 1);
+      font-weight: bold;
+      font-style: italic;
+      font-size: 1.1rem;
+      font-family: "Poppins", sans-serif;
+      letter-spacing: 1.5px;
+   
+    }
+  `}
+      </style>
       {/* Background Image Overlay */}
       <div
         style={{
@@ -120,7 +117,7 @@ const Login = () => {
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          filter: "blur(4px)",
+          filter: "blur(4px) ",
         }}
       ></div>
 
@@ -130,7 +127,7 @@ const Login = () => {
           style={{
             maxWidth: "800px",
             margin: "0 auto",
-            backgroundColor: "hsla(0, 0%, 100%, 0.15)", // Light frosted effect for the background
+            backgroundColor: "hsla(0, 0%, 100%, 0.01)", // Light frosted effect for the background
             backdropFilter: "blur(10px)", // Glassy frosted look
             borderRadius: "15px", // Slightly more rounded corners for elegance
             position: "relative",
@@ -138,125 +135,230 @@ const Login = () => {
             zIndex: 1,
             minHeight: "500px", // Fixed height
             maxHeight: "500px", // Fixed height
-            overflow: "hidden", // Prevent expansion on validation errors
+            overflow: "hidden",
+            // boxShadow: "0 0 20px rgba(255, 255, 255, 0.3)",
           }}
         >
           <div className="row justify-content-center">
             <div className="col-lg-12">
               <div
-                className="modal-content cs_modal"
                 style={{
                   borderRadius: "15px",
                   border: "none",
-                  backgroundColor: "rgba(255, 255, 255, 0.3)", // Slightly transparent background
+                  backgroundColor: "rgba(255, 255, 255, 0.01)", // Slightly transparent background
+                  width: "750px", // Fixed width
+                  height: "400px", // Fixed height
+                  boxShadow: "0 0 25px rgba(255, 255, 255)",
                 }}
               >
                 <div
-                  className="modal-header justify-content-center "
+                  className="modal-header justify-content-center"
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    backgroundColor: "rgba(255, 255, 255, 0.06)",
                     backdropFilter: "blur(10px)",
                     borderRadius: "15px 15px 0 0",
                     padding: "15px",
                   }}
                 >
                   <h5
-                    className="text-white font-weight-bold"
+                    className="text-white font-weight-bold text-uppercase"
                     style={{
-                      fontSize: "3rem", // Increased size for impact
+                      fontSize: "2.5rem", // Increased size for impact
                       fontFamily: "'Merriweather', serif",
                       textShadow: "3px 3px 8px rgba(0, 0, 0, 0.4)",
-                      letterSpacing: "2px",
+                      letterSpacing: "3px",
                       fontWeight: "600",
                     }}
                   >
                     Lottery Admin Login
                   </h5>
                 </div>
-                <div className="" style={{ padding: "30px" }}>
-                  <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                      <input
-                        type="text"
-                        name="userName"
-                        className="form-control"
-                        placeholder="Enter Username"
-                        style={{
-                          borderRadius: "30px",
-                          padding: "12px 20px",
-                          border: "1px solid #4682B4",
-                          backgroundColor: "rgba(255, 255, 255, 0.15)", // Frosted white glass effect
-                          color: "white",
-                          backdropFilter: "blur(10px)", // Frost effect for the background
-                          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Soft shadow for a floating effect
-                        }}
-                        value={values.userName}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      />
+
+                <form
+                  onSubmit={handleSubmit}
+                  style={{
+                    padding: "20px",
+                  }}
+                >
+                  <div className="mb-3 ">
+                    <input
+                      type="text"
+                      name="userName"
+                      className={`form-control ${
+                        errors.userName && touched.userName ? "is-invalid" : ""
+                      }`}
+                      placeholder="Enter Username"
+                      style={{
+                        height: "50px", // Fixed height
+                        borderRadius: "30px",
+                        padding: "12px 20px",
+                        border:
+                          errors.userName && touched.userName
+                            ? "2px solid red"
+                            : "1px solid #4682B4",
+                        backgroundColor: "rgba(255, 255, 255, 0.01)", // Frosted white glass effect
+                        color: "#fff",
+                        backdropFilter: "blur(10px)", // Frost effect for the background
+                        boxShadow: "0 0 10px rgba(255, 255, 255, 50)", // Neon Glow
+                        transition: "0.3s ease-in-out",
+                      }}
+                      value={values.userName}
+                      onChange={handleChange}
+                      onFocus={(e) =>
+                        (e.target.style.boxShadow =
+                          "0 0 20px rgba(255, 255, 255, 50)")
+                      }
+                      onBlur={(e) =>
+                        (e.target.style.boxShadow =
+                          "0 0 10px rgba(255, 255, 255, 50)")
+                      }
+                    />
+
+                    <div
+                      style={{
+                        minHeight: "30px", // Allocated space for error message
+                        height: "20px",
+                        paddingLeft: "25px",
+                        display: "flex", // Keeps content aligned
+                        alignItems: "center", // Centers error text vertically
+                        overflow: "hidden", // Prevents extra spacing
+                      }}
+                    >
                       {errors.userName && touched.userName && (
-                        <p className="fw-bold text-danger mb-0 mt-0">
+                        <p
+                          className="custom-error-message"
+                          style={{
+                            margin: -20,
+                            visibility:
+                              errors.userName && touched.userName
+                                ? "visible"
+                                : "hidden",
+                          }}
+                        >
                           {errors.userName}
                         </p>
                       )}
                     </div>
-                    <div className="mb-4" style={{ position: "relative" }}>
-                      <input
-                        type="password"
-                        name="password"   
-                        className="form-control mt-"
-                        placeholder="Enter Password"
-                        style={{
-                          borderRadius: "30px",
-                          padding: "12px 20px",
-                          border: "1px solid #4682B4",
-                          backgroundColor: "rgba(255, 255, 255, 0.15)", // Frosted white glass effect
-                          color: "white",
-                          backdropFilter: "blur(10px)", // Frost effect for the background
-                          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Soft shadow for a floating effect
-                        }}
-                        value={values.password}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      />
+                  </div>
+                  <div className="mb-3" style={{ position: "relative" }}>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      className={`form-control ${
+                        errors.password && touched.password ? "is-invalid" : ""
+                      }`}
+                      placeholder="Enter Password"
+                      style={{
+                        borderRadius: "30px",
+                        padding: "12px 45px 12px 20px", // Extra padding to the right for the icon
+                        border:
+                          errors.password && touched.password
+                            ? "2px solid red"
+                            : "1px solid #4682B4",
+                        backgroundColor: "rgba(255, 255, 255, 0.01)", // Frosted white glass effect
+                        color: "#fff",
+                        backdropFilter: "blur(10px)", // Frost effect for the background
+                        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Soft shadow for a floating effect
+                        boxShadow: "0 0 10px rgba(255, 255, 255, 50)",
+                        transition: "0.3s ease-in-out",
+                      }}
+                      value={values.password}
+                      onChange={handleChange}
+                      // onBlur={handleBlur}
+                      onFocus={(e) =>
+                        (e.target.style.boxShadow =
+                          "0 0 20px rgba(255, 255, 255, 50)")
+                      }
+                      onBlur={(e) =>
+                        (e.target.style.boxShadow =
+                          "0 0 10px rgba(255, 255, 255, 50)")
+                      }
+                    />
+
+                    <div
+                      className="eye-icon"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: "absolute",
+                        right: "40px",
+                        top: "30%",
+                        transform: "translateY(-50%)",
+                        cursor: "pointer",
+                        color: "#fff",
+                      }}
+                    >
+                      <i
+                        className={`bi ${
+                          showPassword ? "bi-eye-slash" : "bi-eye"
+                        }`}
+                      ></i>
+                    </div>
+                    <div
+                      style={{
+                        minHeight: "30px", // Space allocated for error message
+                        height: "20px",
+                        paddingLeft: "25px",
+                        display: "flex", // Keeps content aligned
+                        alignItems: "center", // Centers error text vertically
+                        overflow: "hidden", // Prevents extra spacing
+                      }}
+                    >
                       {errors.password && touched.password && (
-                        <p className="fw-bold text-danger mb-0 mt-0">
+                        <p
+                          className="custom-error-message"
+                          style={{
+                            margin: -20,
+                            visibility:
+                              errors.password && touched.password
+                                ? "visible"
+                                : "hidden",
+                          }}
+                        >
                           {errors.password}
                         </p>
                       )}
                     </div>
+                  </div>
+                  <div className="text-center">
                     <button
                       type="submit"
-                      className="w-100"
+                      className="w-50"
                       style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.2)", // Transparent white background
+                        backgroundColor: "rgba(255, 255, 255, 0.15)", // More transparent for deeper frosted look
                         borderRadius: "30px",
-                        padding: "10px",
-                        fontSize: "1.7rem", // Increased font size for more impact
+                        padding: "5px",
+                        fontSize: "1.7rem",
                         fontWeight: "bold",
-                        color: "grey", // Using your chosen color for the text
-                        textTransform: "uppercase", // Making the text more striking
-                        letterSpacing: "1px", // Slight letter spacing for a modern look
-                        border: "none", // Remove border for a cleaner look
-                        boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Soft shadow for depth
-                        backdropFilter: "blur(8px)", // Frosted glass effect
-                        transition: "all 0.3s ease-in-out",
+                        color: "#f8f9fa", // Light gray for better contrast
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                        border: "1px solid rgba(255, 255, 255, 0.3)", // Soft frosted border
+                        boxShadow: "0px 4px 10px rgba(255, 255, 255, 0.2)", // Soft inner glow effect
+                        backdropFilter: "blur(12px)", // Stronger blur for a deeper frosted effect
+                        transition: "all 0.4s ease-in-out",
+                        cursor: "pointer",
                       }}
                       onMouseEnter={(e) => {
                         e.target.style.backgroundColor =
-                          "rgba(65, 75, 83, 0.27)"; // Subtle color change on hover
-                        e.target.style.transform = "scale(1.05)"; // Slight scale effect on hover
+                          "rgba(255, 255, 255, 0.3)"; // More visible frosted effect on hover
+                        e.target.style.color = "#fff"; // White text for better contrast
+                        e.target.style.transform = "scale(1.08)"; // Slightly bigger for interactive feel
+                        e.target.style.boxShadow =
+                          "0px 6px 15px rgba(255, 255, 255, 0.4)"; // Glowing effect
                       }}
                       onMouseLeave={(e) => {
                         e.target.style.backgroundColor =
-                          "rgba(255, 255, 255, 0.2)";
+                          "rgba(255, 255, 255, 0.15)";
+                        e.target.style.color = "#f8f9fa";
                         e.target.style.transform = "scale(1)";
+                        e.target.style.boxShadow =
+                          "0px 4px 10px rgba(255, 255, 255, 0.2)";
                       }}
                     >
                       Log in
                     </button>
-                  </form>
-                </div>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
