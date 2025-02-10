@@ -426,20 +426,30 @@ export const ResultDeclare = async (req, res) => {
 
         else {
           const usersWithPurchases = await PurchaseLottery.findAll({
-            where: { marketId },
-            attributes: ['userId', 'marketName', 'marketId'],
+            where: {
+              marketId,
+              [Op.not]: {
+                [Op.or]: ticketConditions, 
+              },
+            },
+            attributes: ["userId", "marketName", "marketId", "lotteryPrice"],
           });
-
-          const userIds = [...new Set(usersWithPurchases.map((user) => user.userId))];
+          
+          const userIds = [
+            ...new Set(usersWithPurchases.map((user) => user.userId)),
+          ];
 
           for (const userId of userIds) {
             const baseURL = process.env.COLOR_GAME_URL;
-            const response = await axios.post(`${baseURL}/api/users/remove-exposer`, {
-              userId,
-              marketId,
-              marketName,
-            });
-
+            const response = await axios.post(
+              `${baseURL}/api/users/remove-exposer`,
+              {
+                userId,
+                marketId,
+                marketName,
+                lotteryPrice: usersWithPurchases[0].lotteryPrice,
+              }
+            );
             if (!response.data.success) {
               return apiResponseErr(
                 null,
