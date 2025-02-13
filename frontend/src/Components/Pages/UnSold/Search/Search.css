@@ -1,0 +1,48 @@
+/* Search.css */
+
+.picker-dropdown {
+    position: absolute;
+    z-index: 1000;
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 10px;
+    width: 100%;
+    max-width: 300px; /* Adjusted width */
+    height: auto; /* Allow dynamic height */
+    overflow-y: auto;
+    max-height: 200px; /* Set a max height */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    top: 100%; /* Position the dropdown just below the input */
+    left: 0;   /* Align with the input */
+  }
+  
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 buttons per row */
+    gap: 10px;
+  }
+  
+  .calendar-cell {
+    width: 100%;
+    padding: 10px;
+    background-color: #e6f7ff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    color: #4682B4;
+    transition: background-color 0.3s ease;
+  }
+  
+  .calendar-cell:hover {
+    background-color: #d4edff;
+  }
+  
+  .input-wrapper {
+    position: relative; /* Ensure the dropdown opens below the correct input */
+    width: 100%; /* Ensure equal width for input and dropdown */
+    display: inline-block;
+  }
+  

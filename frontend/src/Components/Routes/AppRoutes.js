@@ -19,6 +19,7 @@ import Inactive from "../Pages/Inactive";
 import LiveMarkets from "../LiveMarkets/LiveMarkets";
 import Trash from "../Trash/Trash";
 import ResetPassword from "../ResetPassword/ResetPassword";
+import UnsoldTickets from "../Pages/UnSold/Index";
 
 const AppRoutes = () => {
   return (
@@ -56,6 +57,8 @@ const AppRoutes = () => {
             />
 
             <Route path="/purchase-history" element={<PurchasedTickets />} />
+            <Route path="/unsold-tickets" element={<UnsoldTickets />} />
+            <Route path="/unsold-tickets/:marketId" element={<UnsoldTickets />} />
             <Route path="/results/:marketId" element={<Result />} />
             <Route path="/results" element={<Result />} />
 
