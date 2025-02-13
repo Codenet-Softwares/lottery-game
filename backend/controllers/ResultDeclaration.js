@@ -76,6 +76,9 @@ export const ResultDeclare = async (req, res) => {
 
       // Ensure the correct number of tickets for each prize category
       const ticketNumbers = Array.isArray(ticketNumber) ? ticketNumber : [ticketNumber];
+
+      console.log("ticketNumbers................",ticketNumbers)
+
       if (ticketNumbers.length !== prizeLimits[prizeCategory]) {
         return apiResponseErr(
           null,
@@ -248,6 +251,8 @@ export const ResultDeclare = async (req, res) => {
         }
       }
 
+      console.log("generatedTickets.....................", generatedTickets)
+
       const marketData = await PurchaseLottery.findOne({
         attributes: ['sem', 'group', 'series', 'number'],
         where: { marketId },
@@ -288,6 +293,8 @@ export const ResultDeclare = async (req, res) => {
           },
         });
 
+        console.log("matchedTickets..................",matchedTickets)
+
         const firstPrizeTickets = await PurchaseLottery.findAll({
           where: {
             marketId,
@@ -324,6 +331,8 @@ export const ResultDeclare = async (req, res) => {
 
           return !isFirstPrizeWinner;
         });
+
+        console.log("filteredComplementaryTickets....................",filteredComplementaryTickets)
 
         for (const ticket of filteredComplementaryTickets) {
           const { userId, sem, userName, marketName, number, lotteryPrice  } = ticket;
@@ -363,7 +372,10 @@ export const ResultDeclare = async (req, res) => {
               userProfitLossMap[userId] = { totalProfitLoss: 0, totalPrice: 0 };
             }
             userProfitLossMap[userId].totalPrice += Number(lotteryPrice);
+
           });
+
+          console.log("userProfitLossMap........................",userProfitLossMap)
 
 
           for (const ticket of matchedTickets) {
@@ -381,6 +393,7 @@ export const ResultDeclare = async (req, res) => {
 
             const userProfitLoss = userProfitLossMap[ticket.userId];
 
+            console.log("userProfitLoss..........................",userProfitLoss)
 
             if (!userProfitLoss) continue;
 
@@ -390,6 +403,8 @@ export const ResultDeclare = async (req, res) => {
             processedUsers.add(userId);
 
             const totalPrizeForUser = totalPrize * matchedTickets.filter(t => t.userId === userId).length;
+
+            console.log("totalPrizeForUser...........................",totalPrizeForUser )
 
             const baseURL = process.env.COLOR_GAME_URL;
             const response = await axios.post(`${baseURL}/api/users/update-balance`, {
