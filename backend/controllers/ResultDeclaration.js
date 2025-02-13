@@ -414,6 +414,8 @@ export const ResultDeclare = async (req, res) => {
               lotteryPrice: totalPrice
             });
 
+            console.log("user-update-balance.........................................",response.data[0])
+            
             const res = await axios.post(`${baseURL}/api/lottery-profit-loss`, {
               userId,
               userName,
@@ -486,11 +488,15 @@ export const ResultDeclare = async (req, res) => {
       return apiResponseErr(null, false, statusCode.badRequest, 'No valid tickets to save.', res);
     }
 
+    console.log("savedResults....................................",savedResults)
+
     const declaredPrizes = await LotteryResult.findAll({
       where: { marketId },
       attributes: ['prizeCategory'],
       raw: true,
     });
+
+    console.log("declaredPrizes.......................................",declaredPrizes)
 
     const declaredPrizeCategories = declaredPrizes.map((prize) => prize.prizeCategory);
 
