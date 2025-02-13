@@ -20,13 +20,13 @@ import { GetPurchaseHistoryMarketTimings ,LotteryRange , PurchasedTicketsHistory
 
 const UnsoldTickets = () => {
   const { dispatch, showLoader, hideLoader, store , isLoading} = useAppContext();
-
   const { marketId: paramMarketId } = useParams();
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(true);
   const [loader, setLoader] = useState(true);
   const [purchasedTickets, setPurchasedTickets] = useState([]);
+  const [modifiedpurchasedTickets, setModifiedPurchasedTickets] = useState({});
+
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -43,11 +43,18 @@ const UnsoldTickets = () => {
     paramMarketId || null
   );
   const [visibleStartIndex, setVisibleStartIndex] = useState(0);
+  const [lotteryRange, setLotteryRange] = useState(getLotteryRange);
+  const [allActiveMarket, SetAllActiveMarket] = useState([]);
+  const [filteredMarket, setFilteredMarket] = useState(null);
+  const [filteredNumbers, setFilteredNumbers] = useState([]);
+  const [filteredGroups, setFilteredGroups] = useState([]);
+  const [filteredSeries, setFilteredSeries] = useState([]);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [responseData, setResponseData] = useState(null);
   const visibleCount = 5;
 
-  const toggleDropdown = (id) => {
-    setDropdownOpen(dropdownOpen === id ? null : id);
-  };
+  console.log("purchasedTickets", modifiedpurchasedTickets)
+  console.log("modifiedpurchasedTickets", responseData)
 
   const fetchMarketData = async () => {
     const response = await GetPurchaseHistoryMarketTimings({
@@ -77,12 +84,9 @@ const UnsoldTickets = () => {
     // fetchData();
   }, [paramMarketId, navigate, selectedDate]);
 
-  const handleDateChange = (event) => {
-    const newDate = event.target.value;
-    const formattedDate = format(new Date(newDate), "yyyy-MM-dd");
-    setSelectedDate(formattedDate);
-    fetchData();
-  };
+
+
+  
 
   // Create debounced fetchPurchasedLotteryTickets function
   const fetchPurchasedLotteryTickets = useCallback(
@@ -99,12 +103,20 @@ const UnsoldTickets = () => {
 
       if (response?.success) {
         setPurchasedTickets(response.data || []);
+        let result = [];
+        response.data.forEach(item => {
+          // Simply push all tickets into the result array
+          result.push(...item.tickets);
+        });
+        setModifiedPurchasedTickets(result);
+
         setPagination({
           page: response?.pagination?.page || 1,
           limit: response?.pagination?.limit || 10,
           totalPages: response?.pagination?.totalPages,
           totalItems: response?.pagination?.totalItems,
         });
+
         dispatch({
           type: "PURCHASED_LOTTERY_TICKETS",
           payload: response.data,
@@ -146,23 +158,12 @@ const UnsoldTickets = () => {
     fetchPurchasedLotteryTickets,
   ]);
 
-  // Handle search input change
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-    setPagination((prev) => ({ ...prev, page: 1 }));
-  };
-
-  // Handle pagination page change
-  const handlePageChange = (newPage) => {
-    setPagination((prev) => ({ ...prev, page: newPage }));
-  };
-
   // Handle market click (select a market)
   const handleMarketClick = (marketId) => {
     setSelectedMarketId(marketId);
     setPagination((prev) => ({ ...prev, page: 1 }));
     navigate(`/unsold-tickets/${marketId}`);
-
+ 
     
   };
 
@@ -183,23 +184,6 @@ const UnsoldTickets = () => {
     visibleStartIndex,
     visibleStartIndex + visibleCount
   );
-
-  // Calculate start and end indices for pagination display
-  const startIndex = (pagination.page - 1) * pagination.limit + 1;
-  const endIndex = Math.min(
-    pagination.page * pagination.limit,
-    pagination.totalItems
-  );
-
-  const [lotteryRange, setLotteryRange] = useState(getLotteryRange);
-  const [allActiveMarket, SetAllActiveMarket] = useState([]);
-  const [filteredMarket, setFilteredMarket] = useState(null);
-  const [filteredNumbers, setFilteredNumbers] = useState([]);
-  const [filteredGroups, setFilteredGroups] = useState([]);
-  const [filteredSeries, setFilteredSeries] = useState([]);
-//   const { showLoader, hideLoader, isLoading } = useAppContext();
-//   const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
   // Function to handle fetching and setting lottery range and market data
   const handleLotteryRange = async () => {
@@ -238,15 +222,12 @@ const UnsoldTickets = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  const handleSearchChange1 = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       showLoader();
       try {
         await handleLotteryRange();
+        // await handleMarketClickSearch(paramMarketId);
       } catch (error) {
         console.error("Error fetching lottery markets:", error);
       } finally {
@@ -256,10 +237,54 @@ const UnsoldTickets = () => {
     fetchData();
   }, [debouncedSearchTerm]);
 
-//   const handleMarketClick = (market) => {
-//     // Filter the selected market object from allActiveMarket
 
-//   };
+  const handleMarketClickSearch = async (marketId) => {
+    // Filter the selected market object from allActiveMarket
+    const filteredObject = allActiveMarket.find(
+      (item) => item.id === marketId
+    );
+    setFilteredMarket(filteredObject);
+    setLotteryRange({
+      group_start: filteredObject?.group_start,
+      group_end: filteredObject?.group_end,
+      series_start: filteredObject?.series_start,
+      series_end: filteredObject?.series_end,
+      number_start: filteredObject?.number_start,
+      number_end: filteredObject?.number_end,
+    });
+
+    // Initialize the filtered numbers based on the fetched range
+    setFilteredNumbers(
+      generateNumbers(filteredObject.number_start, filteredObject.number_end)
+    );
+    setFilteredGroups(
+      generateGroups(filteredObject.group_start, filteredObject.group_end)
+    );
+    setFilteredSeries(
+      generateSeries(filteredObject.series_start, filteredObject.series_end)
+    );
+  };
+
+
+  function modifyTicketsWithStatus(data, result) {
+    // Create a modified tickets array where each ticket is an object with tickno and isSold
+    const modifiedTickets = data.tickets.map(ticket => {
+      const isSold = result.includes(ticket); // Check if ticket exists in the result array
+      return {
+        tickno: ticket,
+        isSold: isSold
+      };
+    });
+  
+    // Return the modified object with updated tickets array
+    return {
+      ...data,
+      tickets: modifiedTickets
+    };
+  }
+  
+
+  
 
   return (
     <div
@@ -412,7 +437,7 @@ const UnsoldTickets = () => {
                   letterSpacing: "1px",
                 }}
               >
-                🔍 Search Lottery Tickets for {filteredMarket.marketName}
+                🔍 Check Lottery Tickets for {filteredMarket.marketName}
               </h2>
               {/* Pass filtered market and other props to Search component */}
               <Search
@@ -424,6 +449,10 @@ const UnsoldTickets = () => {
                 setFilteredGroups={setFilteredGroups}
                 setFilteredSeries={setFilteredSeries}
                 lotteryRange={lotteryRange}
+                responseData={responseData}
+                setResponseData={setResponseData}
+                modifiedpurchasedTickets={modifiedpurchasedTickets}
+                checkTicketStatus={modifyTicketsWithStatus}
               />
             </Card.Body>
           </Card>

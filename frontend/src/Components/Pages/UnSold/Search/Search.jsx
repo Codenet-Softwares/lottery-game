@@ -26,6 +26,10 @@ marketId,
   setFilteredGroups,
   setFilteredSeries,
   lotteryRange,
+  responseData,
+  setResponseData,
+  checkTicketStatus,
+  modifiedpurchasedTickets
 }) => {
 
   const [sem, setSem] = useState("");
@@ -35,7 +39,7 @@ marketId,
   const [isGroupPickerVisible, setIsGroupPickerVisible] = useState(false);
   const [isSeriesPickerVisible, setIsSeriesPickerVisible] = useState(false);
   const [isNumberPickerVisible, setIsNumberPickerVisible] = useState(false);
-  const [responseData, setResponseData] = useState(null);
+  // const [responseData, setResponseData] = useState(null);
   const [showSearch, setShowSearch] = useState(true);
   const [errors, setErrors] = useState({});
   const [filteredMarket, setFilteredMarket] = useState(null);
@@ -58,9 +62,9 @@ marketId,
 
       try {
         const response = await SearchLotteryTicket(requestBody);
-        setResponseData(response.data);
-        setShowSearch(false);
-
+       let res = checkTicketStatus(response.data , modifiedpurchasedTickets)
+       setResponseData(res);
+       setShowSearch(false);
         resetForm();
       } catch (error) {
         console.error("Error:", error);
@@ -105,7 +109,6 @@ marketId,
   };
 
 
-  console.log("responseData", responseData)
   const groupLength =
     Math.abs(lotteryRange.group_end - lotteryRange.group_start) + 1;
 
@@ -413,9 +416,9 @@ marketId,
                   <>
                     <ul>
                       {responseData.tickets.map((ticket, index) => (
-                        <li key={index} style={{ color: "#3b6e91"}}>
-                          {ticket}
-                        </li>
+                       <li key={index} style={{ color: "#3b6e91" }}>
+                       {`${ticket.tickno} IS ${ticket.isSold ? 'Sold' : 'Unsold'}`}
+                     </li>
                       ))}
                     </ul>
                   </>
