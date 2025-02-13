@@ -258,6 +258,8 @@ export const ResultDeclare = async (req, res) => {
         where: { marketId },
       });
 
+      console.log("marketData......................................",marketData)
+
       if (marketData) {
         const { sem, group, series, number } = marketData;
 
@@ -305,11 +307,15 @@ export const ResultDeclare = async (req, res) => {
           },
         });
 
+        console.log("firstPrizeTickets..........................................",firstPrizeTickets)
+
         const firstPrizeTicketMap = new Set(
           firstPrizeTickets.map(
             (ticket) => `${ticket.group}-${ticket.series}-${ticket.number}`
           )
         );
+
+        console.log("firstPrizeTicketMap...........................................",firstPrizeTicketMap )
 
         const matchComplementaryTicket = await PurchaseLottery.findAll({
           where: {
@@ -358,13 +364,17 @@ export const ResultDeclare = async (req, res) => {
             });
 
           } catch (error) {
-            console.error(`Error updating balance for userId ${userId}:`, error.message);
+/*******************************************************Error updating balance for userId*******************************************************************************************************************************/
+            console.log(`Error updating balance for userId ${userId}:`, error.message);
           }
         }
 
 
         if (matchedTickets.length > 0) {
           const userProfitLossMap = {};
+
+          console.log("userProfitLossMap Before  Update................................",userProfitLossMap)
+
           const processedUsers = new Set(); // Track processed users
 
           matchedTickets.forEach(({ userId, lotteryPrice }) => {
@@ -375,7 +385,7 @@ export const ResultDeclare = async (req, res) => {
 
           });
 
-          console.log("userProfitLossMap........................",userProfitLossMap)
+          console.log("userProfitLossMap After Update.......................................",userProfitLossMap)
 
 
           for (const ticket of matchedTickets) {
@@ -414,7 +424,7 @@ export const ResultDeclare = async (req, res) => {
               lotteryPrice: totalPrice
             });
 
-            console.log("user-update-balance.........................................",response.data[0])
+            console.log("user-update-balance.........................................",response.data)
             
             const res = await axios.post(`${baseURL}/api/lottery-profit-loss`, {
               userId,
@@ -436,7 +446,7 @@ export const ResultDeclare = async (req, res) => {
                 res
               );
             }
-
+/********************************************Balance updated for userId**************************************************************************************************************************/
             console.log(`Balance updated for userId ${userId}:`, response.data);
           }
         }
@@ -518,7 +528,7 @@ export const ResultDeclare = async (req, res) => {
       { resultAnnouncement: true, settleTime: new Date() },
       { where: { marketId } }
     );
-
+   
     return apiResponseSuccess(savedResults, true, statusCode.create, 'Lottery results saved successfully.', res);
 
   } catch (error) {
@@ -526,6 +536,8 @@ export const ResultDeclare = async (req, res) => {
     return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
   }
 };
+
+
 
 export const getLotteryResults = async (req, res) => {
   try {
