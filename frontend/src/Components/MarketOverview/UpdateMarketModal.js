@@ -108,7 +108,27 @@ const UpdateMarketModal = ({ showModal, closeModal, market }) => {
       options: timerOptions,
     },
   ];
-
+  useEffect(() => {
+    if (market) {
+      formik.setValues({
+        marketName: market?.marketName || "",
+        date: market?.date ? moment(market.date).format("YYYY-MM-DD") : "",
+        priceForEach: market?.price || "",
+        groupFrom: market?.group_start || "",
+        groupTo: market?.group_end || "",
+        seriesFrom: market?.series_start || "",
+        seriesTo: market?.series_end || "",
+        numberFrom: market?.number_start || "",
+        numberTo: market?.number_end || "",
+        timerFrom: market?.start_time
+          ? moment.utc(market.start_time).format("HH:mm")
+          : "",
+        timerTo: market?.end_time
+          ? moment.utc(market.end_time).format("HH:mm")
+          : "",
+      });
+    }
+  }, [market]);
 
   return (
     <div>
