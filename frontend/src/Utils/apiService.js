@@ -505,3 +505,19 @@ export async function ResetAdminPassword(body = {}, isToast = false) {
     throw error;
   }
 }
+
+
+export async function UpdateMarketDetails(body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.PUT, body, isToast);
+    const response = await makeCall(
+      `${urls.UpdateDetails}/${body.marketId}`,
+
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}

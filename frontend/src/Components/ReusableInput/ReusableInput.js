@@ -94,10 +94,10 @@ export const FromToInput = ({
 
   const filteredOptions =
     activeInput === fromName
-      ? options.filter((option) =>
+      ? options|| [].filter((option) =>
         option.toString().includes(debouncedFromValue)
       )
-      : options.filter((option) =>
+      : options|| [].filter((option) =>
         option.toString().includes(debouncedToValue)
       );
 

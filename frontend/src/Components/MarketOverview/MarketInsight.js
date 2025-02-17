@@ -1,4 +1,4 @@
- import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   Col,
@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 import moment from "moment";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css"; 
+import "bootstrap-icons/font/bootstrap-icons.css";
 import "./MarketInsight.css";
 import {
   GetMarketTimings,
@@ -20,6 +20,7 @@ import {
 } from "../../Utils/apiService";
 import { useAppContext } from "../../contextApi/context";
 import { toast } from "react-toastify";
+import UpdateMarketModal from "./UpdateMarketModal";
 const MarketInsight = () => {
   const [marketTimes, setMarketTimes] = useState([]);
   const [selectedMarket, setSelectedMarket] = useState(null);
@@ -33,6 +34,18 @@ const MarketInsight = () => {
   const [filteredMarkets, setFilteredMarkets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  console.log("selectedMarket", selectedMarket);
+
+  // Function to handle opening the modal
+  const openModal = () => {
+    setShowModal(true);
+  };
+
+  // Function to handle closing the modal
+  const closeModal = () => {
+    setShowModal(false);
+  };
 
   // Debounce search term
   useEffect(() => {
@@ -76,7 +89,6 @@ const MarketInsight = () => {
       setFilteredMarkets(marketTimes); // Reset the filter when not active
     }
   }, [marketTimes]);
-
 
   useEffect(() => {
     const fetchMarketTimings = async () => {
@@ -189,7 +201,7 @@ const MarketInsight = () => {
           className="text-center text-white"
           style={{ fontWeight: "800", letterSpacing: "1px" }}
         >
-        LOTTERY MARKETS
+          LOTTERY MARKETS
         </h5>
         <div className="market-card-grid">
           {marketTimes.length > 0 ? (
@@ -253,22 +265,29 @@ const MarketInsight = () => {
             <h3 className="market-title text-center mb-4">
               {selectedMarket.marketName} Stats
             </h3>
-            {/* Switch for Market Status Filter */}
-            <div className="d-flex justify-content-end mb-3">
-              <div className="form-check form-switch">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="flexSwitchCheckActive"
-                  checked={selectedMarket.isActive}
-                  onChange={handleMarketStatusToggle}
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="flexSwitchCheckActive"
-                >
-                  {selectedMarket.isActive ? "Active" : "Inactive"}
-                </label>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <i
+                className="bi bi-pencil-fill text-primary fs-5 cursor-pointer"
+                style={{ cursor: "pointer" }}
+                onClick={() => openModal(selectedMarket)} // Open modal with market details
+              ></i>
+              {/* Switch for Market Status Filter */}
+              <div className="d-flex justify-content-end mb-3">
+                <div className="form-check form-switch">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="flexSwitchCheckActive"
+                    checked={selectedMarket.isActive}
+                    onChange={handleMarketStatusToggle}
+                  />
+                  <label
+                    className="form-check-label"
+                    htmlFor="flexSwitchCheckActive"
+                  >
+                    {selectedMarket.isActive ? "Active" : "Inactive"}
+                  </label>
+                </div>
               </div>
             </div>
             <Row>
@@ -394,41 +413,8 @@ const MarketInsight = () => {
                 >
                   Void
                 </button>
-                {/* {selectedMarket.isActive ? <button className="btn btn-danger" onClick={() => handleisActive(selectedMarket.marketId, false)}>Suspend</button> : <button className="btn btn-success" onClick={() => handleisActive(selectedMarket.marketId, true)}> Active</button>} */}
               </div>
             </Row>
-
-            {/* Accordion for Purchased Tickets */}
-
-            {/* <Accordion defaultActiveKey="0" className="mt-4">
-              <Accordion.Item eventKey="0">
-                <Accordion.Header>Purchased Tickets</Accordion.Header>
-                <Accordion.Body>
-                  {purchasedTickets.length > 0 ? (
-                    <div className="ticket-grid">
-                      {purchasedTickets.map((ticket, index) => (
-                        <div key={index} className="ticket-card">
-                          <Card className="ticket-card-item shadow-sm">
-                            <Card.Body>
-                             
-                              <div className="ticket-numbers">
-                                {ticket.ticketList.map((ticketNumber, idx) => (
-                                  <span key={idx} className="ticket-number">
-                                    {ticketNumber}
-                                  </span>
-                                ))}
-                              </div>
-                            </Card.Body>
-                          </Card>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p>No purchased tickets available for this market.</p>
-                  )}
-                </Accordion.Body>
-              </Accordion.Item>
-            </Accordion> */}
 
             <Button
               variant="outline-primary"
@@ -461,6 +447,7 @@ const MarketInsight = () => {
           </Card>
         )}
       </main>
+      <UpdateMarketModal showModal={showModal} closeModal={closeModal}   market={selectedMarket}  />
     </Container>
   );
 };
