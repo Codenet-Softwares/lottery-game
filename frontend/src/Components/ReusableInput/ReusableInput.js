@@ -48,6 +48,7 @@ export const FromToInput = ({
   toError,
   options,
 }) => {
+  console.log("Dropdown Options for", fromName, options);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeInput, setActiveInput] = useState(null);
   const [typedFromValue, setTypedFromValue] = useState(fromValue);
@@ -94,10 +95,10 @@ export const FromToInput = ({
 
   const filteredOptions =
     activeInput === fromName
-      ? options|| [].filter((option) =>
+      ? options.filter((option) =>
         option.toString().includes(debouncedFromValue)
       )
-      : options|| [].filter((option) =>
+      : options.filter((option) =>
         option.toString().includes(debouncedToValue)
       );
 

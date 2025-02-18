@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useFormik } from "formik";
 import moment from "moment";
 import { FromToInput, ReusableInput } from "../ReusableInput/ReusableInput";
@@ -11,12 +11,32 @@ import { UpdateMarketDetails } from "../../Utils/apiService";
 import { initialUpdateMarketFormStates } from "../../Utils/initialState";
 import { validationUpdateSchema } from "../../Utils/validationSchema";
 import { useAppContext } from "../../contextApi/context";
+import "./UpdateMarketModal.css";
 
-const UpdateMarketModal = ({ showModal, closeModal, market }) => {
+const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
   const { showLoader, hideLoader } = useAppContext();
 
+
   const formik = useFormik({
-    initialValues: initialUpdateMarketFormStates,
+    initialValues: market
+      ? {
+          marketName: market?.marketName || "",
+          date: market?.date ? moment(market.date).format("YYYY-MM-DD") : "",
+          priceForEach: market?.price || "",
+          groupFrom: market?.group_start || "",
+          groupTo: market?.group_end || "",
+          seriesFrom: market?.series_start || "",
+          seriesTo: market?.series_end || "",
+          numberFrom: market?.number_start || "",
+          numberTo: market?.number_end || "",
+          timerFrom: market?.start_time
+            ? moment.utc(market.start_time).format("HH:mm")
+            : "",
+          timerTo: market?.end_time
+            ? moment.utc(market.end_time).format("HH:mm")
+            : "",
+        }
+      : initialUpdateMarketFormStates, // Fallback initial values if market is null
     validationSchema: validationUpdateSchema,
     onSubmit: async (values) => {
       showLoader();
@@ -24,7 +44,6 @@ const UpdateMarketModal = ({ showModal, closeModal, market }) => {
       const endTimeISO = convertTimeToISO(values.timerTo, values.date);
 
       const requestBody = {
-        marketId: market?.marketId, // Market ID added in API request
         date: new Date(values.date).toISOString(),
         marketName: values.marketName,
         group: {
@@ -38,44 +57,38 @@ const UpdateMarketModal = ({ showModal, closeModal, market }) => {
         price: parseFloat(values.priceForEach),
       };
 
-      try {
-        const response = await UpdateMarketDetails(requestBody);
-        if (response.success) {
-          console.log("Market updated successfully!");
-        //   formik.resetForm();
-        } else {
-          console.error("Error updating market:", response.message);
-        }
-      } catch (error) {
-        console.error("Error during API request:", error);
-      } finally {
-        hideLoader();
+      // API call to update market details
+      const response = await UpdateMarketDetails(requestBody, market?.marketId);
+
+      if (response.success) {
+        console.log("Market updated successfully!");
+        formik.resetForm();
+        onUpdate();
+        closeModal(); // Close the modal
+      } else {
+        console.error("Error updating market:", response.message);
       }
+
+      hideLoader();
     },
   });
 
+  // Generate dropdown options for various fields
   const groupOptions = useMemo(
     () => generateFilterData({ type: "group", rangeStart: 1, rangeEnd: 99 }),
     []
   );
-
   const seriesOptions = useMemo(
     () => generateFilterData({ type: "series", excludedChars: "I , F , O" }),
     []
   );
-
   const numberOptions = useMemo(
     () =>
       generateFilterData({ type: "number", rangeStart: 1, rangeEnd: 99999 }),
     []
   );
-
   const timerOptions = useMemo(() => generateTimerOptions(), []);
-  useEffect(() => {
-    formik.setFieldValue("groupOptions", groupOptions);
-    formik.setFieldValue("seriesOptions", seriesOptions);
-    formik.setFieldValue("numberOptions", numberOptions);
-  }, [groupOptions, seriesOptions, numberOptions]);
+
   const inputConfig = [
     { placeholder: "Select Date", type: "date", name: "date" },
     { placeholder: "Market Name", name: "marketName" },
@@ -108,43 +121,30 @@ const UpdateMarketModal = ({ showModal, closeModal, market }) => {
       options: timerOptions,
     },
   ];
-  useEffect(() => {
-    if (market) {
-      formik.setValues({
-        marketName: market?.marketName || "",
-        date: market?.date ? moment(market.date).format("YYYY-MM-DD") : "",
-        priceForEach: market?.price || "",
-        groupFrom: market?.group_start || "",
-        groupTo: market?.group_end || "",
-        seriesFrom: market?.series_start || "",
-        seriesTo: market?.series_end || "",
-        numberFrom: market?.number_start || "",
-        numberTo: market?.number_end || "",
-        timerFrom: market?.start_time
-          ? moment.utc(market.start_time).format("HH:mm")
-          : "",
-        timerTo: market?.end_time
-          ? moment.utc(market.end_time).format("HH:mm")
-          : "",
-      });
-    }
-  }, [market]);
 
   return (
     <div>
       {market ? (
         <div
-          className={`modal fade ${showModal ? "show" : ""}`}
-          style={{ display: showModal ? "block" : "none" }}
+          className={`modal fade update-market-modal ${
+            showModal ? "show" : ""
+          }`}
           tabIndex="-1"
           aria-labelledby="updateMarketModalLabel"
           aria-hidden={!showModal}
         >
-          <div className="modal-dialog">
+          <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title" id="updateMarketModalLabel">
-                  Update Market Stats for {market?.marketName}
+                <h5
+                  className="modal-title text-uppercase"
+                  id="updateMarketModalLabel"
+                >
+                  UPDATE{" "}
+                  <span style={{ color: "#ff8c00", fontWeight: "900" }}>
+                    {market?.marketName}
+                  </span>{" "}
+                  STATS
                 </h5>
                 <button
                   type="button"
@@ -152,83 +152,66 @@ const UpdateMarketModal = ({ showModal, closeModal, market }) => {
                   data-bs-dismiss="modal"
                   aria-label="Close"
                   onClick={closeModal}
+                  title="CLOSE"
                 ></button>
               </div>
+
               <div className="modal-body">
                 <form onSubmit={formik.handleSubmit}>
-               
-                    {inputConfig.map((input) => (
-                      <ReusableInput
-                        key={input.name}
-                        placeholder={input.placeholder}
-                        type={input.type || "text"}
-                        name={input.name}
-                        value={formik.values[input.name]}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        error={
-                          formik.touched[input.name] &&
-                          formik.errors[input.name]
-                        }
-                      />
-                    ))}
-
-                    {fromToInputConfig.map((input) => (
-                      <FromToInput
-                        key={input.fromName}
-                        placeholder={input.placeholder}
-                        fromName={input.fromName}
-                        toName={input.toName}
-                        fromValue={formik.values[input.fromName]}
-                        toValue={formik.values[input.toName]}
-                        onChangeFrom={formik.handleChange}
-                        onChangeTo={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        fromError={
-                          formik.touched[input.fromName] &&
-                          formik.errors[input.fromName]
-                        } // Show error if touched
-                        toError={
-                          formik.touched[input.toName] &&
-                          formik.errors[input.toName]
-                        } // Show error if touched
-                        options={input.options}
-                      />
-                    ))}
-
-                    <div
-                      className="text-center mt-3"
-                      style={
-                        {
-                          // position: "relative",
-                        }
+                  {inputConfig.map((input) => (
+                    <ReusableInput
+                      key={input.name}
+                      placeholder={input.placeholder}
+                      type={input.type || "text"}
+                      name={input.name}
+                      value={formik.values[input.name]}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={
+                        formik.touched[input.name] && formik.errors[input.name]
                       }
+                    />
+                  ))}
+
+                  {fromToInputConfig.map((input) => (
+                    <FromToInput
+                      key={input.fromName}
+                      placeholder={input.placeholder}
+                      fromName={input.fromName}
+                      toName={input.toName}
+                      fromValue={formik.values[input.fromName]}
+                      toValue={formik.values[input.toName]}
+                      onChangeFrom={formik.handleChange}
+                      onChangeTo={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      fromError={
+                        formik.touched[input.fromName] &&
+                        formik.errors[input.fromName]
+                      } // Show error if touched
+                      toError={
+                        formik.touched[input.toName] &&
+                        formik.errors[input.toName]
+                      } // Show error if touched
+                      options={input.options}
+                    />
+                  ))}
+
+                  <div className="text-center mt-3">
+                    <button
+                      type="submit"
+                      className="btn update-button text-white"
                     >
-                      <button
-                        type="submit"
-                        className="btn btn-primary px-4"
-                        style={{
-                          background: "#4682B4",
-                          position: "absolute",
-                          bottom: "-20px",
-                          left: "50%",
-                          transform: "translateX(-50%)",
-                        }}
-                      >
-                        update
-                      </button>
-                    </div>
-                  </form>
-             
+                      UPDATE
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
         </div>
       ) : (
         showModal && (
-          <div className="modal fade show" style={{ display: "block" }}>
-            Loading...
-          </div>
+          <div className="modal fade show loading-modal">Loading...</div>
         )
       )}
     </div>

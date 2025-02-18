@@ -10,9 +10,9 @@ export const initialCreateMarketFormStates = {
     timerFrom: "",
     timerTo: "",
     priceForEach: "",
-    groupOptions: [], // Add groupOptions
-    seriesOptions: [], // Add seriesOptions
-    numberOptions: [], // Add numberOptions
+    groupOptions: [], 
+    seriesOptions: [],
+    numberOptions: [], 
 };
 export const initialUpdateMarketFormStates = {
   date: "",
@@ -26,9 +26,9 @@ export const initialUpdateMarketFormStates = {
   timerFrom: "",
   timerTo: "",
   priceForEach: "",
-  groupOptions: [], // Add groupOptions
-  seriesOptions: [], // Add seriesOptions
-  numberOptions: [], // Add numberOptions
+  groupOptions: [], 
+  seriesOptions: [], 
+  numberOptions: [], 
 };
 export const getAdminResetPasswordInitialState = (body = {}) => {
     return {

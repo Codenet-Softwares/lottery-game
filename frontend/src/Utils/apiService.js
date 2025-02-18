@@ -507,11 +507,11 @@ export async function ResetAdminPassword(body = {}, isToast = false) {
 }
 
 
-export async function UpdateMarketDetails(body = {}, isToast = false) {
+export async function UpdateMarketDetails(body = {},marketId, isToast = true) {
   try {
     const callParams = await getAuthCallParams(strings.PUT, body, isToast);
     const response = await makeCall(
-      `${urls.UpdateDetails}/${body.marketId}`,
+      `${urls.UpdateDetails}/${marketId}`,
 
       callParams,
       isToast

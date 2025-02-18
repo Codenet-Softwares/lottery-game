@@ -236,27 +236,35 @@ export const validationUpdateSchema = Yup.object({
   timerFrom: Yup.string().required("Timer From is required"),
 
   timerTo: Yup.string()
-    .required("Timer To is required")
-    .test(
-      "valid-timer-range",
-      "Timer To should be greater than Timer From",
-      function (value) {
-        const { timerFrom } = this.parent;
-        if (!value || !timerFrom) return true; // Skip validation if either field is missing
-  
-        // Convert "HH:mm" to a comparable Date object
-        const parseTime = (time) => {
-          const [hour, minute] = time.split(":").map(Number);
-          return new Date(0, 0, 0, hour, minute);
-        };
-  
-        const startTime = parseTime(timerFrom);
-        const endTime = parseTime(value);
-  
-        if (!startTime || !endTime) return false;
-        return endTime > startTime;
-      }
-    ),
+  .required("Timer To is required"),
+  // .test(
+  //   "valid-timer-range",
+  //   "Timer To should be greater than Timer From",
+  //   function (value) {
+  //     const { timerFrom } = this.parent;
+
+  //     if (!value || !timerFrom) return true; // Skip validation if either field is missing
+
+  //     // Helper function to convert time strings to comparable Date objects
+  //     const parseTime = (time) => {
+  //       const match = time.match(/(\d+):(\d+)\s?(AM|PM)/i);
+  //       if (!match) return null; // Return null if the time string is invalid
+  //       const [hour, minute, meridian] = match.slice(1);
+  //       let hours = parseInt(hour, 10);
+  //       if (meridian.toUpperCase() === "PM" && hours !== 12) hours += 12;
+  //       if (meridian.toUpperCase() === "AM" && hours === 12) hours = 0;
+  //       return new Date(0, 0, 0, hours, parseInt(minute, 10)); // Date set to a baseline date for comparison
+  //     };
+
+  //     const startTime = parseTime(timerFrom);
+  //     const endTime = parseTime(value);
+  //     // Ensure both times are valid before comparing
+  //     if (!startTime || !endTime) return false;
+
+  //     // Check if "Timer To" is logically after "Timer From"
+  //     return endTime > startTime;
+  //   }
+  // )
 
   priceForEach: Yup.number().required("Price is required"),
 });
