@@ -419,6 +419,9 @@ losingTickets.forEach(ticket => {
 console.log(`User Profit (without lotteryPrice): ${userProfitWithoutLotteryPrice}`);
 console.log(`User Profit (with lotteryPrice): ${userProfitWithLotteryPrice}`);
 console.log(`User Loss: ${userLoss}`);
+
+
+
     // Update market status
     const declaredPrizeCategories = declaredResults.map((prize) => prize.prizeCategory);
     const isAllPrizesDeclared = allPrizeCategories.every((category) =>
