@@ -531,7 +531,7 @@ export const ResultDeclare = async (req, res) => {
     );
 console.log("marketId..",marketId)
 await sequelize
-  .query('CALL calculateWinnings(:marketId)', 
+  .query('CALL Testing(:marketId)', 
         {replacements: { marketId: marketId, }})
   .then(v=>console.log("Result........................",v));
    
