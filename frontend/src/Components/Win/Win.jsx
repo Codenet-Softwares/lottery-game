@@ -37,7 +37,7 @@ const Win = () => {
     fetchData();
   }, [debouncedSearchTerm]);
   useEffect(() => {
-    if (allActiveMarket.length > 0) {
+    if ( allActiveMarket?.length > 0) {
       const initialPrizes = allActiveMarket.reduce((acc, market) => {
         acc[market.marketName] = {
           1: { amount: "", complementaryAmount: "", ticketNumbers: [""] },
@@ -283,7 +283,7 @@ const Win = () => {
         className="border border-3 rounded-4 shadow-lg p-4"
         style={{ width: "90%", maxWidth: "1000px", backgroundColor: "#ffffff" }}
       >
-        {allActiveMarket.length > 0 ? (
+        {allActiveMarket && allActiveMarket.length > 0 ? (
           <div>
             {allActiveMarket.map((data, index) => (
               <div

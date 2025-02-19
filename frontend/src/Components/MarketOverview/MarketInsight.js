@@ -46,8 +46,16 @@ const MarketInsight = () => {
     setShowModal(false);
   };
 
-  const handleModalUpdate = () => {
-    setRefresh((prev) => !prev); // This will trigger a re-fetch of market data
+  const handleModalUpdate = (updatedMarket) => {
+    // Update marketTimes state with the new updated market details
+    setMarketTimes((prevMarkets) =>
+      prevMarkets.map((market) =>
+        market.marketId === updatedMarket.marketId ? updatedMarket : market
+      )
+    );
+
+    // Also update selectedMarket so UI reflects new data immediately
+    setSelectedMarket(updatedMarket);
   };
 
   // Debounce search term
@@ -69,7 +77,7 @@ const MarketInsight = () => {
       true
     );
     console.log("line number 71", response);
-    if (response.success) {
+    if (response && response.success) {
       setRefresh((prev) => !prev);
       setSelectedMarket((prevState) => ({
         ...prevState,
@@ -112,7 +120,7 @@ const MarketInsight = () => {
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
-// This is the void api implementation
+  // This is the void api implementation
   const handleVoidMarket = async (marketId) => {
     showLoader();
 
@@ -243,19 +251,26 @@ const MarketInsight = () => {
             </h3>
             <div className="d-flex justify-content-between align-items-center mb-3">
               <i
-                className="bi bi-pencil-fill text-primary fs-5 cursor-pointer"
-                style={{ cursor: "pointer" }}
+                className="bi bi-pencil-square text-primary fs-4 fw-bold  cursor-pointer"
+                title="Edit Market Stats"
+                style={{ cursor: "pointer" ,
+                  textShadow: "2px 2px 2px rgba(0, 0, 0, 0.15)", // Slight depth effect
+                  transform: "scale(1.1)", // Slightly enlarges the icon
+
+
+                }}
                 onClick={() => openModal(selectedMarket)} // Open modal with market details
               ></i>
               {/* Switch for Market Status Filter */}
               <div className="d-flex justify-content-end mb-3">
                 <div className="form-check form-switch">
                   <input
-                    className="form-check-input"
+                    className="form-check-input "
                     type="checkbox"
                     id="flexSwitchCheckActive"
                     checked={selectedMarket.isActive}
                     onChange={handleMarketStatusToggle}
+                    style={{ cursor: "pointer" }}
                   />
                   <label
                     className="form-check-label"

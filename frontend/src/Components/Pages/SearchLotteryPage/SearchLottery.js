@@ -116,7 +116,7 @@ const SearchLottery = () => {
         LOTTERY MARKETS
         </h5>
         <div className="market-card-grid">
-          {allActiveMarket.length > 0 ? (
+          {allActiveMarket && allActiveMarket.length > 0 ? (
             allActiveMarket.map((market) => (
               <Card
                 key={market.id}

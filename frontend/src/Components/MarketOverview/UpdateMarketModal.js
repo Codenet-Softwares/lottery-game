@@ -39,6 +39,36 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
       : initialUpdateMarketFormStates, // Fallback initial values if market is null
     validationSchema: validationUpdateSchema,
     onSubmit: async (values) => {
+      const unchangedValues = market
+      ? {
+          marketName: market?.marketName || "",
+          date: market?.date ? moment(market.date).format("YYYY-MM-DD") : "",
+          priceForEach: market?.price || "",
+          groupFrom: market?.group_start || "",
+          groupTo: market?.group_end || "",
+          seriesFrom: market?.series_start || "",
+          seriesTo: market?.series_end || "",
+          numberFrom: market?.number_start || "",
+          numberTo: market?.number_end || "",
+          timerFrom: market?.start_time
+            ? moment.utc(market.start_time).format("HH:mm")
+            : "",
+          timerTo: market?.end_time
+            ? moment.utc(market.end_time).format("HH:mm")
+            : "",
+        }
+      : initialUpdateMarketFormStates;
+  
+    if (JSON.stringify(values) === JSON.stringify(unchangedValues)) {
+      const confirmClose = window.confirm(
+        "You have not edited any fields. Are you sure you want to proceed?"
+      );
+      if (confirmClose) {
+        closeModal(); // Close the modal if user confirms
+      }
+      return;
+    }
+
       showLoader();
       const startTimeISO = convertTimeToISO(values.timerFrom, values.date);
       const endTimeISO = convertTimeToISO(values.timerTo, values.date);
@@ -62,8 +92,8 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
 
       if (response.success) {
         console.log("Market updated successfully!");
-        formik.resetForm();
-        onUpdate();
+        formik.resetForm(); // not working still there just as in case of fallback
+        onUpdate(response.data);
         closeModal(); // Close the modal
       } else {
         console.error("Error updating market:", response.message);
@@ -141,7 +171,7 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
                   id="updateMarketModalLabel"
                 >
                   UPDATE{" "}
-                  <span style={{ color: "#ff8c00", fontWeight: "900" }}>
+                  <span >
                     {market?.marketName}
                   </span>{" "}
                   STATS
@@ -151,7 +181,10 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
                   className="btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
-                  onClick={closeModal}
+                 onClick={() => {
+                    formik.resetForm(); //  force Reseting form on modal close
+                    closeModal();
+                  }}
                   title="CLOSE"
                 ></button>
               </div>
