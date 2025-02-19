@@ -275,7 +275,7 @@ const declaredResults = await LotteryResult.findAll({
 
 const purchasedTickets = await PurchaseLottery.findAll({
   where: { marketId },
-  attributes: ['userId', 'group', 'series', 'number','sem','lotteryPrice'],
+  attributes: ['userId', 'group', 'series', 'number', 'sem', 'lotteryPrice'],
   raw: true,
 });
 
@@ -352,7 +352,7 @@ purchasedTickets.forEach(ticket => {
         winningTicketDetails = {
           prizeCategory: result.prizeCategory,
           sem: result.sem,
-          prizeAmount: result.prizeAmount// Use the original prize amount
+          prizeAmount: result.prizeAmount // Use the original prize amount
         };
         matchType = 'Exact Match'; // Other prizes only have one type of match
         break;
@@ -380,6 +380,45 @@ purchasedTickets.forEach(ticket => {
   }
 });
 
+// Calculate User Profit or Loss
+let userProfitWithoutLotteryPrice = 0; // Profit without including lotteryPrice
+let userProfitWithLotteryPrice = 0; // Profit including lotteryPrice
+let userLoss = 0;
+
+// Calculate profit from winning tickets
+winningTickets.forEach(ticket => {
+  let prizeAmount = ticket.prizeAmount;
+  let lotteryPrice = ticket.lotteryPrice;
+
+  if (ticket.prizeCategory === 'First Prize') {
+    userProfitWithoutLotteryPrice += prizeAmount; // First Prize: Only Prize Amount
+    userProfitWithLotteryPrice += prizeAmount + lotteryPrice; // First Prize: Prize Amount + Lottery Price
+  } else if (ticket.prizeCategory === 'Complementary Prize') {
+    userProfitWithoutLotteryPrice += prizeAmount; // Complementary Prize: Only Prize Amount
+    userProfitWithLotteryPrice += prizeAmount + lotteryPrice; // Complementary Prize: Prize Amount + Lottery Price
+  } else if (ticket.prizeCategory === 'Second Prize') {
+    userProfitWithoutLotteryPrice += (prizeAmount * ticket.sem); // Second Prize: (Prize Amount * sem)
+    userProfitWithLotteryPrice += (prizeAmount * ticket.sem) + lotteryPrice; // Second Prize: (Prize Amount * sem) + Lottery Price
+  } else if (ticket.prizeCategory === 'Third Prize') {
+    userProfitWithoutLotteryPrice += (prizeAmount * ticket.sem); // Third Prize: (Prize Amount * sem)
+    userProfitWithLotteryPrice += (prizeAmount * ticket.sem) + lotteryPrice; // Third Prize: (Prize Amount * sem) + Lottery Price
+  } else if (ticket.prizeCategory === 'Fourth Prize') {
+    userProfitWithoutLotteryPrice += (prizeAmount * ticket.sem); // Fourth Prize: (Prize Amount * sem)
+    userProfitWithLotteryPrice += (prizeAmount * ticket.sem) + lotteryPrice; // Fourth Prize: (Prize Amount * sem) + Lottery Price
+  } else if (ticket.prizeCategory === 'Fifth Prize') {
+    userProfitWithoutLotteryPrice += (prizeAmount * ticket.sem); // Fifth Prize: (Prize Amount * sem)
+    userProfitWithLotteryPrice += (prizeAmount * ticket.sem) + lotteryPrice; // Fifth Prize: (Prize Amount * sem) + Lottery Price
+  }
+});
+
+// Calculate loss from losing tickets
+losingTickets.forEach(ticket => {
+  userLoss += -ticket.lotteryPrice; // Loss: Negative Lottery Price
+});
+
+console.log(`User Profit (without lotteryPrice): ${userProfitWithoutLotteryPrice}`);
+console.log(`User Profit (with lotteryPrice): ${userProfitWithLotteryPrice}`);
+console.log(`User Loss: ${userLoss}`);
     // Update market status
     const declaredPrizeCategories = declaredResults.map((prize) => prize.prizeCategory);
     const isAllPrizesDeclared = allPrizeCategories.every((category) =>
