@@ -382,7 +382,7 @@ purchasedTickets.forEach(ticket => {
 });
 
 const userTotalPrize = {};
-const userTotalPrice = {};
+const userLotteryPrice = {};
 
 // Calculate total prize amount and lottery price per user
 winningTickets.forEach(ticket => {
@@ -392,10 +392,10 @@ winningTickets.forEach(ticket => {
 
     if (userTotalPrize[ticket.userId]) {
         userTotalPrize[ticket.userId] += calculatedPrize;
-        userTotalPrice[ticket.userId] += ticket.lotteryPrice;
+        userLotteryPrice[ticket.userId] += ticket.lotteryPrice;
     } else {
         userTotalPrize[ticket.userId] = calculatedPrize;
-        userTotalPrice[ticket.userId] = ticket.lotteryPrice;
+        userLotteryPrice[ticket.userId] = ticket.lotteryPrice;
     }
 });
     const baseURL = process.env.COLOR_GAME_URL;
@@ -406,7 +406,7 @@ for (const userId in userTotalPrize) {
             userId,
             prizeAmount: userTotalPrize[userId],
             marketId,
-            lotteryPrice: userTotalPrice[userId]
+            lotteryPrice: userLotteryPrice[userId]
         });
         console.log(`Response for user ${userId}:`, response.data);
     } catch (error) {
@@ -445,7 +445,7 @@ for (const userId in userTotalPrize) {
       }
     // Return the response with saved results and ticket details
     return apiResponseSuccess(
-      winningTickets,
+      combineResult,
       true,
       statusCode.create,
       'Lottery results saved successfully.',
