@@ -413,8 +413,29 @@ for (const userId in userTotalPrize) {
         console.error(`Error updating balance for user ${userId}:`, error.response?.data || error.message);
     }
 }
+const userTotalLoss = {};
 
+// Calculate total lottery price per user
+losingTickets.forEach(ticket => {
+    if (userTotalLoss[ticket.userId]) {
+        userTotalLoss[ticket.userId] += ticket.lotteryPrice;
+    } else {
+        userTotalLoss[ticket.userId] = ticket.lotteryPrice;
+    }
+});
 
+for (const userId in userTotalLoss) {
+  try {
+      const response = await axios.post(`${baseURL}/api/users/remove-exposer`, {
+          userId,
+          marketId,
+          lotteryPrice: userTotalLoss[userId]  // Total loss per user
+      });
+      console.log(`Response for user ${userId}:`, response.data);
+  } catch (error) {
+      console.error(`Error updating balance for user ${userId}:`, error.response?.data || error.message);
+  }
+}
     // Update market status
     const declaredPrizeCategories = declaredResults.map((prize) => prize.prizeCategory);
     const isAllPrizesDeclared = allPrizeCategories.every((category) =>
