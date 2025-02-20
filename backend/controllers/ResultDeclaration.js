@@ -14,7 +14,6 @@ export const ResultDeclare = async (req, res) => {
     const prizes = req.body;
     const { marketId } = req.params;
 
-    // Fetch the market details
     const market = await TicketRange.findOne({ where: { marketId } });
 
     if (!market) {
@@ -23,13 +22,11 @@ export const ResultDeclare = async (req, res) => {
 
     const marketName = market.marketName;
 
-    // Define today's start and end time
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
 
-    // Define prize limits for each category
     const prizeLimits = {
       'First Prize': 1,
       'Second Prize': 10,
@@ -38,7 +35,6 @@ export const ResultDeclare = async (req, res) => {
       'Fifth Prize': 50,
     };
 
-    // Define all required prize categories
     const allPrizeCategories = [
       'First Prize',
       'Second Prize',
@@ -47,7 +43,6 @@ export const ResultDeclare = async (req, res) => {
       'Fifth Prize',
     ];
 
-    // Check if all required prize categories are provided
     const providedCategories = prizes.map(prize => prize.prizeCategory);
     const missingCategories = allPrizeCategories.filter(
       category => !providedCategories.includes(category)
@@ -70,16 +65,13 @@ export const ResultDeclare = async (req, res) => {
     let lastFourForThirdPrize = null;
     let lastFourForFourthPrize = null;
 
-    // Loop through each prize and declare results
     for (let prize of prizes) {
       const { ticketNumber, prizeCategory, prizeAmount, complementaryPrize } = prize;
 
-      // Validate prize category
       if (!prizeLimits[prizeCategory]) {
         return apiResponseErr(null, false, statusCode.badRequest, 'Invalid prize category.', res);
       }
 
-      // Ensure the correct number of tickets for each prize category
       const ticketNumbers = Array.isArray(ticketNumber) ? ticketNumber : [ticketNumber];
       if (ticketNumbers.length !== prizeLimits[prizeCategory]) {
         return apiResponseErr(
@@ -91,7 +83,6 @@ export const ResultDeclare = async (req, res) => {
         );
       }
 
-      // Check for duplicate ticket numbers across prize categories
       const allResults = await LotteryResult.findAll({
         where: {
           createdAt: {
@@ -115,7 +106,6 @@ export const ResultDeclare = async (req, res) => {
         );
       }
 
-      // Check if the prize category limit has been reached
       const existingResults = await LotteryResult.findAll({
         where: { prizeCategory, marketId },
       });
@@ -130,7 +120,6 @@ export const ResultDeclare = async (req, res) => {
         );
       }
 
-      // Handle different prize categories
       if (prizeCategory === 'First Prize') {
         const firstTicket = ticketNumbers[0];
         const lastFive = firstTicket.slice(-5);
@@ -255,32 +244,28 @@ export const ResultDeclare = async (req, res) => {
       }
     }
 
-    // Save the generated tickets
     let savedResults;
     if (generatedTickets.length > 0) {
       savedResults = await LotteryResult.bulkCreate(generatedTickets);
     } else {
       return apiResponseErr(null, false, statusCode.badRequest, 'No valid tickets to save.', res);
     }
-// Normalize ticket numbers by removing spaces and converting to uppercase
 const normalizeTicketNumber = (ticket) => {
   return ticket.replace(/\s+/g, '').toUpperCase();
 };
 
-// Fetch winning and losing tickets
 const declaredResults = await LotteryResult.findAll({
   where: { marketId },
-  attributes: ['ticketNumber', 'prizeCategory', 'prizeAmount', 'complementaryPrize'], // Ensure complementaryPrize is included
+  attributes: ['ticketNumber', 'prizeCategory', 'prizeAmount', 'complementaryPrize','marketName'], // Ensure complementaryPrize is included
   raw: true,
 });
 
 const purchasedTickets = await PurchaseLottery.findAll({
   where: { marketId },
-  attributes: ['userId', 'group', 'series', 'number','sem','lotteryPrice'],
+  attributes: ['userId', 'group', 'series', 'number','sem','lotteryPrice', 'marketName'],
   raw: true,
 });
 
-// Create a map of winning tickets
 const winningTicketsMap = new Map();
 
 declaredResults.forEach(result => {
@@ -290,7 +275,7 @@ declaredResults.forEach(result => {
     winningTicketsMap.set(normalizedTicket, {
       prizeCategory: result.prizeCategory,
       prizeAmount: result.prizeAmount,
-      complementaryPrize: result.complementaryPrize, // Ensure complementaryPrize is included
+      complementaryPrize: result.complementaryPrize, 
     });
   });
 });
@@ -299,14 +284,12 @@ const winningTickets = [];
 const losingTickets = [];
 
 purchasedTickets.forEach(ticket => {
-  // Construct the full ticket number and normalize it
   const ticketNumber = `${ticket.group}${ticket.series}${ticket.number}`;
   const normalizedTicket = normalizeTicketNumber(ticketNumber);
 
-  // Check if the ticket is a winner based on prize category rules
   let isWinner = false;
   let winningTicketDetails = null;
-  let matchType = null; // To track if it's an exact match or complementary match
+  let matchType = null; 
 
   for (const result of declaredResults) {
     const ticketNumbers = Array.isArray(result.ticketNumber) ? result.ticketNumber : [result.ticketNumber];
@@ -314,52 +297,48 @@ purchasedTickets.forEach(ticket => {
       const normalizedDeclaredTicket = normalizeTicketNumber(declaredTicket);
 
       if (result.prizeCategory === 'First Prize') {
-        // First Prize: Exact match
         if (normalizedDeclaredTicket === normalizedTicket) {
           isWinner = true;
           winningTicketDetails = {
             prizeCategory: result.prizeCategory,
-            prizeAmount: result.prizeAmount, // Use the original First Prize amount
+            prizeAmount: result.prizeAmount, 
           };
-          matchType = 'Exact Match'; // Flag for exact match
+          matchType = 'Exact Match'; 
           break;
         }
-        // First Prize: Complementary match (last 5 digits)
         else if (normalizedDeclaredTicket.slice(-5) === normalizedTicket.slice(-5)) {
           isWinner = true;
           winningTicketDetails = {
             prizeCategory: result.prizeCategory,
-            prizeAmount: result.complementaryPrize, // Use the complementary prize amount
+            prizeAmount: result.complementaryPrize, 
           };
-          matchType = 'Complementary Match'; // Flag for complementary match
+          matchType = 'Complementary Match'; 
           break;
         }
       } else if (result.prizeCategory === 'Second Prize' && normalizedDeclaredTicket.slice(-5) === normalizedTicket.slice(-5)) {
-        // Second Prize: Last 5 digits match
         isWinner = true;
         winningTicketDetails = {
           prizeCategory: result.prizeCategory,
           sem: result.sem,
-          prizeAmount: result.prizeAmount // Use the original Second Prize amount
+          prizeAmount: result.prizeAmount 
         };
-        matchType = 'Exact Match'; // Second Prize only has one type of match
+        matchType = 'Exact Match'; 
         break;
       } else if (
         (result.prizeCategory === 'Third Prize' || result.prizeCategory === 'Fourth Prize' || result.prizeCategory === 'Fifth Prize') &&
         normalizedDeclaredTicket.slice(-4) === normalizedTicket.slice(-4)
       ) {
-        // Third, Fourth, Fifth Prize: Last 4 digits match
         isWinner = true;
         winningTicketDetails = {
           prizeCategory: result.prizeCategory,
           sem: result.sem,
-          prizeAmount: result.prizeAmount// Use the original prize amount
+          prizeAmount: result.prizeAmount
         };
-        matchType = 'Exact Match'; // Other prizes only have one type of match
+        matchType = 'Exact Match'; 
         break;
       }
     }
-    if (isWinner) break; // Exit the loop if a match is found
+    if (isWinner) break; 
   }
 
   if (isWinner && winningTicketDetails) {
@@ -370,13 +349,16 @@ purchasedTickets.forEach(ticket => {
       prizeAmount: winningTicketDetails.prizeAmount,
       lotteryPrice: ticket.lotteryPrice,
       sem: ticket.sem,
-      matchType: matchType, // Add match type to the winning ticket
+      matchType: matchType,
+      marketName: ticket.marketName 
     });
   } else {
     losingTickets.push({
       userId: ticket.userId,
       ticketNumber: normalizedTicket,
       lotteryPrice: ticket.lotteryPrice,
+      marketName: ticket.marketName ,
+      sem:  ticket.sem
     });
   }
 });
@@ -384,8 +366,7 @@ purchasedTickets.forEach(ticket => {
 const userTotalPrize = {};
 const userLotteryPrice = {};
 
-// Calculate total prize amount and lottery price per user
-winningTickets.forEach(ticket => {
+  winningTickets.forEach(ticket => {
     let calculatedPrize = ticket.prizeCategory === "First Prize" 
         ? ticket.prizeAmount 
         : ticket.prizeAmount * ticket.sem;
@@ -399,8 +380,7 @@ winningTickets.forEach(ticket => {
     }
 });
     const baseURL = process.env.COLOR_GAME_URL;
-// Send data to external API
-for (const userId in userTotalPrize) {
+  for (const userId in userTotalPrize) {
     try {
         const response = await axios.post(`${baseURL}/api/users/update-balance`, {
             userId,
@@ -413,10 +393,10 @@ for (const userId in userTotalPrize) {
         console.error(`Error updating balance for user ${userId}:`, error.response?.data || error.message);
     }
 }
-const userTotalLoss = {};
 
-// Calculate total lottery price per user
-losingTickets.forEach(ticket => {
+
+const userTotalLoss = {};
+  losingTickets.forEach(ticket => {
     if (userTotalLoss[ticket.userId]) {
         userTotalLoss[ticket.userId] += ticket.lotteryPrice;
     } else {
@@ -429,14 +409,28 @@ for (const userId in userTotalLoss) {
       const response = await axios.post(`${baseURL}/api/users/remove-exposer`, {
           userId,
           marketId,
-          lotteryPrice: userTotalLoss[userId]  // Total loss per user
+          lotteryPrice: userTotalLoss[userId]  
       });
       console.log(`Response for user ${userId}:`, response.data);
   } catch (error) {
       console.error(`Error updating balance for user ${userId}:`, error.response?.data || error.message);
   }
 }
-    // Update market status
+
+for (const userId of Object.keys(userTotalLoss)) {
+  try {
+    await axios.post(`${baseURL}/api/lottery-profit-loss`, {
+      userId,
+      marketId,
+      marketName
+    });
+
+    console.log(`Profit/Loss updated for user ${userId}`);
+  } catch (error) {
+    console.error(`Error updating Profit/Loss for user ${userId}:`, error.response?.data || error.message);
+  }
+}
+
     const declaredPrizeCategories = declaredResults.map((prize) => prize.prizeCategory);
     const isAllPrizesDeclared = allPrizeCategories.every((category) =>
       declaredPrizeCategories.includes(category)
