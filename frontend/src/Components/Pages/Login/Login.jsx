@@ -18,7 +18,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isLoginFromStore = store.admin.isLogin;
+  const isLoginFromStore = store?.admin?.isLogin ;
 
   useEffect(() => {
     if (location.pathname == "/" && !isLoginFromStore) {
@@ -62,13 +62,13 @@ const Login = () => {
         strings.LOCAL_STORAGE_KEY,
         JSON.stringify({
           admin: {
-            accessToken: response.data.accessToken,
+            accessToken: response?.data?.accessToken,
           },
         })
       );
       dispatch({
         type: strings.LOG_IN,
-        payload: response.data,
+        payload: response?.data,
       });
       navigate("/dashboard");
     } else {
