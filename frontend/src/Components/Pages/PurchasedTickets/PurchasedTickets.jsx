@@ -410,12 +410,12 @@ const PurchasedTickets = () => {
                             style={{ position: "relative" }}
                           >
                             <button
-                          className="btn btn-outline-primary fw-semibold px-4 py-2 rounded-3 shadow-sm border-0"
+                          className="btn btn-outline-dark fw-semibold px-4 py-2 rounded-5 shadow-sm border-1"
                               type="button"
                               // onClick={() => toggleDropdown(index)}
                               onClick={() => openModalWithTickets(ticket.tickets)}
                             >
-                             <i className="bi bi-eye me-2"></i> View Tickets
+                             <i className="bi bi-ticket-perforated me-2"></i> View Tickets
                             </button>
                             <ViewTicketsModal
                               isOpen={modalOpen}

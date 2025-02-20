@@ -83,78 +83,39 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
     const ticketsBody = details.map((detail) => (
       <div key={detail.sem} className="mb-4 ticket-section">
         <div>
-        <div className="ticket-header d-flex justify-content-between align-items-center">
-          <h6 className="text-primary fw-bold mb-0">
-            SEM: {detail.sem} | Amount: ₹{detail.lotteryPrice}
-          </h6>
-          <button
-            className="btn btn-danger btn-sm"
-            onClick={() => handleDeleteTicket(detail.purchaseId)}
-          >
-            <i className="bi bi-trash"></i> Delete
-          </button>
-        </div>
+          <div className="ticket-header d-flex justify-content-between align-items-center">
+            <h6 className="text-primary fw-bold mb-0">
+              SEM: {detail.sem} | Amount: ₹{detail.lotteryPrice}
+            </h6>
+            <button
+              className="btn btn-danger btn-sm"
+              onClick={() => handleDeleteTicket(detail.purchaseId)}
+            >
+              <i className="bi bi-trash"></i> Delete
+            </button>
+          </div>
         </div>
         <div className="ticket-scroll-container">
-        <ul className="list-group">
-          {detail.tickets.map((ticket, idx) => (
-            <li
-              key={idx}
-              className="list-group-item d-flex justify-content-between align-items-center"
-            >
-              <span>{ticket}</span>
-            </li>
-          ))}
-        </ul>
+          <ul className="list-group">
+            {detail.tickets.map((ticket, idx) => (
+              <li
+                key={idx}
+                className="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <span>{ticket}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     ));
 
     setModalContent({
       title: "Purchased Tickets",
-      body: (
-      <div className="modal-body-container">
-        {ticketsBody}
-      </div>
-    ),
+      body: <div className="modal-body-container">{ticketsBody}</div>,
     });
     setModalShow(true);
   };
-
-  // const handleDeleteTicket = async (purchaseId) => {
-  //   const confirmDeletion = window.confirm(
-  //     "Are you sure you want to delete this live bet? This action is irreversible."
-  //   );
-  //   if (confirmDeletion) {
-  //     try {
-  //       const response = await DeleteLiveBets({ purchaseId }, false);
-  //       if (response.success) {
-  //         fetchMarketStats ()
-  //         alert("Live bet deleted successfully!");
-  //         setStats((prevStats) =>
-  //           prevStats.map((user) => ({
-  //             ...user,
-  //             details: user.details.map((detail) => ({
-  //               ...detail,
-  //               tickets: detail.tickets.filter(
-  //                 (ticket) => ticket.purchaseId !== purchaseId
-  //               ),
-  //             })),
-  //           }))
-  //         );
-  //         // refresh();
-  //         fetchMarketStats();
-  //         setModalShow(false)
-
-  //       } else {
-  //         alert("Failed to delete live bet. Please try again.");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error deleting live bet:", error);
-  //       alert("An error occurred while deleting live bet.");
-  //     }
-  //   }
-  // };
 
   const handleDeleteTicket = async (purchaseId) => {
     const confirmDeletion = window.confirm(
