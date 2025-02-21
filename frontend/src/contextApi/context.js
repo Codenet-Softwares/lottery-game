@@ -33,7 +33,7 @@ const AppProvider = ({ children }) => {
   const hideLoader = () => setIsLoading(false);
 
   useEffect(() => {
-    if (store.admin.accessToken) {
+    if (store?.admin?.accessToken) {
       localStorage.setItem(strings.LOCAL_STORAGE_KEY, JSON.stringify(store));
       setIsLoading(false);
     } else {

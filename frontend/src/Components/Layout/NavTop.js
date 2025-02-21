@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ScrollMenu } from "react-horizontal-scrolling-menu";
 import { useAppContext } from "../../contextApi/context";
@@ -14,6 +14,7 @@ const NavTop = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const scrollRef = useRef(null);
+  const [scrollState, setScrollState] = useState({ start: true, end: false });
 
   const handleLogout = () => {
     const confirmLogout = window.confirm("Are you sure you want to log out?");
@@ -57,13 +58,22 @@ const NavTop = () => {
     { to: "/reset-password", icon: "fas fa-key", label: "Reset Password" },
   ];
 
+  const handleUpdate = ({ getItemById }) => {
+    setScrollState({
+      start: getItemById(navItems[0]?.to)?.visible ?? true,
+      end: getItemById(navItems[navItems.length - 1]?.to)?.visible ?? false,
+    });
+  };
   return (
     <SimpleBar className="navtop-container">
       <div className="d-flex gap-5 justify-content-center align-items-center position-relative navtop-wrapper">
         {/* Left Arrow */}
         <button
-          className=" btn-light "
+          className={` btn-light ${
+            scrollState.start ? "disabled-arrow" : "enabled-arrow"
+          } `}
           onClick={() => scrollRef.current?.scrollPrev()}
+          disabled={scrollState.start}
         >
           <FaChevronLeft />
         </button>
@@ -72,6 +82,7 @@ const NavTop = () => {
         <div className="overflow-hidden navtop-scroll-container">
           <ScrollMenu
             apiRef={scrollRef}
+            onUpdate={handleUpdate}
             wrapperClassName="custom-scroll-wrapper"
             scrollContainerClassName="custom-scroll-container d-flex align-items-center gap-5"
           >
@@ -94,8 +105,11 @@ const NavTop = () => {
 
         {/* Right Arrow */}
         <button
-          className=" btn-light "
+          className={`btn-light ${
+            scrollState.end ? "disabled-arrow" : "enabled-arrow"
+          }`}
           onClick={() => scrollRef.current?.scrollNext()}
+          disabled={scrollState.end}
         >
           <FaChevronRight />
         </button>
