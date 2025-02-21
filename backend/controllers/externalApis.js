@@ -280,7 +280,7 @@ export const getLiveMarkets = async (req, res) => {
     today.setHours(0, 0, 0, 0);
 
     const ticketData = await PurchaseLottery.findAll({
-      attributes: ["marketId", "marketName", "gameName"],
+      attributes: ["marketId", "marketName", "gameName","userId","userName"],
       where: {
         createdAt: {
           [Op.gte]: today,
