@@ -417,17 +417,49 @@ for (const userId in userTotalLoss) {
   }
 }
 
-for (const userId of Object.keys(userTotalLoss)) {
-  try {
-    await axios.post(`${baseURL}/api/lottery-profit-loss`, {
-      userId,
-      marketId,
-      marketName
-    });
+// for (const userId of Object.keys(userTotalLoss)) {
+//   try {
+//     await axios.post(`${baseURL}/api/lottery-profit-loss`, {
+//       userId,
+//       marketId,
+//       marketName,
+//     });
 
-    console.log(`Profit/Loss updated for user ${userId}`);
+//     console.log(`Profit/Loss updated for user ${userId}`);
+//   } catch (error) {
+//     console.error(`Error updating Profit/Loss for user ${userId}:`, error.response?.data || error.message);
+//   }
+// }
+
+const profitLossData = [];
+
+// Collect winning ticket data
+winningTickets.forEach((ticket) => {
+  profitLossData.push({
+    userId: ticket.userId,
+    marketId: marketId,
+    marketName: marketName,
+    lotteryPrice: ticket.lotteryPrice,
+  });
+});
+
+// Collect losing ticket data
+losingTickets.forEach((ticket) => {
+  profitLossData.push({
+    userId: ticket.userId,
+    marketId: marketId,
+    marketName: marketName,
+    lotteryPrice: ticket.lotteryPrice,
+  });
+});
+
+// Send data to API
+for (const data of profitLossData) {
+  try {
+    await axios.post(`${baseURL}/api/lottery-profit-loss`, data);
+    console.log(`Data updated for user ${data.userId}`);
   } catch (error) {
-    console.error(`Error updating Profit/Loss for user ${userId}:`, error.response?.data || error.message);
+    console.error(`Error updating data for user ${data.userId}:`, error.response?.data || error.message);
   }
 }
 
