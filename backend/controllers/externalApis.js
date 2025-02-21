@@ -66,6 +66,7 @@ export const getLotteryBetHistory = async (req, res) => {
 
     const queryConditions = {
       isVoid: false,
+      resultAnnouncement:true,
       createdAt: {
         [Op.between]: [new Date(startDate), new Date(endDate)],
       },
