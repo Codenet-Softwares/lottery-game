@@ -77,6 +77,11 @@ export async function makeCall(callName, callParams, isToast = true) {
     let timeout = getTimeoutPromise();
 
     const response = await Promise.race([timeout, call]);
+
+    // Handle case where timeout occurs
+    if (!response || response.error) {
+      throw new Error(response?.message || "Server is not responding. Please try again later.");
+    }
     const json = await response.json();
 
     if (response.status === 401) {
@@ -105,8 +110,15 @@ export async function makeCall(callName, callParams, isToast = true) {
     return json;
   } catch (error) {
     console.error("Error in makeCall:", error); // Log errors
-    toast.error(error.message || "An error occurred");
-    throw error; // Rethrow to handle upstream
+       // Handle Network Errors & Server Downtime
+       if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
+        toast.error("The server is currently unreachable. Please check your internet or try again later.");
+      } else {
+        toast.error(error.message || "An unexpected error occurred");
+      }
+  
+      return { error: true, message: error.message, success: false };
+    
   }
 }
 

@@ -10,6 +10,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Pagination from "../../Common/Pagination";
 import { format } from "date-fns";
 import "./PurchasedTickets.css";
+import ViewTicketsModal from "./ViewTicketsModal";
 
 const PurchasedTickets = () => {
   const { dispatch, showLoader, hideLoader, store } = useAppContext();
@@ -37,7 +38,15 @@ const PurchasedTickets = () => {
   );
   const [visibleStartIndex, setVisibleStartIndex] = useState(0);
   const visibleCount = 5;
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedTickets, setSelectedTickets] = useState([]);
 
+  const openModalWithTickets = (ticketNumbers) => {
+    console.log("Opening modal with tickets:", ticketNumbers);
+    setSelectedTickets(ticketNumbers);
+    setModalOpen(true);
+    console.log("Modal state:", modalOpen);
+  };
   const toggleDropdown = (id) => {
     setDropdownOpen(dropdownOpen === id ? null : id);
   };
@@ -401,13 +410,19 @@ const PurchasedTickets = () => {
                             style={{ position: "relative" }}
                           >
                             <button
-                              className="btn btn-link dropdown-toggle"
+                          className="btn btn-outline-dark fw-semibold px-4 py-2 rounded-5 shadow-sm border-1"
                               type="button"
-                              onClick={() => toggleDropdown(index)}
+                              // onClick={() => toggleDropdown(index)}
+                              onClick={() => openModalWithTickets(ticket.tickets)}
                             >
-                              View Tickets
+                             <i className="bi bi-ticket-perforated me-2"></i> View Tickets
                             </button>
-                            <div
+                            <ViewTicketsModal
+                              isOpen={modalOpen}
+                              onClose={() => setModalOpen(false)}
+                              ticketNumbers={selectedTickets}
+                            />
+                            {/* <div
                               className="custom-dropdown-content"
                               style={{
                                 maxHeight:
@@ -445,7 +460,7 @@ const PurchasedTickets = () => {
                                   )}
                                 </div>
                               )}
-                            </div>
+                            </div> */}
                           </div>
                         </td>
                         <td>{ticket.userName || "N/A"}</td>
@@ -464,20 +479,6 @@ const PurchasedTickets = () => {
           </>
         ) : (
           <div className="d-flex flex-column align-items-center mt-5">
-            {/* <h3 className="fw-bold" style={{ color: "#4682B4" }}>
-              No Markets Yet!
-            </h3>
-            <p
-              className="text-muted"
-              style={{
-                fontSize: "1.2rem",
-                maxWidth: "600px",
-                textAlign: "center",
-              }}
-            >
-              Explore available markets or check back later to view your
-              purchase history.
-            </p> */}
             <div
               className="d-flex justify-content-center align-items-center mt-3"
               style={{
@@ -487,11 +488,6 @@ const PurchasedTickets = () => {
                 boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
               }}
             >
-              {/* <img
-                    src="https://via.placeholder.com/150"
-                    alt="No Markets"
-                    style={{ width: "150px", marginRight: "20px" }}
-                  /> */}
               <div>
                 <h5 className="text-secondary text-center">
                   No purchases to display

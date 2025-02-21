@@ -1,4 +1,4 @@
- import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   Col,
@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 import moment from "moment";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css"; 
+import "bootstrap-icons/font/bootstrap-icons.css";
 import "./MarketInsight.css";
 import {
   GetMarketTimings,
@@ -20,6 +20,7 @@ import {
 } from "../../Utils/apiService";
 import { useAppContext } from "../../contextApi/context";
 import { toast } from "react-toastify";
+import UpdateMarketModal from "./UpdateMarketModal";
 const MarketInsight = () => {
   const [marketTimes, setMarketTimes] = useState([]);
   const [selectedMarket, setSelectedMarket] = useState(null);
@@ -27,12 +28,35 @@ const MarketInsight = () => {
   const [purchasedTickets, setPurchasedTickets] = useState([]);
   const { showLoader, hideLoader } = useAppContext();
   const [loading, setLoading] = useState(true);
-  const [marketData, setMarketData] = useState([]);
-  const [error, setError] = useState(null);
   const [refresh, setRefresh] = useState(false);
   const [filteredMarkets, setFilteredMarkets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  console.log("selectedMarket", selectedMarket);
+
+  // Function to handle opening the modal
+  const openModal = (market) => {
+    setSelectedMarket(market);
+    setShowModal(true);
+  };
+
+  // Function to handle closing the modal
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  const handleModalUpdate = (updatedMarket) => {
+    // Update marketTimes state with the new updated market details
+    setMarketTimes((prevMarkets) =>
+      prevMarkets.map((market) =>
+        market.marketId === updatedMarket.marketId ? updatedMarket : market
+      )
+    );
+
+    // Also update selectedMarket so UI reflects new data immediately
+    setSelectedMarket(updatedMarket);
+  };
 
   // Debounce search term
   useEffect(() => {
@@ -43,32 +67,28 @@ const MarketInsight = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Updated function for toggling market status
+  //Api implementation for   toggling market status
   const handleMarketStatusToggle = async () => {
     const newStatus = !selectedMarket.isActive;
 
-    try {
-      showLoader();
-      const response = await isActiveLottery(
-        { status: newStatus, marketId: selectedMarket.marketId },
-        true
-      );
-      if (response.success) {
-        setRefresh((prev) => !prev);
-        setSelectedMarket((prevState) => ({
-          ...prevState,
-          isActive: newStatus,
-        }));
-        toast.success(`Market is now ${newStatus ? "Active" : "Inactive"}`);
-      } else {
-        toast.error("Failed to update market status");
-      }
-    } catch (error) {
-      console.error("Error activating/deactivating lottery:", error);
-      toast.error("An error occurred while updating market status");
-    } finally {
-      hideLoader();
+    showLoader();
+    const response = await isActiveLottery(
+      { status: newStatus, marketId: selectedMarket.marketId },
+      true
+    );
+    console.log("line number 71", response);
+    if (response && response.success) {
+      setRefresh((prev) => !prev);
+      setSelectedMarket((prevState) => ({
+        ...prevState,
+        isActive: newStatus,
+      }));
+      toast.success(`Market is now ${newStatus ? "Active" : "Inactive"}`);
+    } else {
+      toast.error("Failed to update market status");
     }
+
+    hideLoader();
   };
 
   useEffect(() => {
@@ -77,110 +97,90 @@ const MarketInsight = () => {
     }
   }, [marketTimes]);
 
-
   useEffect(() => {
     const fetchMarketTimings = async () => {
       showLoader();
-      try {
-        const response = await GetMarketTimings({
-          search: debouncedSearchTerm,
-        });
-        if (response.success) {
-          setMarketTimes(response.data);
-        }
-      } catch (error) {
-        console.error("Error fetching market timings:", error);
-      } finally {
-        hideLoader();
-        setLoading(false);
+
+      const response = await GetMarketTimings({
+        search: debouncedSearchTerm,
+      });
+      console.log("response for markets line 99", response);
+      if (response.success) {
+        setMarketTimes(response.data);
       }
+
+      hideLoader();
+      setLoading(false);
     };
 
     fetchMarketTimings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refresh, debouncedSearchTerm]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
-
+  // This is the void api implementation
   const handleVoidMarket = async (marketId) => {
     showLoader();
-    try {
-      const requestBody = { marketId };
-      const response = await voidMarket(requestBody);
 
-      if (response.success) {
-        toast.success("Market voided successfully");
+    const requestBody = { marketId };
+    const response = await voidMarket(requestBody);
 
-        // Remove the voided market from the marketTimes state
-        setMarketTimes((prevMarketTimes) =>
-          prevMarketTimes.filter((market) => market.marketId !== marketId)
-        );
+    if (response.success) {
+      toast.success("Market voided successfully");
 
-        if (selectedMarket?.marketId === marketId) {
-          setSelectedMarket(null);
-          setShowStats(false);
-        }
-      } else {
-        toast.error(response.message || "Failed to void market");
+      // Remove the voided market from the marketTimes state
+      setMarketTimes((prevMarketTimes) =>
+        prevMarketTimes.filter((market) => market.marketId !== marketId)
+      );
+
+      if (selectedMarket?.marketId === marketId) {
+        setSelectedMarket(null);
+        setShowStats(false);
       }
-    } catch (error) {
-      console.error("Error in voiding market:", error);
-      toast.error("An error occurred while voiding the market");
-    } finally {
-      hideLoader();
+    } else {
+      toast.error(response.message || "Failed to void market");
     }
-  };
 
-  // useEffect(() => {
-  //   const marketId = "a0587cfe-5600-4675-8d13-00aff76246c1";
-  //   fetchMarketData(marketId);
-  // }, []);`
+    hideLoader();
+  };
 
   useEffect(() => {
     if (selectedMarket) {
       const fetchPurchasedTickets = async () => {
         showLoader();
         setLoading(true);
-        try {
-          const response = await GetPurchaseOverview({
-            marketId: selectedMarket.marketId,
-          });
-          if (response.success) {
-            setPurchasedTickets(response.data.tickets || []);
-          }
-        } catch (error) {
-          console.error("Error fetching purchased tickets:", error);
-        } finally {
-          hideLoader();
-          setLoading(false);
+
+        const response = await GetPurchaseOverview({
+          marketId: selectedMarket.marketId,
+        });
+        if (response.success) {
+          setPurchasedTickets(response.data.tickets || []);
         }
+
+        hideLoader();
+        setLoading(false);
       };
 
       fetchPurchasedTickets();
     }
-  }, [selectedMarket, refresh]); // Runs when selectedMarket changes
+  }, [selectedMarket, refresh]);
 
   const handleisActive = async (id, status) => {
-    try {
-      const response = await isActiveLottery(
-        { status: status, marketId: id },
-        true
-      );
-      setRefresh((prev) => !prev);
-      console.log("Response:", response);
-    } catch (error) {
-      console.error("Error activating/deactivating lottery:", error);
-    }
+    const response = await isActiveLottery(
+      { status: status, marketId: id },
+      true
+    );
+    setRefresh((prev) => !prev);
+    console.log("Response:", response);
   };
 
   const handleMarketClick = (market) => {
     setSelectedMarket(market);
     setShowStats(true);
   };
-  if (loading) {
-    return null;
-  }
+  if (loading) return null;
   return (
     <Container fluid className="alt-dashboard-container">
       {/* Sidebar */}
@@ -189,7 +189,7 @@ const MarketInsight = () => {
           className="text-center text-white"
           style={{ fontWeight: "800", letterSpacing: "1px" }}
         >
-        LOTTERY MARKETS
+          LOTTERY MARKETS
         </h5>
         <div className="market-card-grid">
           {marketTimes.length > 0 ? (
@@ -210,10 +210,6 @@ const MarketInsight = () => {
                       Inactive
                     </Button>
                   )}
-
-                  {/* <Badge bg="light" text="dark" className="mb-2">
-                    {`ID: ${market.marketId.slice(-6).toUpperCase()}`}
-                  </Badge> */}
                 </Card.Body>
               </Card>
             ))
@@ -253,22 +249,36 @@ const MarketInsight = () => {
             <h3 className="market-title text-center mb-4">
               {selectedMarket.marketName} Stats
             </h3>
-            {/* Switch for Market Status Filter */}
-            <div className="d-flex justify-content-end mb-3">
-              <div className="form-check form-switch">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="flexSwitchCheckActive"
-                  checked={selectedMarket.isActive}
-                  onChange={handleMarketStatusToggle}
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="flexSwitchCheckActive"
-                >
-                  {selectedMarket.isActive ? "Active" : "Inactive"}
-                </label>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <i
+                className="bi bi-pencil-square text-primary fs-4 fw-bold  cursor-pointer"
+                title="Edit Market Stats"
+                style={{ cursor: "pointer" ,
+                  textShadow: "2px 2px 2px rgba(0, 0, 0, 0.15)", // Slight depth effect
+                  transform: "scale(1.1)", // Slightly enlarges the icon
+
+
+                }}
+                onClick={() => openModal(selectedMarket)} // Open modal with market details
+              ></i>
+              {/* Switch for Market Status Filter */}
+              <div className="d-flex justify-content-end mb-3">
+                <div className="form-check form-switch">
+                  <input
+                    className="form-check-input "
+                    type="checkbox"
+                    id="flexSwitchCheckActive"
+                    checked={selectedMarket.isActive}
+                    onChange={handleMarketStatusToggle}
+                    style={{ cursor: "pointer" }}
+                  />
+                  <label
+                    className="form-check-label"
+                    htmlFor="flexSwitchCheckActive"
+                  >
+                    {selectedMarket.isActive ? "Active" : "Inactive"}
+                  </label>
+                </div>
               </div>
             </div>
             <Row>
@@ -394,41 +404,8 @@ const MarketInsight = () => {
                 >
                   Void
                 </button>
-                {/* {selectedMarket.isActive ? <button className="btn btn-danger" onClick={() => handleisActive(selectedMarket.marketId, false)}>Suspend</button> : <button className="btn btn-success" onClick={() => handleisActive(selectedMarket.marketId, true)}> Active</button>} */}
               </div>
             </Row>
-
-            {/* Accordion for Purchased Tickets */}
-
-            {/* <Accordion defaultActiveKey="0" className="mt-4">
-              <Accordion.Item eventKey="0">
-                <Accordion.Header>Purchased Tickets</Accordion.Header>
-                <Accordion.Body>
-                  {purchasedTickets.length > 0 ? (
-                    <div className="ticket-grid">
-                      {purchasedTickets.map((ticket, index) => (
-                        <div key={index} className="ticket-card">
-                          <Card className="ticket-card-item shadow-sm">
-                            <Card.Body>
-                             
-                              <div className="ticket-numbers">
-                                {ticket.ticketList.map((ticketNumber, idx) => (
-                                  <span key={idx} className="ticket-number">
-                                    {ticketNumber}
-                                  </span>
-                                ))}
-                              </div>
-                            </Card.Body>
-                          </Card>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p>No purchased tickets available for this market.</p>
-                  )}
-                </Accordion.Body>
-              </Accordion.Item>
-            </Accordion> */}
 
             <Button
               variant="outline-primary"
@@ -461,6 +438,12 @@ const MarketInsight = () => {
           </Card>
         )}
       </main>
+      <UpdateMarketModal
+        showModal={showModal}
+        closeModal={closeModal}
+        market={selectedMarket}
+        onUpdate={handleModalUpdate}
+      />
     </Container>
   );
 };

@@ -1,30 +1,20 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ScrollMenu } from "react-horizontal-scrolling-menu";
 import { useAppContext } from "../../contextApi/context";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import "react-horizontal-scrolling-menu/dist/styles.css";
+import "simplebar-react/dist/simplebar.min.css";
+import SimpleBar from "simplebar-react";
 import { toast } from "react-toastify";
 import "./NavTop.css";
 
 const NavTop = () => {
-  const { store, dispatch } = useAppContext();
-  const navigate = useNavigate();
+  const { dispatch } = useAppContext();
   const location = useLocation();
-  const menuRef = useRef(null);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const menuItems = document.querySelectorAll(".nav-link");
-      const centerIndex = Math.floor(menuItems.length / 2);
-      menuItems.forEach((item, index) => {
-        if (index === centerIndex) {
-          item.classList.add("center-active");
-        } else {
-          item.classList.remove("center-active");
-        }
-      });
-    };
-    menuRef.current.addEventListener("scroll", handleScroll);
-    return () => menuRef.current?.removeEventListener("scroll", handleScroll);
-  }, []);
+  const navigate = useNavigate();
+  const scrollRef = useRef(null);
+  const [scrollState, setScrollState] = useState({ start: true, end: false });
 
   const handleLogout = () => {
     const confirmLogout = window.confirm("Are you sure you want to log out?");
@@ -37,103 +27,102 @@ const NavTop = () => {
     }
   };
 
-  const scrollMenu = (direction) => {
-    if (menuRef.current) {
-      menuRef.current.scrollBy({
-        left: direction === "right" ? 100 : -100,
-        behavior: "smooth",
-      });
-
-      const isAtStart = menuRef.current.scrollLeft === 0;
-      const isAtEnd =
-        Math.ceil(menuRef.current.scrollLeft + menuRef.current.offsetWidth) >=
-        menuRef.current.scrollWidth;
-
-      document.querySelector(".left-arrow").style.display = isAtStart
-        ? "none"
-        : "block";
-
-      document.querySelector(".right-arrow").style.display = isAtEnd
-        ? "none"
-        : "block";
-    }
-  };
-
-  useEffect(() => {
-    const leftArrow = document.querySelector(".left-arrow");
-    const rightArrow = document.querySelector(".right-arrow");
-
-    if (leftArrow && rightArrow) {
-      if (location.pathname === "/dashboard") {
-        leftArrow.style.display = "none";
-      } else if (location.pathname === "/reset-password") {
-        rightArrow.style.display = "none";
-      } else {
-        leftArrow.style.display = "block";
-        rightArrow.style.display = "block";
-      }
-    }
-  }, [location]);
-
   const navItems = [
     { to: "/dashboard", icon: "fas fa-tachometer-alt", label: "Dashboard" },
-    { to: "/lottery-markets", icon: "fas fa-ticket-alt", label: "Create Lottery" },
-    { to: "/Market-overview", icon: "fas fa-chart-line", label: "Market Overview" },
+    {
+      to: "/lottery-markets",
+      icon: "fas fa-ticket-alt",
+      label: "Create Lottery",
+    },
+    {
+      to: "/Market-overview",
+      icon: "fas fa-chart-line",
+      label: "Market Overview",
+    },
     { to: "/results", icon: "fas fa-trophy", label: "Results" },
     { to: "/win", icon: "fas fa-money-bill-wave", label: "Win" },
-    { to: "/purchase-history", icon: "fas fa-history", label: "Purchase History" },
+    {
+      to: "/purchase-history",
+      icon: "fas fa-history",
+      label: "Purchase History",
+    },
     { to: "/search-lottery", icon: "fas fa-search", label: "Search Lottery" },
     { to: "/get-void-market", icon: "fas fa-file-excel", label: "Void" },
     { to: "/inactive", icon: "fas fa-ban", label: "Revoke" },
-    { to: "/live-markets", icon: "fas fa-broadcast-tower", label: "Live Markets" },
+    {
+      to: "/live-markets",
+      icon: "fas fa-broadcast-tower",
+      label: "Live Markets",
+    },
     { to: "/trash", icon: "fas fa-trash-alt", label: "Trash" },
     { to: "/reset-password", icon: "fas fa-key", label: "Reset Password" },
   ];
 
+  const handleUpdate = ({ getItemById }) => {
+    setScrollState({
+      start: getItemById(navItems[0]?.to)?.visible ?? true,
+      end: getItemById(navItems[navItems.length - 1]?.to)?.visible ?? false,
+    });
+  };
   return (
-    <div className="container-fluid g-4 navtop-container">
-      <div className="row d-flex justify-content-center align-items-center">
-        <div className="nav-wrapper justify-content-center align-items-center">
-          <button
-            className="scroll-arrow left-arrow"
-            onClick={() => scrollMenu("left")}
+    <SimpleBar className="navtop-container">
+      <div className="d-flex gap-5 justify-content-center align-items-center position-relative navtop-wrapper">
+        {/* Left Arrow */}
+        <button
+          className={` btn-light ${
+            scrollState.start ? "disabled-arrow" : "enabled-arrow"
+          } `}
+          onClick={() => scrollRef.current?.scrollPrev()}
+          disabled={scrollState.start}
+        >
+          <FaChevronLeft />
+        </button>
+
+        {/* Scroll Menu */}
+        <div className="overflow-hidden navtop-scroll-container">
+          <ScrollMenu
+            apiRef={scrollRef}
+            onUpdate={handleUpdate}
+            wrapperClassName="custom-scroll-wrapper"
+            scrollContainerClassName="custom-scroll-container d-flex align-items-center gap-5"
           >
-            &lt;
-          </button>
-          <div ref={menuRef} className="nav-options">
             {navItems.map(({ to, icon, label }) => (
               <Link
                 key={to}
                 to={to}
-                className={`nav-link mt-2 ${
-                  location.pathname === to|| location.pathname.startsWith(to)  ? "active-link" : ""
+                className={`btn mx-5 text-white  ${
+                  location.pathname === to || location.pathname.startsWith(to)
+                    ? "btn-dark text-white"
+                    : "btn-outline-dark"
                 }`}
               >
-                <i className={`nav-icon ${icon}`} />
-                <span className="text-info text-nowrap">{label}</span>
+                <i className={`${icon} me-2`}></i>
+                {label}
               </Link>
             ))}
-          </div>
-          <button
-            className="scroll-arrow right-arrow"
-            onClick={() => scrollMenu("right")}
-          >
-            &gt;
-          </button>
+          </ScrollMenu>
         </div>
-      </div>
-      <div className="profile_info">
+
+        {/* Right Arrow */}
+        <button
+          className={`btn-light ${
+            scrollState.end ? "disabled-arrow" : "enabled-arrow"
+          }`}
+          onClick={() => scrollRef.current?.scrollNext()}
+          disabled={scrollState.end}
+        >
+          <FaChevronRight />
+        </button>
+
+        {/* Logout Icon */}
         <i
-          className="fas fa-sign-out-alt"
+          className="fas fa-sign-out-alt text-danger fs-2 logout-icon "
           onClick={handleLogout}
-          title="logout"
+          title="Logout"
         />
       </div>
-    </div>
+    </SimpleBar>
   );
 };
 
 export default NavTop;
-
-
-
