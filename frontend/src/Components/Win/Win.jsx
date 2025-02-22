@@ -206,7 +206,7 @@ const Win = () => {
         const response = await CustomWining({ resultArray, marketId: id });
       
         // Refresh the active markets list after a successful submission
-      //  await handleGetAllLotteryMarket();
+       await handleGetAllLotteryMarket();
       } catch (error) {
         console.error(
           `API call failed for ${resultArray.prizeCategory}:`,
