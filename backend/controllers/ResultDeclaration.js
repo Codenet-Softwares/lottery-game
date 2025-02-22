@@ -507,7 +507,7 @@ for (const data of profitLossData) {
 
 export const getLotteryResults = async (req, res) => {
   try {
-    const { marketId } = req.parms;
+    const { marketId } = req.params;
 
     const results = await LotteryResult.findAll({
       where: { marketId },
