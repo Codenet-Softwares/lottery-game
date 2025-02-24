@@ -511,3 +511,9 @@ export const validateResetPassword = [
     .isLength({ min: 8 })
     .withMessage('New password must be at least 8 characters long')
 ];
+
+
+export const createSubAdminSchema = [
+  body('userName').trim().notEmpty().withMessage('User Name is required'),
+  body('password').trim().notEmpty().withMessage('Password is required'),
+];

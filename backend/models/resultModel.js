@@ -36,7 +36,12 @@ const LotteryResult = sequelize.define(
     isRevoke : {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
-    }
+    },
+    adminApprove: {
+      type: DataTypes.ENUM("Pending", "Approve", "Rejected"), 
+      defaultValue: "Pending",
+      allowNull: false,
+    },
   },
   {
     tableName: 'LotteryResult',

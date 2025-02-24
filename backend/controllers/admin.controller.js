@@ -12,6 +12,7 @@ import UserRange from '../models/user.model.js';
 import PurchaseLottery from '../models/purchase.model.js';
 import LotteryResult from '../models/resultModel.js';
 import bcrypt from 'bcrypt';
+import { string } from '../constructor/string.js';
 dotenv.config();
 
 export const createAdmin = async (req, res) => {
@@ -49,6 +50,10 @@ export const login = async (req, res) => {
       return apiResponseErr(null, false, statusCode.badRequest, 'User does not exist', res);
     }
 
+    if(existingUser.role !== string.Admin && existingUser.role !== string.SubAdmin) {
+      return apiResponseErr(null, false, statusCode.unauthorize, 'Unauthorize acccess', res);
+    }
+
     const isPasswordValid = await existingUser.validPassword(password);
 
     if (!isPasswordValid) {
@@ -59,6 +64,7 @@ export const login = async (req, res) => {
       adminId: existingUser.adminId,
       userName: existingUser.userName,
       role: existingUser.role,
+      permissions : existingUser.permissions,
     };
     const accessToken = jwt.sign(userResponse, process.env.JWT_SECRET_KEY, {
       expiresIn: '1d',
@@ -863,4 +869,75 @@ export const resetPassword = async (req, res) => {
   }
 };
 
+export const createSubAdmin = async (req, res) => {
+  try {
+    const { userName, password, permissions } = req.body;
 
+    const existingAdmin = await Admin.findOne({ where: { userName } });
+    
+    if (existingAdmin) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Username already exist!",
+        res
+      );
+    }
+
+    const newSubAdmin = await Admin.create({
+      adminId: uuidv4(),
+      userName,
+      password,
+      role :  string.SubAdmin,
+      permissions: permissions,
+    });
+
+    return apiResponseSuccess(
+      newSubAdmin,
+      true,
+      statusCode.create,
+      "Subadmin create successfully!",
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+
+export const winResultRequest = async (req, res) => {
+  try {
+    const { marketId } = req.params;
+
+    const lotteryResult = await LotteryResult.findAll({ 
+      where: { 
+        marketId, 
+        isWin: 'Pending' 
+      }
+    });
+
+    return apiResponseSuccess(
+      lotteryResult,
+      true,
+      statusCode.create,
+      "Subadmin create successfully!",
+      res
+    );
+
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};

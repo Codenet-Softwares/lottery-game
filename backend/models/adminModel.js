@@ -26,6 +26,10 @@ const Admin = sequelize.define(
       type: DataTypes.ENUM('admin', 'subAdmin', 'user'),
       allowNull: false,
     },
+    permissions: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     indexes: [], 
