@@ -481,7 +481,7 @@ for (const data of profitLossData) {
     );
 
     await PurchaseLottery.update(
-      { resultAnnouncement: true, settleTime: new Date() },
+      { resultAnnouncement: true, settleTime: new Date(), hidePurchase: true },
       { where: { marketId } }
     );
 

@@ -266,7 +266,7 @@ export const purchaseHistory = async (req, res) => {
     const offset = (page - 1) * parseInt(limit);
 
     const purchaseFilter = {
-      where: { userId, marketId },
+      where: { userId, marketId, hidePurchase: false },
       include: [
         {
           model: UserRange,
