@@ -1,13 +1,18 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
 
-const LotteryResult = sequelize.define(
-  'LotteryResult',
+const WinResultRequest = sequelize.define(
+  'winResultRequest',
   {
     resultId: {
       type: DataTypes.STRING,
       primaryKey: true,
       allowNull: false,
+    },
+    adminId : {
+      type: DataTypes.STRING,
+      allowNull: false,
+
     },
     ticketNumber: {
       type: DataTypes.JSON,
@@ -33,16 +38,29 @@ const LotteryResult = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
-    isRevoke : {
+    declearBy:{
+      type: DataTypes.STRING,
+      allowNull: true,
+
+    },
+    isWin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    type: {
+      type: DataTypes.ENUM("Matched","Unmatched"),
+      defaultValue: "Unmatched",
+    },
+    isApproved: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
   },
   {
-    tableName: 'LotteryResult',
+    tableName: 'winResultRequest',
     timestamps: true,
     freezeTableName: true,
   },
 );
 
-export default LotteryResult;
+export default WinResultRequest;

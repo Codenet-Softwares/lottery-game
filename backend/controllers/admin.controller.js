@@ -918,9 +918,11 @@ export const winResultRequest = async (req, res) => {
 
     const lotteryResult = await LotteryResult.findAll({ 
       where: { 
-        marketId, 
-        isWin: 'Pending' 
-      }
+        marketId,
+        adminApprove: 'Pending',
+        role: string.SubAdmin, 
+      },
+      order : [["createdAt", "DESC"]],
     });
 
     return apiResponseSuccess(
