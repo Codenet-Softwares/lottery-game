@@ -10,8 +10,8 @@ export const ResultDeclarationModule = (app) => {
     '/api/admin/results-declaration/:marketId',
     validationRules,
     customErrorHandler,
-    authorize([string.Admin]),
-    ResultDeclare,
+    authorize([string.Admin, string.SubAdmin], [string.WinLottery]),
+    ResultDeclare
   );
 
   app.get('/api/lottery-results/:marketId', validateMarketId, customErrorHandler, getLotteryResults);

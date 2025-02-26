@@ -12,6 +12,7 @@ import UserRange from '../models/user.model.js';
 import PurchaseLottery from '../models/purchase.model.js';
 import LotteryResult from '../models/resultModel.js';
 import bcrypt from 'bcrypt';
+import { string } from '../constructor/string.js';
 dotenv.config();
 
 export const createAdmin = async (req, res) => {
@@ -59,6 +60,7 @@ export const login = async (req, res) => {
       adminId: existingUser.adminId,
       userName: existingUser.userName,
       role: existingUser.role,
+      permissions: existingUser.permissions,
     };
     const accessToken = jwt.sign(userResponse, process.env.JWT_SECRET_KEY, {
       expiresIn: '1d',
@@ -864,3 +866,54 @@ export const resetPassword = async (req, res) => {
 };
 
 
+export const createSubAdmin = async (req, res) => {
+  try {
+    const { userName, password, permissions } = req.body;
+
+    if(!permissions)
+    {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Permission is required",
+        res
+      );
+    }
+
+    const existingAdmin = await Admin.findOne({ where: { userName } });
+    if (existingAdmin) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Username already exist!",
+        res
+      );
+    }
+
+    const newSubAdmin = await Admin.create({
+      adminId: uuidv4(),
+      userName,
+      password,
+      role :  string.SubAdmin,
+      permissions: permissions,
+    });
+
+    return apiResponseSuccess(
+      newSubAdmin,
+      true,
+      statusCode.create,
+      "Subadmin create successfully!",
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
