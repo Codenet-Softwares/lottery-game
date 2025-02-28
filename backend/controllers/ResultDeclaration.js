@@ -8,17 +8,360 @@ import axios from 'axios';
 import TicketRange from '../models/ticketRange.model.js';
 import { TicketService } from '../constructor/ticketService.js';
 import sequelize from '../config/db.js';
+import WinResultRequest from '../models/winResultRequestModel.js'
 
 export const ResultDeclare = async (req, res) => {
   try {
     const prizes = req.body;
     const { marketId } = req.params;
-
+    const role = req.user?.role;
+    const userName = req.user?.userName;
+    const adminId = req.user?.adminId;
     const market = await TicketRange.findOne({ where: { marketId } });
 
     if (!market) {
       return apiResponseErr(null, false, statusCode.badRequest, 'Market not found', res);
     }
+    if (role === 'subAdmin')
+    {
+      const marketName = market.marketName;
+
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const todayEnd = new Date();
+      todayEnd.setHours(23, 59, 59, 999);
+  
+      const prizeLimits = {
+        'First Prize': 1,
+        'Second Prize': 10,
+        'Third Prize': 10,
+        'Fourth Prize': 10,
+        'Fifth Prize': 50,
+      };
+  
+      const allPrizeCategories = [
+        'First Prize',
+        'Second Prize',
+        'Third Prize',
+        'Fourth Prize',
+        'Fifth Prize',
+      ];
+  
+      const providedCategories = prizes.map(prize => prize.prizeCategory);
+      const missingCategories = allPrizeCategories.filter(
+        category => !providedCategories.includes(category)
+      );
+  
+      if (missingCategories.length > 0) {
+        return apiResponseErr(
+          null,
+          false,
+          statusCode.badRequest,
+         `The following prize categories are missing: ${missingCategories.join(', ')}`,
+          res
+        );
+      }
+  
+      let generatedTickets = [];
+      let lastFiveForFirstPrize = null;
+      let lastFourForFirstPrize = null;
+      let lastFourForSecondPrize = null;
+      let lastFourForThirdPrize = null;
+      let lastFourForFourthPrize = null;
+  
+      for (let prize of prizes) {
+        const { ticketNumber, prizeCategory, prizeAmount, complementaryPrize } = prize;
+  
+        if (!prizeLimits[prizeCategory]) {
+          return apiResponseErr(null, false, statusCode.badRequest, 'Invalid prize category.', res);
+        }
+  
+        const ticketNumbers = Array.isArray(ticketNumber) ? ticketNumber : [ticketNumber];
+        if (ticketNumbers.length !== prizeLimits[prizeCategory]) {
+          return apiResponseErr(
+            null,
+            false,
+            statusCode.badRequest,
+            `The ${prizeCategory} requires exactly ${prizeLimits[prizeCategory]} ticket number(s).`,
+            res,
+          );
+        }
+  
+        const allResults = await WinResultRequest.findAll({
+          where: {
+            createdAt: {
+              [Op.between]: [todayStart, todayEnd],
+            },
+            marketId,
+            adminId,
+          },
+        });
+  
+        const isDuplicate = ticketNumbers.some(ticket =>
+          allResults.some(result => result.ticketNumber.includes(ticket))
+        );
+  
+        if (isDuplicate) {
+          return apiResponseErr(
+            null,
+            false,
+            statusCode.badRequest,
+            'One or more ticket numbers have already been assigned a prize in another category.',
+            res,
+          );
+        }
+  
+        const existingResults = await WinResultRequest.findAll({
+          where: { prizeCategory, marketId, adminId, },
+        });
+  
+        if (existingResults.length >= prizeLimits[prizeCategory]) {
+          return apiResponseErr(
+            null,
+            false,
+            statusCode.badRequest,
+            `Cannot add more ticket numbers. ${prizeCategory} already has the required tickets.`,
+            res,
+          );
+        }
+  
+        if (prizeCategory === 'First Prize') {
+          const firstTicket = ticketNumbers[0];
+          const lastFive = firstTicket.slice(-5);
+          const lastFour = firstTicket.slice(-4);
+          lastFiveForFirstPrize = lastFive;
+          lastFourForFirstPrize = lastFour;
+          generatedTickets.push({
+            resultId: uuidv4(),
+            marketId,
+            adminId,
+            ticketNumber: ticketNumbers,
+            marketName,
+            prizeCategory,
+            prizeAmount,
+            complementaryPrize,
+            declearBy: userName,
+          });
+        }
+  
+        if (prizeCategory === 'Second Prize') {
+          const secondTicket = ticketNumbers[0];
+          const lastFive = secondTicket.slice(-5);
+          if (lastFive !== lastFiveForFirstPrize) {
+            lastFourForSecondPrize = lastFive;
+            generatedTickets.push({
+              resultId: uuidv4(),
+              marketId,
+              marketName,
+              adminId,
+              ticketNumber: ticketNumbers,
+              prizeCategory,
+              prizeAmount,
+              declearBy: userName,
+            });
+          } else {
+            return apiResponseErr(
+              null,
+              false,
+              statusCode.badRequest,
+              'Ticket number must be unique',
+              res,
+            );
+          }
+        }
+  
+        if (prizeCategory === 'Third Prize') {
+          const thirdTicket = ticketNumbers[0];
+          const lastFour = thirdTicket.slice(-4);
+          if (lastFour !== lastFiveForFirstPrize && lastFour !== lastFourForSecondPrize && lastFour !== lastFourForFirstPrize) {
+            lastFourForThirdPrize = lastFour;
+            generatedTickets.push({
+              resultId: uuidv4(),
+              marketId,
+              marketName,
+              adminId,
+              ticketNumber: ticketNumbers,
+              prizeCategory,
+              prizeAmount,
+              declearBy: userName,
+            });
+          } else {
+            return apiResponseErr(
+              null,
+              false,
+              statusCode.badRequest,
+              'Ticket number must be unique',
+              res,
+            );
+          }
+        }
+  
+        if (prizeCategory === 'Fourth Prize') {
+          const fourthTicket = ticketNumbers[0];
+          const lastFour = fourthTicket.slice(-4);
+          if (
+            lastFour !== lastFiveForFirstPrize &&
+            lastFour !== lastFourForSecondPrize &&
+            lastFour !== lastFourForThirdPrize &&
+            lastFour !== lastFourForFirstPrize
+          ) {
+            lastFourForFourthPrize = lastFour;
+            generatedTickets.push({
+              resultId: uuidv4(),
+              marketId,
+              marketName,
+              adminId,
+              ticketNumber: ticketNumbers,
+              prizeCategory,
+              prizeAmount,
+              declearBy: userName,
+            });
+          } else {
+            return apiResponseErr(
+              null,
+              false,
+              statusCode.badRequest,
+              'Ticket number must be unique',
+              res,
+            );
+          }
+        }
+  
+        if (prizeCategory === 'Fifth Prize') {
+          const fifthTicket = ticketNumbers[0];
+          const lastFour = fifthTicket.slice(-4);
+          if (
+            lastFour !== lastFiveForFirstPrize &&
+            lastFour !== lastFourForSecondPrize &&
+            lastFour !== lastFourForThirdPrize &&
+            lastFour !== lastFourForFourthPrize &&
+            lastFour !== lastFourForFirstPrize
+          ) {
+            generatedTickets.push({
+              resultId: uuidv4(),
+              marketId,
+              marketName,
+              adminId,
+              ticketNumber: ticketNumbers,
+              prizeCategory,
+              prizeAmount,
+              declearBy: userName,
+            });
+          } else {
+            return apiResponseErr(
+              null,
+              false,
+              statusCode.badRequest,
+              'Ticket number must be unique',
+              res,
+            );
+          }
+        }
+      }
+  
+
+
+
+
+      let savedResults;
+      if (generatedTickets.length > 0) {
+        savedResults = await WinResultRequest.bulkCreate(generatedTickets);
+
+      //   const existingResults = await WinResultRequest.findAll({
+      //     where: { marketId },
+      //     raw: true,
+      // });
+      
+      // // Group results by marketId
+      // const marketGroups = existingResults.reduce((acc, result) => {
+      //     const { marketId } = result;
+      
+      //     if (!acc[marketId]) {
+      //         acc[marketId] = [];
+      //     }
+      
+      //     acc[marketId].push(result);
+      //     return acc;
+      // }, {});
+      
+      // // Iterate through each market group to check ticket matches
+      // for (const marketId in marketGroups) {
+      //     const results = marketGroups[marketId];
+      
+      //     // Group by exact ticketNumber (as a string)
+      //     const ticketGroups = results.reduce((acc, result) => {
+      //         const { ticketNumber } = result;
+      //         const ticketKey = Array.isArray(ticketNumber) 
+      //             ? JSON.stringify(ticketNumber) 
+      //             : ticketNumber; // Handle both arrays and plain strings
+      
+      //         if (!acc[ticketKey]) {
+      //             acc[ticketKey] = [];
+      //         }
+      
+      //         acc[ticketKey].push(result);
+      //         return acc;
+      //     }, {});
+      
+      //     // Update types based on full attribute matching
+      //     for (const ticketKey in ticketGroups) {
+      //         const resultsToUpdate = ticketGroups[ticketKey];
+      
+      //         // Check if all attributes match
+      //         const [firstResult, ...otherResults] = resultsToUpdate;
+      //         let allAttributesMatch = true;
+      
+      //         for (const result of otherResults) {
+      //             if (
+      //                 result.prizeCategory !== firstResult.prizeCategory ||
+      //                 result.prizeAmount !== firstResult.prizeAmount ||
+      //                 result.complementaryPrize !== firstResult.complementaryPrize
+      //             ) {
+      //                 allAttributesMatch = false;
+      //                 console.log(`Mismatch found for resultId: ${result.resultId}`);
+      //                 console.log(`Expected prizeCategory: ${firstResult.prizeCategory}, Got: ${result.prizeCategory}`);
+      //                 console.log(`Expected prizeAmount: ${firstResult.prizeAmount}, Got: ${result.prizeAmount}`);
+      //                 console.log(`Expected complementaryPrize: ${firstResult.complementaryPrize}, Got: ${result.complementaryPrize}`);
+      //                 break;
+      //             }
+      //         }
+      
+      //         const newType = allAttributesMatch ? "Matched" : "Unmatched";
+      
+      //         // Update the database if type needs to change
+      //         await Promise.all(
+      //             resultsToUpdate.map(async (result) => {
+      //                 if (result.type !== newType) {
+      //                     await WinResultRequest.update(
+      //                         { type: newType },
+      //                         { where: { resultId: result.resultId } }
+      //                     );
+      //                     console.log(`Updated resultId: ${result.resultId} to ${newType}`);
+      //                 }
+      //             })
+      //         );
+      //     }
+      // }
+      
+      
+      console.log("Matching process completed!");
+      
+      
+      
+
+        return apiResponseSuccess(
+          savedResults,
+          true,
+          statusCode.create,
+          'Lottery results saved successfully.',
+          res
+        );
+  
+      } else {
+        return apiResponseErr(null, false, statusCode.badRequest, 'No valid tickets to save.', res);
+      }
+  
+    } else {
 
     const marketName = market.marketName;
 
@@ -498,6 +841,7 @@ for (const data of profitLossData) {
       'Lottery results saved successfully.',
       res
     );
+  }
   } catch (error) {
     console.log("error", error);
     return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);

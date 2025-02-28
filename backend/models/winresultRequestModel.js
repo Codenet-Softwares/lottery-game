@@ -1,21 +1,21 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
 
-const WinLotteryrequest = sequelize.define(
-  'winLotteryrequest',
+const WinResultRequest = sequelize.define(
+  'winResultRequest',
   {
     resultId: {
       type: DataTypes.STRING,
       primaryKey: true,
       allowNull: false,
     },
-    adminId : {
+    adminId: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
     declearBy: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     ticketNumber: {
       type: DataTypes.JSON,
@@ -41,24 +41,24 @@ const WinLotteryrequest = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    type : {
+      type: DataTypes.ENUM("Matched", "Unmatched"),
+      defaultValue: "Unmatched",
+    },
     isRevoke : {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    type: {
-      type: DataTypes.ENUM("Matched", "Unmatched"),
-      defaultValue: "Unmatched",
-    },
     isApproved: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
-    },
+    }
   },
   {
-    tableName: 'winLotteryrequest',
+    tableName: 'winResultRequest',
     timestamps: true,
     freezeTableName: true,
   },
 );
 
-export default WinLotteryrequest;
+export default WinResultRequest;
