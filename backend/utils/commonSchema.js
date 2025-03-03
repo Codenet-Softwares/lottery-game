@@ -429,9 +429,10 @@ function validateTicketNumber(ticketNumber, prizeCategory) {
     const ticketRegex = /^\d{4}$/;
     return ticketRegex.test(trimmedNumber);
   } else if (prizeCategory === 'First Prize') {
-    // First prize: whole ticket number (e.g., 38 A 00001)
-    const ticketRegex = /^\d{1,2} [A-Z] \d{5}$/;
-    return ticketRegex.test(trimmedNumber);
+    // First prize: allows both 38A00001 and 38 A 00001
+    const ticketRegex = /^\d{2} ?[A-Z] ?\d{5}$/;
+  return ticketRegex.test(trimmedNumber);
+
   }
   return false;
 }
