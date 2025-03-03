@@ -1,4 +1,4 @@
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import PurchaseLottery from '../models/purchase.model.js';
 import LotteryResult from '../models/resultModel.js';
 import { apiResponseErr, apiResponseSuccess } from '../utils/response.js';
@@ -267,88 +267,74 @@ export const ResultDeclare = async (req, res) => {
       if (generatedTickets.length > 0) {
         savedResults = await WinResultRequest.bulkCreate(generatedTickets);
 
-      //   const existingResults = await WinResultRequest.findAll({
-      //     where: { marketId },
-      //     raw: true,
-      // });
+        const existingAdminIds = await WinResultRequest.findAll({
+          where: { marketId },
+          attributes: ['adminId', 'ticketNumber', 'prizeCategory', 'prizeAmount', 'complementaryPrize'],
+          raw: true,
+      });
       
-      // // Group results by marketId
-      // const marketGroups = existingResults.reduce((acc, result) => {
-      //     const { marketId } = result;
+      // Group data by adminId
+      const groupedByAdmin = {};
+      existingAdminIds.forEach((entry) => {
+          const { adminId, ticketNumber, prizeCategory, prizeAmount, complementaryPrize } = entry;
+          const key = `${prizeCategory}-${prizeAmount}-${complementaryPrize}`; // Group by prize details
+          if (!groupedByAdmin[adminId]) groupedByAdmin[adminId] = {};
+          if (!groupedByAdmin[adminId][key]) groupedByAdmin[adminId][key] = new Set();
+          ticketNumber.forEach(ticket => groupedByAdmin[adminId][key].add(ticket));
+      });
       
-      //     if (!acc[marketId]) {
-      //         acc[marketId] = [];
-      //     }
+      // Get unique admin IDs
+      const adminIds = Object.keys(groupedByAdmin);
       
-      //     acc[marketId].push(result);
-      //     return acc;
-      // }, {});
+      // Compare Admin Data
+      const matchedAdminIds = new Set();
+      for (let i = 0; i < adminIds.length; i++) {
+          for (let j = i + 1; j < adminIds.length; j++) {
+              const admin1 = adminIds[i];
+              const admin2 = adminIds[j];
       
-      // // Iterate through each market group to check ticket matches
-      // for (const marketId in marketGroups) {
-      //     const results = marketGroups[marketId];
+              let isMatched = true;
       
-      //     // Group by exact ticketNumber (as a string)
-      //     const ticketGroups = results.reduce((acc, result) => {
-      //         const { ticketNumber } = result;
-      //         const ticketKey = Array.isArray(ticketNumber) 
-      //             ? JSON.stringify(ticketNumber) 
-      //             : ticketNumber; // Handle both arrays and plain strings
+              // Compare prize categories and amounts
+              const keys1 = Object.keys(groupedByAdmin[admin1]);
+              const keys2 = Object.keys(groupedByAdmin[admin2]);
       
-      //         if (!acc[ticketKey]) {
-      //             acc[ticketKey] = [];
-      //         }
+              if (keys1.length !== keys2.length) {
+                  isMatched = false;
+              } else {
+                  for (const key of keys1) {
+                      if (!groupedByAdmin[admin2][key]) {
+                          isMatched = false;
+                          break;
+                      }
+                      const tickets1 = groupedByAdmin[admin1][key];
+                      const tickets2 = groupedByAdmin[admin2][key];
       
-      //         acc[ticketKey].push(result);
-      //         return acc;
-      //     }, {});
+                      // Compare ticket numbers
+                      if (tickets1.size !== tickets2.size || [...tickets1].some(ticket => !tickets2.has(ticket))) {
+                          isMatched = false;
+                          break;
+                      }
+                  }
+              }
       
-      //     // Update types based on full attribute matching
-      //     for (const ticketKey in ticketGroups) {
-      //         const resultsToUpdate = ticketGroups[ticketKey];
+              // Store matched adminIds
+              if (isMatched) {
+                  matchedAdminIds.add(admin1);
+                  matchedAdminIds.add(admin2);
+              }
+          }
+      }
       
-      //         // Check if all attributes match
-      //         const [firstResult, ...otherResults] = resultsToUpdate;
-      //         let allAttributesMatch = true;
-      
-      //         for (const result of otherResults) {
-      //             if (
-      //                 result.prizeCategory !== firstResult.prizeCategory ||
-      //                 result.prizeAmount !== firstResult.prizeAmount ||
-      //                 result.complementaryPrize !== firstResult.complementaryPrize
-      //             ) {
-      //                 allAttributesMatch = false;
-      //                 console.log(`Mismatch found for resultId: ${result.resultId}`);
-      //                 console.log(`Expected prizeCategory: ${firstResult.prizeCategory}, Got: ${result.prizeCategory}`);
-      //                 console.log(`Expected prizeAmount: ${firstResult.prizeAmount}, Got: ${result.prizeAmount}`);
-      //                 console.log(`Expected complementaryPrize: ${firstResult.complementaryPrize}, Got: ${result.complementaryPrize}`);
-      //                 break;
-      //             }
-      //         }
-      
-      //         const newType = allAttributesMatch ? "Matched" : "Unmatched";
-      
-      //         // Update the database if type needs to change
-      //         await Promise.all(
-      //             resultsToUpdate.map(async (result) => {
-      //                 if (result.type !== newType) {
-      //                     await WinResultRequest.update(
-      //                         { type: newType },
-      //                         { where: { resultId: result.resultId } }
-      //                     );
-      //                     console.log(`Updated resultId: ${result.resultId} to ${newType}`);
-      //                 }
-      //             })
-      //         );
-      //     }
-      // }
+      // Update the database for matched adminIds
+      if (matchedAdminIds.size > 0) {
+          await WinResultRequest.update(
+              { type: 'Matched' },
+              { where: { adminId: Array.from(matchedAdminIds) } }
+          );
+      }
       
       
-      console.log("Matching process completed!");
-      
-      
-      
-
         return apiResponseSuccess(
           savedResults,
           true,
