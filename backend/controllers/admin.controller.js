@@ -622,7 +622,7 @@ export const updateMarketStatus = async (req, res) => {
 
     if (updatedCount === 0) {
       return apiResponseErr(
-        updatedCount,
+        null,
         false,
         statusCode.badRequest,
         "Market not found",
@@ -630,7 +630,7 @@ export const updateMarketStatus = async (req, res) => {
       );
     } else {
       return apiResponseErr(
-        updatedCount,
+        status,
         true,
         statusCode.success,
         "Market updated Successfully",
