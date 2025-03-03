@@ -20,7 +20,7 @@ export const deleteliveBet = async (req, res) => {
       { role: req.user.role },
       process.env.JWT_SECRET_KEY,
       { expiresIn: "1h" }
-    );
+    );          
     const headers = {
       Authorization: `Bearer ${token}`,
     };
@@ -285,5 +285,78 @@ export const deleteTrash = async (req, res) => {
     );
   }
 }
+
+export const deleteBetAfterWin = async (req, res) => {
+  const transaction = await sequelize.transaction();
+  try {
+    // const token = jwt.sign(
+    //   { role: req.user.role },
+    //   process.env.JWT_SECRET_KEY,
+    //   { expiresIn: "1h" }
+    // );          
+    // const headers = {
+    //   Authorization: `Bearer ${token}`,
+    // };
+    const { purchaseId } = req.body;
+    const ticketPurchaseId = await PurchaseLottery.findOne({
+      where: { purchaseId }
+    });
+    if (!ticketPurchaseId) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "PurchaseId Not Found",
+        res
+      );
+    }
+    const baseURL = process.env.COLOR_GAME_URL;
+
+    const response = await axios.post(
+      `${baseURL}/api/external/delete-bet-afterWin-lottery`,
+      {
+        marketId: ticketPurchaseId.marketId,
+        userId: ticketPurchaseId.userId,
+        price: ticketPurchaseId.lotteryPrice,
+      },
+      //{ headers }
+    );
+
+    if (!response.data.success) {
+      return res.status(statusCode.badRequest).json(response.data);
+    }
+
+    await LotteryTrash.create(
+      {
+        trashMarkets: [livePurchaseId.dataValues],
+        trashMarketId: UUIDV4(),
+      },
+      { transaction }
+    );
+
+    await PurchaseLottery.destroy({
+      where: { purchaseId },
+    });
+
+    await transaction.commit();
+
+    return apiResponseSuccess(
+      livePurchaseId,
+      true,
+      statusCode.success,
+      "Balances updated successfully and market Deleted",
+      res
+    );
+  } catch (error) {
+    await transaction.rollback();
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
 
 
