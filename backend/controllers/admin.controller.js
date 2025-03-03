@@ -13,6 +13,7 @@ import PurchaseLottery from '../models/purchase.model.js';
 import LotteryResult from '../models/resultModel.js';
 import bcrypt from 'bcrypt';
 import { string } from '../constructor/string.js';
+import WinResultRequest from '../models/winResultRequestModel.js';
 dotenv.config();
 
 export const createAdmin = async (req, res) => {
@@ -917,3 +918,84 @@ export const createSubAdmin = async (req, res) => {
     );
   }
 };
+
+export const getMatchData = async (req, res) => {
+  try {
+    const { marketId } = req.params;
+    const { page = 1, limit = 10, search, type } = req.query;
+
+    const whereCondition = { marketId };
+    if (type) whereCondition.type = type;
+
+    const existingResults = await WinResultRequest.findAll({
+      where: whereCondition,
+      order: [["createdAt", "ASC"]],
+    });
+
+    if (!existingResults || existingResults.length === 0) {
+      return apiResponseErr(null, false, statusCode.notFound, "No Data found!", res);
+    }
+
+    const groupedResults = { Matched: [], Unmatched: [] };
+
+    existingResults.forEach((result) => {
+      const category = result.type === "Matched" ? "Matched" : "Unmatched";
+
+      let marketEntry = groupedResults[category].find(
+        (entry) => entry.marketId === result.marketId
+      );
+
+      if (!marketEntry) {
+        marketEntry = {
+          marketName: result.marketName,
+          marketId: result.marketId,
+          type: result.type,
+          isApproved: result.isApproved,
+          createdAt: result.createdAt,
+          updatedAt: result.updatedAt,
+          MatchData: [],
+        };
+        groupedResults[category].push(marketEntry);
+      }
+
+      let adminEntry = marketEntry.MatchData.find(
+        (entry) => entry.adminId === result.adminId
+      );
+
+      if (!adminEntry) {
+        adminEntry = {
+          adminId: result.adminId,
+          declearBy: result.declearBy,
+          ticketNumber: {},
+        };
+        marketEntry.MatchData.push(adminEntry);
+      }
+
+      if (!adminEntry.ticketNumber[result.prizeCategory]) {
+        adminEntry.ticketNumber[result.prizeCategory] = [];
+      }
+
+      adminEntry.ticketNumber[result.prizeCategory] = [
+        ...new Set([...adminEntry.ticketNumber[result.prizeCategory], ...result.ticketNumber]),
+      ];
+    });
+
+    return apiResponseSuccess(
+      groupedResults,
+      true,
+      statusCode.success,
+      "Data fetched successfully!",
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+

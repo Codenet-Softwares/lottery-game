@@ -8,6 +8,7 @@ import {
   getAllMarkets,
   getInactiveMarket,
   getMarkets,
+  getMatchData,
   getResult,
   getTicketNumbersByMarket,
   getTicketRange,
@@ -76,4 +77,6 @@ export const adminRoutes = (app) => {
   app.post('/api/admin/reset-password',validateResetPassword,customErrorHandler,authorize([string.Admin]), resetPassword);
 
   app.post('/api/admin/create-subAdmin', createSubAdminSchema, customErrorHandler,  authorize([string.Admin]), createSubAdmin);
+
+  app.get('/api/subAdmin/matching-data/:marketId', getMatchData)
 };

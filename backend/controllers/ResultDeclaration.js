@@ -259,10 +259,6 @@ export const ResultDeclare = async (req, res) => {
         }
       }
   
-
-
-
-
       let savedResults;
       if (generatedTickets.length > 0) {
         savedResults = await WinResultRequest.bulkCreate(generatedTickets);
@@ -273,20 +269,19 @@ export const ResultDeclare = async (req, res) => {
           raw: true,
       });
       
-      // Group data by adminId
       const groupedByAdmin = {};
       existingAdminIds.forEach((entry) => {
           const { adminId, ticketNumber, prizeCategory, prizeAmount, complementaryPrize } = entry;
-          const key = `${prizeCategory}-${prizeAmount}-${complementaryPrize}`; // Group by prize details
+          const key = `${prizeCategory}-${prizeAmount}-${complementaryPrize}`; 
+
           if (!groupedByAdmin[adminId]) groupedByAdmin[adminId] = {};
+
           if (!groupedByAdmin[adminId][key]) groupedByAdmin[adminId][key] = new Set();
           ticketNumber.forEach(ticket => groupedByAdmin[adminId][key].add(ticket));
       });
       
-      // Get unique admin IDs
       const adminIds = Object.keys(groupedByAdmin);
       
-      // Compare Admin Data
       const matchedAdminIds = new Set();
       for (let i = 0; i < adminIds.length; i++) {
           for (let j = i + 1; j < adminIds.length; j++) {
@@ -295,7 +290,6 @@ export const ResultDeclare = async (req, res) => {
       
               let isMatched = true;
       
-              // Compare prize categories and amounts
               const keys1 = Object.keys(groupedByAdmin[admin1]);
               const keys2 = Object.keys(groupedByAdmin[admin2]);
       
@@ -310,15 +304,13 @@ export const ResultDeclare = async (req, res) => {
                       const tickets1 = groupedByAdmin[admin1][key];
                       const tickets2 = groupedByAdmin[admin2][key];
       
-                      // Compare ticket numbers
                       if (tickets1.size !== tickets2.size || [...tickets1].some(ticket => !tickets2.has(ticket))) {
                           isMatched = false;
                           break;
                       }
                   }
               }
-      
-              // Store matched adminIds
+
               if (isMatched) {
                   matchedAdminIds.add(admin1);
                   matchedAdminIds.add(admin2);
@@ -326,7 +318,6 @@ export const ResultDeclare = async (req, res) => {
           }
       }
       
-      // Update the database for matched adminIds
       if (matchedAdminIds.size > 0) {
           await WinResultRequest.update(
               { type: 'Matched' },
