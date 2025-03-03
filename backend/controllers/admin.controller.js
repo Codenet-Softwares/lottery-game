@@ -363,7 +363,6 @@ export const getAllMarkets = async (req, res) => {
       },
       isWin: false,
       isVoid: false,
-      isActive:true
     };
     if (search) {
       whereCondition.marketName = {
