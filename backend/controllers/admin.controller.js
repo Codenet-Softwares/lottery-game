@@ -616,9 +616,16 @@ export const updateMarketStatus = async (req, res) => {
 
   try {
     const [updatedCount] = await TicketRange.update(
-      { isActive: status, hideMarketUser: status ? true : Sequelize.col('hideMarketUser') },
+      { isActive: status },
       { where: { marketId } }
     );
+    
+    if (status) {
+      await TicketRange.update(
+        { hideMarketUser: true },
+        { where: { marketId } }
+      );
+    }
 
     if (updatedCount === 0) {
       return apiResponseErr(
