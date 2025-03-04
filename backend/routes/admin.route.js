@@ -78,5 +78,6 @@ export const adminRoutes = (app) => {
 
   app.post('/api/admin/create-subAdmin', createSubAdminSchema, customErrorHandler,  authorize([string.Admin]), createSubAdmin);
 
-  app.get('/api/subAdmin/matching-data/:marketId', getMatchData)
+  app.get('/api/subAdmin/matching-data', authorize([string.Admin]), getMatchData);
+
 };

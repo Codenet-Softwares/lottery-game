@@ -45,11 +45,11 @@ const WinResultRequest = sequelize.define(
       type: DataTypes.ENUM("Matched", "Unmatched"),
       defaultValue: "Unmatched",
     },
-    isRevoke : {
+    isApproved: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    isApproved: {
+    isReject : {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     }

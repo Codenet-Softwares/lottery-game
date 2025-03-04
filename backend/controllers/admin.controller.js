@@ -921,10 +921,9 @@ export const createSubAdmin = async (req, res) => {
 
 export const getMatchData = async (req, res) => {
   try {
-    const { marketId } = req.params;
     const { page = 1, limit = 10, search, type } = req.query;
 
-    const whereCondition = { marketId };
+    const whereCondition = { isApproved: false };
     if (type) whereCondition.type = type;
 
     const existingResults = await WinResultRequest.findAll({
@@ -980,6 +979,7 @@ export const getMatchData = async (req, res) => {
       ];
     });
 
+
     return apiResponseSuccess(
       groupedResults,
       true,
@@ -997,5 +997,7 @@ export const getMatchData = async (req, res) => {
     );
   }
 };
+
+
 
 
