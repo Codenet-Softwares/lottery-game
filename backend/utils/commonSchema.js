@@ -511,3 +511,9 @@ export const validateResetPassword = [
     .isLength({ min: 8 })
     .withMessage('New password must be at least 8 characters long')
 ];
+
+export const validateDeleteBetAterWin = [
+  body('purchaseId')
+    .notEmpty().withMessage('Purchase ID is required')
+    .isUUID().withMessage('Purchase ID must be a valid UUID'),
+];
