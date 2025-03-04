@@ -284,8 +284,10 @@ const winningTickets = [];
 const losingTickets = [];
 
 purchasedTickets.forEach(ticket => {
-  const ticketNumber = `${ticket.group}${ticket.series}${ticket.number}`;
+  const ticketNumber = `${ticket.group.toString().padStart(2, '0')}${ticket.series}${ticket.number}`;
   const normalizedTicket = normalizeTicketNumber(ticketNumber);
+
+  console.log("normalizedTicket.............................................",normalizedTicket)
 
   let isWinner = false;
   let winningTicketDetails = null;
@@ -295,6 +297,9 @@ purchasedTickets.forEach(ticket => {
     const ticketNumbers = Array.isArray(result.ticketNumber) ? result.ticketNumber : [result.ticketNumber];
     for (const declaredTicket of ticketNumbers) {
       const normalizedDeclaredTicket = normalizeTicketNumber(declaredTicket);
+
+  console.log("normalizedDeclaredTicket.............................................",normalizedDeclaredTicket)
+
 
       if (result.prizeCategory === 'First Prize') {
         if (normalizedDeclaredTicket === normalizedTicket) {
