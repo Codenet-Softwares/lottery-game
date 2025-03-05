@@ -517,3 +517,16 @@ export const validateDeleteBetAterWin = [
     .notEmpty().withMessage('Purchase ID is required')
     .isUUID().withMessage('Purchase ID must be a valid UUID'),
 ];
+
+export const validateAfterWinMarkets = [
+  query("page")
+    .optional()
+    .toInt()
+    .isInt({ min: 1 })
+    .withMessage("Page number must be a positive integer."),
+  query("limit")
+    .optional()
+    .toInt()
+    .isInt({ min: 1 })
+    .withMessage("Limit must be a positive integer."),
+];
