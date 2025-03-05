@@ -37,12 +37,17 @@ class UrlConstant {
   allLiveMarketBroadcast = `${this.url_dev}/live-markets`;
   allLiveMarketstats = `${this.url_dev}/live-lotteries`;
   DeleteLiveBets = `${this.url_dev}/delete-liveBet-lottery`;
-  DeletedLiveBetsMarkets= `${this.url_dev}/get-trash-market`;
-  LiveBetsMarketsDetailsDeleted=`${this.url_dev}/get-trash-bet`;
+  DeletedLiveBetsMarkets = `${this.url_dev}/get-trash-market`;
+  LiveBetsMarketsDetailsDeleted = `${this.url_dev}/get-trash-bet`;
   TrashMarketDetailsDelete = `${this.url_dev}/delete-trash`;
-  RevokeDelete =  `${this.url_dev}/revoke-live-market`
+  RevokeDelete = `${this.url_dev}/revoke-live-market`;
   resetPasswordAdmin = `${this.url_dev}/${this.admin}/reset-password`;
   UpdateDetails = `${this.url_dev}/${this.admin}/update-market`;
+  allLiveMarketBet = `${this.url_dev}/afterWin-markets`;
+  allLiveBetMarket = `${this.url_dev}/afterWin-lotteries`;
+  DeleteLiveMarketBets = `${this.url_dev}/delete-Bet-afterWin-lottery`;
+  getVoidBetMarket = `${this.url_dev}/void-market-lottery`;
+
 }
 
 const urls = new UrlConstant();

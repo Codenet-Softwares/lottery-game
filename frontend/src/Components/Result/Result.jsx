@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { GetResultMarket, GetWiningResult } from "../../Utils/apiService";
+import {
+  GetResultMarket,
+  GetWiningResult,
+  voidBetMarket,
+} from "../../Utils/apiService";
 import { useNavigate, useParams } from "react-router-dom";
 import { format } from "date-fns";
+import { toast } from "react-toastify";
+import { useAppContext } from "../../contextApi/context";
 
 const Result = () => {
   const { marketId } = useParams(); // Extract current marketId from URL
@@ -12,6 +18,10 @@ const Result = () => {
   const [scrollIndex, setScrollIndex] = useState(0);
   const today = format(new Date(), "yyyy-MM-dd");
   const [selectedDate, setSelectedDate] = useState(today); // For date filter
+  const { showLoader, hideLoader } = useAppContext();
+  const [marketTimes, setMarketTimes] = useState([]);
+  const [selectedMarket, setSelectedMarket] = useState(null);
+  const [showStats, setShowStats] = useState(false);
 
   const maxVisibleMarkets = 3;
   const visibleMarkets = markets.slice(
@@ -102,7 +112,30 @@ const Result = () => {
   const handleMarketSelect = (market) => {
     navigate(`/results/${market.marketId}`); // Update URL when selecting a market
   };
+  const handleBetVoidMarket = async (marketId) => {
+    showLoader();
 
+    const requestBody = { marketId };
+    const response = await voidBetMarket(requestBody);
+
+    if (response.success) {
+      toast.success("Market voided successfully");
+
+      // Remove the voided market from the marketTimes state
+      setMarketTimes((prevMarketTimes) =>
+        prevMarketTimes.filter((market) => market.marketId !== marketId)
+      );
+
+      if (selectedMarket?.marketId === marketId) {
+        setSelectedMarket(null);
+        setShowStats(false);
+      }
+    } else {
+      toast.error(response.message || "Failed to void market");
+    }
+
+    hideLoader();
+  };
   return (
     <div
       style={{
@@ -341,6 +374,17 @@ const Result = () => {
                   </div>
                 </div>
               ))}
+              <div className="d-flex justify-content-center align-items-center mt-4">
+                <button
+                  className="btn btn-danger px-4"
+                  onClick={() =>
+                    selectedMarket &&
+                    handleBetVoidMarket(selectedMarket.marketId)
+                  }
+                >
+                  Void
+                </button>
+              </div>
             </div>
           )}
         </div>

@@ -490,7 +490,6 @@ export async function RevokeMarketsDelete(body = {}, isToast = false) {
   }
 }
 
-
 export async function ResetAdminPassword(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.POST, body, isToast);
@@ -506,8 +505,7 @@ export async function ResetAdminPassword(body = {}, isToast = false) {
   }
 }
 
-
-export async function UpdateMarketDetails(body = {},marketId, isToast = true) {
+export async function UpdateMarketDetails(body = {}, marketId, isToast = true) {
   try {
     const callParams = await getAuthCallParams(strings.PUT, body, isToast);
     const response = await makeCall(
@@ -516,6 +514,52 @@ export async function UpdateMarketDetails(body = {},marketId, isToast = true) {
       callParams,
       isToast
     );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function GetliveMarketBet(body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams("GET", body, isToast);
+    const response = await makeCall(
+      `${urls.allLiveMarketBet}?page=${body.page}&limit=${body.limit}&search=${body.search}`,
+      callParams
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function GetBetMarketStats(body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.GET, body, isToast);
+    const response = await makeCall(
+      `${urls.allLiveBetMarket}/${body.marketId}?page=${body.page}&limit=${body.limit}`,
+      callParams
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function DeleteLiveBetMarket(body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.POST, body, isToast);
+    const response = await makeCall(urls.DeleteLiveMarketBets, callParams, isToast);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function voidBetMarket(body, isToast = true) {
+  try {
+    const callParams = await getAuthCallParams(strings.POST, body, isToast);
+    const response = await makeCall(urls.getVoidBetMarket, callParams, isToast);
     return response;
   } catch (error) {
     throw error;

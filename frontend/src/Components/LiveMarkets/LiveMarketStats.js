@@ -57,6 +57,7 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
     }
   };
 
+  
   useEffect(() => {
     if (marketId) {
       fetchMarketStats();
