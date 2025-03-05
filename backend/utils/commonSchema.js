@@ -546,3 +546,9 @@ export const validateAfterWinLottery = [
     .isInt({ min: 1 })
     .withMessage("Limit must be a positive integer."),
 ];
+
+export const validateVoidAfyerWin = [
+  body('marketId')
+    .notEmpty().withMessage('Market ID is required')
+    .isUUID().withMessage('Market ID must be a valid UUID'),
+];

@@ -135,3 +135,87 @@ export const getVoidMarkets = async (req, res) => {
     );
   }
 };
+
+export const voidAfterWinMarket = async (req, res) => {
+  try {
+    const token = jwt.sign(
+      { role: req.user.role },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "1h" }
+    );
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    const { marketId } = req.body;
+    const market = await TicketRange.findOne({ where: { marketId } });
+    if (!market) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Market Not Found",
+        res
+      );
+    }
+
+    await PurchaseLottery.update(
+      { isVoid: true },
+      { where: { marketId } }
+    );
+
+    market.isVoid = true;
+    await market.save();
+
+    const usersByMarket = await PurchaseLottery.findAll({
+      where: { marketId },
+      attributes: ["marketId", "userId", "userName"],
+    });
+
+    const uniqueUserIds = [...new Set(usersByMarket.map((user) => user.userId))];
+
+    console.log("userIds...............................",uniqueUserIds)
+
+    if (uniqueUserIds.length > 0) {
+      const baseURL = process.env.COLOR_GAME_URL;
+
+      const response = await axios.post(
+        `${baseURL}/api/external/void-afterWin-market-lottery`,
+        { marketId, userId: uniqueUserIds },
+       { headers }
+      );
+    }
+
+    await PurchaseLottery.update(
+      { hidePurchase: true },
+      { where: { marketId } }
+    );
+
+    await TicketRange.update({ isActive: false }, { where: { marketId } });
+
+    return apiResponseSuccess(
+      usersByMarket,
+      true,
+      statusCode.success,
+      " Balances updated successfully and market voided",
+      res
+    );
+  } catch (error) {
+    if (error.response) {
+      return apiResponseErr(
+        null,
+        false,
+        error.response.status,
+        error.response.data.message || error.response.data.errMessage,
+        res
+      );
+    } else {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.internalServerError,
+        error.message,
+        res
+      );
+    }
+  }
+};
