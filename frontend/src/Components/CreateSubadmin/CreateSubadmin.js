@@ -1,16 +1,17 @@
 import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-
 import "./CreateSubadmin.css";
 import { ReusableInput } from "../ReusableInput/ReusableInput";
+import { createSubAdmin } from "../../Utils/apiService";
+
 
 const CreateSubadmin = () => {
   const formik = useFormik({
     initialValues: {
       userName: "",
       password: "",
-      permissions: "",
+      permissions: "win-Lottery-Result",
     },
     validationSchema: Yup.object({
       userName: Yup.string()
@@ -25,17 +26,29 @@ const CreateSubadmin = () => {
       const requestBody = {
         userName: values.userName,
         password: values.password,
-        permissions: values.permissions,
+        permissions: `${values.permissions},win-Lottery-Result`,
       };
-      
-      console.log("Submitting:", requestBody);
-      // API call can be implemented here
+
+      createSubAdmin(requestBody);
     },
   });
 
   return (
-    <div className="createsubadmin-container">
-      <h2 className="createsubadmin-title">Create Subadmin</h2>
+    <div
+    className="d-flex align-items-center justify-content-center"
+    style={{ background: "#f0f0f0", minHeight: "75vh" }}
+  >
+    <div
+      className="container mt-3 p-4 shadow rounded"
+      style={{
+        background: "#fff",
+        border: "2px solid black",
+        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
+        maxWidth: "900px",
+        position: "relative",
+      }}
+    >
+      <h2 className="createsubadmin-title text-uppercase">Create Subadmin</h2>
       <form onSubmit={formik.handleSubmit} className="createsubadmin-form">
         <ReusableInput
           name="userName"
@@ -66,6 +79,7 @@ const CreateSubadmin = () => {
           Submit
         </button>
       </form>
+    </div>
     </div>
   );
 };

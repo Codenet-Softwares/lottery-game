@@ -56,7 +56,16 @@ const NavTop = () => {
     },
     { to: "/trash", icon: "fas fa-trash-alt", label: "Trash" },
     { to: "/reset-password", icon: "fas fa-key", label: "Reset Password" },
-    { to: "/create-subadmin", icon: "fas fa-user-shield", label: "Create Sub-Admin" } 
+    {
+      to: "/create-subadmin",
+      icon: "fas fa-user-shield",
+      label: "Create Sub-Admin",
+    },
+    {
+      to: "/prize-validation",
+      icon: " fas fa-clipboard-check",
+      label: "Prize Approval",
+    },
   ];
 
   const handleUpdate = ({ getItemById }) => {

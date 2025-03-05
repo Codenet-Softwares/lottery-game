@@ -1,0 +1,34 @@
+[
+  {
+    "marketId": 1,
+    "subAdmins": [{ "subAdmin1": "John Doe", "subAdmin2": "Jane Smith" }]
+  },
+  {
+    "marketId": 2,
+    "subAdmins": [{ "subAdmin1": "Alice Johnson", "subAdmin2": "Robert White" }]
+  },
+  {
+    "marketId": 3,
+    "subAdmins": [
+      { "subAdmin1": "Olivia Martinez", "subAdmin2": "Liam Taylor" }
+    ]
+  },
+  {
+    "marketId": 4,
+    "subAdmins": [{ "subAdmin1": "Emma Thomas", "subAdmin2": "James Brown" }]
+  },
+  {
+    "marketId": 5,
+    "subAdmins": [{ "subAdmin1": "Benjamin Young", "subAdmin2": "Mia King" }]
+  },
+  {
+    "marketId": 6,
+    "subAdmins": [{ "subAdmin1": "Ethan Scott", "subAdmin2": "Ava Mitchell" }]
+  },
+  {
+    "marketId": 7,
+    "subAdmins": [
+      { "subAdmin1": "Daniel Rodriguez", "subAdmin2": "Harper Lewis" }
+    ]
+  }
+]

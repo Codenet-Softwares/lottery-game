@@ -521,3 +521,14 @@ export async function UpdateMarketDetails(body = {},marketId, isToast = true) {
     throw error;
   }
 }
+
+
+export async function createSubAdmin(body, isToast = true) {
+  try {
+    const callParams = await getAuthCallParams(strings.POST, body, isToast);
+    const response = await makeCall(urls.subAdminCreate, callParams, isToast);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
