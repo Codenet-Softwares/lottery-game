@@ -12,6 +12,8 @@ import UserRange from '../models/user.model.js';
 import PurchaseLottery from '../models/purchase.model.js';
 import LotteryResult from '../models/resultModel.js';
 import bcrypt from 'bcrypt';
+import { string } from '../constructor/string.js';
+import WinResultRequest from '../models/winResultRequestModel.js';
 dotenv.config();
 
 export const createAdmin = async (req, res) => {
@@ -59,6 +61,7 @@ export const login = async (req, res) => {
       adminId: existingUser.adminId,
       userName: existingUser.userName,
       role: existingUser.role,
+      permissions: existingUser.permissions,
     };
     const accessToken = jwt.sign(userResponse, process.env.JWT_SECRET_KEY, {
       expiresIn: '1d',
@@ -862,5 +865,139 @@ export const resetPassword = async (req, res) => {
     );
   }
 };
+
+
+export const createSubAdmin = async (req, res) => {
+  try {
+    const { userName, password, permissions } = req.body;
+
+    if(!permissions)
+    {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Permission is required",
+        res
+      );
+    }
+
+    const existingAdmin = await Admin.findOne({ where: { userName } });
+    if (existingAdmin) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Username already exist!",
+        res
+      );
+    }
+
+    const newSubAdmin = await Admin.create({
+      adminId: uuidv4(),
+      userName,
+      password,
+      role :  string.SubAdmin,
+      permissions: permissions,
+    });
+
+    return apiResponseSuccess(
+      newSubAdmin,
+      true,
+      statusCode.create,
+      "Subadmin create successfully!",
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+export const getMatchData = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, search, type } = req.query;
+
+    const whereCondition = { isApproved: false };
+    if (type) whereCondition.type = type;
+
+    const existingResults = await WinResultRequest.findAll({
+      where: whereCondition,
+      order: [["createdAt", "ASC"]],
+    });
+
+    if (!existingResults || existingResults.length === 0) {
+      return apiResponseErr(null, false, statusCode.notFound, "No Data found!", res);
+    }
+
+    const groupedResults = { Matched: [], Unmatched: [] };
+
+    existingResults.forEach((result) => {
+      const category = result.type === "Matched" ? "Matched" : "Unmatched";
+
+      let marketEntry = groupedResults[category].find(
+        (entry) => entry.marketId === result.marketId
+      );
+
+      if (!marketEntry) {
+        marketEntry = {
+          marketName: result.marketName,
+          marketId: result.marketId,
+          type: result.type,
+          isApproved: result.isApproved,
+          createdAt: result.createdAt,
+          updatedAt: result.updatedAt,
+          MatchData: [],
+        };
+        groupedResults[category].push(marketEntry);
+      }
+
+      let adminEntry = marketEntry.MatchData.find(
+        (entry) => entry.adminId === result.adminId
+      );
+
+      if (!adminEntry) {
+        adminEntry = {
+          adminId: result.adminId,
+          declearBy: result.declearBy,
+          ticketNumber: {},
+        };
+        marketEntry.MatchData.push(adminEntry);
+      }
+
+      if (!adminEntry.ticketNumber[result.prizeCategory]) {
+        adminEntry.ticketNumber[result.prizeCategory] = [];
+      }
+
+      adminEntry.ticketNumber[result.prizeCategory] = [
+        ...new Set([...adminEntry.ticketNumber[result.prizeCategory], ...result.ticketNumber]),
+      ];
+    });
+
+
+    return apiResponseSuccess(
+      groupedResults,
+      true,
+      statusCode.success,
+      "Data fetched successfully!",
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+
 
 

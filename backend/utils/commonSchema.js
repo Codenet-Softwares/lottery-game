@@ -516,8 +516,15 @@ export const validateResetPassword = [
     .withMessage('New password must be at least 8 characters long')
 ];
 
+
 export const validateDeleteBetAterWin = [
   body('purchaseId')
     .notEmpty().withMessage('Purchase ID is required')
-    .isUUID().withMessage('Purchase ID must be a valid UUID'),
+    .isUUID().withMessage('Purchase ID must be a valid UUID')
+  ];
+
+export const createSubAdminSchema = [
+  body('userName').trim().notEmpty().withMessage('User Name is required'),
+  body('password').trim().notEmpty().withMessage('Password is required'),
+
 ];
