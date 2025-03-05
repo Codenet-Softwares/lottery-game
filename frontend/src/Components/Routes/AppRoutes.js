@@ -19,6 +19,8 @@ import Inactive from "../Pages/Inactive";
 import LiveMarkets from "../LiveMarkets/LiveMarkets";
 import Trash from "../Trash/Trash";
 import ResetPassword from "../ResetPassword/ResetPassword";
+import BetAfterWin from "../SettleUnsettle/BetAfterWin";
+import BetSettleUnsettle from "../SettleUnsettle/BetSettleUnsettle";
 
 
 const AppRoutes = () => {
@@ -70,6 +72,9 @@ const AppRoutes = () => {
             <Route path="/Live-markets" element={<LiveMarkets />} />
             <Route path="/trash" element={<Trash />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/settle-unsettle" element={<BetAfterWin />} />
+            <Route path="/live-stats" element={<BetSettleUnsettle />} />
+
           
           </Route>
           {/* not found */}

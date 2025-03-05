@@ -2,6 +2,7 @@ import { string } from '../constructor/string.js';
 import {
   adminPurchaseHistory,
   adminSearchTickets,
+  afteWinMarkets,
   createAdmin,
   dateWiseMarkets,
   getAllMarkets,
@@ -17,7 +18,7 @@ import {
   updateMarketStatus,
 } from '../controllers/admin.controller.js';
 import { authorize } from '../middlewares/auth.js';
-import { validateAdminLogin, validateAdminPurchaseHistory, validateSearchTickets, validateCreateAdmin, validateDateQuery, validateGetResult, validateMarketId, validateLiveLottery, validateLiveMarkets, validateResetPassword, } from '../utils/commonSchema.js';
+import { validateAdminLogin, validateAdminPurchaseHistory, validateSearchTickets, validateCreateAdmin, validateDateQuery, validateGetResult, validateMarketId, validateLiveLottery, validateLiveMarkets, validateResetPassword, validateAfterWinMarkets, } from '../utils/commonSchema.js';
 import customErrorHandler from '../utils/customErrorHandler.js';
 import { apiResponseErr, apiResponseSuccess } from '../utils/response.js';
 import { statusCode } from '../utils/statusCodes.js';
@@ -73,5 +74,8 @@ export const adminRoutes = (app) => {
   app.get('/api/live-lotteries/:marketId', validateLiveLottery, customErrorHandler, authorize([string.Admin]), liveLotteries);
 
   app.post('/api/admin/reset-password',validateResetPassword,customErrorHandler,authorize([string.Admin]), resetPassword);
+
+  app.get('/api/afterWin-markets',validateAfterWinMarkets, customErrorHandler, authorize([string.Admin]), afteWinMarkets)
+
 
 };
