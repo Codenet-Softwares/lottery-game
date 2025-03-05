@@ -864,3 +864,51 @@ export const resetPassword = async (req, res) => {
 };
 
 
+export const afteWinMarkets = async (req, res) => {
+  try {
+    let { page = 1, limit = 10, search = '' } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+    const offset = (page - 1) * limit;
+
+    let whereCondition = { isWin: true };
+
+    if (search) {
+      whereCondition.marketName = { [Op.like]: `%${search}%` }; 
+    }
+
+    const { count, rows: marketName } = await TicketRange.findAndCountAll({
+      where: whereCondition,
+      attributes: ["marketId", "marketName", "gameName"],
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']], 
+    });
+
+    const paginatedData = {
+      page,
+      limit,
+      totalItems: count,
+      totalPages: Math.ceil(count / limit),
+
+    }
+    return apiResponsePagination(
+      marketName,
+      true,
+      statusCode.success,
+      "Market name fetch Successfully",
+      paginatedData ,
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+

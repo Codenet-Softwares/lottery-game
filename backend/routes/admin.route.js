@@ -2,6 +2,7 @@ import { string } from '../constructor/string.js';
 import {
   adminPurchaseHistory,
   adminSearchTickets,
+  afteWinMarkets,
   createAdmin,
   dateWiseMarkets,
   getAllMarkets,
@@ -73,5 +74,8 @@ export const adminRoutes = (app) => {
   app.get('/api/live-lotteries/:marketId', validateLiveLottery, customErrorHandler, authorize([string.Admin]), liveLotteries);
 
   app.post('/api/admin/reset-password',validateResetPassword,customErrorHandler,authorize([string.Admin]), resetPassword);
+
+  app.get('/api/afterWin-markets', afteWinMarkets)
+
 
 };
