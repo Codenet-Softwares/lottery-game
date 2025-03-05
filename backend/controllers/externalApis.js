@@ -66,7 +66,6 @@ export const getLotteryBetHistory = async (req, res) => {
 
     const queryConditions = {
       isVoid: false,
-      resultAnnouncement:true,
       createdAt: {
         [Op.between]: [new Date(startDate), new Date(endDate)],
       },
@@ -74,6 +73,25 @@ export const getLotteryBetHistory = async (req, res) => {
 
     if (type === "void") {
       queryConditions.isVoid = true;
+    }
+    
+   else  if (type === "settle")
+    {
+      queryConditions.resultAnnouncement = true;
+    }
+
+   else  if(type === "unsettle")
+    {
+      queryConditions.resultAnnouncement = false;
+    }
+    else{
+      return apiResponseSuccess(
+        [],
+        true,
+        statusCode.success,
+        "No bet history found",
+        res
+      );
     }
 
     if (userId) queryConditions.userId = userId;

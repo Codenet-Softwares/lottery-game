@@ -429,9 +429,12 @@ function validateTicketNumber(ticketNumber, prizeCategory) {
     const ticketRegex = /^\d{4}$/;
     return ticketRegex.test(trimmedNumber);
   } else if (prizeCategory === 'First Prize') {
-    // First prize: allows both 38A00001 and 38 A 00001
-    const ticketRegex = /^\d{2} ?[A-Z] ?\d{5}$/;
-  return ticketRegex.test(trimmedNumber);
+  
+
+
+      // First prize: allows both 38A00001 and 38 A 00001
+      const ticketRegex = /^\d{2} ?[A-Z] ?\d{5}$/;
+      return ticketRegex.test(trimmedNumber);
 
   }
   return false;
@@ -511,4 +514,10 @@ export const validateResetPassword = [
     .withMessage('New password is required')
     .isLength({ min: 8 })
     .withMessage('New password must be at least 8 characters long')
+];
+
+export const validateDeleteBetAterWin = [
+  body('purchaseId')
+    .notEmpty().withMessage('Purchase ID is required')
+    .isUUID().withMessage('Purchase ID must be a valid UUID'),
 ];

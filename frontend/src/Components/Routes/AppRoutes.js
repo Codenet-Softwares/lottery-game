@@ -19,6 +19,7 @@ import Inactive from "../Pages/Inactive";
 import LiveMarkets from "../LiveMarkets/LiveMarkets";
 import Trash from "../Trash/Trash";
 import ResetPassword from "../ResetPassword/ResetPassword";
+import CreateSubadmin from "../CreateSubadmin/CreateSubadmin";
 
 const AppRoutes = () => {
   return (
@@ -69,6 +70,7 @@ const AppRoutes = () => {
             <Route path="/Live-markets" element={<LiveMarkets />} />
             <Route path="/trash" element={<Trash />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/create-subadmin" element={<CreateSubadmin />} />
           </Route>
           {/* not found */}
           <Route path="*" element={<NotFound />} />

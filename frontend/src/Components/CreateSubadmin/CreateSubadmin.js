@@ -1,8 +1,9 @@
 import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { ReusableInput } from "./ReusableInput";
+
 import "./CreateSubadmin.css";
+import { ReusableInput } from "../ReusableInput/ReusableInput";
 
 const CreateSubadmin = () => {
   const formik = useFormik({

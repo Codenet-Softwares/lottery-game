@@ -12,6 +12,7 @@ import jwt from "jsonwebtoken";
 import LotteryTrash from "../models/trash.model.js";
 import { Sequelize } from "sequelize";
 import { TicketService } from "../constructor/ticketService.js";
+import LotteryResult from "../models/resultModel.js";
 
 export const deleteliveBet = async (req, res) => {
   const transaction = await sequelize.transaction();
@@ -20,7 +21,7 @@ export const deleteliveBet = async (req, res) => {
       { role: req.user.role },
       process.env.JWT_SECRET_KEY,
       { expiresIn: "1h" }
-    );
+    );          
     const headers = {
       Authorization: `Bearer ${token}`,
     };
@@ -285,5 +286,111 @@ export const deleteTrash = async (req, res) => {
     );
   }
 }
+
+export const deleteBetAfterWin = async (req, res) => {
+  const transaction = await sequelize.transaction();
+  try {
+    const token = jwt.sign(
+      { role: req.user.role },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "1h" }
+    );
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    const { purchaseId } = req.body;
+    const ticketPurchaseId = await PurchaseLottery.findOne({
+      where: { purchaseId },
+    });
+
+    if (!ticketPurchaseId) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "PurchaseId Not Found",
+        res
+      );
+    }
+
+    const fullTicketNumber = `${ticketPurchaseId.group} ${ticketPurchaseId.series} ${ticketPurchaseId.number}`;
+    const lastFiveDigits = ticketPurchaseId.number.slice(-5);
+    const lastFourDigits = ticketPurchaseId.number.slice(-4);
+
+    const lotteryResults = await LotteryResult.findAll({
+      where: { marketId: ticketPurchaseId.marketId },
+    });
+
+    const winningTicket = lotteryResults.find((result) => {
+      if (!Array.isArray(result.ticketNumber)) return false;
+
+      if (result.prizeCategory === "First Prize") {
+        return result.ticketNumber.includes(fullTicketNumber);
+      } else if (result.prizeCategory === "Second Prize") {
+        return result.ticketNumber.includes(lastFiveDigits);
+      } else {
+        return result.ticketNumber.includes(lastFourDigits);
+      }
+    });
+
+    if (!winningTicket) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "No winning ticket found",
+        res
+      );
+    }
+
+    const baseURL = process.env.COLOR_GAME_URL;
+
+    const response = await axios.post(
+      `${baseURL}/api/external/delete-bet-afterWin-lottery`,
+      {
+        marketId: ticketPurchaseId.marketId,
+        userId: ticketPurchaseId.userId,
+        sem: ticketPurchaseId.sem,
+        prizeAmount: winningTicket.prizeAmount,
+        prizeCategory: winningTicket.prizeCategory,
+        complementaryPrize: winningTicket.complementaryPrize,
+      },
+      { headers }
+    );
+
+    await PurchaseLottery.destroy({
+      where: { purchaseId },
+    });
+
+    await transaction.commit();
+
+    return apiResponseSuccess(
+      ticketPurchaseId,
+      true,
+      statusCode.success,
+      "Balances updated successfully and Bet Deleted",
+      res
+    );
+  } catch (error) {
+    await transaction.rollback();
+    if (error.response) {
+      return apiResponseErr(
+        null,
+        false,
+        error.response.status,
+        error.response.data.message || error.response.data.errMessage,
+        res
+      );
+    } else {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.internalServerError,
+        error.message,
+        res
+      );
+    }
+  }
+};
 
 
