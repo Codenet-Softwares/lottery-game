@@ -530,3 +530,19 @@ export const validateAfterWinMarkets = [
     .isInt({ min: 1 })
     .withMessage("Limit must be a positive integer."),
 ];
+
+export const validateAfterWinLottery = [
+  param('marketId')
+    .isUUID()
+    .withMessage('Market ID is not valid'),
+  query("page")
+    .optional()
+    .toInt()
+    .isInt({ min: 1 })
+    .withMessage("Page number must be a positive integer."),
+  query("limit")
+    .optional()
+    .toInt()
+    .isInt({ min: 1 })
+    .withMessage("Limit must be a positive integer."),
+];
