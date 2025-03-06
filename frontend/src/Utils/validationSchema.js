@@ -281,3 +281,16 @@ export const resetPasswordSchema = Yup.object().shape({
     .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
     .required("Confirm password is required"),
 });
+
+
+export const createSubadminSchema = Yup.object({
+  userName: Yup.string()
+    .required("Username is required")
+    .min(4, "Must be at least 4 characters"),
+  password: Yup.string()
+    .required("Password is required")
+    .min(8, "Password must be at least 8 characters"),
+  permissions: Yup.array()
+    .min(1, "At least one permission is required")
+    .required("Permissions are required"),
+});

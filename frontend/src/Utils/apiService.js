@@ -1,15 +1,32 @@
+import { toast } from "react-toastify";
 import strings from "./constant/stringConstant";
 import { getAuthCallParams, getNoAuthCallParams, makeCall } from "./service";
 import urls from "./UrlConstant";
 
 // Admin login
-export async function adminLogin(body, isToast = true) {
+export async function adminLogin(body, isToast = true, expectedRole = "admin") {
   try {
     const callParams = getNoAuthCallParams(strings.POST, body);
-    const response = await makeCall(urls.login, callParams, isToast);
+    const response = await makeCall(urls.login, callParams, false); // Prevent default toast inside makeCall
+
+    if (response?.success) {
+      const userRole = response?.data?.role;
+
+      // If the logged-in role does not match the expected role, return an error response
+      if (userRole !== expectedRole) {
+        toast.error("Unauthorized login attempt"); // Show only error
+        return { success: false };
+      }
+
+      // Only show success toast if login is truly authorized
+      if (isToast) {
+        toast.success("Login successfully!");
+      }
+    }
+
     return response;
   } catch (error) {
-    throw error;
+    return { success: false, errMessage: "Network error, please try again" };
   }
 }
 
@@ -490,7 +507,6 @@ export async function RevokeMarketsDelete(body = {}, isToast = false) {
   }
 }
 
-
 export async function ResetAdminPassword(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.POST, body, isToast);
@@ -506,8 +522,7 @@ export async function ResetAdminPassword(body = {}, isToast = false) {
   }
 }
 
-
-export async function UpdateMarketDetails(body = {},marketId, isToast = true) {
+export async function UpdateMarketDetails(body = {}, marketId, isToast = true) {
   try {
     const callParams = await getAuthCallParams(strings.PUT, body, isToast);
     const response = await makeCall(
@@ -521,7 +536,6 @@ export async function UpdateMarketDetails(body = {},marketId, isToast = true) {
     throw error;
   }
 }
-
 
 export async function createSubAdmin(body, isToast = true) {
   try {
