@@ -864,3 +864,138 @@ export const resetPassword = async (req, res) => {
 };
 
 
+export const afteWinMarkets = async (req, res) => {
+  try {
+    let { page = 1, limit = 10, search = '' } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+    const offset = (page - 1) * limit;
+
+    let whereCondition = { isWin: true , isVoid: false};
+
+    if (search) {
+      whereCondition.marketName = { [Op.like]: `%${search}%` }; 
+    }
+
+    const { count, rows: marketName } = await TicketRange.findAndCountAll({
+      where: whereCondition,
+      attributes: ["marketId", "marketName", "gameName"],
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']], 
+    });
+
+    const paginatedData = {
+      page,
+      limit,
+      totalItems: count,
+      totalPages: Math.ceil(count / limit),
+
+    }
+    return apiResponsePagination(
+      marketName,
+      true,
+      statusCode.success,
+      "Market name fetch Successfully",
+      paginatedData ,
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+export const afterWinLotteries = async (req, res) => {
+  try {
+    const { marketId } = req.params;
+    const { page = 1, limit = 10, search= "" } = req.query;
+
+    const offset = (page - 1) * limit;
+
+    const whereConditions = {
+      marketId,
+      resultAnnouncement: true,
+    };
+
+    if (search) {
+      whereConditions.userName = { [Op.like]: `%${search}%` };
+    }
+
+    const  purchaseLotteries  = await PurchaseLottery.findAll({
+      where: whereConditions,
+    });
+    
+    if (!purchaseLotteries.length) {
+      return apiResponseSuccess([], true, statusCode.success, "No bet history found", res);
+    }
+
+    const userData = {};
+    for (const purchase of purchaseLotteries) {
+      const {
+        userName,
+        lotteryPrice,
+        group,
+        series,
+        number,
+        sem,
+        marketName,
+        marketId,
+        purchaseId,
+      } = purchase;
+
+      if (!userData[userName]) {
+        userData[userName] = {
+          userName,
+          marketName,
+          marketId,
+          amount: 0,
+          details: [],
+        };
+      }
+
+      userData[userName].amount += lotteryPrice;
+
+      const ticketService = new TicketService();
+      const tickets = await ticketService.list(group, series, number, sem, marketId);
+
+      userData[userName].details.push({
+        sem,
+        tickets,
+        purchaseId,
+        lotteryPrice,
+      });
+    }
+
+    const userDataArray = Object.values(userData);
+
+    const totalItems = userDataArray.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const paginatedData = userDataArray.slice(offset, page * limit);
+
+    const pagination = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages,
+      totalItems,
+    };
+
+    return apiResponsePagination(
+      paginatedData,
+      true,
+      statusCode.success,
+      "success",
+      pagination,
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
+  }
+};
+
+
