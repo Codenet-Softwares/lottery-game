@@ -110,32 +110,46 @@ const Result = () => {
 
   // Handle market selection
   const handleMarketSelect = (market) => {
-    navigate(`/results/${market.marketId}`); // Update URL when selecting a market
+    navigate(`/results/${market.marketId}`); 
   };
   const handleBetVoidMarket = async (marketId) => {
+    if (!marketId) {
+        console.error("Market ID is missing!");
+        toast.error("Market ID is required!");
+        return;
+    }
+
+    console.log("Void button clicked for marketId:", marketId);
     showLoader();
 
-    const requestBody = { marketId };
-    const response = await voidBetMarket(requestBody);
+    try {
+        const response = await voidBetMarket({ marketId });
+        console.log("API Response:", response); 
 
-    if (response.success) {
-      toast.success("Market voided successfully");
+        if (response.success) {
+            toast.success("Market voided successfully");
 
-      // Remove the voided market from the marketTimes state
-      setMarketTimes((prevMarketTimes) =>
-        prevMarketTimes.filter((market) => market.marketId !== marketId)
-      );
+            setMarketTimes((prevMarketTimes) =>
+                prevMarketTimes.filter((market) => market.marketId !== marketId)
+            );
 
-      if (selectedMarket?.marketId === marketId) {
-        setSelectedMarket(null);
-        setShowStats(false);
-      }
-    } else {
-      toast.error(response.message || "Failed to void market");
+            if (selectedMarket?.marketId === marketId) {
+                setSelectedMarket(null);
+                setShowStats(false);
+            }
+        } else {
+            console.error("Void market failed:", response.errMessage);
+            toast.error(response.errMessage || "Failed to void market");
+        }
+    } catch (error) {
+        console.error("Error in voidBetMarket:", error);
+        toast.error("Something went wrong!");
     }
 
     hideLoader();
-  };
+};
+
+
   return (
     <div
       style={{
@@ -375,15 +389,8 @@ const Result = () => {
                 </div>
               ))}
               <div className="d-flex justify-content-center align-items-center mt-4">
-                <button
-                  className="btn btn-danger px-4"
-                  onClick={() =>
-                    selectedMarket &&
-                    handleBetVoidMarket(selectedMarket.marketId)
-                  }
-                >
-                  Void
-                </button>
+              <button onClick={() => handleBetVoidMarket(marketId)}>Void</button>
+
               </div>
             </div>
           )}
