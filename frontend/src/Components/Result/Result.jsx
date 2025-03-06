@@ -389,7 +389,9 @@ const Result = () => {
                 </div>
               ))}
               <div className="d-flex justify-content-center align-items-center mt-4">
-              <button onClick={() => handleBetVoidMarket(marketId)}>Void</button>
+                <div className="">
+              <button onClick={() => handleBetVoidMarket(marketId)} className="btn btn-danger border-0 px-4">Void</button>
+                  </div>
 
               </div>
             </div>

@@ -62,18 +62,25 @@ const BetAfterWin = () => {
   // };
 
   return (
-    <div className="text-center bet_page">
-      {/* <h1 className="fw-bold heading py-3 text-uppercase">Bet After Win</h1> */}
-      <div className="container">
-        <div className="search-container-search-live">
-          <input
-            type="text"
-            className="form-control search-input-live"
-            placeholder="Search by market name"
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
-        </div>
+    <div className="text-center bet_page rounded-4" style={{background:"#333333"}}>
+      <div className="container-fluid p-3 px-5">
+        {!selectedMarketId && (
+          <>
+            <h1 className="fw-bold heading py-3 text-uppercase text-light">
+              Bet After Win
+            </h1>
+            <div className="search-container-search-live d-flex justify-content-center align-items-center">
+              <input
+                type="text"
+                className="form-control search-input-live"
+                placeholder="Search by market name"
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
+          </>
+        )}
+
         {selectedMarketId ? (
           <div>
             <BetSettleUnsettle
@@ -111,7 +118,7 @@ const BetAfterWin = () => {
                     className="live-stats-button"
                     onClick={() => handleLiveStatsClick(market.marketId)}
                   >
-                    Live Stats
+                    Win Stats
                   </button>
                 </li>
               ))}

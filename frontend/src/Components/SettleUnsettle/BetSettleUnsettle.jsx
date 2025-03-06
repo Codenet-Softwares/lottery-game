@@ -24,6 +24,7 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
         marketId,
         page: pagination.page,
         limit: pagination.limit,
+        search:searchTerm,
       });
 
       console.log("API Response===========================", response);
@@ -43,7 +44,12 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
       console.error("Error fetching market stats:", error);
     }
   };
-
+  useEffect(() => {
+    if (marketId) {
+      fetchLiveBetMarketStats();
+    }
+  }, [marketId, pagination.page, pagination.limit, searchTerm]);
+  
   const handleShowTickets = (details) => {
     const ticketsBody = details.map((detail) => (
       <div key={detail.sem} className="mb-4 ticket-section">
@@ -129,12 +135,12 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
     pagination.totalItems
   );
   return (
-    <div className="container bg-dark mt-4 rounded" style={{ overflow: "hidden" }}>
+    <div className="container mt-4 rounded" style={{ overflow: "hidden" }}>
       {betStats ? (
         <div className="container " style={{ overflow: "hidden" }}>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div
-              className="d-flex justify-content-start"
+              className="d-flex justify-content-start mt-5 px-3"
               style={{ position: "absolute", left: "40px" }}
             >
               {backButton}
@@ -151,7 +157,7 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
                 marginRight: "auto",
               }}
             >
-              Market Stats for {betStats[0]?.marketName}
+              Market Stats For {betStats[0]?.marketName}
             </h3>
           </div>
 
