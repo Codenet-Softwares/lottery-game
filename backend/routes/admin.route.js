@@ -15,8 +15,10 @@ import {
   liveLotteries,
   liveMarkets,
   login,
+  marketWiseSubadmin,
   resetPassword,
   updateMarketStatus,
+  winResultMarket,
 } from '../controllers/admin.controller.js';
 import { authorize } from '../middlewares/auth.js';
 import { validateAdminLogin, validateAdminPurchaseHistory, validateSearchTickets, validateCreateAdmin, validateDateQuery, validateGetResult, validateMarketId, validateLiveLottery, validateLiveMarkets, validateResetPassword, createSubAdminSchema, } from '../utils/commonSchema.js';
@@ -78,6 +80,10 @@ export const adminRoutes = (app) => {
 
   app.post('/api/admin/create-subAdmin', createSubAdminSchema, customErrorHandler,  authorize([string.Admin]), createSubAdmin);
 
-  app.get('/api/subAdmin/matching-data', authorize([string.Admin]), getMatchData);
+  app.get('/api/subAdmin/matching-data/:marketId', authorize([string.Admin]), getMatchData);
+
+  app.get('/api/subadmin/win-request-market', authorize([string.Admin]), winResultMarket)
+
+  app.get('/api/market-wise-subadmin/:marketId', authorize([string.Admin]), marketWiseSubadmin)
 
 };

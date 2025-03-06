@@ -921,9 +921,11 @@ export const createSubAdmin = async (req, res) => {
 
 export const getMatchData = async (req, res) => {
   try {
+
+    const { marketId } = req.params;
     const { page = 1, limit = 10, search, type } = req.query;
 
-    const whereCondition = { isApproved: false };
+    const whereCondition = { marketId, isApproved: false };
     if (type) whereCondition.type = type;
 
     const existingResults = await WinResultRequest.findAll({
@@ -997,6 +999,162 @@ export const getMatchData = async (req, res) => {
     );
   }
 };
+
+
+export const winResultMarket = async(req, res) => {
+  try {
+    const { page = 1, limit = 10, search = "" } = req.query;
+    const offset = (page - 1) * limit;
+
+    const whereClause = {
+      isApproved: false,
+      isReject: false,
+    };
+
+    if (search) {
+      whereClause.marketName = { [Op.like]: `%${search}%` };
+    }
+
+    const { count, rows } = await WinResultRequest.findAndCountAll({
+      attributes: ["marketId", "marketName"],
+      where : whereClause,
+      group: ["marketId", "marketId"],
+      order: [["createdAt", "DESC"]],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      raw: true,
+    })
+
+ 
+    if(!rows || rows.length == 0)
+      {
+        return apiResponseSuccess(
+          [],
+          true,
+          statusCode.success,
+          "Data Not Found!",
+          res
+        );
+      }
+
+
+    const totalItems = count.length;
+    const totalPages = Math.ceil(totalItems / limit);
+
+    const pagination = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalItems,
+      totalPages,
+    }
+
+    return apiResponsePagination(
+      rows,
+      true,
+      statusCode.create,
+      "Data fetch successfully!",
+      pagination,
+      res
+    );
+
+
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+
+export const marketWiseSubadmin = async (req, res) => {
+  try {
+    const { marketId } = req.params;
+    const { page = 1, limit = 10, search = "" } = req.query;
+
+    const offset = (page - 1) * limit;
+
+    const whereCondition = {
+      marketId,
+      isApproved: false,
+      isReject: false,
+    };
+
+    if (search) {
+      whereCondition[Op.or] = [
+        { adminId: { [Op.like]: `%${search}%` } },
+        { declearBy: { [Op.like]: `%${search}%` } },
+      ];
+    }
+
+    const { count, rows: existingAdmin } = await WinResultRequest.findAndCountAll({
+      attributes: ["marketId","marketName","adminId", "declearBy"],
+      where: whereCondition,
+      group: ["marketId","marketName","adminId", "declearBy"],
+      order: [["createdAt", "DESC"]],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+    });
+
+    if (!existingAdmin || existingAdmin.length === 0) {
+      return apiResponseSuccess(
+        [],
+        true,
+        statusCode.create,
+        "Data not found!",
+        res
+      );
+    }
+
+    const totalItems = count.length;
+    const totalPages = Math.ceil(totalItems / limit);
+
+    const marketData = existingAdmin.reduce((acc, item) => {
+      let marketIndex = acc.findIndex(market => market.marketId === item.marketId);
+
+      if (marketIndex === -1) {
+        acc.push({
+          marketId: item.marketId,
+          marketName: item.marketName,
+          subAdmins: [{ adminId: item.adminId, declearBy: item.declearBy }],
+        });
+      } else {
+        acc[marketIndex].subAdmins.push({ adminId: item.adminId, declearBy: item.declearBy });
+      }
+
+      return acc;
+    }, []);
+    
+    const pagination = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalItems,
+      totalPages,
+    };
+
+    return apiResponsePagination(
+      marketData,
+      true,
+      statusCode.success,
+      "Data fetch successfully!",
+      pagination,
+      res
+    );
+
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
 
 
 
