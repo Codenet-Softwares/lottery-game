@@ -9,6 +9,7 @@ import { statusCode } from "../utils/statusCodes.js";
 import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
 import axios from "axios";
+import LotteryResult from "../models/resultModel.js";
 
 export const voidMarket = async (req, res) => {
   try {
@@ -191,6 +192,10 @@ export const voidAfterWinMarket = async (req, res) => {
     );
 
     await TicketRange.update({ isActive: false }, { where: { marketId } });
+
+    await LotteryResult.destroy({
+      where: { marketId },
+    });
 
     return apiResponseSuccess(
       usersByMarket,
