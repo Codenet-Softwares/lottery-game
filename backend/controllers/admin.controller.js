@@ -871,7 +871,7 @@ export const afteWinMarkets = async (req, res) => {
     limit = parseInt(limit);
     const offset = (page - 1) * limit;
 
-    let whereCondition = { isWin: true };
+    let whereCondition = { isWin: true , isVoid: false};
 
     if (search) {
       whereCondition.marketName = { [Op.like]: `%${search}%` }; 
