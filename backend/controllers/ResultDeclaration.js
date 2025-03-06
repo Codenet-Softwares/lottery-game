@@ -1,4 +1,4 @@
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import PurchaseLottery from '../models/purchase.model.js';
 import LotteryResult from '../models/resultModel.js';
 import { apiResponseErr, apiResponseSuccess } from '../utils/response.js';
@@ -605,6 +605,27 @@ export const subadminResultRequest = async (req, res) => {
     const userName = req.user?.userName;
     const adminId = req.user?.adminId;
     const market = await TicketRange.findOne({ where: { marketId } });
+
+
+    const existingMarket = await WinResultRequest.findAll({
+      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("adminId")), "adminId"]],
+      where: { 
+        marketId, 
+        isApproved: false, 
+        isReject: false 
+      },
+      raw: true,
+    });
+
+    if (existingMarket.length >= 2) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Maximum of two subadmin entries allowed for this market!",
+        res
+      );
+    }
 
     const marketName = market.marketName;
 

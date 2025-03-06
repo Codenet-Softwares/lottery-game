@@ -923,7 +923,7 @@ export const getMatchData = async (req, res) => {
   try {
 
     const { marketId } = req.params;
-    const { page = 1, limit = 10, search, type } = req.query;
+    const { type } = req.query;
 
     const whereCondition = { marketId, isApproved: false };
     if (type) whereCondition.type = type;
