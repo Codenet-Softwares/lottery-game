@@ -6,17 +6,33 @@ import Admin from '../models/adminModel.js';
 
 // const tokenBlacklist = new Set();
 
-export const authorize = (roles) => {
+export const authorize = (roles, permissions) => {
   return async (req, res, next) => {
     try {
+
       const authToken = req?.headers?.authorization;
       if (!authToken) {
-        return apiResponseErr(null, false, statusCode.unauthorize, 'Unauthorize', res);
+        return apiResponseErr(
+          null,
+          false,
+          statusCode.unauthorize,
+          "Unauthorize",
+          res
+        );
       }
 
-      const tokenParts = authToken.split(' ');
-      if (tokenParts.length !== 2 || !(tokenParts[0] === 'Bearer' && tokenParts[1])) {
-        return apiResponseErr(null, false, statusCode.unauthorize, 'Invalid token format', res);
+      const tokenParts = authToken.split(" ");
+      if (
+        tokenParts.length !== 2 ||
+        !(tokenParts[0] === "Bearer" && tokenParts[1])
+      ) {
+        return apiResponseErr(
+          null,
+          false,
+          statusCode.unauthorize,
+          "Invalid token format",
+          res
+        );
       }
 
       // const token = tokenParts[1];
@@ -35,7 +51,13 @@ export const authorize = (roles) => {
       try {
         user = jwt.verify(tokenParts[1], process.env.JWT_SECRET_KEY);
       } catch (error) {
-        return apiResponseErr(null, false, statusCode.unauthorize, 'Unauthorize', res);
+        return apiResponseErr(
+          null,
+          false,
+          statusCode.unauthorize,
+          "Unauthorize",
+          res
+        );
       }
 
       if (!user) {
@@ -43,75 +65,70 @@ export const authorize = (roles) => {
           null,
           false,
           statusCode.unauthorize,
-          'Unauthorized access: No user decoded from token',
-          res,
+          "Unauthorized access: No user decoded from token",
+          res
         );
       }
 
       let existingUser;
 
-      if (roles.includes(string.Admin)) {
+      if (roles.includes(string.Admin) || roles.includes(string.SubAdmin)) {
         existingUser = await Admin.findOne({
-          where: {
-            adminId: user.adminId,
-          },
+          where: { adminId: user.adminId },
         });
       }
 
-      if (roles.includes(string.SubAdmin)) {
-        existingUser = await Admin.findOne({
-          where: {
-            adminId: user.adminId,
-          },
-        });
-      }
-
-      // if (roles.includes(string.Maker)) {
-      //   existingUser = await User.findOne({
-      //     where: {
-      //       userId: user.userId,
-      //     },
-      //   });
-      // }
-
-      // if (roles.includes(string.Checker)) {
-      //   existingUser = await User.findOne({
-      //     where: {
-      //       userId: user.userId,
-      //     },
-      //   });
-      // }
-
-      // if (roles.includes(string.Carrier)) {
-      //   existingUser = await User.findOne({
-      //     where: {
-      //       userId: user.userId,
-      //     },
-      //   });
-      // }
-
+      
       if (!existingUser) {
         return apiResponseErr(
           null,
           false,
           statusCode.unauthorize,
-          'Unauthorized access: User not found in database',
-          res,
+          "Unauthorized access: User not found in database",
+          res
         );
       }
 
-      const rolesArray = existingUser.role ? existingUser.role.split(',') : [];
+      const rolesArray = existingUser.role ? existingUser.role.split(",") : [];
 
       if (roles && roles.length > 0) {
-        const userHasRequiredRole = roles.some((role) => rolesArray.includes(role));
+        const userHasRequiredRole = roles.some((role) =>
+          rolesArray.includes(role)
+        );
 
         if (!userHasRequiredRole) {
           return apiResponseErr(
             rolesArray,
             false,
             statusCode.unauthorize,
-            'Unauthorized access: User does not have required role',
-            res,
+            "Unauthorized access: User does not have required role",
+            res
+          );
+        }
+      }
+
+      if (permissions && permissions.length > 0) {
+        const userPermissions = existingUser.permissions ? existingUser.permissions.split(',') : [];
+
+        let userHasRequiredPermission = false;
+
+        if (rolesArray.includes(string.Admin)) {
+          userHasRequiredPermission = true;
+        } else {
+          permissions.forEach((per) => {
+            if (userPermissions.map(p => p.trim()).includes(per)) {
+              userHasRequiredPermission = true;
+            }
+          });
+        }
+        
+        if (!userHasRequiredPermission) {
+          return apiResponseErr(
+            null,
+            false,
+            statusCode.unauthorize,
+            "Unauthorized access: User does not have required permission",
+            res
           );
         }
       }
@@ -125,11 +142,12 @@ export const authorize = (roles) => {
         false,
         error.responseCode ?? statusCode.internalServerError,
         error.errMessage ?? error.message,
-        res,
+        res
       );
     }
   };
 };
+
 
 // export const addToBlacklist = (token) => {
 //   tokenBlacklist.add(token);

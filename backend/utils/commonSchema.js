@@ -552,3 +552,15 @@ export const validateVoidAfyerWin = [
     .notEmpty().withMessage('Market ID is required')
     .isUUID().withMessage('Market ID must be a valid UUID'),
 ];
+
+export const createSubAdminSchema = [
+  body('userName').trim().notEmpty().withMessage('User Name is required'),
+  body('password').trim().notEmpty().withMessage('Password is required'),
+];
+
+
+export const validateMarketWiseSubadmin = [
+  param("marketId")
+    .isUUID()
+    .withMessage("Invalid marketId. It should be a valid UUID."),
+];

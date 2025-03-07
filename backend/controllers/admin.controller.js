@@ -12,6 +12,8 @@ import UserRange from '../models/user.model.js';
 import PurchaseLottery from '../models/purchase.model.js';
 import LotteryResult from '../models/resultModel.js';
 import bcrypt from 'bcrypt';
+import WinResultRequest from '../models/winResultRequestModel.js';
+import { string } from '../constructor/string.js';
 dotenv.config();
 
 export const createAdmin = async (req, res) => {
@@ -59,6 +61,7 @@ export const login = async (req, res) => {
       adminId: existingUser.adminId,
       userName: existingUser.userName,
       role: existingUser.role,
+      parmission : existingUser.permissions,
     };
     const accessToken = jwt.sign(userResponse, process.env.JWT_SECRET_KEY, {
       expiresIn: '1d',
@@ -999,3 +1002,294 @@ export const afterWinLotteries = async (req, res) => {
 };
 
 
+
+export const createSubAdmin = async (req, res) => {
+  try {
+    const { userName, password, permissions } = req.body;
+
+    if(!permissions)
+    {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Permission is required",
+        res
+      );
+    }
+
+    const existingAdmin = await Admin.findOne({ where: { userName } });
+    if (existingAdmin) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Username already exist!",
+        res
+      );
+    }
+
+    const newSubAdmin = await Admin.create({
+      adminId: uuidv4(),
+      userName,
+      password,
+      role : string.SubAdmin,
+      permissions: permissions,
+    });
+
+    return apiResponseSuccess(
+      newSubAdmin,
+      true,
+      statusCode.create,
+      "Subadmin create successfully!",
+      res
+    );
+
+  } catch (error) {
+
+    console.log("err", error)
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+export const winResultMarket = async(req, res) => {
+  try {
+    const { page = 1, limit = 10, search = "" } = req.query;
+    const offset = (page - 1) * limit;
+
+    const whereClause = {
+      isApproved: false,
+      isReject: false,
+    };
+
+    if (search) {
+      whereClause.marketName = { [Op.like]: `%${search}%` };
+    }
+
+    const { count, rows } = await WinResultRequest.findAndCountAll({
+      attributes: ["marketId", "marketName"],
+      where : whereClause,
+      group: ["marketId", "marketId"],
+      order: [["createdAt", "DESC"]],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      raw: true,
+    })
+
+ 
+    if(!rows || rows.length == 0)
+      {
+        return apiResponseSuccess(
+          [],
+          true,
+          statusCode.success,
+          "Data Not Found!",
+          res
+        );
+      }
+
+
+    const totalItems = count.length;
+    const totalPages = Math.ceil(totalItems / limit);
+
+    const pagination = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalItems,
+      totalPages,
+    }
+
+    return apiResponsePagination(
+      rows,
+      true,
+      statusCode.create,
+      "Data fetch successfully!",
+      pagination,
+      res
+    );
+
+
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+
+export const marketWiseSubadmin = async (req, res) => {
+  try {
+    const { marketId } = req.params;
+    const { page = 1, limit = 10, search = "" } = req.query;
+
+    const offset = (page - 1) * limit;
+
+    const whereCondition = {
+      marketId,
+      isApproved: false,
+      isReject: false,
+    };
+
+    if (search) {
+      whereCondition[Op.or] = [
+        { adminId: { [Op.like]: `%${search}%` } },
+        { declearBy: { [Op.like]: `%${search}%` } },
+      ];
+    }
+
+    const { count, rows: existingAdmin } = await WinResultRequest.findAndCountAll({
+      attributes: ["marketId","marketName","adminId", "declearBy"],
+      where: whereCondition,
+      group: ["marketId","marketName","adminId", "declearBy"],
+      order: [["createdAt", "DESC"]],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+    });
+
+    if (!existingAdmin || existingAdmin.length === 0) {
+      return apiResponseSuccess(
+        [],
+        true,
+        statusCode.create,
+        "Data not found!",
+        res
+      );
+    }
+
+    const totalItems = count.length;
+    const totalPages = Math.ceil(totalItems / limit);
+
+    const marketData = existingAdmin.reduce((acc, item) => {
+      let marketIndex = acc.findIndex(market => market.marketId === item.marketId);
+
+      if (marketIndex === -1) {
+        acc.push({
+          marketId: item.marketId,
+          marketName: item.marketName,
+          subAdmins: [{ adminId: item.adminId, declearBy: item.declearBy }],
+        });
+      } else {
+        acc[marketIndex].subAdmins.push({ adminId: item.adminId, declearBy: item.declearBy });
+      }
+
+      return acc;
+    }, []);
+    
+    const pagination = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalItems,
+      totalPages,
+    };
+
+    return apiResponsePagination(
+      marketData,
+      true,
+      statusCode.success,
+      "Data fetch successfully!",
+      pagination,
+      res
+    );
+
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+
+export const getMatchData = async (req, res) => {
+  try {
+
+    const { marketId } = req.params;
+    const { type } = req.query;
+
+    const whereCondition = { marketId, isApproved: false };
+    if (type) whereCondition.type = type;
+
+    const existingResults = await WinResultRequest.findAll({
+      where: whereCondition,
+      order: [["createdAt", "ASC"]],
+    });
+
+    if (!existingResults || existingResults.length === 0) {
+      return apiResponseErr(null, false, statusCode.notFound, "No Data found!", res);
+    }
+
+    const groupedResults = { Matched: [], Unmatched: [] };
+
+    existingResults.forEach((result) => {
+      const category = result.type === "Matched" ? "Matched" : "Unmatched";
+
+      let marketEntry = groupedResults[category].find(
+        (entry) => entry.marketId === result.marketId
+      );
+
+      if (!marketEntry) {
+        marketEntry = {
+          marketName: result.marketName,
+          marketId: result.marketId,
+          type: result.type,
+          isApproved: result.isApproved,
+          createdAt: result.createdAt,
+          updatedAt: result.updatedAt,
+          MatchData: [],
+        };
+        groupedResults[category].push(marketEntry);
+      }
+
+      let adminEntry = marketEntry.MatchData.find(
+        (entry) => entry.adminId === result.adminId
+      );
+
+      if (!adminEntry) {
+        adminEntry = {
+          adminId: result.adminId,
+          declearBy: result.declearBy,
+          ticketNumber: {},
+        };
+        marketEntry.MatchData.push(adminEntry);
+      }
+
+      if (!adminEntry.ticketNumber[result.prizeCategory]) {
+        adminEntry.ticketNumber[result.prizeCategory] = [];
+      }
+
+      adminEntry.ticketNumber[result.prizeCategory] = [
+        ...new Set([...adminEntry.ticketNumber[result.prizeCategory], ...result.ticketNumber]),
+      ];
+    });
+
+
+    return apiResponseSuccess(
+      groupedResults,
+      true,
+      statusCode.success,
+      "Data fetched successfully!",
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
