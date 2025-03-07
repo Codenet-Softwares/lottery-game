@@ -1446,12 +1446,19 @@ export const getMatchData = async (req, res) => {
       }
 
       if (!adminEntry.ticketNumber[result.prizeCategory]) {
+        adminEntry.ticketNumber[result.prizeCategory] = {
+          prizeAmount: result.prizeAmount,
+          tickets: [],
+        };
+      }
+
+      if (!adminEntry.ticketNumber[result.prizeCategory]) {
         adminEntry.ticketNumber[result.prizeCategory] = { prizeAmount : result.prizeAmount, tickets : [],};
       }
 
-      adminEntry.ticketNumber[result.prizeCategory] = [
+      adminEntry.ticketNumber[result.prizeCategory].tickets = [
         ...new Set([
-          ...adminEntry.ticketNumber[result.prizeCategory],
+          ...adminEntry.ticketNumber[result.prizeCategory].tickets,
           ...result.ticketNumber,
         ]),
       ];
