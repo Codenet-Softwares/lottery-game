@@ -8,6 +8,7 @@ import {
   createSubAdmin,
   dateWiseMarkets,
   getAllMarkets,
+  getAllSubAdmin,
   getInactiveMarket,
   getMarkets,
   getMatchData,
@@ -91,6 +92,8 @@ export const adminRoutes = (app) => {
   app.get('/api/market-wise-subadmin/:marketId', validateMarketWiseSubadmin, customErrorHandler, authorize([string.Admin]), marketWiseSubadmin)
 
   app.get('/api/subAdmin/matching-data/:marketId', validateMarketWiseSubadmin, customErrorHandler, authorize([string.Admin]), getMatchData);
+
+  app.get('/api/admin/get-all-subAdmin', authorize([string.Admin]), getAllSubAdmin)
 
 
 };

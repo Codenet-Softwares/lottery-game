@@ -1293,3 +1293,67 @@ export const getMatchData = async (req, res) => {
     );
   }
 };
+
+export const getAllSubAdmin = async(req, res) => {
+  try {
+    const { page = 1, limit = 10, search = "" } = req.query;
+    const offset = (page - 1) * limit;
+
+    const searchCondition = {
+      role : string.SubAdmin
+    }
+
+    if(search)
+    {
+      searchCondition.userName = { [Op.like]: `%${search}%` };
+    }
+
+    const { count, rows : existingAdmin } = await Admin.findAndCountAll({
+      attributes: ["adminId", "userName", "role", "permissions"],
+      where: searchCondition,
+      order: [["createdAt", "DESC"]],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      raw: true,
+    });
+
+    if(!existingAdmin || existingAdmin.length == 0)
+    {
+      return apiResponseSuccess(
+        [],
+        true,
+        statusCode.success,
+        "No data found!",
+        res
+      );
+    };
+
+    const totalItems = count;
+    const totalPages = Math.ceil(totalItems / parseInt(limit)); //
+
+    const pagination = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages,
+      totalItems,
+    }
+
+    return apiResponsePagination(
+      existingAdmin,
+      true,
+      statusCode.success,
+      "Data fetched successfully!",
+      pagination,
+      res
+    );
+
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
