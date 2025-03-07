@@ -14,6 +14,8 @@ import LotteryResult from '../models/resultModel.js';
 import bcrypt from 'bcrypt';
 import { string } from '../constructor/string.js';
 import WinResultRequest from '../models/winResultRequestModel.js';
+import WinResultRequest from '../models/winResultRequestModel.js';
+import { string } from '../constructor/string.js';
 dotenv.config();
 
 export const createAdmin = async (req, res) => {
@@ -62,6 +64,7 @@ export const login = async (req, res) => {
       userName: existingUser.userName,
       role: existingUser.role,
       permissions: existingUser.permissions,
+      parmission : existingUser.permissions,
     };
     const accessToken = jwt.sign(userResponse, process.env.JWT_SECRET_KEY, {
       expiresIn: '1d',
@@ -867,6 +870,142 @@ export const resetPassword = async (req, res) => {
 };
 
 
+export const afteWinMarkets = async (req, res) => {
+  try {
+    let { page = 1, limit = 10, search = '' } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+    const offset = (page - 1) * limit;
+
+    let whereCondition = { isWin: true , isVoid: false};
+
+    if (search) {
+      whereCondition.marketName = { [Op.like]: `%${search}%` }; 
+    }
+
+    const { count, rows: marketName } = await TicketRange.findAndCountAll({
+      where: whereCondition,
+      attributes: ["marketId", "marketName", "gameName"],
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']], 
+    });
+
+    const paginatedData = {
+      page,
+      limit,
+      totalItems: count,
+      totalPages: Math.ceil(count / limit),
+
+    }
+    return apiResponsePagination(
+      marketName,
+      true,
+      statusCode.success,
+      "Market name fetch Successfully",
+      paginatedData ,
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+export const afterWinLotteries = async (req, res) => {
+  try {
+    const { marketId } = req.params;
+    const { page = 1, limit = 10, search= "" } = req.query;
+
+    const offset = (page - 1) * limit;
+
+    const whereConditions = {
+      marketId,
+      resultAnnouncement: true,
+    };
+
+    if (search) {
+      whereConditions.userName = { [Op.like]: `%${search}%` };
+    }
+
+    const  purchaseLotteries  = await PurchaseLottery.findAll({
+      where: whereConditions,
+    });
+    
+    if (!purchaseLotteries.length) {
+      return apiResponseSuccess([], true, statusCode.success, "No bet history found", res);
+    }
+
+    const userData = {};
+    for (const purchase of purchaseLotteries) {
+      const {
+        userName,
+        lotteryPrice,
+        group,
+        series,
+        number,
+        sem,
+        marketName,
+        marketId,
+        purchaseId,
+      } = purchase;
+
+      if (!userData[userName]) {
+        userData[userName] = {
+          userName,
+          marketName,
+          marketId,
+          amount: 0,
+          details: [],
+        };
+      }
+
+      userData[userName].amount += lotteryPrice;
+
+      const ticketService = new TicketService();
+      const tickets = await ticketService.list(group, series, number, sem, marketId);
+
+      userData[userName].details.push({
+        sem,
+        tickets,
+        purchaseId,
+        lotteryPrice,
+      });
+    }
+
+    const userDataArray = Object.values(userData);
+
+    const totalItems = userDataArray.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const paginatedData = userDataArray.slice(offset, page * limit);
+
+    const pagination = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalPages,
+      totalItems,
+    };
+
+    return apiResponsePagination(
+      paginatedData,
+      true,
+      statusCode.success,
+      "success",
+      pagination,
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
+  }
+};
+
+
+
 export const createSubAdmin = async (req, res) => {
   try {
     const { userName, password, permissions } = req.body;
@@ -897,7 +1036,7 @@ export const createSubAdmin = async (req, res) => {
       adminId: uuidv4(),
       userName,
       password,
-      role :  string.SubAdmin,
+      role : string.SubAdmin,
       permissions: permissions,
     });
 
@@ -908,6 +1047,77 @@ export const createSubAdmin = async (req, res) => {
       "Subadmin create successfully!",
       res
     );
+
+  } catch (error) {
+
+    console.log("err", error)
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+export const winResultMarket = async(req, res) => {
+  try {
+    const { page = 1, limit = 10, search = "" } = req.query;
+    const offset = (page - 1) * limit;
+
+    const whereClause = {
+      isApproved: false,
+      isReject: false,
+    };
+
+    if (search) {
+      whereClause.marketName = { [Op.like]: `%${search}%` };
+    }
+
+    const { count, rows } = await WinResultRequest.findAndCountAll({
+      attributes: ["marketId", "marketName"],
+      where : whereClause,
+      group: ["marketId", "marketId"],
+      order: [["createdAt", "DESC"]],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      raw: true,
+    })
+
+ 
+    if(!rows || rows.length == 0)
+      {
+        return apiResponseSuccess(
+          [],
+          true,
+          statusCode.success,
+          "Data Not Found!",
+          res
+        );
+      }
+
+
+    const totalItems = count.length;
+    const totalPages = Math.ceil(totalItems / limit);
+
+    const pagination = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalItems,
+      totalPages,
+    }
+
+    return apiResponsePagination(
+      rows,
+      true,
+      statusCode.create,
+      "Data fetch successfully!",
+      pagination,
+      res
+    );
+
+
   } catch (error) {
     return apiResponseErr(
       null,
@@ -919,11 +1129,100 @@ export const createSubAdmin = async (req, res) => {
   }
 };
 
+
+export const marketWiseSubadmin = async (req, res) => {
+  try {
+    const { marketId } = req.params;
+    const { page = 1, limit = 10, search = "" } = req.query;
+
+    const offset = (page - 1) * limit;
+
+    const whereCondition = {
+      marketId,
+      isApproved: false,
+      isReject: false,
+    };
+
+    if (search) {
+      whereCondition[Op.or] = [
+        { adminId: { [Op.like]: `%${search}%` } },
+        { declearBy: { [Op.like]: `%${search}%` } },
+      ];
+    }
+
+    const { count, rows: existingAdmin } = await WinResultRequest.findAndCountAll({
+      attributes: ["marketId","marketName","adminId", "declearBy"],
+      where: whereCondition,
+      group: ["marketId","marketName","adminId", "declearBy"],
+      order: [["createdAt", "DESC"]],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+    });
+
+    if (!existingAdmin || existingAdmin.length === 0) {
+      return apiResponseSuccess(
+        [],
+        true,
+        statusCode.create,
+        "Data not found!",
+        res
+      );
+    }
+
+    const totalItems = count.length;
+    const totalPages = Math.ceil(totalItems / limit);
+
+    const marketData = existingAdmin.reduce((acc, item) => {
+      let marketIndex = acc.findIndex(market => market.marketId === item.marketId);
+
+      if (marketIndex === -1) {
+        acc.push({
+          marketId: item.marketId,
+          marketName: item.marketName,
+          subAdmins: [{ adminId: item.adminId, declearBy: item.declearBy }],
+        });
+      } else {
+        acc[marketIndex].subAdmins.push({ adminId: item.adminId, declearBy: item.declearBy });
+      }
+
+      return acc;
+    }, []);
+    
+    const pagination = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalItems,
+      totalPages,
+    };
+
+    return apiResponsePagination(
+      marketData,
+      true,
+      statusCode.success,
+      "Data fetch successfully!",
+      pagination,
+      res
+    );
+
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+
 export const getMatchData = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search, type } = req.query;
 
-    const whereCondition = { isApproved: false };
+    const { marketId } = req.params;
+    const { type } = req.query;
+
+    const whereCondition = { marketId, isApproved: false };
     if (type) whereCondition.type = type;
 
     const existingResults = await WinResultRequest.findAll({
@@ -997,7 +1296,3 @@ export const getMatchData = async (req, res) => {
     );
   }
 };
-
-
-
-

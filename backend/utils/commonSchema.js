@@ -520,11 +520,52 @@ export const validateResetPassword = [
 export const validateDeleteBetAterWin = [
   body('purchaseId')
     .notEmpty().withMessage('Purchase ID is required')
-    .isUUID().withMessage('Purchase ID must be a valid UUID')
-  ];
+    .isUUID().withMessage('Purchase ID must be a valid UUID'),
+];
+
+export const validateAfterWinMarkets = [
+  query("page")
+    .optional()
+    .toInt()
+    .isInt({ min: 1 })
+    .withMessage("Page number must be a positive integer."),
+  query("limit")
+    .optional()
+    .toInt()
+    .isInt({ min: 1 })
+    .withMessage("Limit must be a positive integer."),
+];
+
+export const validateAfterWinLottery = [
+  param('marketId')
+    .isUUID()
+    .withMessage('Market ID is not valid'),
+  query("page")
+    .optional()
+    .toInt()
+    .isInt({ min: 1 })
+    .withMessage("Page number must be a positive integer."),
+  query("limit")
+    .optional()
+    .toInt()
+    .isInt({ min: 1 })
+    .withMessage("Limit must be a positive integer."),
+];
+
+export const validateVoidAfyerWin = [
+  body('marketId')
+    .notEmpty().withMessage('Market ID is required')
+    .isUUID().withMessage('Market ID must be a valid UUID'),
+];
 
 export const createSubAdminSchema = [
   body('userName').trim().notEmpty().withMessage('User Name is required'),
   body('password').trim().notEmpty().withMessage('Password is required'),
+];
 
+
+export const validateMarketWiseSubadmin = [
+  param("marketId")
+    .isUUID()
+    .withMessage("Invalid marketId. It should be a valid UUID."),
 ];

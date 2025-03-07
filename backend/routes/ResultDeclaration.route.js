@@ -17,8 +17,9 @@ export const ResultDeclarationModule = (app) => {
   app.post('/api/subadmin/win-result-request/:marketId', 
     validationRules,
     customErrorHandler, 
-    authorize([string.Admin, string.SubAdmin], [string.WinLottery]), 
+    authorize([string.SubAdmin], [string.WinLottery]), 
     subadminResultRequest)
+
 
   app.get('/api/lottery-results/:marketId', validateMarketId, customErrorHandler, getLotteryResults);
 
