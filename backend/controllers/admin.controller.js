@@ -1224,7 +1224,7 @@ export const getMatchData = async (req, res) => {
 
     const existingResults = await WinResultRequest.findAll({
       where: whereCondition,
-      order: [["createdAt", "ASC"]],
+      order: [["createdAt", "DESC"]],
     });
 
     if (!existingResults || existingResults.length === 0) {
@@ -1267,13 +1267,17 @@ export const getMatchData = async (req, res) => {
       }
 
       if (!adminEntry.ticketNumber[result.prizeCategory]) {
-        adminEntry.ticketNumber[result.prizeCategory] = [];
+        adminEntry.ticketNumber[result.prizeCategory] = { prizeAmount : result.prizeAmount, tickets : [],};
       }
 
-      adminEntry.ticketNumber[result.prizeCategory] = [
-        ...new Set([...adminEntry.ticketNumber[result.prizeCategory], ...result.ticketNumber]),
+      adminEntry.ticketNumber[result.prizeCategory].tickets = [
+        ...new Set([...adminEntry.ticketNumber[result.prizeCategory].tickets, ...result.ticketNumber]),
       ];
+
     });
+
+
+    
 
 
     return apiResponseSuccess(
