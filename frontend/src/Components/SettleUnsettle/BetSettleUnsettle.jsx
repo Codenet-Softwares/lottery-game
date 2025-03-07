@@ -135,12 +135,12 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
     pagination.totalItems
   );
   return (
-    <div className="container mt-4 rounded" style={{ overflow: "hidden" }}>
+    <div className="container mt-4 rounded" style={{ overflow: "hidden",background:"#F0F0F0" }}>
       {betStats ? (
         <div className="container " style={{ overflow: "hidden" }}>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div
-              className="d-flex justify-content-start mt-5 px-3"
+              className="d-flex justify-content-start mt-5 px-5"
               style={{ position: "absolute", left: "40px" }}
             >
               {backButton}

@@ -8,6 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
 import { useAppContext } from "../../contextApi/context";
+import { isRevokeLottery } from "../../Utils/apiService";
 
 const Result = () => {
   const { marketId } = useParams(); // Extract current marketId from URL
@@ -22,6 +23,7 @@ const Result = () => {
   const [marketTimes, setMarketTimes] = useState([]);
   const [selectedMarket, setSelectedMarket] = useState(null);
   const [showStats, setShowStats] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
   const maxVisibleMarkets = 3;
   const visibleMarkets = markets.slice(
@@ -78,7 +80,20 @@ const Result = () => {
       setResults([]);
     }
   };
-
+  const handleRevokeAnnouncement = async (marketId) => {
+    try {
+      showLoader(); // Show the loader before the API call starts
+      const res = await isRevokeLottery({ marketId: marketId });
+      if (res) {
+        toast.success(res.message);
+        setRefresh((prev) => !prev);
+      }
+    } catch (err) {
+      console.error("Error fetching inactive games:", err);
+    } finally {
+      hideLoader(); // Hide the loader after the API call finishes
+    }
+  };
   // Fetch markets when the selected date changes
   useEffect(() => {
     fetchMarkets();
@@ -110,45 +125,44 @@ const Result = () => {
 
   // Handle market selection
   const handleMarketSelect = (market) => {
-    navigate(`/results/${market.marketId}`); 
+    navigate(`/results/${market.marketId}`);
   };
   const handleBetVoidMarket = async (marketId) => {
     if (!marketId) {
-        console.error("Market ID is missing!");
-        toast.error("Market ID is required!");
-        return;
+      console.error("Market ID is missing!");
+      toast.error("Market ID is required!");
+      return;
     }
 
     console.log("Void button clicked for marketId:", marketId);
     showLoader();
 
     try {
-        const response = await voidBetMarket({ marketId });
-        console.log("API Response:", response); 
+      const response = await voidBetMarket({ marketId });
+      console.log("API Response:", response);
 
-        if (response.success) {
-            toast.success("Market voided successfully");
+      if (response.success) {
+        toast.success("Market voided successfully");
 
-            setMarketTimes((prevMarketTimes) =>
-                prevMarketTimes.filter((market) => market.marketId !== marketId)
-            );
+        setMarketTimes((prevMarketTimes) =>
+          prevMarketTimes.filter((market) => market.marketId !== marketId)
+        );
 
-            if (selectedMarket?.marketId === marketId) {
-                setSelectedMarket(null);
-                setShowStats(false);
-            }
-        } else {
-            console.error("Void market failed:", response.errMessage);
-            toast.error(response.errMessage || "Failed to void market");
+        if (selectedMarket?.marketId === marketId) {
+          setSelectedMarket(null);
+          setShowStats(false);
         }
+      } else {
+        console.error("Void market failed:", response.errMessage);
+        toast.error(response.errMessage || "Failed to void market");
+      }
     } catch (error) {
-        console.error("Error in voidBetMarket:", error);
-        toast.error("Something went wrong!");
+      console.error("Error in voidBetMarket:", error);
+      toast.error("Something went wrong!");
     }
 
     hideLoader();
-};
-
+  };
 
   return (
     <div
@@ -388,12 +402,25 @@ const Result = () => {
                   </div>
                 </div>
               ))}
-              <div className="d-flex justify-content-center align-items-center mt-4">
-                <div className="">
-              <button onClick={() => handleBetVoidMarket(marketId)} className="btn btn-danger border-0 px-4">Void</button>
-                  </div>
 
-              </div>
+              {results.length > 0 && (
+                <div className="d-flex justify-content-center align-items-center mt-4">
+                  <button
+                    onClick={() => handleBetVoidMarket(marketId)}
+                    className="btn border-0 px-4 me-3 text-white"
+                  style={{background:"#4682B4"}}
+                  >
+                    Void
+                  </button>
+
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleRevokeAnnouncement(marketId)}
+                  >
+                    Revoke
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

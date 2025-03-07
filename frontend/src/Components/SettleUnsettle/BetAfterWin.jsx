@@ -62,11 +62,11 @@ const BetAfterWin = () => {
   // };
 
   return (
-    <div className="text-center bet_page rounded-4" style={{background:"#333333"}}>
+    <div className="text-center bet_page rounded-4" >
       <div className="container-fluid p-3 px-5">
         {!selectedMarketId && (
           <>
-            <h1 className="fw-bold heading py-3 text-uppercase text-light">
+            <h1 className="fw-bold heading py-3 text-uppercase text-black">
               Bet After Win
             </h1>
             <div className="search-container-search-live d-flex justify-content-center align-items-center">
