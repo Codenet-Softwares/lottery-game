@@ -1448,12 +1448,13 @@ export const getMatchData = async (req, res) => {
       if (!adminEntry.ticketNumber[result.prizeCategory]) {
         adminEntry.ticketNumber[result.prizeCategory] = {
           prizeAmount: result.prizeAmount,
+          ...(result.complementaryPrize !== 0 && { complementaryPrize: result.complementaryPrize }), 
           tickets: [],
         };
       }
 
       if (!adminEntry.ticketNumber[result.prizeCategory]) {
-        adminEntry.ticketNumber[result.prizeCategory] = { prizeAmount : result.prizeAmount, tickets : [],};
+        adminEntry.ticketNumber[result.prizeCategory] = { prizeAmount : result.prizeAmount, complementaryPrize: result.complementaryPrize, tickets : [],};
       }
 
       adminEntry.ticketNumber[result.prizeCategory].tickets = [
