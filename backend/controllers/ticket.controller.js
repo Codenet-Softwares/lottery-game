@@ -69,6 +69,7 @@ export const saveTicketRange = async (req, res) => {
   }
 };
 
+
 export const updateMarket = async (req, res) => {
   try {
     const { marketId } = req.params;
@@ -86,45 +87,45 @@ export const updateMarket = async (req, res) => {
       );
     }
 
-const allowedFields = ['group', 'series', 'number', 'start_time', 'end_time', 'marketName', 'date', 'price'];
-const updates = {};
+    const allowedFields = ['group', 'series', 'number', 'start_time', 'end_time', 'marketName', 'date', 'price'];
+    const updates = { isUpdate: true }; // Set isUpdate to true when API is hit
 
-for (const [key, value] of Object.entries(updatedFields)) {
-  if (!allowedFields.includes(key)) continue;
+    for (const [key, value] of Object.entries(updatedFields)) {
+      if (!allowedFields.includes(key)) continue;
 
-  if (['group', 'number'].includes(key)) {
-    const { min, max } = value || {};
-    if (min === undefined || max === undefined) {
-      return apiResponseErr(null, false, statusCode.badRequest, `${key} must have both min and max values.`, res);
+      if (['group', 'number'].includes(key)) {
+        const { min, max } = value || {};
+        if (min === undefined || max === undefined) {
+          return apiResponseErr(null, false, statusCode.badRequest, `${key} must have both min and max values.`, res);
+        }
+        updates[`${key}_start`] = min;
+        updates[`${key}_end`] = max;
+      } else if (key === 'series') {
+        const { start, end } = value || {};
+        if (start === undefined || end === undefined) {
+          return apiResponseErr(null, false, statusCode.badRequest, 'Series must have both start and end values.', res);
+        }
+        updates[`${key}_start`] = start;
+        updates[`${key}_end`] = end;
+      } else {
+        updates[key] = value;
+      }
     }
-    updates[`${key}_start`] = min;
-    updates[`${key}_end`] = max;
-  } else if (key === 'series') {
-    const { start, end } = value || {};
-    if (start === undefined || end === undefined) {
-      return apiResponseErr(null, false, statusCode.badRequest, 'Series must have both start and end values.', res);
+
+    if (Object.keys(updates).length === 0) {
+      return apiResponseErr(null, false, statusCode.badRequest, 'No valid fields provided for update.', res);
     }
-    updates[`${key}_start`] = start;
-    updates[`${key}_end`] = end;
-  } else {
-    updates[key] = value;
-  }
-}
 
-if (Object.keys(updates).length === 0) {
-  return apiResponseErr(null, false, statusCode.badRequest, 'No valid fields provided for update.', res);
-}
-
-await ticketRange.update(updates);
-
+    await ticketRange.update(updates);
 
     return apiResponseSuccess(
-      ticketRange,
+      { ...ticketRange.toJSON(), isUpdate: true }, // Send updated data
       true,
       statusCode.success,
       'Lottery market updated successfully.',
       res
     );
+
   } catch (error) {
     return apiResponseErr(
       null,
@@ -135,6 +136,8 @@ await ticketRange.update(updates);
     );
   }
 };
+
+
 
 
 export const geTicketRange = async (req, res) => {

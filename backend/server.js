@@ -75,8 +75,8 @@ app.get('/lottery-events', (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
-  res.setHeader('Access-Control-Allow-Origin', 'https://cg.user.dummydoma.in'); // change with server URl 
-  // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000'); //  Local URL
+  // res.setHeader('Access-Control-Allow-Origin', 'https://cg.user.dummydoma.in'); // change with server URl 
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001'); //  Local URL
 
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -101,7 +101,7 @@ app.get('/lottery-events', (req, res) => {
 
 
 sequelize
-  .sync({ alter: false })
+  .sync({ alter: true })
   .then(() => {
     console.log('Database & tables created!');
     app.listen(process.env.PORT, () => {
@@ -170,6 +170,50 @@ sequelize
         console.error('Error checking market statuses:', error);
       }
     });
+
+
+    // Cron job runs every second to reset isUpdate to false
+    cron.schedule('* * * * * *', async () => {  // Runs every second
+      try {
+        
+        // Find markets where isUpdate is true
+        const marketsToUpdate = await TicketRange.findAll({ where: { isUpdate: true } });
+        
+        if (marketsToUpdate.length === 0) {
+          console.log('No markets found to reset.');
+          return;
+        }
+    
+        const updatedMarketList = [];
+    
+        for (const market of marketsToUpdate) {
+          market.isUpdate = false;
+          const updatedMarket = await market.save(); // Save to D
+          // Push to list (whether it's in cache or not)
+          updatedMarketList.push(updatedMarket.toJSON());
+          // Update cache
+          updatedMarketsCache.set(updatedMarket.marketId, updatedMarket.toJSON());
+        }
+      
+        // Send data to all clients
+        clients.forEach((client) => {
+          try {
+            if (client.writable) {
+              client.write(`data: ${JSON.stringify(updatedMarketList)}\n\n`);
+            } else {
+              console.warn('[SSE] Client not writable, skipping...');
+            }
+          } catch (err) {
+            console.error('[SSE] Error sending data to client:', err);
+          }
+        });
+  
+      } catch (error) {
+        console.error('Error in cron job:', error);
+      }
+      console.log(`[SSE] Updates broadcasted: ${JSON.stringify(updatedMarketList)}`);
+
+    });    
   })
   .catch((err) => {
     console.error('Unable to create tables:', err);
