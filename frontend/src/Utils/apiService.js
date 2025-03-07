@@ -531,8 +531,7 @@ export async function createSubAdmin(body, isToast = true) {
   }
 }
 
-
-// MARKETNAMES API FOR PRIZE VALIDATION 
+// MARKETNAMES API FOR PRIZE VALIDATION
 export async function PrizeValidationMarkets(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
@@ -547,9 +546,12 @@ export async function PrizeValidationMarkets(body = {}, isToast = false) {
   }
 }
 
-
-// SUBADMINS NAMES WITH  RESPECT TO MARKETNAMES API FOR PRIZE VALIDATION  TO APPROVE 
-export async function ViewSubAdminsPrizeValidationMarkets(body = {}, marketId, isToast = false) {
+// SUBADMINS NAMES WITH  RESPECT TO MARKETNAMES API FOR PRIZE VALIDATION  TO APPROVE
+export async function ViewSubAdminsPrizeValidationMarkets(
+  body = {},
+  marketId,
+  isToast = false
+) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
     const response = await makeCall(
@@ -563,9 +565,12 @@ export async function ViewSubAdminsPrizeValidationMarkets(body = {}, marketId, i
   }
 }
 
-
-// COMPARE CHECK DATA WITH SUBADMINS NAMES COMPARISON LIST  WITH  RESPECT TO MARKETNAMES API FOR PRIZE VALIDATION  TO APPROVE 
-export async function ViewSubAdminsPrizeValidationMarketsCompareCheck(body = {}, marketId, isToast = false) {
+// COMPARE CHECK DATA WITH SUBADMINS NAMES COMPARISON LIST  WITH  RESPECT TO MARKETNAMES API FOR PRIZE VALIDATION  TO APPROVE
+export async function ViewSubAdminsPrizeValidationMarketsCompareCheck(
+  body = {},
+  marketId,
+  isToast = false
+) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
     const response = await makeCall(
@@ -579,6 +584,22 @@ export async function ViewSubAdminsPrizeValidationMarketsCompareCheck(body = {},
   }
 }
 
-
-
-
+// COMPARE CHECK DATA WITH SUBADMINS NAMES COMPARISON LIST  WITH  RESPECT TO MARKETNAMES API FOR  APPROVE   AND REJECT
+export async function ApproveReject(
+  body = {},
+  marketId,
+  type,
+  isToast = false
+) {
+  try {
+    const callParams = await getAuthCallParams(strings.POST, body, isToast);
+    const response = await makeCall(
+      ` ${urls.ApproveReject}/${marketId}?type=${type}`,
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}

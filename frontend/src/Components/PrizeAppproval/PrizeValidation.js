@@ -6,6 +6,7 @@ import {
   PrizeValidationMarkets,
   ViewSubAdminsPrizeValidationMarkets,
   ViewSubAdminsPrizeValidationMarketsCompareCheck,
+  ApproveReject
 } from "../../Utils/apiService";
 import ComparisonTable from "./ComparisonTable";
 
@@ -17,13 +18,14 @@ const PrizeValidation = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState([]);
   const [loadingModal, setLoadingModal] = useState(false);
+  console.log('LINE 21',modalContent)
 
   useEffect(() => {
     const fetchMarketData = async () => {
       try {
         setLoading(true);
         const allMarket = await PrizeValidationMarkets({ search: "" });
-        console.log(allMarket); // Debugging
+        console.log(allMarket); 
 
         const formattedMarkets = allMarket.data.map((item, index) => ({
           id: item.marketId,
@@ -81,6 +83,31 @@ const PrizeValidation = () => {
     }
   };
 
+
+  const handleApproveReject = async (type) => {
+    if (!selectedMarket || !modalContent?.Matched?.length) return;
+  
+    // Extract and format matched data
+    const formattedData = modalContent.Matched.flatMap((match) =>
+      match.MatchData.map(({ ticketNumber, prizeAmount, tickets }) => ({
+        prizeCategory: ticketNumber,
+        prizeAmount,
+        ticketNumber: tickets,
+      }))
+    );
+  
+    try {
+      const response = await ApproveReject(formattedData, selectedMarket.id, type);
+      if (response?.success) {
+        alert(`${type} successful!`);
+        setShowModal(false);
+      }
+    } catch (error) {
+      console.error(`Error during ${type}:`, error);
+    }
+  };
+  
+
   const marketColumns = [
     { key: "serialNumber", label: "S.No." },
     { key: "marketName", label: "Market Name" },
@@ -123,10 +150,11 @@ const PrizeValidation = () => {
     {
       key: "compareCheck",
       label: "Compare Check",
-      render: () => (
+      render: (row) => (
         <button
-          className="btn btn-info"
+          className="btn btn-info fw-bold text-uppercase"
           onClick={() => fetchComparisonData(selectedMarket?.id)}
+          disabled={!row.subAdmin2} // Disable button if only one sub-admin exists
         >
           Approval Check
         </button>
@@ -177,22 +205,24 @@ const PrizeValidation = () => {
         show={showModal}
         handleClose={() => setShowModal(false)}
         title="Approval Check"
-        // body={
-        //   <ComparisonTable
-        //     modalContent={modalContent}
-        //     loadingModal={loadingModal}
-        //   />
-        // }
+        body={
+          <ComparisonTable
+            modalContent={modalContent}
+            loadingModal={loadingModal}
+          />
+        }
         footerButtons={[
           {
             text: "Approve",
-            // onClick: handleApprove,
+            onClick: () => handleApproveReject("approve"),
             className: "btn btn-success",
+            disabled: !modalContent?.Matched?.length,  // Disable if no Matched data
           },
           {
             text: "Reject",
-            // onClick: handleReject,
+            onClick: () => handleApproveReject("reject"),
             className: "btn btn-danger",
+            disabled: !modalContent?.Matched?.length,  // Disable if no Matched data
           },
         ]}
       />

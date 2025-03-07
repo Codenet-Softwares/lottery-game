@@ -1,95 +1,186 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import "./PrizeValidation.css";
+import ReusableTable from "../Reusables/ReusableTable";
+import ReusableModal from "../Reusables/ReusableModal";
+import {
+  PrizeValidationMarkets,
+  ViewSubAdminsPrizeValidationMarkets,
+  ViewSubAdminsPrizeValidationMarketsCompareCheck,
+  ApproveReject,
+} from "../../Utils/apiService";
+import ComparisonTable from "./ComparisonTable";
 
-const ComparisonTable = ({ modalContent, loadingModal }) => {
-  if (loadingModal) {
-    return <p>Loading...</p>;
-  }
+const PrizeValidation = () => {
+  const [marketData, setMarketData] = useState([]);
+  const [approvalData, setApprovalData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedMarket, setSelectedMarket] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [modalContent, setModalContent] = useState([]);
+  const [loadingModal, setLoadingModal] = useState(false);
 
-  if (!modalContent || (!modalContent.Matched?.length && !modalContent.Unmatched?.length)) {
-    return <p>No data available</p>;
-  }
+  useEffect(() => {
+    const fetchMarketData = async () => {
+      try {
+        setLoading(true);
+        const allMarket = await PrizeValidationMarkets({ search: "" });
+        const formattedMarkets = allMarket.data.map((item, index) => ({
+          id: item.marketId,
+          marketName: item.marketName,
+          serialNumber: index + 1,
+        }));
+        setMarketData(formattedMarkets);
+      } catch (error) {
+        console.error("Error fetching market data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMarketData();
+  }, []);
+
+  const fetchApprovalData = async (market) => {
+    try {
+      const response = await ViewSubAdminsPrizeValidationMarkets({}, market.id);
+      if (response?.success) {
+        setApprovalData(response.data || []);
+      } else {
+        setApprovalData([]);
+      }
+      setSelectedMarket(market);
+    } catch (error) {
+      console.error("Error fetching approval data:", error);
+    }
+  };
+
+  const fetchComparisonData = async (marketId) => {
+    try {
+      setLoadingModal(true);
+      const response = await ViewSubAdminsPrizeValidationMarketsCompareCheck(
+        {},
+        marketId
+      );
+      if (response?.success) {
+        setModalContent(response.data || []);
+      } else {
+        setModalContent([]);
+      }
+    } catch (error) {
+      console.error("Error fetching comparison data:", error);
+      setModalContent([]);
+    } finally {
+      setLoadingModal(false);
+      setShowModal(true);
+    }
+  };
+
+  const handleApproveReject = async (type) => {
+    if (!selectedMarket || modalContent.length === 0) return;
+    try {
+      const response = await ApproveReject(modalContent, selectedMarket.id, type);
+      if (response?.success) {
+        alert(`${type} successful!`);
+        setShowModal(false);
+      }
+    } catch (error) {
+      console.error(`Error during ${type}:`, error);
+    }
+  };
+
+  const marketColumns = [
+    { key: "serialNumber", label: "S.No." },
+    { key: "marketName", label: "Market Name" },
+    {
+      key: "approveButton",
+      label: "Approval List",
+      render: (row) => (
+        <button
+          className="btn btn-primary text-uppercase fw-bold"
+          onClick={() => fetchApprovalData(row)}
+        >
+          View Approval
+        </button>
+      ),
+    },
+  ];
+
+  const approvalColumns = [
+    { key: "subAdmin1", label: "Sub-Admin 1" },
+    { key: "subAdmin2", label: "Sub-Admin 2" },
+    {
+      key: "compareCheck",
+      label: "Compare Check",
+      render: (row) => (
+        <button
+          className="btn btn-info"
+          onClick={() => fetchComparisonData(selectedMarket?.id)}
+          disabled={!row.subAdmin2}
+        >
+          Approval Check
+        </button>
+      ),
+    },
+  ];
 
   return (
-    <div className="comparison-table">
-      {modalContent.Matched?.length > 0 && (
+    <div className="prize-validation-container">
+      {selectedMarket ? (
+        <div className="approval-view">
+          <button
+            className="btn btn-secondary mb-3 text-uppercase fw-bold"
+            onClick={() => setSelectedMarket(null)}
+          >
+            Back to Market List
+          </button>
+          <h3 className="text-uppercase">
+            Approval List for {selectedMarket.marketName}
+          </h3>
+          <ReusableTable
+            data={approvalData}
+            columns={approvalColumns}
+            itemsPerPage={5}
+            showSearch={false}
+            paginationVisible={false}
+          />
+        </div>
+      ) : (
         <>
-          <h5 className="text-success fw-bold">Matched Entries</h5>
-          {modalContent.Matched.map((market, index) => (
-            <div key={index} className="mb-3 border p-2 rounded">
-              <h6 className="fw-bold">{market.marketName}</h6>
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>Prize Category</th>
-                    <th>Declared By 1</th>
-                    <th>Ticket Numbers</th>
-                    <th>Declared By 2</th>
-                    <th>Ticket Numbers</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {market.MatchData.map((entry, i) => {
-                    const categories = Object.keys(entry.ticketNumber);
-                    return categories.map((category, j) => {
-                      const declaredBy = Object.keys(entry.declaredBy);
-                      return (
-                        <tr key={`${i}-${j}`}>
-                          {j === 0 && (
-                            <td rowSpan={categories.length} className="align-middle fw-bold">
-                              {category}
-                            </td>
-                          )}
-                          <td>{declaredBy[0] || "-"}</td>
-                          <td>{entry.ticketNumber[category][0]?.join(", ") || "-"}</td>
-                          <td>{declaredBy[1] || "-"}</td>
-                          <td>{entry.ticketNumber[category][1]?.join(", ") || "-"}</td>
-                        </tr>
-                      );
-                    });
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ))}
+          <h2 className="prize-validation-title text-uppercase">
+            Prize Approval Market List
+          </h2>
+          {loading ? (
+            <p className="loading-text">Loading market data...</p>
+          ) : (
+            <ReusableTable
+              data={marketData}
+              columns={marketColumns}
+              itemsPerPage={10}
+              showSearch={false}
+              paginationVisible={true}
+            />
+          )}
         </>
       )}
-
-      {modalContent.Unmatched?.length > 0 && (
-        <>
-          <h5 className="text-danger fw-bold mt-4">Unmatched Entries</h5>
-          {modalContent.Unmatched.map((market, index) => (
-            <div key={index} className="mb-3 border p-2 rounded">
-              <h6 className="fw-bold">{market.marketName}</h6>
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>Prize Category</th>
-                    <th>Declared By</th>
-                    <th>Ticket Numbers</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {market.MatchData.map((entry, i) =>
-                    Object.entries(entry.ticketNumber).map(([category, numbers], j) => (
-                      <tr key={`${i}-${j}`}>
-                        {j === 0 && (
-                          <td rowSpan={Object.keys(entry.ticketNumber).length} className="align-middle fw-bold">
-                            {category}
-                          </td>
-                        )}
-                        <td>{entry.declearBy}</td>
-                        <td>{numbers.join(", ")}</td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          ))}
-        </>
-      )}
+      <ReusableModal
+        show={showModal}
+        handleClose={() => setShowModal(false)}
+        title="Approval Check"
+        body={<ComparisonTable modalContent={modalContent} loadingModal={loadingModal} />}
+        footerButtons={[
+          {
+            text: "Approve",
+            onClick: () => handleApproveReject("approve"),
+            className: "btn btn-success",
+          },
+          {
+            text: "Reject",
+            onClick: () => handleApproveReject("reject"),
+            className: "btn btn-danger",
+          },
+        ]}
+      />
     </div>
   );
 };
 
-export default ComparisonTable;
+export default PrizeValidation;
