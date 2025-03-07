@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import "./PrizeValidation.css";
 import ReusableTable from "../Reusables/ReusableTable";
 import ReusableModal from "../Reusables/ReusableModal";
-import { AllActiveLotteryMarkets } from "../../Utils/apiService"; // Assuming this is where the API function is imported
+import {
+  PrizeValidationMarkets,
+  ViewSubAdminsPrizeValidationMarkets,
+  ViewSubAdminsPrizeValidationMarketsCompareCheck,
+} from "../../Utils/apiService";
+import ComparisonTable from "./ComparisonTable";
 
 const PrizeValidation = () => {
   const [marketData, setMarketData] = useState([]);
@@ -10,21 +15,22 @@ const PrizeValidation = () => {
   const [loading, setLoading] = useState(true);
   const [selectedMarket, setSelectedMarket] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [modalContent, setModalContent] = useState("");
+  const [modalContent, setModalContent] = useState([]);
+  const [loadingModal, setLoadingModal] = useState(false);
 
   useEffect(() => {
     const fetchMarketData = async () => {
       try {
         setLoading(true);
-        const allmarket = await AllActiveLotteryMarkets({ search: "" });
-        console.log(allmarket); // Debugging: Check the structure of the response
-  
-        const formattedMarkets = allmarket.data.map((item, index) => ({
-          id: item.marketId, // Corrected field name
-          marketName: item.marketName, // Corrected field name
+        const allMarket = await PrizeValidationMarkets({ search: "" });
+        console.log(allMarket); // Debugging
+
+        const formattedMarkets = allMarket.data.map((item, index) => ({
+          id: item.marketId,
+          marketName: item.marketName,
           serialNumber: index + 1,
         }));
-  
+
         setMarketData(formattedMarkets);
       } catch (error) {
         console.error("Error fetching market data:", error);
@@ -32,10 +38,48 @@ const PrizeValidation = () => {
         setLoading(false);
       }
     };
-  
+
     fetchMarketData();
   }, []);
-  
+
+  const fetchApprovalData = async (market) => {
+    try {
+      const response = await ViewSubAdminsPrizeValidationMarkets({}, market.id);
+      console.log("Approval Data Response:", response);
+
+      if (response?.success) {
+        setApprovalData(response.data || []);
+      } else {
+        setApprovalData([]);
+      }
+      setSelectedMarket(market);
+    } catch (error) {
+      console.error("Error fetching approval data:", error);
+    }
+  };
+
+  const fetchComparisonData = async (marketId) => {
+    try {
+      setLoadingModal(true);
+      const response = await ViewSubAdminsPrizeValidationMarketsCompareCheck(
+        {},
+        marketId
+      );
+      console.log("Comparison Data Response:", response);
+
+      if (response?.success) {
+        setModalContent(response.data || []);
+      } else {
+        setModalContent([]);
+      }
+    } catch (error) {
+      console.error("Error fetching comparison data:", error);
+      setModalContent([]);
+    } finally {
+      setLoadingModal(false);
+      setShowModal(true);
+    }
+  };
 
   const marketColumns = [
     { key: "serialNumber", label: "S.No." },
@@ -46,7 +90,7 @@ const PrizeValidation = () => {
       render: (row) => (
         <button
           className="btn btn-primary text-uppercase fw-bold"
-          onClick={() => setSelectedMarket(row)}
+          onClick={() => fetchApprovalData(row)}
         >
           View Approval
         </button>
@@ -54,22 +98,24 @@ const PrizeValidation = () => {
     },
   ];
 
-  const selectedMarketApprovals = Array.isArray(approvalData)
-    ? approvalData.find((item) => item.marketId === selectedMarket?.id)
-    : undefined;
+  const selectedMarketApprovals = approvalData.find(
+    (item) => item.marketId === selectedMarket?.id
+  );
 
   const filteredApprovalData = selectedMarketApprovals
-    ? selectedMarketApprovals.subAdmins.map((subAdmin, index) => ({
-        id: index + 1,
-        subAdmin1: subAdmin.subAdmin1,
-        subAdmin2: subAdmin.subAdmin2,
-      }))
+    ? selectedMarketApprovals.subAdmins.reduce((acc, subAdmin, index) => {
+        if (index % 2 === 0) {
+          acc.push({
+            id: acc.length + 1,
+            subAdmin1: subAdmin.declearBy,
+            subAdmin2: "",
+          });
+        } else {
+          acc[acc.length - 1].subAdmin2 = subAdmin.declearBy;
+        }
+        return acc;
+      }, [])
     : [];
-
-  const handleApprovalCheck = () => {
-    setModalContent("Approval check details go here...");
-    setShowModal(true);
-  };
 
   const approvalColumns = [
     { key: "subAdmin1", label: "Sub-Admin 1" },
@@ -78,7 +124,10 @@ const PrizeValidation = () => {
       key: "compareCheck",
       label: "Compare Check",
       render: () => (
-        <button className="btn btn-info" onClick={handleApprovalCheck}>
+        <button
+          className="btn btn-info"
+          onClick={() => fetchComparisonData(selectedMarket?.id)}
+        >
           Approval Check
         </button>
       ),
@@ -128,7 +177,24 @@ const PrizeValidation = () => {
         show={showModal}
         handleClose={() => setShowModal(false)}
         title="Approval Check"
-        body={modalContent}
+        // body={
+        //   <ComparisonTable
+        //     modalContent={modalContent}
+        //     loadingModal={loadingModal}
+        //   />
+        // }
+        footerButtons={[
+          {
+            text: "Approve",
+            // onClick: handleApprove,
+            className: "btn btn-success",
+          },
+          {
+            text: "Reject",
+            // onClick: handleReject,
+            className: "btn btn-danger",
+          },
+        ]}
       />
     </div>
   );

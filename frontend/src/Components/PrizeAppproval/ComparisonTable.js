@@ -20,33 +20,25 @@ const ComparisonTable = ({ modalContent, loadingModal }) => {
               <table className="table table-bordered">
                 <thead>
                   <tr>
+                    <th>Declared By</th>
                     <th>Prize Category</th>
-                    <th>Declared By 1</th>
-                    <th>Ticket Numbers</th>
-                    <th>Declared By 2</th>
                     <th>Ticket Numbers</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {market.MatchData.map((entry, i) => {
-                    const categories = Object.keys(entry.ticketNumber);
-                    return categories.map((category, j) => {
-                      const declaredBy = Object.keys(entry.declaredBy);
-                      return (
-                        <tr key={`${i}-${j}`}>
-                          {j === 0 && (
-                            <td rowSpan={categories.length} className="align-middle fw-bold">
-                              {category}
-                            </td>
-                          )}
-                          <td>{declaredBy[0] || "-"}</td>
-                          <td>{entry.ticketNumber[category][0]?.join(", ") || "-"}</td>
-                          <td>{declaredBy[1] || "-"}</td>
-                          <td>{entry.ticketNumber[category][1]?.join(", ") || "-"}</td>
-                        </tr>
-                      );
-                    });
-                  })}
+                  {market.MatchData.map((entry, i) =>
+                    Object.entries(entry.ticketNumber).map(([category, numbers], j) => (
+                      <tr key={`${i}-${j}`}>
+                        {j === 0 && (
+                          <td rowSpan={Object.keys(entry.ticketNumber).length} className="align-middle">
+                            {entry.declearBy}
+                          </td>
+                        )}
+                        <td>{category}</td>
+                        <td>{numbers.join(", ")}</td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -63,8 +55,8 @@ const ComparisonTable = ({ modalContent, loadingModal }) => {
               <table className="table table-bordered">
                 <thead>
                   <tr>
-                    <th>Prize Category</th>
                     <th>Declared By</th>
+                    <th>Prize Category</th>
                     <th>Ticket Numbers</th>
                   </tr>
                 </thead>
@@ -73,11 +65,11 @@ const ComparisonTable = ({ modalContent, loadingModal }) => {
                     Object.entries(entry.ticketNumber).map(([category, numbers], j) => (
                       <tr key={`${i}-${j}`}>
                         {j === 0 && (
-                          <td rowSpan={Object.keys(entry.ticketNumber).length} className="align-middle fw-bold">
-                            {category}
+                          <td rowSpan={Object.keys(entry.ticketNumber).length} className="align-middle">
+                            {entry.declearBy}
                           </td>
                         )}
-                        <td>{entry.declearBy}</td>
+                        <td>{category}</td>
                         <td>{numbers.join(", ")}</td>
                       </tr>
                     ))

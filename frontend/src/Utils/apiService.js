@@ -4,29 +4,13 @@ import { getAuthCallParams, getNoAuthCallParams, makeCall } from "./service";
 import urls from "./UrlConstant";
 
 // Admin login
-export async function adminLogin(body, isToast = true, expectedRole = "admin") {
+export async function adminLogin(body, isToast = true) {
   try {
     const callParams = getNoAuthCallParams(strings.POST, body);
-    const response = await makeCall(urls.login, callParams, false); // Prevent default toast inside makeCall
-
-    if (response?.success) {
-      const userRole = response?.data?.role;
-
-      // If the logged-in role does not match the expected role, return an error response
-      if (userRole !== expectedRole) {
-        toast.error("Unauthorized login attempt"); // Show only error
-        return { success: false };
-      }
-
-      // Only show success toast if login is truly authorized
-      if (isToast) {
-        toast.success("Login successfully!");
-      }
-    }
-
+    const response = await makeCall(urls.login, callParams, isToast);
     return response;
   } catch (error) {
-    return { success: false, errMessage: "Network error, please try again" };
+    throw error;
   }
 }
 
@@ -546,3 +530,55 @@ export async function createSubAdmin(body, isToast = true) {
     throw error;
   }
 }
+
+
+// MARKETNAMES API FOR PRIZE VALIDATION 
+export async function PrizeValidationMarkets(body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.GET, body, isToast);
+    const response = await makeCall(
+      ` ${urls.compareValidationMarkets}?search=${body.search}`,
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+// SUBADMINS NAMES WITH  RESPECT TO MARKETNAMES API FOR PRIZE VALIDATION  TO APPROVE 
+export async function ViewSubAdminsPrizeValidationMarkets(body = {}, marketId, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.GET, body, isToast);
+    const response = await makeCall(
+      ` ${urls.ViewSubAdminsValidationMarkets}/${marketId}`,
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+// COMPARE CHECK DATA WITH SUBADMINS NAMES COMPARISON LIST  WITH  RESPECT TO MARKETNAMES API FOR PRIZE VALIDATION  TO APPROVE 
+export async function ViewSubAdminsPrizeValidationMarketsCompareCheck(body = {}, marketId, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.GET, body, isToast);
+    const response = await makeCall(
+      ` ${urls.SubAdminsValidationMarketsCompareCheck}/${marketId}`,
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+
+

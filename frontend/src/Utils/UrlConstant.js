@@ -6,6 +6,7 @@ class UrlConstant {
 
   admin = "admin";
   login = `${this.url_dev}/login`;
+  subadmin = "subadmin"
   generateTicketId = `${this.url_dev}/ticket-create`;
   generateLottery = `${this.url_dev}/create-lottery`;
   getLotteryTicket = `${this.url_dev}/getAllLotteries`;
@@ -44,6 +45,9 @@ class UrlConstant {
   resetPasswordAdmin = `${this.url_dev}/${this.admin}/reset-password`;
   UpdateDetails = `${this.url_dev}/${this.admin}/update-market`;
   subAdminCreate = `${this.url_dev}/${this.admin}/create-subAdmin`;
+  compareValidationMarkets = `${this.url_dev}/${this.subadmin}/win-request-market`;
+  ViewSubAdminsValidationMarkets = `${this.url_dev}/market-wise-subadmin`;
+  SubAdminsValidationMarketsCompareCheck = `${this.url_dev}/${this.subadmin}/matching-data`
 }
 
 const urls = new UrlConstant();
