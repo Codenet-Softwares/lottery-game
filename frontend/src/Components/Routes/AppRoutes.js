@@ -19,6 +19,8 @@ import Inactive from "../Pages/Inactive";
 import LiveMarkets from "../LiveMarkets/LiveMarkets";
 import Trash from "../Trash/Trash";
 import ResetPassword from "../ResetPassword/ResetPassword";
+import CreateSubadmin from "../CreateSubadmin/CreateSubadmin";
+import PrizeValidation from "../PrizeAppproval/PrizeValidation";
 import BetAfterWin from "../SettleUnsettle/BetAfterWin";
 import BetSettleUnsettle from "../SettleUnsettle/BetSettleUnsettle";
 
@@ -71,6 +73,8 @@ const AppRoutes = () => {
             <Route path="/Live-markets" element={<LiveMarkets />} />
             <Route path="/trash" element={<Trash />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/create-subadmin" element={<CreateSubadmin />} />
+            <Route path="/prize-validation" element={<PrizeValidation />} />
             <Route path="/bet-tracker" element={<BetAfterWin />} />
             {/* <Route path="/live-stats" element={<BetSettleUnsettle />} /> */}
           </Route>

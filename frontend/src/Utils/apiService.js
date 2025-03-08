@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import strings from "./constant/stringConstant";
 import { getAuthCallParams, getNoAuthCallParams, makeCall } from "./service";
 import urls from "./UrlConstant";
@@ -217,6 +218,24 @@ export async function GetDrawTime(body, isToast = false) {
   }
 }
 
+export async function CustomWiningAdmin(body, isToast = true) {
+  try {
+    const callParams = await getAuthCallParams(
+      strings.POST,
+      body.resultArray,
+      isToast
+    );
+    const response = await makeCall(
+      `${urls. CustomWinningPrizeadmin}/${body.marketId}`,
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function CustomWining(body, isToast = true) {
   try {
     const callParams = await getAuthCallParams(
@@ -225,7 +244,7 @@ export async function CustomWining(body, isToast = true) {
       isToast
     );
     const response = await makeCall(
-      `${urls.CustomWinningPrize}/${body.marketId}`,
+      `${urls. CustomWinningPrizeSubadmin}/${body.marketId}`,
       callParams,
       isToast
     );
@@ -511,6 +530,89 @@ export async function UpdateMarketDetails(body = {}, marketId, isToast = true) {
     const response = await makeCall(
       `${urls.UpdateDetails}/${marketId}`,
 
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function createSubAdmin(body, isToast = true) {
+  try {
+    const callParams = await getAuthCallParams(strings.POST, body, isToast);
+    const response = await makeCall(urls.subAdminCreate, callParams, isToast);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// MARKETNAMES API FOR PRIZE VALIDATION
+export async function PrizeValidationMarkets(body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.GET, body, isToast);
+    const response = await makeCall(
+      ` ${urls.compareValidationMarkets}?search=${body.search}`,
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// SUBADMINS NAMES WITH  RESPECT TO MARKETNAMES API FOR PRIZE VALIDATION  TO APPROVE
+export async function ViewSubAdminsPrizeValidationMarkets(
+  body = {},
+  marketId,
+  isToast = false
+) {
+  try {
+    const callParams = await getAuthCallParams(strings.GET, body, isToast);
+    const response = await makeCall(
+      ` ${urls.ViewSubAdminsValidationMarkets}/${marketId}`,
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// COMPARE CHECK DATA WITH SUBADMINS NAMES COMPARISON LIST  WITH  RESPECT TO MARKETNAMES API FOR PRIZE VALIDATION  TO APPROVE
+export async function ViewSubAdminsPrizeValidationMarketsCompareCheck(
+  body = {},
+  marketId,
+  isToast = false
+) {
+  try {
+    const callParams = await getAuthCallParams(strings.GET, body, isToast);
+    const response = await makeCall(
+      ` ${urls.SubAdminsValidationMarketsCompareCheck}/${marketId}`,
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// COMPARE CHECK DATA WITH SUBADMINS NAMES COMPARISON LIST  WITH  RESPECT TO MARKETNAMES API FOR  APPROVE   AND REJECT
+export async function ApproveReject(
+  body = {},
+  marketId,
+  type,
+  isToast = false
+) {
+  try {
+    const callParams = await getAuthCallParams(strings.POST, body, isToast);
+    const response = await makeCall(
+      ` ${urls.ApproveReject}/${marketId}?type=${body.type}`,
       callParams,
       isToast
     );

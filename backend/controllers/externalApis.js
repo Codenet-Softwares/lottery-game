@@ -71,20 +71,13 @@ export const getLotteryBetHistory = async (req, res) => {
       },
     };
 
-    if (type === "void") {
+    if(type === "void") {
       queryConditions.isVoid = true;
-    }
-    
-   else  if (type === "settle")
-    {
+    }else if (type === "settle"){
       queryConditions.resultAnnouncement = true;
-    }
-
-   else  if(type === "unsettle")
-    {
+    }else if(type === "unsettle"){
       queryConditions.resultAnnouncement = false;
-    }
-    else{
+    }else{
       return apiResponseSuccess(
         [],
         true,

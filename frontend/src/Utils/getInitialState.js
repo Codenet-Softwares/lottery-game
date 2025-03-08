@@ -7,6 +7,7 @@ export const getAdminInitialState = (body = {}) => {
     userName: body.userName ?? '',
     adminId: body.adminId ?? '',
     roles: body.role ?? [],
+    permissions:body.permissions ?? ''
   };
 };
 
