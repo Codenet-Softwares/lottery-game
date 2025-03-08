@@ -17,14 +17,21 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
     totalPages: 0,
     totalItems: 0,
   });
+// Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
 
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
   const fetchLiveBetMarketStats = async () => {
     try {
       const response = await GetBetMarketStats({
         marketId,
         page: pagination.page,
         limit: pagination.limit,
-        search:searchTerm,
+        search: debouncedSearchTerm,
       });
 
       console.log("API Response===========================", response);
@@ -48,7 +55,7 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
     if (marketId) {
       fetchLiveBetMarketStats();
     }
-  }, [marketId, pagination.page, pagination.limit, searchTerm]);
+  }, [marketId, pagination.page, pagination.limit, debouncedSearchTerm]);
   
   const handleShowTickets = (details) => {
     const ticketsBody = details.map((detail) => (
@@ -272,15 +279,16 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
                 </tbody>
               </table>
             </div>
-
-            <Pagination
-              currentPage={pagination.page}
-              totalPages={pagination.totalPages}
-              handlePageChange={handlePageChange}
-              startIndex={startIndex}
-              endIndex={endIndex}
-              totalData={pagination.totalItems}
-            />
+            {filteredStats.length > 0 && pagination.totalPages > 0 && (
+              <Pagination
+                currentPage={pagination.page}
+                totalPages={pagination.totalPages}
+                handlePageChange={handlePageChange}
+                startIndex={startIndex}
+                endIndex={endIndex}
+                totalData={pagination.totalItems}
+              />
+            )}
           </div>
 
           <ReusableModal
