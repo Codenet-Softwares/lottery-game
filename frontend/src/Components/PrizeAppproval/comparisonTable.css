@@ -1,0 +1,6 @@
+.small-dropdown {
+    width: 150px; /* Fixed width */
+    max-height: 100px; /* Fixed height for scrollable area */
+    overflow-y: auto; /* Enables scrolling */
+  }
+  

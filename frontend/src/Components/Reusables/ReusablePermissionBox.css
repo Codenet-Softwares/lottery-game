@@ -1,0 +1,45 @@
+.permission-box-container {
+  margin-top: 15px;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background: #e6f7ff;
+}
+
+.permission-label {
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.permission-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  min-height: 100px; 
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.permission-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.error-message {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+.no-permissions {
+  grid-column: 1 / -1; /* Makes the text span across all columns */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%; /* Ensures it takes up the full height */
+  font-size: 14px;
+  font-weight: bold;
+  color: #555;
+}

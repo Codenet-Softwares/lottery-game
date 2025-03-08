@@ -429,9 +429,13 @@ function validateTicketNumber(ticketNumber, prizeCategory) {
     const ticketRegex = /^\d{4}$/;
     return ticketRegex.test(trimmedNumber);
   } else if (prizeCategory === 'First Prize') {
+  
+
+
       // First prize: allows both 38A00001 and 38 A 00001
       const ticketRegex = /^\d{2} ?[A-Z] ?\d{5}$/;
       return ticketRegex.test(trimmedNumber);
+
   }
   return false;
 }
@@ -512,6 +516,7 @@ export const validateResetPassword = [
     .withMessage('New password must be at least 8 characters long')
 ];
 
+
 export const validateDeleteBetAterWin = [
   body('purchaseId')
     .notEmpty().withMessage('Purchase ID is required')
@@ -551,4 +556,24 @@ export const validateVoidAfyerWin = [
   body('marketId')
     .notEmpty().withMessage('Market ID is required')
     .isUUID().withMessage('Market ID must be a valid UUID'),
+];
+
+export const createSubAdminSchema = [
+  body('userName').trim().notEmpty().withMessage('User Name is required'),
+  body('password').trim().notEmpty().withMessage('Password is required'),
+];
+
+
+export const validateMarketWiseSubadmin = [
+  param("marketId")
+    .isUUID()
+    .withMessage("Invalid marketId. It should be a valid UUID."),
+];
+
+
+export const validateAdminApproveReject = [
+  param("marketId")
+    .isUUID()
+    .withMessage("Invalid marketId. It should be a valid UUID."),
+    body('type').trim().notEmpty().withMessage('Type is required'),
 ];

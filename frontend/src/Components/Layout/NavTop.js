@@ -10,7 +10,13 @@ import { toast } from "react-toastify";
 import "./NavTop.css";
 
 const NavTop = () => {
-  const { dispatch } = useAppContext();
+  const { dispatch, store } = useAppContext();
+  console.log(
+    "data from store for topnavbar1",
+    store.admin.roles,
+    "data from store for topnavbar2",
+    store.admin.permissions
+  );
   const location = useLocation();
   const navigate = useNavigate();
   const scrollRef = useRef(null);
@@ -26,38 +32,66 @@ const NavTop = () => {
       toast.info("Logout cancelled.");
     }
   };
-
+// Defined navigation items with the fields of permission if added in future 
   const navItems = [
-    { to: "/dashboard", icon: "fas fa-tachometer-alt", label: "Dashboard" },
+    { to: "/dashboard", icon: "fas fa-tachometer-alt", label: "Dashboard",permission: "" },
     {
       to: "/lottery-markets",
       icon: "fas fa-ticket-alt",
       label: "Create Lottery",
+      permission: ""
     },
     {
       to: "/Market-overview",
       icon: "fas fa-chart-line",
       label: "Market Overview",
+      permission: ""
     },
-    { to: "/results", icon: "fas fa-trophy", label: "Results" },
-    { to: "/win", icon: "fas fa-money-bill-wave", label: "Win" },
+    { to: "/results", icon: "fas fa-trophy", label: "Results",permission: "" },
+    { to: "/win", icon: "fas fa-money-bill-wave", label: "Win" , permission: "win-Lottery-Result" },
     {
       to: "/purchase-history",
       icon: "fas fa-history",
       label: "Purchase History",
+      permission: ""
     },
-    { to: "/search-lottery", icon: "fas fa-search", label: "Search Lottery" },
-    { to: "/get-void-market", icon: "fas fa-file-excel", label: "Void" },
-    { to: "/inactive", icon: "fas fa-ban", label: "Revoke" },
+    { to: "/search-lottery", icon: "fas fa-search", label: "Search Lottery",permission: "" },
+    { to: "/get-void-market", icon: "fas fa-file-excel", label: "Void",permission: "" },
+    { to: "/inactive", icon: "fas fa-ban", label: "Revoke" ,permission: ""},
     {
       to: "/live-markets",
       icon: "fas fa-broadcast-tower",
       label: "Live Markets",
+      permission: ""
     },
-    { to: "/trash", icon: "fas fa-trash-alt", label: "Trash" },
-    { to: "/reset-password", icon: "fas fa-key", label: "Reset Password" },
+    { to: "/trash", icon: "fas fa-trash-alt", label: "Trash" , permission: ""},
+    { to: "/reset-password", icon: "fas fa-key", label: "Reset Password", permission: "" },
+    {
+      to: "/create-subadmin",
+      icon: "fas fa-user-shield",
+      label: "Create Sub-Admin",
+      permission: ""
+    },
+    {
+      to: "/prize-validation",
+      icon: " fas fa-clipboard-check",
+      label: "Prize Approval",
+      permission: ""
+    },
+    { to: "/bet-tracker", icon: "fas fa-balance-scale", label: "Win Tracker" },
   ];
 
+  // Get permissions as an array
+  const userPermissions = store?.admin?.permissions
+    ? store.admin.permissions.split(",").map((perm) => perm.trim())
+    : [];
+
+  // Filter navigation items based on permissions
+  const filteredNavItems =
+    userPermissions.length === 0
+      ? navItems // If no specific permissions, show all
+      : navItems.filter((item) => userPermissions.includes(item.permission));
+  // Handle scroll update
   const handleUpdate = ({ getItemById }) => {
     setScrollState({
       start: getItemById(navItems[0]?.to)?.visible ?? true,
@@ -65,7 +99,7 @@ const NavTop = () => {
     });
   };
   return (
-    <SimpleBar className="navtop-container">
+    <SimpleBar className="navtop-container-Y">
       <div className="d-flex gap-5 justify-content-center align-items-center position-relative navtop-wrapper">
         {/* Left Arrow */}
         <button
@@ -86,7 +120,7 @@ const NavTop = () => {
             wrapperClassName="custom-scroll-wrapper"
             scrollContainerClassName="custom-scroll-container d-flex align-items-center gap-5"
           >
-            {navItems.map(({ to, icon, label }) => (
+            {filteredNavItems.map(({ to, icon, label }) => (
               <Link
                 key={to}
                 to={to}

@@ -6,6 +6,7 @@ class UrlConstant {
 
   admin = "admin";
   login = `${this.url_dev}/login`;
+  subadmin = "subadmin"
   generateTicketId = `${this.url_dev}/ticket-create`;
   generateLottery = `${this.url_dev}/create-lottery`;
   getLotteryTicket = `${this.url_dev}/getAllLotteries`;
@@ -21,7 +22,8 @@ class UrlConstant {
   PurchasedLotteryHistory = `${this.url_dev}/admin/purchase-history`;
   lotteryClock = `${this.url_dev}/admin/draw-dates`;
   GetScheduleTime = `${this.url_dev}/draw-dates`;
-  CustomWinningPrize = `${this.url_dev}/${this.admin}/results-declaration`;
+  CustomWinningPrizeadmin = `${this.url_dev}/${this.admin}/results-declaration`;
+  CustomWinningPrizeSubadmin = `${this.url_dev}/${this.subadmin}/win-result-request`; 
   GetResult = `${this.url_dev}/lottery-results`;
   lotteryRange = `${this.url_dev}/get-range`;
   allActiveLotteryMarket = `${this.url_dev}/${this.admin}/getAll-markets`;
@@ -37,12 +39,21 @@ class UrlConstant {
   allLiveMarketBroadcast = `${this.url_dev}/live-markets`;
   allLiveMarketstats = `${this.url_dev}/live-lotteries`;
   DeleteLiveBets = `${this.url_dev}/delete-liveBet-lottery`;
-  DeletedLiveBetsMarkets= `${this.url_dev}/get-trash-market`;
-  LiveBetsMarketsDetailsDeleted=`${this.url_dev}/get-trash-bet`;
+  DeletedLiveBetsMarkets = `${this.url_dev}/get-trash-market`;
+  LiveBetsMarketsDetailsDeleted = `${this.url_dev}/get-trash-bet`;
   TrashMarketDetailsDelete = `${this.url_dev}/delete-trash`;
-  RevokeDelete =  `${this.url_dev}/revoke-live-market`
+  RevokeDelete = `${this.url_dev}/revoke-live-market`;;
   resetPasswordAdmin = `${this.url_dev}/${this.admin}/reset-password`;
   UpdateDetails = `${this.url_dev}/${this.admin}/update-market`;
+  subAdminCreate = `${this.url_dev}/${this.admin}/create-subAdmin`;
+  compareValidationMarkets = `${this.url_dev}/${this.subadmin}/win-request-market`;
+  ViewSubAdminsValidationMarkets = `${this.url_dev}/market-wise-subadmin`;
+  SubAdminsValidationMarketsCompareCheck = `${this.url_dev}/${this.subadmin}/matching-data`;
+  ApproveReject = `${this.url_dev}/${this.admin}/approved-reject`
+  allLiveMarketBet = `${this.url_dev}/afterWin-markets`;
+  allLiveBetMarket = `${this.url_dev}/afterWin-lotteries`;
+  DeleteLiveMarketBets = `${this.url_dev}/delete-Bet-afterWin-lottery`;
+  getVoidBetMarket = `${this.url_dev}/void-market-afterWin-lottery`;
 }
 
 const urls = new UrlConstant();
