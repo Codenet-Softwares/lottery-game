@@ -1565,7 +1565,8 @@ export const adminApproveReject = async(req,res) => {
         "This result is rejected!",
         res
       );
-    };
+    }else if (type === 'Approve')
+    {
 
     const existingTicket = await WinResultRequest.findAll({
       attributes: ["marketName","prizeCategory", "prizeAmount", "ticketNumber", "complementaryPrize"],
@@ -1611,12 +1612,21 @@ export const adminApproveReject = async(req,res) => {
       "Ticket fetch successfull!",
       res
     );
+  }else{
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.badRequest,
+      error.message,
+      res
+    );
+  }
   } catch (error) {
     return apiResponseErr(
       null,
       false,
       statusCode.internalServerError,
-      error.message,
+      "Type should be not null!",
       res
     );
   }
