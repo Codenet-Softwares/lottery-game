@@ -1,5 +1,6 @@
 import { string } from '../constructor/string.js';
 import {
+  adminApproveReject,
   adminPurchaseHistory,
   adminSearchTickets,
   afterWinLotteries,
@@ -24,7 +25,7 @@ import {
   winResultMarket,
 } from '../controllers/admin.controller.js';
 import { authorize } from '../middlewares/auth.js';
-import { validateAdminLogin, validateAdminPurchaseHistory, validateSearchTickets, validateCreateAdmin, validateDateQuery, validateGetResult, validateMarketId, validateLiveLottery, validateLiveMarkets, validateResetPassword, validateAfterWinMarkets, validateAfterWinLottery, createSubAdminSchema, validateMarketWiseSubadmin, } from '../utils/commonSchema.js';
+import { validateAdminLogin, validateAdminPurchaseHistory, validateSearchTickets, validateCreateAdmin, validateDateQuery, validateGetResult, validateMarketId, validateLiveLottery, validateLiveMarkets, validateResetPassword, validateAfterWinMarkets, validateAfterWinLottery, createSubAdminSchema, validateMarketWiseSubadmin, validateAdminApproveReject, } from '../utils/commonSchema.js';
 import customErrorHandler from '../utils/customErrorHandler.js';
 import { apiResponseErr, apiResponseSuccess } from '../utils/response.js';
 import { statusCode } from '../utils/statusCodes.js';
@@ -95,5 +96,6 @@ export const adminRoutes = (app) => {
 
   app.get('/api/admin/get-all-subAdmin', authorize([string.Admin]), getAllSubAdmin)
 
+  app.post('/api/admin/approved-reject/:marketId',validateAdminApproveReject, customErrorHandler, authorize([string.Admin]),adminApproveReject)
 
 };

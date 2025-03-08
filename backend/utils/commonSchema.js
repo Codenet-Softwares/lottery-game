@@ -569,3 +569,11 @@ export const validateMarketWiseSubadmin = [
     .isUUID()
     .withMessage("Invalid marketId. It should be a valid UUID."),
 ];
+
+
+export const validateAdminApproveReject = [
+  param("marketId")
+    .isUUID()
+    .withMessage("Invalid marketId. It should be a valid UUID."),
+    body('type').trim().notEmpty().withMessage('Type is required'),
+];

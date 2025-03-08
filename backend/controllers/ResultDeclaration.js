@@ -14,12 +14,7 @@ export const ResultDeclare = async (req, res) => {
   try {
     const prizes = req.body;
     const { marketId } = req.params;
-    const {type} = req.query;
-    if(type === 'isReject'){
-      await WinResultRequest.update({isReject: true},{where:{ marketId }})
-
-      return apiResponseErr(null, false, statusCode.badRequest, 'Result is Rejected', res);
-    }
+    
     const market = await TicketRange.findOne({ where: { marketId } });
 
     if (!market) {
