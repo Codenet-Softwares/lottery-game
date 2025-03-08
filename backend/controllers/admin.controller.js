@@ -1558,10 +1558,10 @@ export const adminApproveReject = async(req,res) => {
     {
     await WinResultRequest.update({ isReject: true },{ where: { marketId } });
 
-      return apiResponseErr(
+      return apiResponseSuccess(
         [],
         false,
-        statusCode.badRequest,
+        statusCode.success,
         "This result is rejected!",
         res
       );

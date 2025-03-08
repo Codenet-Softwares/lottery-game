@@ -714,6 +714,8 @@ export const subadminResultRequest = async (req, res) => {
           },
           marketId,
           adminId,
+          isReject: false,
+          isApproved: false
         },
       });
 
@@ -732,7 +734,8 @@ export const subadminResultRequest = async (req, res) => {
       }
 
       const existingResults = await WinResultRequest.findAll({
-        where: { prizeCategory, marketId, adminId },
+        where: { prizeCategory, marketId, adminId,   isReject: false,
+          isApproved: false },
       });
 
       if (existingResults.length >= prizeLimits[prizeCategory]) {
@@ -888,7 +891,7 @@ export const subadminResultRequest = async (req, res) => {
       savedResults = await WinResultRequest.bulkCreate(generatedTickets);
 
       const existingAdminIds = await WinResultRequest.findAll({
-        where: { marketId },
+        where: { marketId, isReject: false, isApproved: false  },
         attributes: [
           "adminId",
           "marketId",
