@@ -6,7 +6,8 @@ import {
   PrizeValidationMarkets,
   ViewSubAdminsPrizeValidationMarkets,
   ViewSubAdminsPrizeValidationMarketsCompareCheck,
-  ApproveReject
+  ApproveReject,
+  CustomWiningAdmin,
 } from "../../Utils/apiService";
 import ComparisonTable from "./ComparisonTable";
 
@@ -18,95 +19,85 @@ const PrizeValidation = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState([]);
   const [loadingModal, setLoadingModal] = useState(false);
-  console.log('LINE 21',modalContent)
 
+  // marketnames for the page of Prize Approval Market List
+
+  const fetchMarketData = async () => {
+    try {
+      setLoading(true);
+      const allMarket = await PrizeValidationMarkets({ search: "" });
+      console.log(allMarket);
+
+      const formattedMarkets = allMarket.data.map((item, index) => ({
+        id: item.marketId,
+        marketName: item.marketName,
+        serialNumber: index + 1,
+      }));
+
+      setMarketData(formattedMarkets);
+    } catch (error) {
+      console.error("Error fetching market data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // rerender of the  marketnames for the page of Prize Approval Market List
   useEffect(() => {
-    const fetchMarketData = async () => {
-      try {
-        setLoading(true);
-        const allMarket = await PrizeValidationMarkets({ search: "" });
-        console.log(allMarket); 
-
-        const formattedMarkets = allMarket.data.map((item, index) => ({
-          id: item.marketId,
-          marketName: item.marketName,
-          serialNumber: index + 1,
-        }));
-
-        setMarketData(formattedMarkets);
-      } catch (error) {
-        console.error("Error fetching market data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchMarketData();
   }, []);
 
+  //  ViewSubAdmins for the page of Prize Approval with respect to  Market List
   const fetchApprovalData = async (market) => {
-    try {
-      const response = await ViewSubAdminsPrizeValidationMarkets({}, market.id);
-      console.log("Approval Data Response:", response);
+    const response = await ViewSubAdminsPrizeValidationMarkets({}, market.id);
+    console.log("Approval Data Response:", response);
 
-      if (response?.success) {
-        setApprovalData(response.data || []);
-      } else {
-        setApprovalData([]);
-      }
-      setSelectedMarket(market);
-    } catch (error) {
-      console.error("Error fetching approval data:", error);
+    if (response?.success) {
+      setApprovalData(response.data || []);
+    } else {
+      setApprovalData([]);
     }
+    setSelectedMarket(market);
   };
-
+  //  comparelist  for the page of Prize Approval with respect to  Market List by 2 subadmins
   const fetchComparisonData = async (marketId) => {
-    try {
-      setLoadingModal(true);
-      const response = await ViewSubAdminsPrizeValidationMarketsCompareCheck(
-        {},
-        marketId
-      );
-      console.log("Comparison Data Response:", response);
-
-      if (response?.success) {
-        setModalContent(response.data || []);
-      } else {
-        setModalContent([]);
-      }
-    } catch (error) {
-      console.error("Error fetching comparison data:", error);
-      setModalContent([]);
-    } finally {
-      setLoadingModal(false);
-      setShowModal(true);
-    }
-  };
-
-
-  const handleApproveReject = async (type) => {
-    if (!selectedMarket || !modalContent?.Matched?.length) return;
-  
-    // Extract and format matched data
-    const formattedData = modalContent.Matched.flatMap((match) =>
-      match.MatchData.map(({ ticketNumber, prizeAmount, tickets }) => ({
-        prizeCategory: ticketNumber,
-        prizeAmount,
-        ticketNumber: tickets,
-      }))
+    setLoadingModal(true);
+    const response = await ViewSubAdminsPrizeValidationMarketsCompareCheck(
+      {},
+      marketId
     );
-  
-    try {
-      const response = await ApproveReject(formattedData, selectedMarket.id, type);
-      if (response?.success) {
-        alert(`${type} successful!`);
-        setShowModal(false);
-      }
-    } catch (error) {
-      console.error(`Error during ${type}:`, error);
+    console.log("Comparison Data Response:", response);
+
+    if (response?.success) {
+      setModalContent(response.data || []);
+    } else {
+      setModalContent([]);
     }
   };
-  
+  //  approve reject fetch and succeded here in this function
+  const handleApproveReject = async (type) => {
+    if (!selectedMarket) return;
+
+    //  Call the first API (ApproveReject)
+    const response = await ApproveReject({ type }, selectedMarket.id);
+
+    if (response?.success) {
+      // Pass the response from ApproveReject as the payload to CustomWining
+      const customWiningResponse = await CustomWiningAdmin({
+        resultArray: response.data,
+        marketId: selectedMarket.id,
+      });
+
+      if (customWiningResponse?.success) {
+        alert(`${type} successful!`);
+        setApprovalData([]);
+        setShowModal(false);
+        setSelectedMarket(null); // Reset to go back to Prize Approval Market List
+
+        fetchMarketData();
+      }
+    }
+  };
 
   const marketColumns = [
     { key: "serialNumber", label: "S.No." },
@@ -203,7 +194,10 @@ const PrizeValidation = () => {
       )}
       <ReusableModal
         show={showModal}
-        handleClose={() => setShowModal(false)}
+        handleClose={() => {
+          console.log("Closing Modal...");
+          setShowModal(false);
+        }}
         title="Approval Check"
         body={
           <ComparisonTable
@@ -214,15 +208,15 @@ const PrizeValidation = () => {
         footerButtons={[
           {
             text: "Approve",
-            onClick: () => handleApproveReject("approve"),
+            onClick: () => handleApproveReject("Approve"),
             className: "btn btn-success",
-            disabled: !modalContent?.Matched?.length,  // Disable if no Matched data
+            disabled: !modalContent?.Matched?.length, // Disable if no Matched data
           },
           {
             text: "Reject",
-            onClick: () => handleApproveReject("reject"),
+            onClick: () => handleApproveReject("Reject"),
             className: "btn btn-danger",
-            disabled: !modalContent?.Matched?.length,  // Disable if no Matched data
+            disabled: !modalContent?.Matched?.length,
           },
         ]}
       />

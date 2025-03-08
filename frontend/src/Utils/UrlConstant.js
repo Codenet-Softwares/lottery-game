@@ -22,8 +22,8 @@ class UrlConstant {
   PurchasedLotteryHistory = `${this.url_dev}/admin/purchase-history`;
   lotteryClock = `${this.url_dev}/admin/draw-dates`;
   GetScheduleTime = `${this.url_dev}/draw-dates`;
-  // CustomWinningPrize = `${this.url_dev}/${this.admin}/results-declaration`; // this is the old endpoint of custom winning for admin next to this line is the new one which should be done by subamin only 
-  CustomWinningPrize = `${this.url_dev}/${this.subadmin}/win-result-request`; 
+  CustomWinningPrizeadmin = `${this.url_dev}/${this.admin}/results-declaration`;
+  CustomWinningPrizeSubadmin = `${this.url_dev}/${this.subadmin}/win-result-request`; 
   GetResult = `${this.url_dev}/lottery-results`;
   lotteryRange = `${this.url_dev}/get-range`;
   allActiveLotteryMarket = `${this.url_dev}/${this.admin}/getAll-markets`;
@@ -49,7 +49,7 @@ class UrlConstant {
   compareValidationMarkets = `${this.url_dev}/${this.subadmin}/win-request-market`;
   ViewSubAdminsValidationMarkets = `${this.url_dev}/market-wise-subadmin`;
   SubAdminsValidationMarketsCompareCheck = `${this.url_dev}/${this.subadmin}/matching-data`;
-  ApproveReject = `${this.url_dev}/${this.admin}/results-declaration`
+  ApproveReject = `${this.url_dev}/${this.admin}/approved-reject`
 }
 
 const urls = new UrlConstant();

@@ -1,4 +1,5 @@
 import React from "react";
+import  './comparisonTable.css'
 
 const ComparisonTable = ({ modalContent, loadingModal }) => {
   if (loadingModal) {
@@ -16,7 +17,7 @@ const ComparisonTable = ({ modalContent, loadingModal }) => {
         modalContent.Matched.map((market, index) => (
           <div key={index} className="mb-3 border p-2 rounded">
             <h6 className="fw-bold">{market.marketName}</h6>
-            <table className="table table-bordered">
+            <table className="table table-bordered text-uppercase fs-6">
               <thead>
                 <tr>
                   <th>Declared By 1</th>
@@ -24,6 +25,7 @@ const ComparisonTable = ({ modalContent, loadingModal }) => {
                   <th>Prize Category</th>
                   <th>Ticket Numbers</th>
                   <th>Prize Amount</th>
+                  <th>complimentary</th>
                 </tr>
               </thead>
               <tbody>
@@ -44,8 +46,15 @@ const ComparisonTable = ({ modalContent, loadingModal }) => {
                           </>
                         )}
                         <td>{category}</td>
-                        <td>{entry1.ticketNumber[category]?.tickets.join(", ") || "-"}</td>
+                        <td>
+                          <select className="form-select small-dropdown ">
+                            {entry1.ticketNumber[category]?.tickets.map((ticket, idx) => (
+                              <option key={idx}>{ticket}</option>
+                            ))}
+                          </select>
+                        </td>
                         <td>₹{entry1.ticketNumber[category]?.prizeAmount || "-"}</td>
+                        <td>₹{entry1.ticketNumber[category]?.complementaryPrize || "NA"}</td>
                       </tr>
                     );
                   })
@@ -67,37 +76,48 @@ const ComparisonTable = ({ modalContent, loadingModal }) => {
       {/* Unmatched Entries */}
       <h5 className="fw-bold text-danger mt-4">Unmatched Entries</h5>
       {hasUnmatchedData ? (
-        modalContent.Unmatched.map((market, index) => (
-          <div key={index} className="mb-3 border p-2 rounded">
-            <h6 className="fw-bold">{market.marketName}</h6>
-            <table className="table table-bordered">
-              <thead>
-                <tr>
-                  <th>Declared By</th>
-                  <th>Prize Category</th>
-                  <th>Ticket Numbers</th>
-                  <th>Prize Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {market.MatchData.map((entry, i) =>
+        <div className="table-responsive">
+          <table className="table table-bordered">
+            <thead>
+              <tr>
+                <th>Market</th>
+                <th>Declared By</th>
+                <th>Prize Category</th>
+                <th>Ticket Numbers</th>
+                <th>Prize Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {modalContent.Unmatched.map((market, index) =>
+                market.MatchData.map((entry, i) =>
                   Object.entries(entry.ticketNumber).map(([category, details], j) => (
-                    <tr key={`${i}-${j}`}>
+                    <tr key={`${index}-${i}-${j}`}>
+                      {i === 0 && j === 0 && (
+                        <td rowSpan={Object.keys(market.MatchData[0].ticketNumber).length * market.MatchData.length} className="align-middle">
+                          {market.marketName}
+                        </td>
+                      )}
                       {j === 0 && (
                         <td rowSpan={Object.keys(entry.ticketNumber).length} className="align-middle">
                           {entry.declearBy}
                         </td>
                       )}
                       <td>{category}</td>
-                      <td>{details.tickets.join(", ")}</td>
+                      <td>
+                        <select className="form-select small-dropdown">
+                          {details.tickets.map((ticket, idx) => (
+                            <option key={idx}>{ticket}</option>
+                          ))}
+                        </select>
+                      </td>
                       <td>₹{details.prizeAmount}</td>
                     </tr>
                   ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        ))
+                )
+              )}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <p className="text-danger">No unmatched data available</p>
       )}

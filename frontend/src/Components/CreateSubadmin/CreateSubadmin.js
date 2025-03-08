@@ -25,6 +25,7 @@ const CreateSubadmin = ({ permissionsList = ["win-Lottery-Result"] }) => {
         permissions: values.permissions.map(String).join(","), // Ensure each permission is a string
       };
       createSubAdmin(requestBody);
+      formik.resetForm()
     },
   });
 

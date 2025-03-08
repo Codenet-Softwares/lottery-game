@@ -218,6 +218,24 @@ export async function GetDrawTime(body, isToast = false) {
   }
 }
 
+export async function CustomWiningAdmin(body, isToast = true) {
+  try {
+    const callParams = await getAuthCallParams(
+      strings.POST,
+      body.resultArray,
+      isToast
+    );
+    const response = await makeCall(
+      `${urls. CustomWinningPrizeadmin}/${body.marketId}`,
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function CustomWining(body, isToast = true) {
   try {
     const callParams = await getAuthCallParams(
@@ -226,7 +244,7 @@ export async function CustomWining(body, isToast = true) {
       isToast
     );
     const response = await makeCall(
-      `${urls.CustomWinningPrize}/${body.marketId}`,
+      `${urls. CustomWinningPrizeSubadmin}/${body.marketId}`,
       callParams,
       isToast
     );
@@ -594,7 +612,7 @@ export async function ApproveReject(
   try {
     const callParams = await getAuthCallParams(strings.POST, body, isToast);
     const response = await makeCall(
-      ` ${urls.ApproveReject}/${marketId}?type=${type}`,
+      ` ${urls.ApproveReject}/${marketId}?type=${body.type}`,
       callParams,
       isToast
     );
