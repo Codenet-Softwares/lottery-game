@@ -179,6 +179,12 @@ sequelize
         // Find markets where isUpdate is true
         const marketsToUpdate = await TicketRange.findAll({ where: { isUpdate: true } });
         
+        // if (marketsToUpdate.length === 0) {
+        //   console.log('No markets found to reset.');
+        //   return;
+        // }
+    
+
         const updatedMarketList = [];
     
         for (const market of marketsToUpdate) {
@@ -206,7 +212,7 @@ sequelize
       } catch (error) {
         console.error('Error in cron job:', error);
       }
-      console.log(`[SSE] Updates broadcasted: ${JSON.stringify(updatedMarketList)}`);
+      //console.log(`[SSE] Updates broadcasted: ${JSON.stringify(updatedMarketList)}`);
 
     });    
   })
