@@ -80,7 +80,11 @@ const TicketRange = sequelize.define(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
-    }
+    },
+    isUpdate: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     tableName: 'TicketRange',

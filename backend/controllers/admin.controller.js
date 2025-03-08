@@ -1547,3 +1547,77 @@ export const getAllSubAdmin = async(req, res) => {
     );
   }
 };
+
+
+export const adminApproveReject = async(req,res) => {
+  try {
+    const { type } = req.body;
+    const { marketId } = req.params;
+
+    if(type === 'Reject')
+    {
+    await WinResultRequest.update({ isReject: true },{ where: { marketId } });
+
+      return apiResponseErr(
+        [],
+        false,
+        statusCode.badRequest,
+        "This result is rejected!",
+        res
+      );
+    };
+
+    const existingTicket = await WinResultRequest.findAll({
+      attributes: ["marketName","prizeCategory", "prizeAmount", "ticketNumber", "complementaryPrize"],
+      where : {
+        marketId,
+        type : "Matched", 
+        isApproved : false, 
+        isReject : false
+      },
+      group: ["marketName","prizeCategory", "prizeAmount", "ticketNumber", "complementaryPrize"],
+      order: [["createdAt", "DESC"]],
+    });
+
+    if(!existingTicket || existingTicket.length == 0)
+    {
+      return apiResponseSuccess(
+        [],
+        true,
+        statusCode.badRequest,
+        "Ticket fetch successfull!",
+        res
+      );
+    }
+
+    const formattedResults = existingTicket.map(ticket => {
+      const result = {
+        prizeCategory: ticket.prizeCategory,
+        prizeAmount: ticket.prizeAmount,
+        ticketNumber: Array.isArray(ticket.ticketNumber) ? ticket.ticketNumber : [ticket.ticketNumber]
+      };
+      
+      if (ticket.complementaryPrize && ticket.complementaryPrize !== 0) {
+        result.complementaryPrize = ticket.complementaryPrize;
+      }
+      
+      return result;
+    });
+
+    return apiResponseSuccess(
+      formattedResults,
+      true,
+      statusCode.success,
+      "Ticket fetch successfull!",
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
