@@ -1617,7 +1617,7 @@ export const adminApproveReject = async(req,res) => {
       null,
       false,
       statusCode.badRequest,
-      error.message,
+      "type should be null!",
       res
     );
   }
@@ -1626,7 +1626,7 @@ export const adminApproveReject = async(req,res) => {
       null,
       false,
       statusCode.internalServerError,
-      "Type should be not null!",
+      error.message,
       res
     );
   }
