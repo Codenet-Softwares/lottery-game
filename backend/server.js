@@ -179,7 +179,6 @@ sequelize
         // Find markets where isUpdate is true
         const marketsToUpdate = await TicketRange.findAll({ where: { isUpdate: true } });
         
-
         const updatedMarketList = [];
     
         for (const market of marketsToUpdate) {
@@ -207,7 +206,7 @@ sequelize
       } catch (error) {
         console.error('Error in cron job:', error);
       }
-      //console.log(`[SSE] Updates broadcasted: ${JSON.stringify(updatedMarketList)}`);
+      console.log(`[SSE] Updates broadcasted: ${JSON.stringify(updatedMarketList)}`);
 
     });    
   })
