@@ -42,7 +42,7 @@ const ReusableTable = ({ data, columns, itemsPerPage, tableHeading , showSearch,
         <thead className="table-dark">
           <tr>
             {columns.map((column) => (
-              <th key={column.key}>{column.label}</th>
+              <th key={column.key} className="text-uppercase">{column.label}</th>
             ))}
           </tr>
         </thead>
@@ -51,7 +51,7 @@ const ReusableTable = ({ data, columns, itemsPerPage, tableHeading , showSearch,
             paginatedData.map((row, index) => (
               <tr key={index}>
                 {columns.map((column) => (
-                  <td key={column.key}>
+                  <td key={column.key} className="text-uppercase">
                     {column.render ? column.render(row) : row[column.key]}
                   </td>
                 ))}

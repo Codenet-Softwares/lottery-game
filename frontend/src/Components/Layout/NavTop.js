@@ -78,7 +78,8 @@ const NavTop = () => {
       label: "Prize Approval",
       permission: ""
     },
-    { to: "/bet-tracker", icon: "fas fa-balance-scale", label: "Win Tracker" },
+    { to: "/bet-tracker", icon: "fas fa-balance-scale", label: "Win Tracker", permission: "" },
+    { to: "/view-all-subadmin", icon: "fas fa-users-cog", label: "Sub-Admins", permission: "" }
   ];
 
   // Get permissions as an array
