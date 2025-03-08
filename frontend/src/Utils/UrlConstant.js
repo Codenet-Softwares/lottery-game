@@ -49,7 +49,8 @@ class UrlConstant {
   compareValidationMarkets = `${this.url_dev}/${this.subadmin}/win-request-market`;
   ViewSubAdminsValidationMarkets = `${this.url_dev}/market-wise-subadmin`;
   SubAdminsValidationMarketsCompareCheck = `${this.url_dev}/${this.subadmin}/matching-data`;
-  ApproveReject = `${this.url_dev}/${this.admin}/approved-reject`
+  ApproveReject = `${this.url_dev}/${this.admin}/approved-reject`;
+  AllSubAdmins = `${this.url_dev}/${this.admin}/get-all-subAdmin`;
   allLiveMarketBet = `${this.url_dev}/afterWin-markets`;
   allLiveBetMarket = `${this.url_dev}/afterWin-lotteries`;
   DeleteLiveMarketBets = `${this.url_dev}/delete-Bet-afterWin-lottery`;

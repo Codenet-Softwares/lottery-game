@@ -23,6 +23,7 @@ import CreateSubadmin from "../CreateSubadmin/CreateSubadmin";
 import PrizeValidation from "../PrizeAppproval/PrizeValidation";
 import BetAfterWin from "../SettleUnsettle/BetAfterWin";
 import BetSettleUnsettle from "../SettleUnsettle/BetSettleUnsettle";
+import ViewAllSubadmin from "../ViewAllSubAdmin/ViewAllSUbadmin";
 
 const AppRoutes = () => {
   return (
@@ -76,7 +77,8 @@ const AppRoutes = () => {
             <Route path="/create-subadmin" element={<CreateSubadmin />} />
             <Route path="/prize-validation" element={<PrizeValidation />} />
             <Route path="/bet-tracker" element={<BetAfterWin />} />
-            {/* <Route path="/live-stats" element={<BetSettleUnsettle />} /> */}
+            <Route path="/view-all-subadmin" element={<ViewAllSubadmin />} />
+           
           </Route>
           {/* not found */}
           <Route path="*" element={<NotFound />} />

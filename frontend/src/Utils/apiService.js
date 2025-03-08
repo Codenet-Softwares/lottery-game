@@ -226,7 +226,7 @@ export async function CustomWiningAdmin(body, isToast = true) {
       isToast
     );
     const response = await makeCall(
-      `${urls. CustomWinningPrizeadmin}/${body.marketId}`,
+      `${urls.CustomWinningPrizeadmin}/${body.marketId}`,
       callParams,
       isToast
     );
@@ -244,7 +244,7 @@ export async function CustomWining(body, isToast = true) {
       isToast
     );
     const response = await makeCall(
-      `${urls. CustomWinningPrizeSubadmin}/${body.marketId}`,
+      `${urls.CustomWinningPrizeSubadmin}/${body.marketId}`,
       callParams,
       isToast
     );
@@ -622,6 +622,20 @@ export async function ApproveReject(
   }
 }
 
+// VIEW ALL SUBADMIN LIST 
+export async function ViewAllSubAdmins(
+  body = {},
+
+  isToast = false
+) {
+  try {
+    const callParams = await getAuthCallParams(strings.GET, body, isToast);
+    const response = await makeCall(urls.AllSubAdmins, callParams, isToast);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
 export async function GetliveMarketBet(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams("GET", body, isToast);
@@ -653,7 +667,11 @@ export async function GetBetMarketStats(body = {}, isToast = false) {
 export async function DeleteLiveBetMarket(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.POST, body, isToast);
-    const response = await makeCall(urls.DeleteLiveMarketBets, callParams, isToast);
+    const response = await makeCall(
+      urls.DeleteLiveMarketBets,
+      callParams,
+      isToast
+    );
     return response;
   } catch (error) {
     throw error;
