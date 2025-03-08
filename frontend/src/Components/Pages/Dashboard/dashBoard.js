@@ -1,9 +1,11 @@
 import React, { useRef } from "react";
 import { Link } from "react-router-dom";
 import DashCard from "../../../Utils/constant/DashCard";
-import "./DashBoard.css"; // Import the CSS for styling
+import "./DashBoard.css"; 
+import { useAppContext } from "../../../contextApi/context";
 
 const Dashboard = () => {
+  const { store } = useAppContext(); 
   const cardsRef = useRef(null);
 
   const scroll = (direction) => {
@@ -15,6 +17,18 @@ const Dashboard = () => {
       behavior: "smooth",
     });
   };
+
+  // Filter DashCard based on roles & permissions
+  const filteredDashCards =
+    store.admin.roles === "admin"
+      ? DashCard // Show all cards for admin
+      : store.admin.roles === "subAdmin"
+      ? DashCard.filter((card) =>
+          store.admin.permissions.includes("win-Lottery-Result")
+            ? card.name === "Authorize Win"
+            : false
+        )
+      : [];
 
   return (
     <div className="dashboard-container">
@@ -28,7 +42,7 @@ const Dashboard = () => {
         </button>
 
         <div className="cards-wrapper" ref={cardsRef}>
-          {DashCard.map((card, index) => (
+          {filteredDashCards.map((card, index) => (
             <div className="card-item" key={index}>
               <div className="card-content" style={card.cardstyle}>
                 <i

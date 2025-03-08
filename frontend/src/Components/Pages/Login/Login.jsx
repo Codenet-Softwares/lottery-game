@@ -170,7 +170,7 @@ const Login = () => {
                       fontWeight: "600",
                     }}
                   >
-                    Lottery Admin Login
+                     Login
                   </h5>
                 </div>
 
