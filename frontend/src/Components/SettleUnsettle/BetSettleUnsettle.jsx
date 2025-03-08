@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { DeleteLiveBets, GetMarketStats } from "../../Utils/apiService";
-import ReusableModal from "../Reusables/ReusableModal";
-import "./LiveMarketStats.css";
 import Pagination from "../Common/Pagination";
+import { GetBetMarketStats, DeleteLiveBetMarket } from "../../Utils/apiService";
+import ReusableModal from "../Reusables/ReusableModal";
 import { useAppContext } from "../../contextApi/context";
 
-const LiveMarketStats = ({ marketId, backButton, refresh }) => {
-  const { showLoader, hideLoader } = useAppContext();
-  const [stats, setStats] = useState(null);
-  const [modalShow, setModalShow] = useState(false);
-  const [modalContent, setModalContent] = useState({ title: "", body: "" });
-
+const BetSettleUnsettle = ({ marketId, backButton }) => {
+  const [betStats, setBetStats] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [modalShow, setModalShow] = useState(false);
+  const [modalContent, setModalContent] = useState({ title: "", body: "" });
+  const { showLoader, hideLoader } = useAppContext();
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -20,29 +18,19 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
     totalItems: 0,
   });
 
-  // Debounce search term
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  // Fetch market stats based on pagination and search term
-  const fetchMarketStats = async () => {
+  const fetchLiveBetMarketStats = async () => {
     try {
-      const response = await GetMarketStats({
+      const response = await GetBetMarketStats({
         marketId,
         page: pagination.page,
         limit: pagination.limit,
-        search: debouncedSearchTerm,
+        search:searchTerm,
       });
 
-      if (response.success) {
-        setStats(response.data);
+      console.log("API Response===========================", response);
 
-        // Safely handle pagination properties
+      if (response?.success) {
+        setBetStats(response.data);
         setPagination((prev) => ({
           page: response.pagination?.page || prev.page,
           limit: response.pagination?.limit || prev.limit,
@@ -50,36 +38,18 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
           totalItems: response.pagination?.totalItems || 0,
         }));
       } else {
-        console.error("Failed to fetch market stats:", response.message);
+        console.error("Failed to fetch market stats:", response?.message);
       }
     } catch (error) {
       console.error("Error fetching market stats:", error);
     }
   };
-
-  
   useEffect(() => {
     if (marketId) {
-      fetchMarketStats();
+      fetchLiveBetMarketStats();
     }
-  }, [marketId, pagination.page, pagination.limit, debouncedSearchTerm]);
-
-  const handlePageChange = (newPage) => {
-    setPagination((prev) => ({ ...prev, page: newPage }));
-  };
-
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-    setPagination((prev) => ({ ...prev, page: 1 })); // Reset pagination on search change
-  };
-
-  // Calculate start and end indices for pagination display
-  const startIndex = (pagination.page - 1) * pagination.limit + 1;
-  const endIndex = Math.min(
-    pagination.page * pagination.limit,
-    pagination.totalItems
-  );
-
+  }, [marketId, pagination.page, pagination.limit, searchTerm]);
+  
   const handleShowTickets = (details) => {
     const ticketsBody = details.map((detail) => (
       <div key={detail.sem} className="mb-4 ticket-section">
@@ -117,31 +87,18 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
     });
     setModalShow(true);
   };
-
   const handleDeleteTicket = async (purchaseId) => {
     const confirmDeletion = window.confirm(
       "Are you sure you want to delete this live bet? This action is irreversible."
     );
-
+  
     if (confirmDeletion) {
       try {
-        showLoader(); // Show loader before the request
-        const response = await DeleteLiveBets({ purchaseId }, false);
+        showLoader();
+        const response = await DeleteLiveBetMarket({ purchaseId }, false);
         if (response.success) {
           alert("Live bet deleted successfully!");
-          setStats((prevStats) =>
-            prevStats.map((user) => ({
-              ...user,
-              details: user.details.map((detail) => ({
-                ...detail,
-                tickets: detail.tickets.filter(
-                  (ticket) => ticket.purchaseId !== purchaseId
-                ),
-              })),
-            }))
-          );
-          fetchMarketStats();
-          setModalShow(false);
+          window.location.reload(); // Reload the page after successful deletion
         } else {
           alert("Failed to delete live bet. Please try again.");
         }
@@ -149,41 +106,58 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
         console.error("Error deleting live bet:", error);
         alert("An error occurred while deleting the live bet.");
       } finally {
-        hideLoader(); // Hide loader after the request, regardless of success or failure
+        hideLoader();
       }
     }
   };
+  
 
-  const filteredStats = stats?.filter((user) =>
+  useEffect(() => {
+    console.log("Market ID================", marketId);
+    if (marketId) {
+      fetchLiveBetMarketStats();
+    }
+  }, [marketId, pagination.page, pagination.limit]);
+
+  const handlePageChange = (page) => {
+    setPagination((prev) => ({ ...prev, page }));
+  };
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    setPagination((prev) => ({ ...prev, page: 1 }));
+  };
+  const filteredStats = betStats?.filter((user) =>
     user.userName.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
   );
-
+  const startIndex = (pagination.page - 1) * pagination.limit + 1;
+  const endIndex = Math.min(
+    pagination.page * pagination.limit,
+    pagination.totalItems
+  );
   return (
-    <div className="container" style={{ overflow: "hidden" }}>
-      {stats ? (
+    <div className="container mt-4 rounded" style={{ overflow: "hidden",background:"#F0F0F0" }}>
+      {betStats ? (
         <div className="container " style={{ overflow: "hidden" }}>
           <div className="d-flex justify-content-between align-items-center mb-4">
-            {/* Back button outside the main container but in the same row */}
             <div
-              className="d-flex justify-content-start"
+              className="d-flex justify-content-start mt-5 px-5"
               style={{ position: "absolute", left: "40px" }}
             >
               {backButton}
             </div>
 
-            {/* Centering the Market Stats title */}
             <h3
-              className="text-custom fw-bold d-flex align-items-center"
+              className="text-custom fw-bold d-flex align-items-center mt-3"
               style={{
                 fontFamily: '"Arial", sans-serif',
                 fontSize: "2rem",
-                color: "#5a8f7d", // Unique formal color
+                color: "#5a8f7d",
                 textShadow: "1px 1px 4px rgba(0, 0, 0, 0.2)",
                 marginLeft: "auto",
                 marginRight: "auto",
               }}
             >
-              Market Stats for {stats[0]?.marketName}
+              Market Stats For {betStats[0]?.marketName}
             </h3>
           </div>
 
@@ -212,19 +186,6 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
               }
             />
           </div>
-
-          <marquee
-            className="bg-light text-dark py-2 rounded shadow-sm mb-3"
-            style={{ fontSize: "1.1rem", fontWeight: "500" }}
-          >
-            {stats
-              .flatMap((user) =>
-                user.details.flatMap((detail) =>
-                  detail.tickets.map((ticket) => `${user.userName}: ${ticket}`)
-                )
-              )
-              .join(" | ")}
-          </marquee>
 
           <div className="table-responsive">
             <table className="table table-striped table-bordered table-hover shadow m-0">
@@ -336,4 +297,4 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
   );
 };
 
-export default LiveMarketStats;
+export default BetSettleUnsettle;
