@@ -75,8 +75,8 @@ app.get('/lottery-events', (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
-  // res.setHeader('Access-Control-Allow-Origin', 'https://cg.user.dummydoma.in'); // change with server URl 
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001'); //  Local URL
+  res.setHeader('Access-Control-Allow-Origin', 'https://cg.user.dummydoma.in'); // change with server URl 
+  // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001'); //  Local URL
 
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -179,11 +179,6 @@ sequelize
         // Find markets where isUpdate is true
         const marketsToUpdate = await TicketRange.findAll({ where: { isUpdate: true } });
         
-        if (marketsToUpdate.length === 0) {
-          console.log('No markets found to reset.');
-          return;
-        }
-    
         const updatedMarketList = [];
     
         for (const market of marketsToUpdate) {
