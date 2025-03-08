@@ -1080,8 +1080,7 @@ export const afteWinMarkets = async (req, res) => {
 export const afterWinLotteries = async (req, res) => {
   try {
     const { marketId } = req.params;
-    const { page = 1, limit = 10, search = "" } = req.query;
-
+    const { page = 1, limit = 10, search = "" } = req.query || {};
     const offset = (page - 1) * limit;
 
     const whereConditions = {
@@ -1097,60 +1096,85 @@ export const afterWinLotteries = async (req, res) => {
       where: whereConditions,
     });
 
-    if (!purchaseLotteries.length) {
+  const userData = {};
+
+    await Promise.all(
+      purchaseLotteries.map(async (lottery) => {
+        const {
+          userName,
+          lotteryPrice,
+          group,
+          series,
+          number,
+          sem,
+          marketName,
+          marketId,
+          purchaseId,
+        } = lottery;
+
+        const fullTicketNumber = `${group} ${series} ${number}`;
+        const lastFiveDigits = number.slice(-5);
+        const lastFourDigits = number.slice(-4);
+
+        const lotteryResults = await LotteryResult.findAll({
+          where: { marketId },
+        });
+
+        const winningTicket = lotteryResults.find((result) => {
+          if (!Array.isArray(result.ticketNumber)) return false;
+
+          if (result.prizeCategory === "First Prize") {
+            return result.ticketNumber.includes(fullTicketNumber);
+          } else if (result.prizeCategory === "Second Prize") {
+            return result.ticketNumber.includes(lastFiveDigits);
+          } else {
+            return result.ticketNumber.includes(lastFourDigits);
+          }
+        });
+
+        if (winningTicket) {
+          if (!userData[userName]) {
+            userData[userName] = {
+              userName,
+              marketName,
+              marketId,
+              amount: 0,
+              details: [],
+            };
+          }
+
+          userData[userName].amount += lotteryPrice;
+
+          const ticketService = new TicketService();
+          const tickets = await ticketService.list(
+            group,
+            series,
+            number,
+            sem,
+            marketId
+          );
+
+          userData[userName].details.push({
+            sem,
+            tickets,
+            purchaseId,
+            lotteryPrice,
+          });
+        }
+      })
+    );
+
+    const userDataArray = Object.values(userData);
+
+    if (userDataArray.length === 0) {
       return apiResponseSuccess(
         [],
         true,
-        statusCode.success,
-        "No bet history found",
+        statusCode.create,
+        "No market data found!",
         res
       );
     }
-
-    const userData = {};
-    for (const purchase of purchaseLotteries) {
-      const {
-        userName,
-        lotteryPrice,
-        group,
-        series,
-        number,
-        sem,
-        marketName,
-        marketId,
-        purchaseId,
-      } = purchase;
-
-      if (!userData[userName]) {
-        userData[userName] = {
-          userName,
-          marketName,
-          marketId,
-          amount: 0,
-          details: [],
-        };
-      }
-
-      userData[userName].amount += lotteryPrice;
-
-      const ticketService = new TicketService();
-      const tickets = await ticketService.list(
-        group,
-        series,
-        number,
-        sem,
-        marketId
-      );
-
-      userData[userName].details.push({
-        sem,
-        tickets,
-        purchaseId,
-        lotteryPrice,
-      });
-    }
-
-    const userDataArray = Object.values(userData);
 
     const totalItems = userDataArray.length;
     const totalPages = Math.ceil(totalItems / limit);
@@ -1166,11 +1190,12 @@ export const afterWinLotteries = async (req, res) => {
     return apiResponsePagination(
       paginatedData,
       true,
-      statusCode.success,
-      "success",
+      statusCode.create,
+      "Data fetch successfully!",
       pagination,
       res
     );
+    
   } catch (error) {
     return apiResponseErr(
       null,
@@ -1448,13 +1473,19 @@ export const getMatchData = async (req, res) => {
       if (!adminEntry.ticketNumber[result.prizeCategory]) {
         adminEntry.ticketNumber[result.prizeCategory] = {
           prizeAmount: result.prizeAmount,
-          ...(result.complementaryPrize !== 0 && { complementaryPrize: result.complementaryPrize }), 
+          ...(result.complementaryPrize !== 0 && {
+            complementaryPrize: result.complementaryPrize,
+          }),
           tickets: [],
         };
       }
 
       if (!adminEntry.ticketNumber[result.prizeCategory]) {
-        adminEntry.ticketNumber[result.prizeCategory] = { prizeAmount : result.prizeAmount, complementaryPrize: result.complementaryPrize, tickets : [],};
+        adminEntry.ticketNumber[result.prizeCategory] = {
+          prizeAmount: result.prizeAmount,
+          complementaryPrize: result.complementaryPrize,
+          tickets: [],
+        };
       }
 
       adminEntry.ticketNumber[result.prizeCategory].tickets = [
@@ -1463,7 +1494,6 @@ export const getMatchData = async (req, res) => {
           ...result.ticketNumber,
         ]),
       ];
-
     });
 
     return apiResponseSuccess(
@@ -1484,21 +1514,20 @@ export const getMatchData = async (req, res) => {
   }
 };
 
-export const getAllSubAdmin = async(req, res) => {
+export const getAllSubAdmin = async (req, res) => {
   try {
     const { page = 1, limit = 10, search = "" } = req.query;
     const offset = (page - 1) * limit;
 
     const searchCondition = {
-      role : string.SubAdmin
-    }
+      role: string.SubAdmin,
+    };
 
-    if(search)
-    {
+    if (search) {
       searchCondition.userName = { [Op.like]: `%${search}%` };
     }
 
-    const { count, rows : existingAdmin } = await Admin.findAndCountAll({
+    const { count, rows: existingAdmin } = await Admin.findAndCountAll({
       attributes: ["adminId", "userName", "role", "permissions"],
       where: searchCondition,
       order: [["createdAt", "DESC"]],
@@ -1507,8 +1536,7 @@ export const getAllSubAdmin = async(req, res) => {
       raw: true,
     });
 
-    if(!existingAdmin || existingAdmin.length == 0)
-    {
+    if (!existingAdmin || existingAdmin.length == 0) {
       return apiResponseSuccess(
         [],
         true,
@@ -1516,7 +1544,7 @@ export const getAllSubAdmin = async(req, res) => {
         "No data found!",
         res
       );
-    };
+    }
 
     const totalItems = count;
     const totalPages = Math.ceil(totalItems / parseInt(limit)); //
@@ -1526,7 +1554,7 @@ export const getAllSubAdmin = async(req, res) => {
       limit: parseInt(limit),
       totalPages,
       totalItems,
-    }
+    };
 
     return apiResponsePagination(
       existingAdmin,
@@ -1536,7 +1564,6 @@ export const getAllSubAdmin = async(req, res) => {
       pagination,
       res
     );
-
   } catch (error) {
     return apiResponseErr(
       null,
@@ -1548,15 +1575,16 @@ export const getAllSubAdmin = async(req, res) => {
   }
 };
 
-
-export const adminApproveReject = async(req,res) => {
+export const adminApproveReject = async (req, res) => {
   try {
     const { type } = req.body;
     const { marketId } = req.params;
 
-    if(type === 'Reject')
-    {
-    await WinResultRequest.update({ isReject: true },{ where: { marketId } });
+    if (type === "Reject") {
+      await WinResultRequest.update(
+        { isReject: true },
+        { where: { marketId } }
+      );
 
       return apiResponseSuccess(
         [],
@@ -1565,62 +1593,73 @@ export const adminApproveReject = async(req,res) => {
         "This result is rejected!",
         res
       );
-    }else if (type === 'Approve')
-    {
+    } else if (type === "Approve") {
+      const existingTicket = await WinResultRequest.findAll({
+        attributes: [
+          "marketName",
+          "prizeCategory",
+          "prizeAmount",
+          "ticketNumber",
+          "complementaryPrize",
+        ],
+        where: {
+          marketId,
+          type: "Matched",
+          isApproved: false,
+          isReject: false,
+        },
+        group: [
+          "marketName",
+          "prizeCategory",
+          "prizeAmount",
+          "ticketNumber",
+          "complementaryPrize",
+        ],
+        order: [["createdAt", "DESC"]],
+      });
 
-    const existingTicket = await WinResultRequest.findAll({
-      attributes: ["marketName","prizeCategory", "prizeAmount", "ticketNumber", "complementaryPrize"],
-      where : {
-        marketId,
-        type : "Matched", 
-        isApproved : false, 
-        isReject : false
-      },
-      group: ["marketName","prizeCategory", "prizeAmount", "ticketNumber", "complementaryPrize"],
-      order: [["createdAt", "DESC"]],
-    });
+      if (!existingTicket || existingTicket.length == 0) {
+        return apiResponseSuccess(
+          [],
+          true,
+          statusCode.badRequest,
+          "Ticket fetch successfull!",
+          res
+        );
+      }
 
-    if(!existingTicket || existingTicket.length == 0)
-    {
+      const formattedResults = existingTicket.map((ticket) => {
+        const result = {
+          prizeCategory: ticket.prizeCategory,
+          prizeAmount: ticket.prizeAmount,
+          ticketNumber: Array.isArray(ticket.ticketNumber)
+            ? ticket.ticketNumber
+            : [ticket.ticketNumber],
+        };
+
+        if (ticket.complementaryPrize && ticket.complementaryPrize !== 0) {
+          result.complementaryPrize = ticket.complementaryPrize;
+        }
+
+        return result;
+      });
+
       return apiResponseSuccess(
-        [],
+        formattedResults,
         true,
-        statusCode.badRequest,
+        statusCode.success,
         "Ticket fetch successfull!",
         res
       );
+    } else {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "type should be null!",
+        res
+      );
     }
-
-    const formattedResults = existingTicket.map(ticket => {
-      const result = {
-        prizeCategory: ticket.prizeCategory,
-        prizeAmount: ticket.prizeAmount,
-        ticketNumber: Array.isArray(ticket.ticketNumber) ? ticket.ticketNumber : [ticket.ticketNumber]
-      };
-      
-      if (ticket.complementaryPrize && ticket.complementaryPrize !== 0) {
-        result.complementaryPrize = ticket.complementaryPrize;
-      }
-      
-      return result;
-    });
-
-    return apiResponseSuccess(
-      formattedResults,
-      true,
-      statusCode.success,
-      "Ticket fetch successfull!",
-      res
-    );
-  }else{
-    return apiResponseErr(
-      null,
-      false,
-      statusCode.badRequest,
-      "type should be null!",
-      res
-    );
-  }
   } catch (error) {
     return apiResponseErr(
       null,
