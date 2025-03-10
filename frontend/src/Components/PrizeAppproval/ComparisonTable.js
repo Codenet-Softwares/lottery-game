@@ -1,9 +1,9 @@
 import React from "react";
-import './comparisonTable.css'
+import  './comparisonTable.css'
 
 const ComparisonTable = ({ modalContent }) => {
-
-
+  
+ 
 
   const hasMatchedData = modalContent?.Matched?.length > 0;
   const hasUnmatchedData = modalContent?.Unmatched?.length > 0;
@@ -30,7 +30,8 @@ const ComparisonTable = ({ modalContent }) => {
               </thead>
               <tbody>
                 {market.MatchData.length > 1 ? (
-                  Object.keys(market.MatchData[0].ticketNumber).map((category, j) => {
+                  // Object.keys(market.MatchData[0].ticketNumber).map((category, j) => {
+                    ["First Prize", "Second Prize", "Third Prize", "Fourth Prize", "Fifth Prize"].map((category, j) => {
                     const entry1 = market.MatchData[0];
                     const entry2 = market.MatchData[1] || {};
                     return (
@@ -119,6 +120,7 @@ const ComparisonTable = ({ modalContent }) => {
                 )
               )}
             </tbody>
+            
           </table>
         </div>
       ) : (
