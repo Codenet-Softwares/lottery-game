@@ -1617,6 +1617,7 @@ export const adminApproveReject = async (req, res) => {
             },
             { where: { marketId } }
           );
+
         } else if (existingTicket[0].type === "Unmatched") {
           await WinResultRequest.update(
             {
@@ -1779,6 +1780,73 @@ export const getSubAdminHistory = async(req,res) => {
         res
       );
     
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+export const getSubadminResult = async (req, res) => {
+  try {
+    const { page = 1 , pageSize = 10 } = req.query;
+    const offset = (page - 1) * pageSize;
+
+    const adminId = req.user?.adminId;
+    const { marketId } = req.params;
+
+    const results = await WinResultRequest.findAll({
+      attributes: [
+        "ticketNumber",
+        "prizeCategory",
+        "prizeAmount",
+        "complementaryPrize",
+        "marketName",
+        "marketId",
+        "createdAt",
+        "updatedAt"
+      ],
+      where: { adminId, marketId, status : 'Approve' },
+      group: [
+        "ticketNumber",
+        "prizeCategory",
+        "prizeAmount",
+        "complementaryPrize",
+        "marketName",
+        "marketId",
+        "createdAt",
+        "updatedAt"
+      ],
+      raw: true,
+    });
+
+    if (results.length === 0) {
+      return apiResponseSuccess(
+        [],
+        true,
+        statusCode.success,
+        `No lottery results found.`,
+        res
+      );
+    }
+
+
+    const totalItems = results.length;
+    const totalPages = Math.ceil(totalItems / parseInt(pageSize));
+    const paginatedData = results.slice(offset, offset + parseInt(pageSize));
+
+    const pagination = {
+      page: parseInt(page),
+      limit: parseInt(pageSize),
+      totalPages,
+      totalItems,
+    };
+
+    return apiResponsePagination(paginatedData, true, statusCode.success, 'Lottery results fetched successfully.',pagination, res);
   } catch (error) {
     return apiResponseErr(
       null,

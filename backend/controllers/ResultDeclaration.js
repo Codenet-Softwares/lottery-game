@@ -739,9 +739,6 @@ export const subadminResultRequest = async (req, res) => {
           isApproved: false },
       });
 
-
-      console.log("___________", existingResults)
-
       if (existingResults.length >= prizeLimits[prizeCategory]) {
         return apiResponseErr(
           null,
