@@ -687,3 +687,17 @@ export async function voidBetMarket(body, isToast = true) {
     throw error;
   }
 }
+
+
+export async function subAdminWinResult(body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.GET, body, isToast);
+    const response = await makeCall(
+      `${urls.getSubAdminWinResult}?page=${body.page}&limit=${body.limit}&search=${body.search}`,
+      callParams
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
