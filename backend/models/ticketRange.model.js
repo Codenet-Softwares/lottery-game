@@ -73,7 +73,7 @@ const TicketRange = sequelize.define(
     },
     inactiveGame: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      defaultValue: false,
     },
     gameName: {
       type: DataTypes.STRING(50),

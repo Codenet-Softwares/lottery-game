@@ -750,6 +750,8 @@ export const updateMarketStatus = async (req, res) => {
       {
         isActive: status,
         hideMarketUser: status ? true : Sequelize.col("hideMarketUser"),
+        inactiveGame: true
+
       },
       { where: { marketId } }
     );

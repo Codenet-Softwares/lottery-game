@@ -139,9 +139,8 @@ sequelize
         for (const market of activeMarkets) {
           if (!updatedMarketsCache.has(market.marketId) || updatedMarketsCache.get(market.marketId).isActive !== true) {
             market.isActive = true;
-            if (market.hideMarketUser === false) {
-              market.hideMarketUser = true;
-            }    
+            market.hideMarketUser = true;
+           
             const response = await market.save();
             updateMarket.push(response.toJSON());
            updatedMarketsCache.set(market.marketId, response.toJSON());
