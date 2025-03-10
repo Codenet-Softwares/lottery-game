@@ -75,8 +75,8 @@ app.get('/lottery-events', (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
-  res.setHeader('Access-Control-Allow-Origin', 'https://cg.user.dummydoma.in'); // change with server URl 
-  // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001'); //  Local URL
+  // res.setHeader('Access-Control-Allow-Origin', 'https://cg.user.dummydoma.in'); // change with server URl 
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3002'); //  Local URL
 
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -101,7 +101,7 @@ app.get('/lottery-events', (req, res) => {
 
 
 sequelize
-  .sync({ alter: false })
+  .sync({ alter: true })
   .then(() => {
     console.log('Database & tables created!');
     app.listen(process.env.PORT, () => {
@@ -139,10 +139,12 @@ sequelize
         for (const market of activeMarkets) {
           if (!updatedMarketsCache.has(market.marketId) || updatedMarketsCache.get(market.marketId).isActive !== true) {
             market.isActive = true;
-            market.hideMarketUser = true
+            if (market.hideMarketUser === false) {
+              market.hideMarketUser = true;
+            }    
             const response = await market.save();
             updateMarket.push(response.toJSON());
-            updatedMarketsCache.set(market.marketId, response.toJSON());
+           updatedMarketsCache.set(market.marketId, response.toJSON());
           }
         }
 
@@ -152,7 +154,7 @@ sequelize
             market.isActive = false;
             const response = await market.save();
             updateMarket.push(response.toJSON());
-            updatedMarketsCache.set(market.marketId, response.toJSON());
+           updatedMarketsCache.set(market.marketId, response.toJSON());
           }
         }
 
@@ -171,6 +173,9 @@ sequelize
       }
     });
 
+
+  
+    
 
     // Cron job runs every second to reset isUpdate to false
     cron.schedule('* * * * * *', async () => {  // Runs every second

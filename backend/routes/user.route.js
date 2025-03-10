@@ -15,7 +15,7 @@ import { apiResponseErr, apiResponseSuccess } from '../utils/response.js';
 import { statusCode } from '../utils/statusCodes.js';
 
 export const userRoute = (app) => {
-  app.get('/api/getAll-markets', authenticateUser, getAllMarkets)
+  app.get('/api/getAll-markets', /*authenticateUser,*/ getAllMarkets)
 
   app.post('/api/search-ticket',
     validateSearchTickets,

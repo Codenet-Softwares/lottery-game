@@ -16,6 +16,7 @@ import {
   getResult,
   getTicketNumbersByMarket,
   getTicketRange,
+  inactiveMarketStatus,
   liveLotteries,
   liveMarkets,
   login,
@@ -71,6 +72,8 @@ export const adminRoutes = (app) => {
   app.get('/api/get-inactive-markets', authorize([string.Admin]), getInactiveMarket)
 
   app.post('/api/update-market-status', updateMarketStatus)
+
+  app.post('/api/update-inactive-market-status', inactiveMarketStatus)
 
   app.get("/api/admin/prize-results", authorize([string.Admin]), getResult);
 

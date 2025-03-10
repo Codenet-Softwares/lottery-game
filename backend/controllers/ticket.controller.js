@@ -173,6 +173,40 @@ export const geTicketRange = async (req, res) => {
   }
 };
 
+export const geTicketRangeExternal = async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const { search = "" } = req.query;
+    const whereCondition = {
+      date: {
+        [Op.gte]: today,
+      },
+      isWin: false,
+      isVoid: false,
+      inactiveGame: true
+    };
+
+    if (search) {
+      whereCondition.marketName = {
+        [Op.like]: `%${search}%`, 
+      };
+    }
+    const ticketData = await TicketRange.findAll({
+      where: whereCondition, order : [["createdAt", "DESC"]],
+    });
+
+    if (!ticketData || ticketData.length === 0) {
+      return apiResponseSuccess([], true, statusCode.success, 'No data', res);
+    }
+
+    return apiResponseSuccess(ticketData, true, statusCode.success, 'Success', res);
+  } catch (error) {
+    return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
+  }
+};
+
 
 
 export const getIsactiveMarket = async (req, res) => {

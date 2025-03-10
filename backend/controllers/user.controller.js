@@ -20,29 +20,29 @@ export const getAllMarkets = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const currentTime = getISTTime();
+    // const currentTime = getISTTime();
 
-    await TicketRange.update(
-      { isActive: false },
-      {
-        where: {
-          [Op.or]: [
-            { start_time: { [Op.gt]: currentTime } }, 
-            { end_time: { [Op.lt]: currentTime } }   
-          ]
-        },
-      }
-    );
+    // await TicketRange.update(
+    //   { isActive: false },
+    //   {
+    //     where: {
+    //       [Op.or]: [
+    //         { start_time: { [Op.gt]: currentTime } }, 
+    //         { end_time: { [Op.lt]: currentTime } }   
+    //       ]
+    //     },
+    //   }
+    // );
 
-    await TicketRange.update(
-      { isActive: true },
-      {
-        where: {
-          start_time: { [Op.lte]: currentTime },
-          end_time: { [Op.gte]: currentTime },
-        },
-      }
-    );
+    // await TicketRange.update(
+    //   { isActive: true },
+    //   {
+    //     where: {
+    //       start_time: { [Op.lte]: currentTime },
+    //       end_time: { [Op.gte]: currentTime },
+    //     },
+    //   }
+    // );
 
     const ticketData = await TicketRange.findAll({
       attributes: ["marketId", "marketName", "isActive", "isWin", "isVoid", "hideMarketUser", "start_time", "end_time", "createdAt"],
@@ -52,9 +52,10 @@ export const getAllMarkets = async (req, res) => {
         },
         isVoid: false,
         isWin: false,
-        hideMarketUser: true
+        inactiveGame: true
       },
     });
+
 
     ticketData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); 
 
