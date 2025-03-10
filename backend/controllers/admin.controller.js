@@ -1417,7 +1417,7 @@ export const getMatchData = async (req, res) => {
     const { marketId } = req.params;
     const { type } = req.query;
 
-    const whereCondition = { marketId, isApproved: false };
+    const whereCondition = { marketId, isApproved: false, isReject: false };
     if (type) whereCondition.type = type;
 
     const existingResults = await WinResultRequest.findAll({
@@ -1581,10 +1581,62 @@ export const adminApproveReject = async (req, res) => {
     const { marketId } = req.params;
 
     if (type === "Reject") {
-      await WinResultRequest.update(
-        { isReject: true },
-        { where: { marketId } }
-      );
+      const existingTicket = await WinResultRequest.findAll({
+        attributes: [
+          "marketName",
+          "prizeCategory",
+          "prizeAmount",
+          "ticketNumber",
+          "complementaryPrize",
+          "type",
+        ],
+        where: {
+          marketId,
+          isApproved: false,
+          isReject: false,
+        },
+        group: [
+          "marketName",
+          "prizeCategory",
+          "prizeAmount",
+          "ticketNumber",
+          "complementaryPrize",
+          "type",
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+
+      if (existingTicket.length > 0) {
+        if (existingTicket[0].type === "Matched") {
+          await WinResultRequest.update(
+            {
+              isReject: true,
+              status: "Reject",
+              remarks:
+                "Your result has been rejected. Kindly reach out to your upline for further guidance.",
+            },
+            { where: { marketId } }
+          );
+        } else if (existingTicket[0].type === "Unmatched") {
+          await WinResultRequest.update(
+            {
+              isReject: true,
+              status: "Reject",
+              remarks:
+                "Oops! Your submission does not match our records. Please check the data and try again.",
+            },
+            { where: { marketId } }
+          );
+        }
+      } else {
+        return apiResponseSuccess(
+          [],
+          false,
+          statusCode.error,
+          "No records found for the given marketId!",
+          res
+        );
+      }
 
       return apiResponseSuccess(
         [],
@@ -1623,7 +1675,7 @@ export const adminApproveReject = async (req, res) => {
           [],
           true,
           statusCode.badRequest,
-          "Ticket fetch successfull!",
+          "Ticket not found!",
           res
         );
       }
@@ -1660,6 +1712,73 @@ export const adminApproveReject = async (req, res) => {
         res
       );
     }
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+export const getSubAdminHistory = async(req,res) => {
+  try {
+    const adminId = req.user?.adminId;
+    const { status, page = 1 , pageSize = 10 , search } = req.query;
+    const offset = (page - 1) * pageSize;
+
+    const whereCondition = { adminId };
+
+    if(status)
+    {
+      whereCondition.status = status;
+    }
+
+    if(search)
+    {
+      whereCondition.marketName =  { [Op.like]: `%${search}%` };
+    }
+
+    const existingResults = await WinResultRequest.findAll({
+      attributes : ["marketId","marketName", "type", "status", "remarks"],
+      where: whereCondition,
+      group : ["marketId","marketName", "type", "status", "remarks"],
+      order: [["createdAt", "DESC"]],
+    });
+
+    if(!existingResults || existingResults.length == 0)
+    {
+      return apiResponseSuccess(
+        [],
+        true,
+        statusCode.success,
+        "Data not found!",
+        res
+      );
+    };
+
+    const totalItems = existingResults.length;
+    const totalPages = Math.ceil(totalItems / parseInt(pageSize));
+    const paginatedData = existingResults.slice(offset, offset + parseInt(pageSize));
+
+    const pagination = {
+      page: parseInt(page),
+      limit: parseInt(pageSize),
+      totalPages,
+      totalItems,
+    };
+
+      return apiResponsePagination(
+        paginatedData,
+        true,
+        statusCode.success,
+        "Data fetch successfull!",
+        pagination,
+        res
+      );
+    
   } catch (error) {
     return apiResponseErr(
       null,

@@ -12,7 +12,7 @@ import WinResultRequest from '../models/winResultRequestModel.js';
 
 export const ResultDeclare = async (req, res) => {
   try {
-    const prizes = req.body;
+    const  prizes= req.body;
     const { marketId } = req.params;
     
     const market = await TicketRange.findOne({ where: { marketId } });
@@ -251,7 +251,8 @@ export const ResultDeclare = async (req, res) => {
     } else {
       return apiResponseErr(null, false, statusCode.badRequest, 'No valid tickets to save.', res);
     }
-    await WinResultRequest.update({isApproved: true},{where:{marketId}})
+    await WinResultRequest.update({isApproved: true, status : "Approve", remarks : "Congratulations! Your result has been approved."},{where:{marketId, isReject: false}});
+
 const normalizeTicketNumber = (ticket) => {
   return ticket.replace(/\s+/g, '').toUpperCase();
 };
@@ -734,9 +735,12 @@ export const subadminResultRequest = async (req, res) => {
       }
 
       const existingResults = await WinResultRequest.findAll({
-        where: { prizeCategory, marketId, adminId,   isReject: false,
+        where: { prizeCategory, marketId, adminId, isReject: false,
           isApproved: false },
       });
+
+
+      console.log("___________", existingResults)
 
       if (existingResults.length >= prizeLimits[prizeCategory]) {
         return apiResponseErr(

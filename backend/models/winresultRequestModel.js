@@ -52,6 +52,14 @@ const WinResultRequest = sequelize.define(
     isReject : {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    status : {
+      type: DataTypes.ENUM("Pending", "Approve", "Reject"),
+      defaultValue: "Pending",
+    },
+    remarks : {
+      type: DataTypes.STRING,
+      allowNull: true,
     }
   },
   {

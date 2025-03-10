@@ -14,6 +14,7 @@ import {
   getMarkets,
   getMatchData,
   getResult,
+  getSubAdminHistory,
   getTicketNumbersByMarket,
   getTicketRange,
   liveLotteries,
@@ -88,14 +89,16 @@ export const adminRoutes = (app) => {
 
   app.post('/api/admin/create-subAdmin', createSubAdminSchema, customErrorHandler,  authorize([string.Admin]), createSubAdmin);
 
-  app.get('/api/subadmin/win-request-market', authorize([string.Admin]), winResultMarket)
+  app.get('/api/subadmin/win-request-market', authorize([string.Admin]), winResultMarket);
 
-  app.get('/api/market-wise-subadmin/:marketId', validateMarketWiseSubadmin, customErrorHandler, authorize([string.Admin]), marketWiseSubadmin)
+  app.get('/api/market-wise-subadmin/:marketId', validateMarketWiseSubadmin, customErrorHandler, authorize([string.Admin]), marketWiseSubadmin);
 
   app.get('/api/subAdmin/matching-data/:marketId', validateMarketWiseSubadmin, customErrorHandler, authorize([string.Admin]), getMatchData);
 
-  app.get('/api/admin/get-all-subAdmin', authorize([string.Admin]), getAllSubAdmin)
+  app.get('/api/admin/get-all-subAdmin', authorize([string.Admin]), getAllSubAdmin);
 
-  app.post('/api/admin/approved-reject/:marketId',validateAdminApproveReject, customErrorHandler, authorize([string.Admin]),adminApproveReject)
+  app.post('/api/admin/approved-reject/:marketId',validateAdminApproveReject, customErrorHandler, authorize([string.Admin]),adminApproveReject);
+
+  app.get('/api/subAdmin/get-subAdmin-history',authorize([string.SubAdmin]), getSubAdminHistory)
 
 };

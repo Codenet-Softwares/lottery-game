@@ -14,7 +14,7 @@ export const ResultDeclarationModule = (app) => {
     ResultDeclare
   );
 
-  app.post('/api/subadmin/win-result-request/:marketId', 
+  app.post('/api/subadmin/win-result-request/:marketId',
     validationRules,
     customErrorHandler, 
     authorize([string.SubAdmin], [string.WinLottery]), 
