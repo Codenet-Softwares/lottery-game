@@ -13,6 +13,7 @@ const ReusableTable = ({ data, columns, itemsPerPage, tableHeading , showSearch,
       item[column.key]?.toString().toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
+  
 
   // Pagination Logic
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);

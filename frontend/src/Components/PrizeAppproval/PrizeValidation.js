@@ -78,17 +78,30 @@ const PrizeValidation = () => {
   const handleApproveReject = async (type) => {
     if (!selectedMarket) return;
 
-    //  Call the first API (ApproveReject)
-    const response = await ApproveReject({ type }, selectedMarket.id);
+    if (type === "Approve") {
+      //  Call the first API (ApproveReject)
+      const response = await ApproveReject({ type }, selectedMarket.id);
 
-    if (response?.success) {
-      // Pass the response from ApproveReject as the payload to CustomWining
-      const customWiningResponse = await CustomWiningAdmin({
-        resultArray: response.data,
-        marketId: selectedMarket.id,
-      });
+      if (response?.success) {
+        // Pass the response from ApproveReject as the payload to CustomWining
+        const customWiningResponse = await CustomWiningAdmin({
+          resultArray: response.data,
+          marketId: selectedMarket.id,
+        });
 
-      if (customWiningResponse?.success) {
+        if (customWiningResponse?.success) {
+          alert(`${type} successful!`);
+          setApprovalData([]);
+          setShowModal(false);
+          setSelectedMarket(null); // Reset to go back to Prize Approval Market List
+
+          fetchMarketData();
+        }
+      }
+    }
+    if (type === "Reject") {
+      const response = await ApproveReject({ type }, selectedMarket.id);
+      if (!response?.success) {
         alert(`${type} successful!`);
         setApprovalData([]);
         setShowModal(false);
@@ -122,17 +135,17 @@ const PrizeValidation = () => {
 
   const filteredApprovalData = selectedMarketApprovals
     ? selectedMarketApprovals.subAdmins.reduce((acc, subAdmin, index) => {
-        if (index % 2 === 0) {
-          acc.push({
-            id: acc.length + 1,
-            subAdmin1: subAdmin.declearBy,
-            subAdmin2: "",
-          });
-        } else {
-          acc[acc.length - 1].subAdmin2 = subAdmin.declearBy;
-        }
-        return acc;
-      }, [])
+      if (index % 2 === 0) {
+        acc.push({
+          id: acc.length + 1,
+          subAdmin1: subAdmin.declearBy,
+          subAdmin2: "",
+        });
+      } else {
+        acc[acc.length - 1].subAdmin2 = subAdmin.declearBy;
+      }
+      return acc;
+    }, [])
     : [];
 
   const approvalColumns = [
@@ -210,13 +223,13 @@ const PrizeValidation = () => {
             text: "Approve",
             onClick: () => handleApproveReject("Approve"),
             className: "btn btn-success",
-            disabled: !modalContent?.Matched?.length, // Disable if no Matched data
+            // disabled: !modalContent?.Matched?.length, // Disable if no Matched data
           },
           {
             text: "Reject",
             onClick: () => handleApproveReject("Reject"),
             className: "btn btn-danger",
-            disabled: !modalContent?.Matched?.length,
+            // disabled: !modalContent?.Matched?.length,
           },
         ]}
       />

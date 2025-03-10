@@ -1,9 +1,9 @@
 import React from "react";
-import  './comparisonTable.css'
+import './comparisonTable.css'
 
 const ComparisonTable = ({ modalContent }) => {
-  
- 
+
+
 
   const hasMatchedData = modalContent?.Matched?.length > 0;
   const hasUnmatchedData = modalContent?.Unmatched?.length > 0;
@@ -85,6 +85,7 @@ const ComparisonTable = ({ modalContent }) => {
                 <th>Prize Category</th>
                 <th>Ticket Numbers</th>
                 <th>Prize Amount</th>
+                <th>complimentary</th>
               </tr>
             </thead>
             <tbody>
@@ -111,6 +112,8 @@ const ComparisonTable = ({ modalContent }) => {
                         </select>
                       </td>
                       <td>₹{details.prizeAmount}</td>
+                      <td>₹{details?.complementaryPrize || "NA"}</td>
+                      {console.log("complementaryPrize", details?.complementaryPrize || "NA")}
                     </tr>
                   ))
                 )
