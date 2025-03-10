@@ -1,13 +1,13 @@
 import React from "react";
 import  './comparisonTable.css'
 
-const ComparisonTable = ({ modalContent, loadingModal }) => {
-  if (loadingModal) {
-    return <p>Loading...</p>;
-  }
+const ComparisonTable = ({ modalContent }) => {
+  
+ 
 
   const hasMatchedData = modalContent?.Matched?.length > 0;
   const hasUnmatchedData = modalContent?.Unmatched?.length > 0;
+
 
   return (
     <div className="comparison-table">

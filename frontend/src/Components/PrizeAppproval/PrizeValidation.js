@@ -61,7 +61,6 @@ const PrizeValidation = () => {
   };
   //  comparelist  for the page of Prize Approval with respect to  Market List by 2 subadmins
   const fetchComparisonData = async (marketId) => {
-    setLoadingModal(true);
     const response = await ViewSubAdminsPrizeValidationMarketsCompareCheck(
       {},
       marketId
@@ -73,6 +72,7 @@ const PrizeValidation = () => {
     } else {
       setModalContent([]);
     }
+    setShowModal(true); // Open the modal
   };
   //  approve reject fetch and succeded here in this function
   const handleApproveReject = async (type) => {
@@ -145,7 +145,7 @@ const PrizeValidation = () => {
         <button
           className="btn btn-info fw-bold text-uppercase"
           onClick={() => fetchComparisonData(selectedMarket?.id)}
-          disabled={!row.subAdmin2} // Disable button if only one sub-admin exists
+          disabled={!row.subAdmin2}
         >
           Approval Check
         </button>
