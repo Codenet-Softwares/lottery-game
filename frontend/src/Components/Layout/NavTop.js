@@ -32,54 +32,101 @@ const NavTop = () => {
       toast.info("Logout cancelled.");
     }
   };
-// Defined navigation items with the fields of permission if added in future 
+  // Defined navigation items with the fields of permission if added in future
   const navItems = [
-    { to: "/dashboard", icon: "fas fa-tachometer-alt", label: "Dashboard",permission: "" },
+    {
+      to: "/dashboard",
+      icon: "fas fa-tachometer-alt",
+      label: "Dashboard",
+      permission: "",
+    },
     {
       to: "/lottery-markets",
       icon: "fas fa-ticket-alt",
       label: "Create Lottery",
-      permission: ""
+      permission: "",
     },
     {
       to: "/Market-overview",
       icon: "fas fa-chart-line",
       label: "Market Overview",
-      permission: ""
+      permission: "",
     },
-    { to: "/results", icon: "fas fa-trophy", label: "Results",permission: "" },
-    { to: "/win", icon: "fas fa-money-bill-wave", label: "Win" , permission: "win-Lottery-Result" },
+    { to: "/results", icon: "fas fa-trophy", label: "Results", permission: "" },
+    {
+      to: "/win",
+      icon: "fas fa-money-bill-wave",
+      label: "Win",
+      permission: "win-Lottery-Result",
+    },
     {
       to: "/purchase-history",
       icon: "fas fa-history",
       label: "Purchase History",
-      permission: ""
+      permission: "",
     },
-    { to: "/search-lottery", icon: "fas fa-search", label: "Search Lottery",permission: "" },
-    { to: "/get-void-market", icon: "fas fa-file-excel", label: "Void",permission: "" },
-    { to: "/inactive", icon: "fas fa-ban", label: "Revoke" ,permission: ""},
+    {
+      to: "/search-lottery",
+      icon: "fas fa-search",
+      label: "Search Lottery",
+      permission: "",
+    },
+    {
+      to: "/get-void-market",
+      icon: "fas fa-file-excel",
+      label: "Void",
+      permission: "",
+    },
+    { to: "/inactive", icon: "fas fa-ban", label: "Revoke", permission: "" },
     {
       to: "/live-markets",
       icon: "fas fa-broadcast-tower",
       label: "Live Markets",
-      permission: ""
+      permission: "",
     },
-    { to: "/trash", icon: "fas fa-trash-alt", label: "Trash" , permission: ""},
-    { to: "/reset-password", icon: "fas fa-key", label: "Reset Password", permission: "" },
+    { to: "/trash", icon: "fas fa-trash-alt", label: "Trash", permission: "" },
+    {
+      to: "/reset-password",
+      icon: "fas fa-key",
+      label: "Reset Password",
+      permission: "",
+    },
     {
       to: "/create-subadmin",
       icon: "fas fa-user-shield",
       label: "Create Sub-Admin",
-      permission: ""
+      permission: "",
     },
     {
       to: "/prize-validation",
       icon: " fas fa-clipboard-check",
       label: "Prize Approval",
-      permission: ""
+      permission: "",
     },
-    { to: "/bet-tracker", icon: "fas fa-balance-scale", label: "Win Tracker", permission: "" },
-    { to: "/view-all-subadmin", icon: "fas fa-users-cog", label: "Sub-Admins", permission: "" }
+    {
+      to: "/bet-tracker",
+      icon: "fas fa-balance-scale",
+      label: "Win Tracker",
+      permission: "",
+    },
+    {
+      to: "/view-all-subadmin",
+      icon: "fas fa-users-cog",
+      label: "Sub-Admins",
+      permission: "",
+    },
+    {
+      to: "/subAdminData",
+      icon: "fas fa-database",
+      label: "SubAdmin Data",
+      permission: "win-Analytics",
+    },
+    {
+      to: "/subAdmin-win-result",
+      icon: "fas fa-trophy",
+      label: "SubAdmin Win Result",
+      permission: "result-View",
+    },
   ];
 
   // Get permissions as an array
