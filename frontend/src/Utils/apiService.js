@@ -687,3 +687,13 @@ export async function voidBetMarket(body, isToast = true) {
     throw error;
   }
 }
+
+export async function getUpdateMarket(body, isToast = true) {
+  try {
+    const callParams = await getAuthCallParams(strings.POST, body, isToast);
+    const response = await makeCall(urls.getUpdateInactive, callParams, isToast);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
