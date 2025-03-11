@@ -750,6 +750,8 @@ export const updateMarketStatus = async (req, res) => {
       {
         isActive: status,
         hideMarketUser: status ? true : Sequelize.col("hideMarketUser"),
+        inactiveGame: true
+
       },
       { where: { marketId } }
     );
@@ -781,6 +783,47 @@ export const updateMarketStatus = async (req, res) => {
     );
   }
 };
+
+export const inactiveMarketStatus = async (req, res) => {
+  const { marketId } = req.body;
+
+  try {
+    const [updatedCount] = await TicketRange.update(
+      {
+        //isActive: false,
+        inactiveGame: false
+      },
+      { where: { marketId } }
+    );
+
+    if (updatedCount === 0) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Market not found",
+        res
+      );
+    } else {
+      return apiResponseSuccess(
+        { updatedCount },
+        true,
+        statusCode.success,
+        "Market updated successfully",
+        res
+      );
+    }
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
 
 export const liveMarkets = async (req, res) => {
   try {

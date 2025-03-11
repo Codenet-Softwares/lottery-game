@@ -52,9 +52,10 @@ export const getAllMarkets = async (req, res) => {
         },
         isVoid: false,
         isWin: false,
-        hideMarketUser: true
+        inactiveGame: true
       },
     });
+
 
     ticketData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); 
 
