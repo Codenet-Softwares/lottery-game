@@ -101,7 +101,7 @@ app.get('/lottery-events', (req, res) => {
 
 
 sequelize
-  .sync({ alter: true })
+  .sync({ alter: false })
   .then(() => {
     console.log('Database & tables created!');
     app.listen(process.env.PORT, () => {
@@ -140,6 +140,7 @@ sequelize
           if (!updatedMarketsCache.has(market.marketId) || updatedMarketsCache.get(market.marketId).isActive !== true) {
             market.isActive = true;
             market.hideMarketUser = true;
+            market.inactiveGame = true
            
             const response = await market.save();
             updateMarket.push(response.toJSON());
