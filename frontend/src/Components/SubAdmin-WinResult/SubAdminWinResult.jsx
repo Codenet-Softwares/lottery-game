@@ -42,26 +42,26 @@ const Result = () => {
         if (response.data.length > 0) {
           // If markets exist for this day and no marketId is in URL, navigate to the first market of the selected date
           if (!marketId) {
-            navigate(`/results/${response.data[0].marketId}`);
+            navigate(`/subAdmin-win-result/${response.data[0].marketId}`);
           } else if (!response.data.some((m) => m.marketId === marketId)) {
             // If the current marketId is not in the list, navigate to the first market of the day
-            navigate(`/results/${response.data[0].marketId}`);
+            navigate(`/subAdmin-win-result/${response.data[0].marketId}`);
           }
         } else {
           // No markets found for the selected date
           setError("No markets found for the selected date.");
           setResults([]); // Ensure no results are displayed
-          navigate(`/results`); // Navigate to results without marketId
+          navigate(`/subAdmin-win-result`); // Navigate to results without marketId
         }
       } else {
         setError("Failed to fetch markets or no data available.");
         setResults([]); // Ensure no results are displayed
-        navigate(`/results`); // Navigate to results without marketId
+        navigate(`/subAdmin-win-result`); // Navigate to results without marketId
       }
     } catch (err) {
       setError("Error fetching markets.");
       setResults([]); // Ensure no results are displayed
-      navigate(`/results`); // Navigate to results without marketId
+      navigate(`/subAdmin-win-result`); // Navigate to results without marketId
     }
   };
 
@@ -127,7 +127,7 @@ const Result = () => {
 
   // Handle market selection
   const handleMarketSelect = (market) => {
-    navigate(`/results/${market.marketId}`);
+    navigate(`/subAdmin-win-result/${market.marketId}`);
   };
   const handleBetVoidMarket = async (marketId) => {
     if (!marketId) {
@@ -405,7 +405,7 @@ const Result = () => {
                 </div>
               ))}
 
-              {results.length > 0 && (
+              {/* {results.length > 0 && (
                 <div className="d-flex justify-content-center align-items-center mt-4">
                   <button
                     onClick={() => handleBetVoidMarket(marketId)}
@@ -422,7 +422,7 @@ const Result = () => {
                     Revoke
                   </button>
                 </div>
-              )}
+              )} */}
             </div>
           )}
         </div>

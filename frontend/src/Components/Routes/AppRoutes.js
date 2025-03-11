@@ -81,6 +81,7 @@ const AppRoutes = () => {
             <Route path="/bet-tracker" element={<BetAfterWin />} />
             <Route path="/view-all-subadmin" element={<ViewAllSubadmin />} />
             <Route path="/subAdminData" element={<WinResult />} />
+            <Route path="/subAdmin-win-result/:marketId" element={<SubAdminWinResult />} />
             <Route path="/subAdmin-win-result" element={<SubAdminWinResult/>} />
            
           </Route>
