@@ -2,7 +2,6 @@ import React from "react";
 import './comparisonTable.css';
 
 const prizeOrder = ["First Prize", "Second Prize", "Third Prize", "Fourth Prize", "Fifth Prize"];
-
 const ComparisonTable = ({ modalContent }) => {
   const hasMatchedData = modalContent?.Matched?.length > 0;
   const hasUnmatchedData = modalContent?.Unmatched?.length > 0;
@@ -10,7 +9,6 @@ const ComparisonTable = ({ modalContent }) => {
   const sortCategories = (categories) => {
     return categories.sort((a, b) => prizeOrder.indexOf(a) - prizeOrder.indexOf(b));
   };
-
   return (
     <div className="comparison-table">
       {/* Matched Entries */}
@@ -115,6 +113,7 @@ const ComparisonTable = ({ modalContent }) => {
                       </td>
                       <td>₹{entry.ticketNumber[category]?.prizeAmount}</td>
                       <td>₹{entry.ticketNumber[category]?.complementaryPrize || "NA"}</td>
+
                     </tr>
                   ))
                 )
