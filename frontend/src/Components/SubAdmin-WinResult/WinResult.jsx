@@ -5,8 +5,9 @@ import Pagination from "../Common/Pagination";
 const WinResult = () => {
   const [loading, setLoading] = useState(true);
   const [subAdminResult, setSubAdminResult] = useState([]);
+  const [allResults, setAllResults] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState(""); // Added status filter state
+  const [statusFilter, setStatusFilter] = useState("");
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -21,11 +22,10 @@ const WinResult = () => {
         page: pagination.page,
         limit: pagination.limit,
         search: searchTerm,
-        status: statusFilter, // Added status filter to API call
       });
 
       if (response?.success) {
-        setSubAdminResult(response.data || []);
+        setAllResults(response.data || []);
         setPagination((prev) => ({
           page: response.pagination?.page || prev.page,
           limit: response.pagination?.limit || prev.limit,
@@ -33,7 +33,7 @@ const WinResult = () => {
           totalItems: response.pagination?.totalItems || 0,
         }));
       } else {
-        setSubAdminResult([]);
+        setAllResults([]);
       }
     } catch (error) {
       console.error("Error fetching sub-admin result:", error);
@@ -44,7 +44,18 @@ const WinResult = () => {
 
   useEffect(() => {
     fetchSubAdminResult();
-  }, [pagination.page, pagination.limit, searchTerm, statusFilter]); // Added statusFilter dependency
+  }, [pagination.page, pagination.limit, searchTerm]); 
+
+  useEffect(() => {
+    if (statusFilter) {
+      const filteredResults = allResults.filter(
+        (item) => item.status.toLowerCase() === statusFilter.toLowerCase()
+      );
+      setSubAdminResult(filteredResults);
+    } else {
+      setSubAdminResult(allResults);
+    }
+  }, [statusFilter, allResults]);
 
   const handlePageChange = (page) => {
     setPagination((prev) => ({ ...prev, page }));
@@ -57,7 +68,7 @@ const WinResult = () => {
 
   const handleStatusChange = (event) => {
     setStatusFilter(event.target.value);
-    setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page on status change
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   const startIndex = (pagination.page - 1) * pagination.limit + 1;
@@ -68,10 +79,10 @@ const WinResult = () => {
 
   return (
     <div className="container d-flex justify-content-center mt-4">
-      <div className="col-md-9 bg-light p-4 rounded shadow">
+      <div className="col-md-9 p-4 rounded shadow" style={{background:"#E6F7FF"}}>
         <h2 className="text-center text-primary mb-3 fw-bold">Win Result</h2>
 
-        {/* Search Bar & Dropdown in One Row */}
+        {/* Search Bar */}
         <div className="d-flex mb-3">
           <input
             type="text"
@@ -114,8 +125,8 @@ const WinResult = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="3" className="text-center text-danger">
-                        No Data Available
+                      <td colSpan="3" className="text-center text-danger fw-bold">
+                        No Data Available for Selected Status
                       </td>
                     </tr>
                   )}
