@@ -24,6 +24,8 @@ import PrizeValidation from "../PrizeAppproval/PrizeValidation";
 import BetAfterWin from "../SettleUnsettle/BetAfterWin";
 import BetSettleUnsettle from "../SettleUnsettle/BetSettleUnsettle";
 import ViewAllSubadmin from "../ViewAllSubAdmin/ViewAllSUbadmin";
+import WinResult from "../SubAdmin-WinResult/WinResult";
+import SubAdminWinResult from "../SubAdmin-WinResult/SubAdminWinResult";
 
 const AppRoutes = () => {
   return (
@@ -78,6 +80,8 @@ const AppRoutes = () => {
             <Route path="/prize-validation" element={<PrizeValidation />} />
             <Route path="/bet-tracker" element={<BetAfterWin />} />
             <Route path="/view-all-subadmin" element={<ViewAllSubadmin />} />
+            <Route path="/subAdminData" element={<WinResult />} />
+            <Route path="/subAdmin-win-result" element={<SubAdminWinResult/>} />
            
           </Route>
           {/* not found */}

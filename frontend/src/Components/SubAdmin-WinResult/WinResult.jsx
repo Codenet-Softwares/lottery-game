@@ -44,7 +44,7 @@ const WinResult = () => {
 
   useEffect(() => {
     fetchSubAdminResult();
-  }, [pagination.page, pagination.limit, searchTerm]); 
+  }, [pagination.page, pagination.limit, searchTerm]);
 
   useEffect(() => {
     if (statusFilter) {
@@ -79,8 +79,11 @@ const WinResult = () => {
 
   return (
     <div className="container d-flex justify-content-center mt-4">
-      <div className="col-md-9 p-4 rounded shadow" style={{background:"#E6F7FF"}}>
-        <h2 className="text-center text-primary mb-3 fw-bold">Win Result</h2>
+      <div
+        className="col-md-10 p-4 rounded shadow"
+        style={{ background: "#E6F7FF" }}
+      >
+        <h2 className="text-center text-primary mb-3 fw-bold fw-bold text-uppercase">SubAdmin History</h2>
 
         {/* Search Bar */}
         <div className="d-flex mb-3">
@@ -93,7 +96,11 @@ const WinResult = () => {
           />
 
           {/* Status Dropdown */}
-          <select className="form-select" value={statusFilter} onChange={handleStatusChange}>
+          <select
+            className="form-select"
+            value={statusFilter}
+            onChange={handleStatusChange}
+          >
             <option value="">All Status</option>
             <option value="Pending">Pending</option>
             <option value="Approve">Approve</option>
@@ -111,21 +118,28 @@ const WinResult = () => {
                   <tr>
                     <th>Market Name</th>
                     <th>Status</th>
-                    <th>Remark</th>
+                    <th className="test-start">Remark</th>
                   </tr>
                 </thead>
                 <tbody>
                   {subAdminResult.length > 0 ? (
                     subAdminResult.map((item) => (
                       <tr key={item.marketId}>
-                        <td>{item.marketName}</td>
-                        <td>{item.status}</td>
-                        <td>{item.remarks || "No Remark"}</td>
+                        <td className="text-center align-top">
+                          {item.marketName}
+                        </td>
+                        <td className="text-center align-top">{item.status}</td>
+                        <td className="text-start align-top text-wrap">
+                          {item.remarks || "No Remark"}
+                        </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="3" className="text-center text-danger fw-bold">
+                      <td
+                        colSpan="3"
+                        className="text-center text-danger fw-bold"
+                      >
                         No Data Available for Selected Status
                       </td>
                     </tr>
