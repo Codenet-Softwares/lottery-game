@@ -223,13 +223,12 @@ const PrizeValidation = () => {
             text: "Approve",
             onClick: () => handleApproveReject("Approve"),
             className: "btn btn-success",
-            // disabled: !modalContent?.Matched?.length, // Disable if no Matched data
+            disabled: modalContent?.Unmatched?.length > 0, // Disable if no Matched data
           },
           {
             text: "Reject",
             onClick: () => handleApproveReject("Reject"),
             className: "btn btn-danger",
-            // disabled: !modalContent?.Matched?.length,
           },
         ]}
       />
