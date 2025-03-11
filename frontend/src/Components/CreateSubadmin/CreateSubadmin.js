@@ -11,7 +11,7 @@ const inputConfig = [
   { placeholder: "Password", type: "password", name: "password" },
 ];
 
-const CreateSubadmin = ({ permissionsList = ["win-Lottery-Result"] }) => {
+const CreateSubadmin = ({ permissionsList = ["win-Lottery-Result",'result-View','win-Analytics' ] }) => {
   const formik = useFormik({
     initialValues: {
       userName: "",
