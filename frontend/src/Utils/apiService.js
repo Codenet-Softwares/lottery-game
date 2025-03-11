@@ -701,3 +701,18 @@ export async function subAdminWinResult(body = {}, isToast = false) {
     throw error;
   }
 }
+
+
+
+export async function GetWiningResultSubAdmin(body) {
+  try {
+    const callParams = await getAuthCallParams(strings.GET, body);
+    const response = await makeCall(
+      `${urls.GetResultSubAdmin}/${body.marketId}`,
+      callParams
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}

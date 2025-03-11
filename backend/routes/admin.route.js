@@ -15,6 +15,7 @@ import {
   getMatchData,
   getResult,
   getSubAdminHistory,
+  getSubadminResult,
   getTicketNumbersByMarket,
   getTicketRange,
   liveLotteries,
@@ -100,5 +101,7 @@ export const adminRoutes = (app) => {
   app.post('/api/admin/approved-reject/:marketId',validateAdminApproveReject, customErrorHandler, authorize([string.Admin]),adminApproveReject);
 
   app.get('/api/subAdmin/get-subAdmin-history',authorize([string.SubAdmin]), getSubAdminHistory)
+
+  app.get('/api/subAdmin/get-result/:marketId',authorize([string.SubAdmin]), getSubadminResult)
 
 };

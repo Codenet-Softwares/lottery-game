@@ -55,7 +55,8 @@ class UrlConstant {
   allLiveBetMarket = `${this.url_dev}/afterWin-lotteries`;
   DeleteLiveMarketBets = `${this.url_dev}/delete-Bet-afterWin-lottery`;
   getVoidBetMarket = `${this.url_dev}/void-market-afterWin-lottery`;
-  getSubAdminWinResult = `${this.url_dev}/subAdmin/get-subAdmin-history`
+  getSubAdminWinResult = `${this.url_dev}/subAdmin/get-subAdmin-history`;
+  GetResultSubAdmin =`${this.url_dev}/${this.subadmin}/get-result`;
 }
 
 const urls = new UrlConstant();

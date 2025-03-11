@@ -251,7 +251,7 @@ export const ResultDeclare = async (req, res) => {
     } else {
       return apiResponseErr(null, false, statusCode.badRequest, 'No valid tickets to save.', res);
     }
-    await WinResultRequest.update({isApproved: true, status : "Approve", remarks : "Congratulations! Your result has been approved."},{where:{marketId, isReject: false}});
+    await WinResultRequest.update({isApproved: true, status : "Approve", remarks : "Congratulations! Your result has been approved."},{where:{marketId, isReject: false, status : "Pending"}});
 
 const normalizeTicketNumber = (ticket) => {
   return ticket.replace(/\s+/g, '').toUpperCase();
@@ -613,6 +613,27 @@ export const subadminResultRequest = async (req, res) => {
     const adminId = req.user?.adminId;
     const market = await TicketRange.findOne({ where: { marketId } });
 
+    const rejectedSubadmins = await WinResultRequest.findAll({
+      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("adminId")), "adminId"]],
+      where: { 
+        marketId, 
+        isReject: true,
+        status : 'Reject',
+      },
+      raw: true,
+    });
+
+    const rejectedAdminIds = rejectedSubadmins.map(entry => entry.adminId);
+
+    if (rejectedAdminIds.length === 2 && !rejectedAdminIds.includes(adminId)) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Only the two sub-admins with rejected entries can submit results for this market!",
+        res
+      );
+    };
 
     const existingMarket = await WinResultRequest.findAll({
       attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("adminId")), "adminId"]],
@@ -632,7 +653,7 @@ export const subadminResultRequest = async (req, res) => {
         "Maximum of two subadmin entries allowed for this market!",
         res
       );
-    }
+    };
 
     const marketName = market.marketName;
 
@@ -738,9 +759,6 @@ export const subadminResultRequest = async (req, res) => {
         where: { prizeCategory, marketId, adminId, isReject: false,
           isApproved: false },
       });
-
-
-      console.log("___________", existingResults)
 
       if (existingResults.length >= prizeLimits[prizeCategory]) {
         return apiResponseErr(
@@ -972,7 +990,7 @@ export const subadminResultRequest = async (req, res) => {
       if (matchedAdminIds.size > 0) {
         await WinResultRequest.update(
           { type: "Matched" },
-          { where: { adminId: Array.from(matchedAdminIds) } }
+          { where: { adminId: Array.from(matchedAdminIds), marketId, status: 'Pending'} }
         );
       }
 
