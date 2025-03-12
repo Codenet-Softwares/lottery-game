@@ -11,12 +11,6 @@ import "./NavTop.css";
 
 const NavTop = () => {
   const { dispatch, store } = useAppContext();
-  console.log(
-    "data from store for topnavbar1",
-    store.admin.roles,
-    "data from store for topnavbar2",
-    store.admin.permissions
-  );
   const location = useLocation();
   const navigate = useNavigate();
   const scrollRef = useRef(null);
@@ -32,66 +26,129 @@ const NavTop = () => {
       toast.info("Logout cancelled.");
     }
   };
-// Defined navigation items with the fields of permission if added in future 
+
+  // Navigation items with permissions
   const navItems = [
-    { to: "/dashboard", icon: "fas fa-tachometer-alt", label: "Dashboard",permission: "" },
+    {
+      to: "/dashboard",
+      icon: "fas fa-tachometer-alt",
+      label: "Dashboard",
+      permission: "",
+    },
     {
       to: "/lottery-markets",
       icon: "fas fa-ticket-alt",
       label: "Create Lottery",
-      permission: ""
+      permission: "",
     },
     {
       to: "/Market-overview",
       icon: "fas fa-chart-line",
       label: "Market Overview",
-      permission: ""
+      permission: "",
     },
-    { to: "/results", icon: "fas fa-trophy", label: "Results",permission: "" },
-    { to: "/win", icon: "fas fa-money-bill-wave", label: "Win" , permission: "win-Lottery-Result" },
+    { to: "/results", icon: "fas fa-trophy", label: "Results", permission: "" },
+    {
+      to: "/win",
+      icon: "fas fa-money-bill-wave",
+      label: "Win",
+      permission: "win-Lottery-Result",
+    },
     {
       to: "/purchase-history",
       icon: "fas fa-history",
       label: "Purchase History",
-      permission: ""
+      permission: "",
     },
-    { to: "/search-lottery", icon: "fas fa-search", label: "Search Lottery",permission: "" },
-    { to: "/get-void-market", icon: "fas fa-file-excel", label: "Void",permission: "" },
-    { to: "/inactive", icon: "fas fa-ban", label: "Revoke" ,permission: ""},
+    {
+      to: "/search-lottery",
+      icon: "fas fa-search",
+      label: "Search Lottery",
+      permission: "",
+    },
+    {
+      to: "/get-void-market",
+      icon: "fas fa-file-excel",
+      label: "Void",
+      permission: "",
+    },
+    { to: "/inactive", icon: "fas fa-ban", label: "Revoke", permission: "" },
     {
       to: "/live-markets",
       icon: "fas fa-broadcast-tower",
       label: "Live Markets",
-      permission: ""
+      permission: "",
     },
-    { to: "/trash", icon: "fas fa-trash-alt", label: "Trash" , permission: ""},
-    { to: "/reset-password", icon: "fas fa-key", label: "Reset Password", permission: "" },
+    { to: "/trash", icon: "fas fa-trash-alt", label: "Trash", permission: "" },
+    {
+      to: "/reset-password",
+      icon: "fas fa-key",
+      label: "Reset Password",
+      permission: "",
+    },
     {
       to: "/create-subadmin",
       icon: "fas fa-user-shield",
       label: "Create Sub-Admin",
-      permission: ""
+      permission: "",
     },
     {
       to: "/prize-validation",
-      icon: " fas fa-clipboard-check",
+      icon: "fas fa-clipboard-check",
       label: "Prize Approval",
-      permission: ""
+      permission: "",
     },
-    { to: "/bet-tracker", icon: "fas fa-balance-scale", label: "Win Tracker", permission: "" },
-    { to: "/view-all-subadmin", icon: "fas fa-users-cog", label: "Sub-Admins", permission: "" }
+    {
+      to: "/bet-tracker",
+      icon: "fas fa-balance-scale",
+      label: "Win Tracker",
+      permission: "",
+    },
+    {
+      to: "/view-all-subadmin",
+      icon: "fas fa-users-cog",
+      label: "Sub-Admins",
+      permission: "",
+    },
+    {
+      to: "/subAdminData",
+      icon: "fas fa-database",
+      label: "SubAdmin Data",
+      permission: "win-Analytics",
+    },
+    {
+      to: "/subAdmin-win-result",
+      icon: "fas fa-trophy",
+      label: "SubAdmin Result",
+      permission: "result-View",
+    },
   ];
 
-  // Get permissions as an array
+  // Get roles and permissions as arrays
+  const userRoles = store?.admin?.roles
+    ? store.admin.roles.split(",").map((role) => role.trim())
+    : [];
   const userPermissions = store?.admin?.permissions
     ? store.admin.permissions.split(",").map((perm) => perm.trim())
     : [];
 
-  // Filter navigation items based on permissions
-  const filteredNavItems =
-    userPermissions.length === 0
-      ? navItems // If no specific permissions, show all
-      : navItems.filter((item) => userPermissions.includes(item.permission));
+  // Define items that should only be visible to sub-admins
+  const subAdminOnlyItems = [
+    "win-Lottery-Result",
+    "win-Analytics",
+    "result-View",
+  ];
+
+  // Filter navigation items based on permissions and roles
+  const filteredNavItems = navItems.filter((item) => {
+    if (subAdminOnlyItems.includes(item.permission)) {
+      return userRoles.includes("subAdmin");
+    }
+    return (
+      userPermissions.length === 0 || userPermissions.includes(item.permission)
+    );
+  });
+
   // Handle scroll update
   const handleUpdate = ({ getItemById }) => {
     setScrollState({
@@ -99,14 +156,15 @@ const NavTop = () => {
       end: getItemById(navItems[navItems.length - 1]?.to)?.visible ?? false,
     });
   };
+
   return (
     <SimpleBar className="navtop-container-Y">
       <div className="d-flex gap-5 justify-content-center align-items-center position-relative navtop-wrapper">
-        {/* Left Arrow */}
+        {/* Left Scroll Button */}
         <button
-          className={` btn-light ${
+          className={`btn-light ${
             scrollState.start ? "disabled-arrow" : "enabled-arrow"
-          } `}
+          }`}
           onClick={() => scrollRef.current?.scrollPrev()}
           disabled={scrollState.start}
         >
@@ -125,7 +183,7 @@ const NavTop = () => {
               <Link
                 key={to}
                 to={to}
-                className={`btn mx-5 text-white  ${
+                className={`btn mx-5 text-white ${
                   location.pathname === to || location.pathname.startsWith(to)
                     ? "btn-dark text-white"
                     : "btn-outline-dark"
@@ -138,7 +196,7 @@ const NavTop = () => {
           </ScrollMenu>
         </div>
 
-        {/* Right Arrow */}
+        {/* Right Scroll Button */}
         <button
           className={`btn-light ${
             scrollState.end ? "disabled-arrow" : "enabled-arrow"
@@ -149,9 +207,9 @@ const NavTop = () => {
           <FaChevronRight />
         </button>
 
-        {/* Logout Icon */}
+        {/* Logout Button */}
         <i
-          className="fas fa-sign-out-alt text-danger fs-2 logout-icon "
+          className="fas fa-sign-out-alt text-danger fs-2 logout-icon"
           onClick={handleLogout}
           title="Logout"
         />

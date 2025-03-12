@@ -14,6 +14,8 @@ import {
   getMarkets,
   getMatchData,
   getResult,
+  getSubAdminHistory,
+  getSubadminResult,
   getTicketNumbersByMarket,
   getTicketRange,
   inactiveMarketStatus,
@@ -65,7 +67,7 @@ export const adminRoutes = (app) => {
 
   app.get('/api/admin/getAll-markets', authorize([string.Admin, string.SubAdmin], [string.WinLottery]), getAllMarkets)
 
-  app.get('/api/admin/dateWise-markets',authorize([string.Admin]), dateWiseMarkets)
+  app.get('/api/admin/dateWise-markets',authorize([string.Admin, string.SubAdmin], [string.WinLottery]), dateWiseMarkets)
 
   app.get('/api/admin/get-markets', authorize([string.Admin]), getMarkets)//worked in date filter
 
@@ -91,14 +93,18 @@ export const adminRoutes = (app) => {
 
   app.post('/api/admin/create-subAdmin', createSubAdminSchema, customErrorHandler,  authorize([string.Admin]), createSubAdmin);
 
-  app.get('/api/subadmin/win-request-market', authorize([string.Admin]), winResultMarket)
+  app.get('/api/subadmin/win-request-market', authorize([string.Admin]), winResultMarket);
 
-  app.get('/api/market-wise-subadmin/:marketId', validateMarketWiseSubadmin, customErrorHandler, authorize([string.Admin]), marketWiseSubadmin)
+  app.get('/api/market-wise-subadmin/:marketId', validateMarketWiseSubadmin, customErrorHandler, authorize([string.Admin]), marketWiseSubadmin);
 
   app.get('/api/subAdmin/matching-data/:marketId', validateMarketWiseSubadmin, customErrorHandler, authorize([string.Admin]), getMatchData);
 
-  app.get('/api/admin/get-all-subAdmin', authorize([string.Admin]), getAllSubAdmin)
+  app.get('/api/admin/get-all-subAdmin', authorize([string.Admin]), getAllSubAdmin);
 
-  app.post('/api/admin/approved-reject/:marketId',validateAdminApproveReject, customErrorHandler, authorize([string.Admin]),adminApproveReject)
+  app.post('/api/admin/approved-reject/:marketId',validateAdminApproveReject, customErrorHandler, authorize([string.Admin]),adminApproveReject);
+
+  app.get('/api/subAdmin/get-subAdmin-history',authorize([string.SubAdmin], [string.winAnalytics]), getSubAdminHistory);
+
+  app.get('/api/subAdmin/get-result/:marketId',authorize([string.SubAdmin], [string.resultView]), getSubadminResult);
 
 };

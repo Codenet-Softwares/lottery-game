@@ -1,7 +1,7 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const ReusableModal = ({ show, handleClose, title, body ,footerButtons = []}) => {
+const ReusableModal = ({ show, handleClose, title, body, footerButtons = [] }) => {
   return (
     <div
       className={`modal-overlay ${show ? "d-block" : "d-none"}`}
@@ -51,13 +51,14 @@ const ReusableModal = ({ show, handleClose, title, body ,footerButtons = []}) =>
             >
               {body}
             </div>
-             {/* Footer (conditionally rendered) */}
-             {footerButtons.length > 0 && (
+            {/* Footer (conditionally rendered) */}
+            {footerButtons.length > 0 && (
               <div className="modal-footer d-flex justify-content-center">
                 {footerButtons.map((btn, index) => (
                   <button
                     key={index}
                     className={btn.className || "btn btn-secondary"}
+                    disabled={btn.disabled}
                     onClick={btn.onClick}
                   >
                     {btn.text}
