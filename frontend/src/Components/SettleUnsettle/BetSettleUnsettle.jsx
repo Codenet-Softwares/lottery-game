@@ -30,6 +30,7 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
       console.log("API Response===========================", response);
 
       if (response?.success) {
+        
         setBetStats(response.data);
         setPagination((prev) => ({
           page: response.pagination?.page || prev.page,
@@ -94,11 +95,23 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
   
     if (confirmDeletion) {
       try {
-        showLoader();
-        const response = await DeleteLiveBetMarket({ purchaseId }, false);
+        showLoader();  
+        const response = await DeleteLiveBetMarket({ purchaseId }, false);  
         if (response.success) {
-          alert("Live bet deleted successfully!");
-          window.location.reload(); // Reload the page after successful deletion
+          alert("Live bet deleted successfully!"); 
+          // Remove the deleted item from the state instead of refreshing
+          setBetStats((prevStats) =>
+            prevStats
+              .map((user) => ({
+                ...user,
+                details: user.details.filter(
+                  (detail) => detail.purchaseId !== purchaseId
+                ),
+              }))
+              .filter((user) => user.details.length > 0) // Remove users with no remaining bets
+          );  
+          // Close modal
+          setModalShow(false);
         } else {
           alert("Failed to delete live bet. Please try again.");
         }
@@ -111,7 +124,6 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
     }
   };
   
-
   useEffect(() => {
     console.log("Market ID================", marketId);
     if (marketId) {
