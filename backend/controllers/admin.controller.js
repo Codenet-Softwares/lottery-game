@@ -750,8 +750,7 @@ export const updateMarketStatus = async (req, res) => {
       {
         isActive: status,
         hideMarketUser: status ? true : Sequelize.col("hideMarketUser"),
-        inactiveGame: true
-
+        inactiveGame: true,
       },
       { where: { marketId } }
     );
@@ -791,7 +790,7 @@ export const inactiveMarketStatus = async (req, res) => {
     const [updatedCount] = await TicketRange.update(
       {
         //isActive: false,
-        inactiveGame: false
+        inactiveGame: false,
       },
       { where: { marketId } }
     );
@@ -823,7 +822,6 @@ export const inactiveMarketStatus = async (req, res) => {
     );
   }
 };
-
 
 export const liveMarkets = async (req, res) => {
   try {
@@ -1139,7 +1137,7 @@ export const afterWinLotteries = async (req, res) => {
       where: whereConditions,
     });
 
-  const userData = {};
+    const userData = {};
 
     await Promise.all(
       purchaseLotteries.map(async (lottery) => {
@@ -1478,69 +1476,77 @@ export const getMatchData = async (req, res) => {
       );
     }
 
-    const groupedResults = { Matched: [], Unmatched: [] };
+    const structuredResults = {
+      marketName: existingResults[0].marketName,
+      marketId: existingResults[0].marketId,
+      declarers: [...new Set(existingResults.map((r) => r.declearBy))],
+      prizes: [],
+    };
+
+    const prizeMap = new Map();
 
     existingResults.forEach((result) => {
-      const category = result.type === "Matched" ? "Matched" : "Unmatched";
+      if (!prizeMap.has(result.prizeCategory)) {
+        prizeMap.set(result.prizeCategory, {
+          prizeName: result.prizeCategory,
+          MatchedTickets: [],
+          DeclaredPrizes: {},
+          UnmatchedEntries: [],
+          SubPrizes: [],
+        });
+      }
 
-      let marketEntry = groupedResults[category].find(
-        (entry) => entry.marketId === result.marketId
+      const prize = prizeMap.get(result.prizeCategory);
+      prize.DeclaredPrizes[result.declearBy] = result.prizeAmount;
+
+      const unmatchedEntry = prize.UnmatchedEntries.find(
+        (entry) => entry.declaredBy === result.declearBy
       );
-
-      if (!marketEntry) {
-        marketEntry = {
-          marketName: result.marketName,
-          marketId: result.marketId,
-          type: result.type,
-          isApproved: result.isApproved,
-          createdAt: result.createdAt,
-          updatedAt: result.updatedAt,
-          MatchData: [],
-        };
-        groupedResults[category].push(marketEntry);
+      if (!unmatchedEntry) {
+        prize.UnmatchedEntries.push({
+          declaredBy: result.declearBy,
+          ticketNumber: [],
+        });
       }
 
-      let adminEntry = marketEntry.MatchData.find(
-        (entry) => entry.adminId === result.adminId
-      );
+      result.ticketNumber.forEach((ticket) => {
+        const isMatched =
+          existingResults.filter((r) => r.ticketNumber.includes(ticket))
+            .length > 1;
+        if (isMatched) {
+          if (!prize.MatchedTickets.includes(ticket)) {
+            prize.MatchedTickets.push(ticket);
+          }
+        } else {
+          prize.UnmatchedEntries.find(
+            (entry) => entry.declaredBy === result.declearBy
+          ).ticketNumber.push(ticket);
+        }
+      });
 
-      if (!adminEntry) {
-        adminEntry = {
-          adminId: result.adminId,
-          declearBy: result.declearBy,
-          ticketNumber: {},
-        };
-        marketEntry.MatchData.push(adminEntry);
+      // Remove empty UnmatchedEntries if no tickets exist for any declarer
+      if (
+        prize.UnmatchedEntries.every((entry) => entry.ticketNumber.length === 0)
+      ) {
+        prize.UnmatchedEntries = [];
       }
 
-      if (!adminEntry.ticketNumber[result.prizeCategory]) {
-        adminEntry.ticketNumber[result.prizeCategory] = {
-          prizeAmount: result.prizeAmount,
-          ...(result.complementaryPrize !== 0 && {
-            complementaryPrize: result.complementaryPrize,
-          }),
-          tickets: [],
-        };
+      if (result.complementaryPrize) {
+        let subPrize = prize.SubPrizes.find(
+          (sp) => sp.prizeName === "Complimentary Prize"
+        );
+        if (!subPrize) {
+          subPrize = { prizeName: "Complimentary Prize", DeclaredPrizes: {} };
+          prize.SubPrizes.push(subPrize);
+        }
+        subPrize.DeclaredPrizes[result.declearBy] = result.complementaryPrize;
       }
-
-      if (!adminEntry.ticketNumber[result.prizeCategory]) {
-        adminEntry.ticketNumber[result.prizeCategory] = {
-          prizeAmount: result.prizeAmount,
-          complementaryPrize: result.complementaryPrize,
-          tickets: [],
-        };
-      }
-
-      adminEntry.ticketNumber[result.prizeCategory].tickets = [
-        ...new Set([
-          ...adminEntry.ticketNumber[result.prizeCategory].tickets,
-          ...result.ticketNumber,
-        ]),
-      ];
     });
 
+    structuredResults.prizes = Array.from(prizeMap.values());
+
     return apiResponseSuccess(
-      groupedResults,
+      structuredResults,
       true,
       statusCode.success,
       "Data fetched successfully!",
@@ -1658,7 +1664,7 @@ export const adminApproveReject = async (req, res) => {
               remarks:
                 "Your result has been rejected. Kindly reach out to your upline for further guidance.",
             },
-            { where: { marketId } }
+            { where: { marketId, status: "Pending" } }
           );
         } else if (existingTicket[0].type === "Unmatched") {
           await WinResultRequest.update(
@@ -1668,7 +1674,7 @@ export const adminApproveReject = async (req, res) => {
               remarks:
                 "Oops! Your submission does not match our records. Please check the data and try again.",
             },
-            { where: { marketId } }
+            { where: { marketId, status: "Pending" } }
           );
         }
       } else {
@@ -1766,33 +1772,30 @@ export const adminApproveReject = async (req, res) => {
   }
 };
 
-export const getSubAdminHistory = async(req,res) => {
+export const getSubAdminHistory = async (req, res) => {
   try {
     const adminId = req.user?.adminId;
-    const { status, page = 1 , pageSize = 10 , search } = req.query;
+    const { status, page = 1, pageSize = 10, search } = req.query;
     const offset = (page - 1) * pageSize;
 
     const whereCondition = { adminId };
 
-    if(status)
-    {
+    if (status) {
       whereCondition.status = status;
     }
 
-    if(search)
-    {
-      whereCondition.marketName =  { [Op.like]: `%${search}%` };
+    if (search) {
+      whereCondition.marketName = { [Op.like]: `%${search}%` };
     }
 
     const existingResults = await WinResultRequest.findAll({
-      attributes : ["marketId","marketName", "type", "status", "remarks"],
+      attributes: ["marketId", "marketName", "type", "status", "remarks"],
       where: whereCondition,
-      group : ["marketId","marketName", "type", "status", "remarks"],
+      group: ["marketId", "marketName", "type", "status", "remarks"],
       order: [["createdAt", "DESC"]],
     });
 
-    if(!existingResults || existingResults.length == 0)
-    {
+    if (!existingResults || existingResults.length == 0) {
       return apiResponseSuccess(
         [],
         true,
@@ -1800,11 +1803,14 @@ export const getSubAdminHistory = async(req,res) => {
         "Data not found!",
         res
       );
-    };
+    }
 
     const totalItems = existingResults.length;
     const totalPages = Math.ceil(totalItems / parseInt(pageSize));
-    const paginatedData = existingResults.slice(offset, offset + parseInt(pageSize));
+    const paginatedData = existingResults.slice(
+      offset,
+      offset + parseInt(pageSize)
+    );
 
     const pagination = {
       page: parseInt(page),
@@ -1813,15 +1819,14 @@ export const getSubAdminHistory = async(req,res) => {
       totalItems,
     };
 
-      return apiResponsePagination(
-        paginatedData,
-        true,
-        statusCode.success,
-        "Data fetch successfull!",
-        pagination,
-        res
-      );
-    
+    return apiResponsePagination(
+      paginatedData,
+      true,
+      statusCode.success,
+      "Data fetch successfull!",
+      pagination,
+      res
+    );
   } catch (error) {
     return apiResponseErr(
       null,
@@ -1835,7 +1840,7 @@ export const getSubAdminHistory = async(req,res) => {
 
 export const getSubadminResult = async (req, res) => {
   try {
-    const { page = 1 , pageSize = 10 } = req.query;
+    const { page = 1, pageSize = 10 } = req.query;
     const offset = (page - 1) * pageSize;
 
     const adminId = req.user?.adminId;
@@ -1850,9 +1855,9 @@ export const getSubadminResult = async (req, res) => {
         "marketName",
         "marketId",
         "createdAt",
-        "updatedAt"
+        "updatedAt",
       ],
-      where: { adminId, marketId, status : 'Approve' },
+      where: { adminId, marketId, status: "Approve" },
       group: [
         "ticketNumber",
         "prizeCategory",
@@ -1861,7 +1866,7 @@ export const getSubadminResult = async (req, res) => {
         "marketName",
         "marketId",
         "createdAt",
-        "updatedAt"
+        "updatedAt",
       ],
       raw: true,
     });
@@ -1876,7 +1881,6 @@ export const getSubadminResult = async (req, res) => {
       );
     }
 
-
     const totalItems = results.length;
     const totalPages = Math.ceil(totalItems / parseInt(pageSize));
     const paginatedData = results.slice(offset, offset + parseInt(pageSize));
@@ -1888,7 +1892,14 @@ export const getSubadminResult = async (req, res) => {
       totalItems,
     };
 
-    return apiResponsePagination(paginatedData, true, statusCode.success, 'Lottery results fetched successfully.',pagination, res);
+    return apiResponsePagination(
+      paginatedData,
+      true,
+      statusCode.success,
+      "Lottery results fetched successfully.",
+      pagination,
+      res
+    );
   } catch (error) {
     return apiResponseErr(
       null,
