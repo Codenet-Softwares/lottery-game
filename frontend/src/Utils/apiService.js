@@ -688,6 +688,15 @@ export async function voidBetMarket(body, isToast = true) {
   }
 }
 
+export async function getUpdateMarket(body, isToast = true) {
+  try {
+    const callParams = await getAuthCallParams(strings.POST, body, isToast);
+    const response = await makeCall(urls.getUpdateInactive, callParams, isToast);
+      return response;
+  } catch (error) {
+    throw error;
+  }
+}
 
 export async function subAdminWinResult(body = {}, isToast = false) {
   try {
@@ -702,8 +711,6 @@ export async function subAdminWinResult(body = {}, isToast = false) {
   }
 }
 
-
-
 export async function GetWiningResultSubAdmin(body) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body);
@@ -716,3 +723,4 @@ export async function GetWiningResultSubAdmin(body) {
     throw error;
   }
 }
+

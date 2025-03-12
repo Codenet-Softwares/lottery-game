@@ -1,5 +1,5 @@
 class UrlConstant {
-  constructor() {}
+  constructor() { }
   //url was commented
 
   url_dev = process.env.REACT_APP_API_URL;
@@ -23,7 +23,7 @@ class UrlConstant {
   lotteryClock = `${this.url_dev}/admin/draw-dates`;
   GetScheduleTime = `${this.url_dev}/draw-dates`;
   CustomWinningPrizeadmin = `${this.url_dev}/${this.admin}/results-declaration`;
-  CustomWinningPrizeSubadmin = `${this.url_dev}/${this.subadmin}/win-result-request`; 
+  CustomWinningPrizeSubadmin = `${this.url_dev}/${this.subadmin}/win-result-request`;
   GetResult = `${this.url_dev}/lottery-results`;
   lotteryRange = `${this.url_dev}/get-range`;
   allActiveLotteryMarket = `${this.url_dev}/${this.admin}/getAll-markets`;
@@ -55,8 +55,10 @@ class UrlConstant {
   allLiveBetMarket = `${this.url_dev}/afterWin-lotteries`;
   DeleteLiveMarketBets = `${this.url_dev}/delete-Bet-afterWin-lottery`;
   getVoidBetMarket = `${this.url_dev}/void-market-afterWin-lottery`;
+  getUpdateInactive = `${this.url_dev}/update-inactive-market-status`
   getSubAdminWinResult = `${this.url_dev}/subAdmin/get-subAdmin-history`;
   GetResultSubAdmin =`${this.url_dev}/${this.subadmin}/get-result`;
+
 }
 
 const urls = new UrlConstant();

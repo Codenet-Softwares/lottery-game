@@ -17,6 +17,7 @@ import {
   GetPurchaseOverview,
   voidMarket,
   isActiveLottery,
+  getUpdateMarket,
 } from "../../Utils/apiService";
 import { useAppContext } from "../../contextApi/context";
 import { toast } from "react-toastify";
@@ -70,12 +71,21 @@ const MarketInsight = () => {
   //Api implementation for   toggling market status
   const handleMarketStatusToggle = async () => {
     const newStatus = !selectedMarket.isActive;
-
+    let response;
     showLoader();
-    const response = await isActiveLottery(
-      { status: newStatus, marketId: selectedMarket.marketId },
-      true
-    );
+    if (selectedMarket.isActive) {
+      response = await getUpdateMarket(
+        { marketId: selectedMarket.marketId },
+        true
+      );
+    }
+    else {
+      response = await isActiveLottery(
+        { status: newStatus, marketId: selectedMarket.marketId },
+        true
+      );
+    }
+
     console.log("line number 71", response);
     if (response && response.success) {
       setRefresh((prev) => !prev);
@@ -253,7 +263,8 @@ const MarketInsight = () => {
               <i
                 className="bi bi-pencil-square text-primary fs-4 fw-bold  cursor-pointer"
                 title="Edit Market Stats"
-                style={{ cursor: "pointer" ,
+                style={{
+                  cursor: "pointer",
                   textShadow: "2px 2px 2px rgba(0, 0, 0, 0.15)", // Slight depth effect
                   transform: "scale(1.1)", // Slightly enlarges the icon
 
@@ -349,8 +360,8 @@ const MarketInsight = () => {
                         Start:{" "}
                         {selectedMarket.start_time
                           ? moment
-                              .utc(selectedMarket.start_time)
-                              .format("HH:mm")
+                            .utc(selectedMarket.start_time)
+                            .format("HH:mm")
                           : "N/A"}
                         | End:{" "}
                         {selectedMarket.end_time
