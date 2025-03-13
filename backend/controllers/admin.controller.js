@@ -17,7 +17,7 @@ import PurchaseLottery from "../models/purchase.model.js";
 import LotteryResult from "../models/resultModel.js";
 import bcrypt from "bcrypt";
 
-import WinResultRequest from "../models/winResultRequestModel.js";
+import WinResultRequest from "../models/winresultRequestModel.js";
 
 import { string } from "../constructor/string.js";
 dotenv.config();
