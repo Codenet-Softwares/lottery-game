@@ -26,6 +26,7 @@ import BetSettleUnsettle from "../SettleUnsettle/BetSettleUnsettle";
 import ViewAllSubadmin from "../ViewAllSubAdmin/ViewAllSUbadmin";
 import WinResult from "../SubAdmin-WinResult/WinResult";
 import SubAdminWinResult from "../SubAdmin-WinResult/SubAdminWinResult";
+import DemoMap from "../demoMap";
 
 const AppRoutes = () => {
   return (
@@ -83,6 +84,7 @@ const AppRoutes = () => {
             <Route path="/subAdminData" element={<WinResult />} />
             <Route path="/subAdmin-win-result/:marketId" element={<SubAdminWinResult />} />
             <Route path="/subAdmin-win-result" element={<SubAdminWinResult/>} />
+            <Route path="/demo" element={<DemoMap/>} />
            
           </Route>
           {/* not found */}
