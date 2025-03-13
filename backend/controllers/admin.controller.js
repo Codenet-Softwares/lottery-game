@@ -1453,6 +1453,104 @@ export const marketWiseSubadmin = async (req, res) => {
   }
 };
 
+
+// export const getMatchData = async (req, res) => {
+//   try {
+//     const { marketId } = req.params;
+//     const { type } = req.query;
+
+//     const whereCondition = { marketId, isApproved: false, isReject: false };
+//     if (type) whereCondition.type = type;
+
+//     const existingResults = await WinResultRequest.findAll({
+//       where: whereCondition,
+//       order: [["createdAt", "DESC"]],
+//     });
+
+//     if (!existingResults || existingResults.length === 0) {
+//       return apiResponseErr(null, false, statusCode.notFound, "No Data found!", res);
+//     }
+
+//     const structuredResults = {
+//       marketName: existingResults[0].marketName,
+//       marketId: existingResults[0].marketId,
+//       declarers: [...new Set(existingResults.map((r) => r.declearBy))],
+//       matchedEnteries: [],
+//       UnmatchedEntries: [],
+//     };
+
+//     const prizeMap = new Map();
+
+//     existingResults.forEach((result) => {
+//       if (!prizeMap.has(result.prizeCategory)) {
+//         prizeMap.set(result.prizeCategory, {
+//           prizeName: result.prizeCategory,
+//           MatchedTickets: [],
+//           DeclaredPrizes: {},
+//           SubPrizes: [],
+//         });
+//       }
+
+//       const prize = prizeMap.get(result.prizeCategory);
+//       prize.DeclaredPrizes[result.declearBy] = result.prizeAmount;
+
+//       result.ticketNumber.forEach((ticket) => {
+//         const isMatched = existingResults.some(r => 
+//           r.ticketNumber.includes(ticket) && r.declearBy !== result.declearBy
+//         );
+//         if (isMatched) {
+//           if (!prize.MatchedTickets.includes(ticket)) {
+//             prize.MatchedTickets.push(ticket);
+//           }
+//         }
+//       });
+
+//       if (result.complementaryPrize) {
+//         let subPrize = prize.SubPrizes.find(sp => sp.prizeName === "Complimentary Prize");
+//         if (!subPrize) {
+//           subPrize = { prizeName: "Complimentary Prize", DeclaredPrizes: {} };
+//           prize.SubPrizes.push(subPrize);
+//         }
+//         subPrize.DeclaredPrizes[result.declearBy] = result.complementaryPrize;
+//       }
+//     });
+
+//     existingResults.forEach((result) => {
+//       const prize = prizeMap.get(result.prizeCategory);
+//       const unmatchedEntries = result.ticketNumber.filter(ticket => !prize.MatchedTickets.includes(ticket));
+      
+//       if (unmatchedEntries.length > 0) {
+//         let unmatchedPrize = structuredResults.UnmatchedEntries.find(u => u.prizeName === result.prizeCategory);
+//         if (!unmatchedPrize) {
+//           unmatchedPrize = {
+//             prizeName: result.prizeCategory,
+//             Tickets: [],
+//             DeclaredPrizes: null,
+//             SubPrizes: [],
+//           };
+//           structuredResults.UnmatchedEntries.push(unmatchedPrize);
+//         }
+//         unmatchedPrize.Tickets.push({ declaredBy: result.declearBy, ticketNumber: unmatchedEntries });
+//       }
+//     });
+
+//     prizeMap.forEach((prize) => {
+//       if (prize.MatchedTickets.length > 0) {
+//         structuredResults.matchedEnteries.push(prize);
+//       }
+//     });
+
+//     return res.status(200).json({
+//       data: structuredResults,
+//       success: true,
+//       successCode: 200,
+//       message: "Data fetched successfully!",
+//     });
+//   } catch (error) {
+//     return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
+//   }
+// };
+
 export const getMatchData = async (req, res) => {
   try {
     const { marketId } = req.params;
@@ -1467,20 +1565,15 @@ export const getMatchData = async (req, res) => {
     });
 
     if (!existingResults || existingResults.length === 0) {
-      return apiResponseErr(
-        null,
-        false,
-        statusCode.notFound,
-        "No Data found!",
-        res
-      );
+      return apiResponseErr(null, false, statusCode.notFound, "No Data found!", res);
     }
 
     const structuredResults = {
       marketName: existingResults[0].marketName,
       marketId: existingResults[0].marketId,
       declarers: [...new Set(existingResults.map((r) => r.declearBy))],
-      prizes: [],
+      matchedEnteries: [],
+      UnmatchedEntries: [],
     };
 
     const prizeMap = new Map();
@@ -1491,7 +1584,6 @@ export const getMatchData = async (req, res) => {
           prizeName: result.prizeCategory,
           MatchedTickets: [],
           DeclaredPrizes: {},
-          UnmatchedEntries: [],
           SubPrizes: [],
         });
       }
@@ -1499,42 +1591,19 @@ export const getMatchData = async (req, res) => {
       const prize = prizeMap.get(result.prizeCategory);
       prize.DeclaredPrizes[result.declearBy] = result.prizeAmount;
 
-      const unmatchedEntry = prize.UnmatchedEntries.find(
-        (entry) => entry.declaredBy === result.declearBy
-      );
-      if (!unmatchedEntry) {
-        prize.UnmatchedEntries.push({
-          declaredBy: result.declearBy,
-          ticketNumber: [],
-        });
-      }
-
       result.ticketNumber.forEach((ticket) => {
-        const isMatched =
-          existingResults.filter((r) => r.ticketNumber.includes(ticket))
-            .length > 1;
+        const isMatched = existingResults.some(r => 
+          r.ticketNumber.includes(ticket) && r.declearBy !== result.declearBy
+        );
         if (isMatched) {
           if (!prize.MatchedTickets.includes(ticket)) {
             prize.MatchedTickets.push(ticket);
           }
-        } else {
-          prize.UnmatchedEntries.find(
-            (entry) => entry.declaredBy === result.declearBy
-          ).ticketNumber.push(ticket);
         }
       });
 
-      // Remove empty UnmatchedEntries if no tickets exist for any declarer
-      if (
-        prize.UnmatchedEntries.every((entry) => entry.ticketNumber.length === 0)
-      ) {
-        prize.UnmatchedEntries = [];
-      }
-
       if (result.complementaryPrize) {
-        let subPrize = prize.SubPrizes.find(
-          (sp) => sp.prizeName === "Complimentary Prize"
-        );
+        let subPrize = prize.SubPrizes.find(sp => sp.prizeName === "Complimentary Prize");
         if (!subPrize) {
           subPrize = { prizeName: "Complimentary Prize", DeclaredPrizes: {} };
           prize.SubPrizes.push(subPrize);
@@ -1543,25 +1612,64 @@ export const getMatchData = async (req, res) => {
       }
     });
 
-    structuredResults.prizes = Array.from(prizeMap.values());
+    existingResults.forEach((result) => {
+      const prize = prizeMap.get(result.prizeCategory);
+      const unmatchedEntries = result.ticketNumber.filter(ticket => !prize.MatchedTickets.includes(ticket));
 
-    return apiResponseSuccess(
-      structuredResults,
-      true,
-      statusCode.success,
-      "Data fetched successfully!",
-      res
-    );
+      if (unmatchedEntries.length > 0) {
+        let unmatchedPrize = structuredResults.UnmatchedEntries.find(u => u.prizeName === result.prizeCategory);
+        if (!unmatchedPrize) {
+          unmatchedPrize = {
+            prizeName: result.prizeCategory,
+            Tickets: [],
+            DeclaredPrizes: null,
+            SubPrizes: [],
+          };
+          structuredResults.UnmatchedEntries.push(unmatchedPrize);
+        }
+        unmatchedPrize.Tickets.push({ declaredBy: result.declearBy, ticketNumber: unmatchedEntries });
+      }
+    });
+
+    prizeMap.forEach((prize,prizeCategory) => {
+      if (prize.MatchedTickets.length > 0) {
+        structuredResults.matchedEnteries.push(prize);
+      } else {
+        // Remove MatchedTickets when it's an empty array
+        const { MatchedTickets, ...prizeWithoutEmptyTickets } = prize;
+        structuredResults.matchedEnteries.push(prizeWithoutEmptyTickets);
+      }
+      const declaredPrizeValues = Object.values(prize.DeclaredPrizes);
+      const allDeclaredPrizesMatch = declaredPrizeValues.every((val, _, arr) => val === arr[0]);
+
+      let allSubPrizesMatch = true;
+      if (prize.SubPrizes.length > 0) {
+        const subPrizeValues = prize.SubPrizes.map(sp => Object.values(sp.DeclaredPrizes));
+        allSubPrizesMatch = subPrizeValues.every(values => values.every((val, _, arr) => val === arr[0]));
+      }
+
+      if (allDeclaredPrizesMatch && allSubPrizesMatch) {
+        structuredResults.matchedEnteries.push(prize);
+      } else {
+        structuredResults.UnmatchedEntries.push({
+          prizeName: prizeCategory,
+          DeclaredPrizes: prize.DeclaredPrizes,
+        });
+      }
+    });
+    
+
+    return res.status(200).json({
+      data: structuredResults,
+      success: true,
+      successCode: 200,
+      message: "Data fetched successfully!",
+    });
   } catch (error) {
-    return apiResponseErr(
-      null,
-      false,
-      statusCode.internalServerError,
-      error.message,
-      res
-    );
+    return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
   }
 };
+
 
 export const getAllSubAdmin = async (req, res) => {
   try {
