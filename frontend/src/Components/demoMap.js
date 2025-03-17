@@ -18,7 +18,7 @@ const DemoMap = () => {
     matchedEntries = [],
     UnmatchedEntries = [],
   } = ApprovalData;
-
+console.log('======>>> line 21',ApprovalData)
   return (
     <div className="container mt-4">
       <h2 className="text-primary">{marketName} - Prize Details</h2>
