@@ -24,11 +24,12 @@ import {
   login,
   marketWiseSubadmin,
   resetPassword,
+  subAdminResetPassword,
   updateMarketStatus,
   winResultMarket,
 } from '../controllers/admin.controller.js';
 import { authorize } from '../middlewares/auth.js';
-import { validateAdminLogin, validateAdminPurchaseHistory, validateSearchTickets, validateCreateAdmin, validateDateQuery, validateGetResult, validateMarketId, validateLiveLottery, validateLiveMarkets, validateResetPassword, validateAfterWinMarkets, validateAfterWinLottery, createSubAdminSchema, validateMarketWiseSubadmin, validateAdminApproveReject, } from '../utils/commonSchema.js';
+import { validateAdminLogin, validateAdminPurchaseHistory, validateSearchTickets, validateCreateAdmin, validateDateQuery, validateGetResult, validateMarketId, validateLiveLottery, validateLiveMarkets, validateResetPassword, validateAfterWinMarkets, validateAfterWinLottery, createSubAdminSchema, validateMarketWiseSubadmin, validateAdminApproveReject, resetPasswordSchema, } from '../utils/commonSchema.js';
 import customErrorHandler from '../utils/customErrorHandler.js';
 import { apiResponseErr, apiResponseSuccess } from '../utils/response.js';
 import { statusCode } from '../utils/statusCodes.js';
@@ -36,6 +37,7 @@ import { statusCode } from '../utils/statusCodes.js';
 export const adminRoutes = (app) => {
   app.post('/api/create-admin', validateCreateAdmin, customErrorHandler, createAdmin);
   app.post('/api/login', validateAdminLogin, customErrorHandler, login);
+  app.post('/api/subAdmin/reset-password', resetPasswordSchema, customErrorHandler, subAdminResetPassword);
   app.post(
     '/api/admin/search-ticket',
     validateSearchTickets,

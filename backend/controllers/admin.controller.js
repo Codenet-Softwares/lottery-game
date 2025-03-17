@@ -72,23 +72,28 @@ export const login = async (req, res) => {
     const existingUser = await Admin.findOne({ where: { userName } });
 
     if (!existingUser) {
-      return apiResponseErr(
-        null,
-        false,
-        statusCode.badRequest,
-        "User does not exist",
-        res
-      );
+      return apiResponseErr(null, false, statusCode.badRequest, "User does not exist", res);
+    }
+
+    if (existingUser.role !== 'admin' && existingUser.role !== 'subAdmin') {
+      return apiResponseErr(null, false, statusCode.unauthorized, "Unauthorized access", res);
     }
 
     const isPasswordValid = await existingUser.validPassword(password);
 
     if (!isPasswordValid) {
-      return apiResponseErr(
-        null,
-        false,
-        statusCode.badRequest,
-        "Invalid username or password",
+      return apiResponseErr(null, false, statusCode.badRequest, "Invalid username or password", res);
+    }
+
+    if (existingUser.isReset === true && existingUser.role === 'subAdmin') {
+      return apiResponseSuccess(
+        {
+          message: 'Password reset required. Please reset your password.',
+          isReset: existingUser.isReset,
+        },
+        true,
+        statusCode.success,
+        "Password reset required",
         res
       );
     }
@@ -99,30 +104,44 @@ export const login = async (req, res) => {
       role: existingUser.role,
       permissions: existingUser.permissions,
     };
-    const accessToken = jwt.sign(userResponse, process.env.JWT_SECRET_KEY, {
-      expiresIn: "1d",
-    });
 
-    return apiResponseSuccess(
-      {
-        accessToken,
-        ...userResponse,
-      },
-      true,
-      statusCode.success,
-      "login successfully",
-      res
-    );
+    const accessToken = jwt.sign(userResponse, process.env.JWT_SECRET_KEY, { expiresIn: "1d" });
+
+    return apiResponseSuccess({ accessToken, ...userResponse }, true, statusCode.success, "Login successful", res);
   } catch (error) {
-    apiResponseErr(
-      null,
-      false,
-      statusCode.internalServerError,
-      error.errMessage ?? error.message,
-      res
-    );
+    return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
   }
 };
+
+export const subAdminResetPassword = async (req, res) => {
+  try {
+    const { userName, oldPassword, newPassword } = req.body;
+
+    const existingUser = await Admin.findOne({ where: { userName, role: 'subAdmin' } });
+
+    if (!existingUser) {
+      return apiResponseErr(null, false, statusCode.badRequest, "Sub-admin not found", res);
+    }
+
+    const isPasswordMatch = await existingUser.validPassword(oldPassword);
+    if (!isPasswordMatch) {
+      return apiResponseErr(null, false, statusCode.badRequest, "Invalid old password", res);
+    }
+
+    await existingUser.update({
+      password: newPassword, 
+      isReset: false
+    });
+
+    return apiResponseSuccess(null, true, statusCode.success, "Password reset successfully.", res);
+
+  } catch (error) {
+    return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
+  }
+};
+
+
+
 
 export const adminSearchTickets = async ({
   group,

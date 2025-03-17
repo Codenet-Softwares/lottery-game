@@ -294,3 +294,14 @@ export const createSubadminSchema = Yup.object({
     .min(1, "At least one permission is required")
     .required("Permissions are required"),
 });
+export const resetPasswordSchemaSubAdmin = Yup.object().shape({
+  newPassword: Yup.string()
+    .required("New password is required")
+    .notOneOf(
+      [Yup.ref("oldPassword"), null],
+      "New password cannot be the same as the old password"
+    ),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
+    .required("Confirm password is required"),
+});

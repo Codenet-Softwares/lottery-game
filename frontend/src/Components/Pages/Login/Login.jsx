@@ -58,6 +58,11 @@ const Login = () => {
     const response = await adminLogin(values);
     console.log("Response from login:", response);
     if (response && response.success) {
+      if (response?.data?.message == "Password reset required. Please reset your password.") {
+        navigate("/subAdmin-reset-password", { state: { password: values.password, userName: values.userName } });
+        return; 
+    }
+
       localStorage.setItem(
         strings.LOCAL_STORAGE_KEY,
         JSON.stringify({
