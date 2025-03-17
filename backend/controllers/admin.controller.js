@@ -1504,26 +1504,21 @@ export const getMatchData = async (req, res) => {
       }
     });
 
-    // Process each prize for match/unmatch
     prizeMap.forEach((prize) => {
       const declarers = Object.keys(prize.ticketsByDeclarer);
       const allTickets = declarers.map(declarer => prize.ticketsByDeclarer[declarer]);
 
-      // Find matched tickets (appear in all declarers)
       const commonTickets = allTickets.reduce((a, b) => a.filter(ticket => b.includes(ticket)));
 
-      // Find unmatched tickets per declarer
       const unmatchedTickets = declarers.map(declarer => {
         const tickets = prize.ticketsByDeclarer[declarer];
         const notMatched = tickets.filter(ticket => !commonTickets.includes(ticket));
         return { declaredBy: declarer, ticketNumber: notMatched };
       }).filter(entry => entry.ticketNumber.length > 0);
 
-      // Check if DeclaredPrizes match
       const declaredPrizeValues = Object.values(prize.DeclaredPrizes);
       const declaredPrizesMatch = declaredPrizeValues.every(val => val === declaredPrizeValues[0]);
 
-      // Check if SubPrizes match
       let subPrizesMatch = true;
       for (const subPrize of prize.SubPrizes) {
         const values = Object.values(subPrize.DeclaredPrizes);
@@ -1533,11 +1528,9 @@ export const getMatchData = async (req, res) => {
         }
       }
 
-      // Determine matched or unmatched
       const isAllMatched = commonTickets.length > 0 && declaredPrizesMatch && subPrizesMatch && unmatchedTickets.length === 0;
 
       if (isAllMatched) {
-        // All matched
         const matchEntry = {
           prizeName: prize.prizeName,
           Tickets: commonTickets,
@@ -1546,12 +1539,10 @@ export const getMatchData = async (req, res) => {
         };
         structuredResults.matchedEnteries.push(matchEntry);
       } else {
-        // Unmatched entries - break down into parts
         const hasUnmatchedTickets = unmatchedTickets.length > 0;
         const hasUnmatchedDeclaredPrizes = !declaredPrizesMatch;
         const hasUnmatchedSubPrizes = !subPrizesMatch;
         
-        // Prepare unmatched subprizes if needed
         const unmatchedSubPrizes = hasUnmatchedSubPrizes
           ? prize.SubPrizes.map(sp => ({
               prizeName: sp.prizeName,
@@ -1567,7 +1558,7 @@ export const getMatchData = async (req, res) => {
             SubPrizes: unmatchedSubPrizes,
           });
         }
-        // If Tickets, DeclaredPrizes, and SubPrizes matched individually, push only matched ones
+
         const partialMatchEntry = {
           prizeName: prize.prizeName,
           Tickets: commonTickets.length > 0 ? commonTickets : [],
