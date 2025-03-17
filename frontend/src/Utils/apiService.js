@@ -722,5 +722,19 @@ export async function GetWiningResultSubAdmin(body) {
   } catch (error) {
     throw error;
   }
-}
 
+}
+export async function ResetSubAdminPassword(body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.POST, body, isToast);
+    const response = await makeCall(
+      urls.SubPasswordReset,
+
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}

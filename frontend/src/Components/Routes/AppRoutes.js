@@ -44,6 +44,8 @@ const AppRoutes = () => {
       />
       <BrowserRouter>
         <Routes>
+        <Route path="/subAdmin-reset-password" element={<ResetPassword/>}></Route>
+
           <Route path="/" element={<Login />}></Route>
           <Route path="/login" element={<Login />}></Route>
           <Route
