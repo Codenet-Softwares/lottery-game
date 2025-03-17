@@ -98,7 +98,6 @@ export const login = async (req, res) => {
       userName: existingUser.userName,
       role: existingUser.role,
       permissions: existingUser.permissions,
-      parmission: existingUser.permissions,
     };
     const accessToken = jwt.sign(userResponse, process.env.JWT_SECRET_KEY, {
       expiresIn: "1d",
@@ -1458,7 +1457,7 @@ export const getMatchData = async (req, res) => {
     const { marketId } = req.params;
     const { type } = req.query;
 
-    const whereCondition = { marketId, isApproved: false };
+    const whereCondition = { marketId, isApproved: false, isReject: false };
     if (type) whereCondition.type = type;
 
     const existingResults = await WinResultRequest.findAll({
@@ -1467,93 +1466,132 @@ export const getMatchData = async (req, res) => {
     });
 
     if (!existingResults || existingResults.length === 0) {
-      return apiResponseErr(
-        null,
-        false,
-        statusCode.notFound,
-        "No Data found!",
-        res
-      );
+      return apiResponseErr(null, false, statusCode.notFound, "No Data found!", res);
     }
 
-    const groupedResults = { Matched: [], Unmatched: [] };
+    const structuredResults = {
+      marketName: existingResults[0].marketName,
+      marketId: existingResults[0].marketId,
+      declarers: [...new Set(existingResults.map((r) => r.declearBy))],
+      matchedEnteries: [],
+      UnmatchedEntries: [],
+    };
 
+    const prizeMap = new Map();
+
+    // Group data by prizeCategory
     existingResults.forEach((result) => {
-      const category = result.type === "Matched" ? "Matched" : "Unmatched";
-
-      let marketEntry = groupedResults[category].find(
-        (entry) => entry.marketId === result.marketId
-      );
-
-      if (!marketEntry) {
-        marketEntry = {
-          marketName: result.marketName,
-          marketId: result.marketId,
-          type: result.type,
-          isApproved: result.isApproved,
-          createdAt: result.createdAt,
-          updatedAt: result.updatedAt,
-          MatchData: [],
-        };
-        groupedResults[category].push(marketEntry);
+      if (!prizeMap.has(result.prizeCategory)) {
+        prizeMap.set(result.prizeCategory, {
+          prizeName: result.prizeCategory,
+          ticketsByDeclarer: {},
+          DeclaredPrizes: {},
+          SubPrizes: [],
+        });
       }
 
-      let adminEntry = marketEntry.MatchData.find(
-        (entry) => entry.adminId === result.adminId
-      );
+      const prize = prizeMap.get(result.prizeCategory);
+      prize.DeclaredPrizes[result.declearBy] = result.prizeAmount;
+      prize.ticketsByDeclarer[result.declearBy] = result.ticketNumber;
 
-      if (!adminEntry) {
-        adminEntry = {
-          adminId: result.adminId,
-          declearBy: result.declearBy,
-          ticketNumber: {},
-        };
-        marketEntry.MatchData.push(adminEntry);
+      if (result.complementaryPrize) {
+        let subPrize = prize.SubPrizes.find(sp => sp.prizeName === "Complimentary Prize");
+        if (!subPrize) {
+          subPrize = { prizeName: "Complimentary Prize", DeclaredPrizes: {} };
+          prize.SubPrizes.push(subPrize);
+        }
+        subPrize.DeclaredPrizes[result.declearBy] = result.complementaryPrize;
       }
-
-      if (!adminEntry.ticketNumber[result.prizeCategory]) {
-        adminEntry.ticketNumber[result.prizeCategory] = {
-          prizeAmount: result.prizeAmount,
-          ...(result.complementaryPrize !== 0 && {
-            complementaryPrize: result.complementaryPrize,
-          }),
-          tickets: [],
-        };
-      }
-
-      if (!adminEntry.ticketNumber[result.prizeCategory]) {
-        adminEntry.ticketNumber[result.prizeCategory] = {
-          prizeAmount: result.prizeAmount,
-          complementaryPrize: result.complementaryPrize,
-          tickets: [],
-        };
-      }
-
-      adminEntry.ticketNumber[result.prizeCategory].tickets = [
-        ...new Set([
-          ...adminEntry.ticketNumber[result.prizeCategory].tickets,
-          ...result.ticketNumber,
-        ]),
-      ];
     });
 
-    return apiResponseSuccess(
-      groupedResults,
-      true,
-      statusCode.success,
-      "Data fetched successfully!",
-      res
-    );
+    // Process each prize for match/unmatch
+    prizeMap.forEach((prize) => {
+      const declarers = Object.keys(prize.ticketsByDeclarer);
+      const allTickets = declarers.map(declarer => prize.ticketsByDeclarer[declarer]);
+
+      // Find matched tickets (appear in all declarers)
+      const commonTickets = allTickets.reduce((a, b) => a.filter(ticket => b.includes(ticket)));
+
+      // Find unmatched tickets per declarer
+      const unmatchedTickets = declarers.map(declarer => {
+        const tickets = prize.ticketsByDeclarer[declarer];
+        const notMatched = tickets.filter(ticket => !commonTickets.includes(ticket));
+        return { declaredBy: declarer, ticketNumber: notMatched };
+      }).filter(entry => entry.ticketNumber.length > 0);
+
+      // Check if DeclaredPrizes match
+      const declaredPrizeValues = Object.values(prize.DeclaredPrizes);
+      const declaredPrizesMatch = declaredPrizeValues.every(val => val === declaredPrizeValues[0]);
+
+      // Check if SubPrizes match
+      let subPrizesMatch = true;
+      for (const subPrize of prize.SubPrizes) {
+        const values = Object.values(subPrize.DeclaredPrizes);
+        if (!values.every(val => val === values[0])) {
+          subPrizesMatch = false;
+          break;
+        }
+      }
+
+      // Determine matched or unmatched
+      const isAllMatched = commonTickets.length > 0 && declaredPrizesMatch && subPrizesMatch && unmatchedTickets.length === 0;
+
+      if (isAllMatched) {
+        // All matched
+        const matchEntry = {
+          prizeName: prize.prizeName,
+          Tickets: commonTickets,
+          DeclaredPrizes: prize.DeclaredPrizes,
+          SubPrizes: prize.SubPrizes,
+        };
+        structuredResults.matchedEnteries.push(matchEntry);
+      } else {
+        // Unmatched entries - break down into parts
+        const hasUnmatchedTickets = unmatchedTickets.length > 0;
+        const hasUnmatchedDeclaredPrizes = !declaredPrizesMatch;
+        const hasUnmatchedSubPrizes = !subPrizesMatch;
+        
+        // Prepare unmatched subprizes if needed
+        const unmatchedSubPrizes = hasUnmatchedSubPrizes
+          ? prize.SubPrizes.map(sp => ({
+              prizeName: sp.prizeName,
+              DeclaredPrizes: sp.DeclaredPrizes,
+            }))
+          : [];
+        
+        if (hasUnmatchedTickets || hasUnmatchedDeclaredPrizes || hasUnmatchedSubPrizes) {
+          structuredResults.UnmatchedEntries.push({
+            prizeName: prize.prizeName,
+            Tickets: hasUnmatchedTickets ? unmatchedTickets : [],
+            DeclaredPrizes: hasUnmatchedDeclaredPrizes ? prize.DeclaredPrizes : null,
+            SubPrizes: unmatchedSubPrizes,
+          });
+        }
+        // If Tickets, DeclaredPrizes, and SubPrizes matched individually, push only matched ones
+        const partialMatchEntry = {
+          prizeName: prize.prizeName,
+          Tickets: commonTickets.length > 0 ? commonTickets : [],
+          DeclaredPrizes: declaredPrizesMatch ? prize.DeclaredPrizes : null,
+          SubPrizes: subPrizesMatch ? prize.SubPrizes : [],
+        };
+
+        if (partialMatchEntry.Tickets.length > 0 || partialMatchEntry.DeclaredPrizes || partialMatchEntry.SubPrizes.length > 0) {
+          structuredResults.matchedEnteries.push(partialMatchEntry);
+        }
+      }
+    });
+
+    return res.status(200).json({
+      data: structuredResults,
+      success: true,
+      successCode: 200,
+      message: "Data fetched successfully!",
+    });
   } catch (error) {
-    return apiResponseErr(
-      null,
-      false,
-      statusCode.internalServerError,
-      error.message,
-      res
-    );
+    return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
   }
 };
+
 
 export const getAllSubAdmin = async (req, res) => {
   try {

@@ -1,135 +1,183 @@
 import React from "react";
 import "./comparisonTable.css";
 
-const prizeOrder = ["First Prize", "Second Prize", "Third Prize", "Fourth Prize", "Fifth Prize"];
+const prizeOrder = [
+  "First Prize",
+  "Second Prize",
+  "Third Prize",
+  "Fourth Prize",
+  "Fifth Prize",
+];
 
-const ComparisonTable = ({ modalContent, loadingModal }) => {
-  if (loadingModal) {
-    return <p>Loading...</p>;
-  }
+const ComparisonTable = ({ modalContent }) => {
+  const { matchedEnteries = [], UnmatchedEntries = [] } = modalContent;
 
-  const hasMatchedData = modalContent?.Matched?.length > 0;
-  const hasUnmatchedData = modalContent?.Unmatched?.length > 0;
+  // Sorting prizes based on the predefined order
+  const sortedPrizeNames = [
+    ...new Set(
+      [...matchedEnteries, ...UnmatchedEntries].map((e) => e.prizeName)
+    ),
+  ].sort((a, b) => prizeOrder.indexOf(a) - prizeOrder.indexOf(b));
 
   return (
-    <div className="comparison-table">
-      {/* Matched Entries */}
-      <h5 className="fw-bold text-success">Matched Entries</h5>
-      {hasMatchedData ? (
-        modalContent.Matched.map((market, index) => (
-          <div key={index} className="mb-3 border p-2 rounded">
-            <h6 className="fw-bold">{market.marketName}</h6>
-            <table className="table table-bordered text-uppercase fs-6">
-              <thead>
-                <tr>
-                  <th>Declared By 1</th>
-                  <th>Declared By 2</th>
-                  <th>Prize Category</th>
-                  <th>Ticket Numbers</th>
-                  <th>Prize Amount</th>
-                  <th>Complimentary</th>
-                </tr>
-              </thead>
-              <tbody>
-                {market.MatchData.length > 1 ? (
-                  prizeOrder.map((category, j) => {
-                    const entry1 = market.MatchData[0];
-                    const entry2 = market.MatchData[1] || {};
-                    if (!entry1.ticketNumber[category]) return null;
+    <div className="table-responsive">
+      <table className="table table-bordered table-striped">
+        <thead className="table-dark">
+          <tr>
+            <th>Prize Name</th>
+            <th>Type</th>
+            <th>Declared Prizes</th>
+            <th>Unmatched Tickets</th>
+            <th>Matched Tickets</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sortedPrizeNames.map((prizeName, index) => {
+            const matchedEntry = matchedEnteries.find(
+              (e) => e.prizeName === prizeName
+            );
+            const unmatchedEntries = UnmatchedEntries.filter(
+              (e) => e.prizeName === prizeName
+            );
 
-                    return (
-                      <tr key={j}>
-                        {j === 0 && (
-                          <>
-                            <td rowSpan={prizeOrder.length} className="align-middle">
-                              {entry1.declearBy}
-                            </td>
-                            <td rowSpan={prizeOrder.length} className="align-middle">
-                              {entry2.declearBy || "-"}
-                            </td>
-                          </>
-                        )}
-                        <td>{category}</td>
-                        <td>
-                          <select className="form-select small-dropdown">
-                            {entry1.ticketNumber[category]?.tickets.map((ticket, idx) => (
-                              <option key={idx}>{ticket}</option>
-                            ))}
-                          </select>
-                        </td>
-                        <td>₹{entry1.ticketNumber[category]?.prizeAmount || "-"}</td>
-                        <td>₹{entry1.ticketNumber[category]?.complementaryPrize || "NA"}</td>
-                      </tr>
-                    );
-                  })
-                ) : (
+            const totalRows = (matchedEntry ? 1 : 0) + unmatchedEntries.length;
+
+            return (
+              <React.Fragment key={`prize-${index}`}>
+                {matchedEntry && (
                   <tr>
-                    <td>{market.MatchData[0]?.declearBy}</td>
-                    <td>-</td>
-                    <td colSpan="3" className="text-center">No additional data</td>
+                    <td
+                      rowSpan={totalRows}
+                      className="fw-bold text-primary align-middle"
+                    >
+                      {matchedEntry.prizeName}
+                    </td>
+                    <td className="fw-bold text-success">Matched</td>
+                    <td>
+                      {Object.entries(matchedEntry.DeclaredPrizes ?? {}).map(
+                        ([declarer, amount]) => (
+                          <div key={declarer}>
+                            {declarer}: {amount}
+                          </div>
+                        )
+                      )}
+                    </td>
+                    <td>Not Available</td>
+                    <td>
+                      {matchedEntry.MatchedTickets?.length > 0 ||
+                      matchedEntry.Tickets?.length > 0 ? (
+                        <select className="form-select">
+                          {(
+                            matchedEntry.MatchedTickets || matchedEntry.Tickets
+                          ).map((ticket, i) => (
+                            <option key={i} value={ticket}>
+                              {ticket}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        "Not Available"
+                      )}
+                    </td>
                   </tr>
                 )}
-              </tbody>
-            </table>
-          </div>
-        ))
-      ) : (
-        <p className="text-danger">No matched data available</p>
-      )}
 
-      {/* Unmatched Entries */}
-      <h5 className="fw-bold text-danger mt-4">Unmatched Entries</h5>
-      {hasUnmatchedData ? (
-        <div className="table-responsive">
-          <table className="table table-bordered">
-            <thead>
-              <tr>
-                <th>Market</th>
-                <th>Declared By</th>
-                <th>Prize Category</th>
-                <th>Ticket Numbers</th>
-                <th>Prize Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {modalContent.Unmatched.map((market, index) =>
-                market.MatchData.map((entry, i) =>
-                  prizeOrder.map((category, j) => {
-                    const details = entry.ticketNumber[category];
-                    if (!details) return null;
-
-                    return (
-                      <tr key={`${index}-${i}-${j}`}>
-                        {i === 0 && j === 0 && (
-                          <td rowSpan={prizeOrder.length * market.MatchData.length} className="align-middle">
-                            {market.marketName}
-                          </td>
-                        )}
-                        {j === 0 && (
-                          <td rowSpan={prizeOrder.length} className="align-middle">
-                            {entry.declearBy}
-                          </td>
-                        )}
-                        <td>{category}</td>
-                        <td>
-                          <select className="form-select small-dropdown">
-                            {details.tickets.map((ticket, idx) => (
-                              <option key={idx}>{ticket}</option>
+                {unmatchedEntries.map((unmatched, uIndex) => (
+                  <tr key={`unmatched-${uIndex}`}>
+                    {!matchedEntry && uIndex === 0 && (
+                      <td
+                        rowSpan={totalRows}
+                        className="fw-bold text-primary align-middle"
+                      >
+                        {unmatched.prizeName}
+                      </td>
+                    )}
+                    <td className="fw-bold text-danger align-middle ">
+                      Unmatched
+                    </td>
+                    <td>
+                      {unmatched.DeclaredPrizes
+                        ? Object.entries(unmatched.DeclaredPrizes ?? {}).map(
+                            ([declarer, amount]) => (
+                              <div key={declarer}>
+                                {declarer}: {amount}
+                              </div>
+                            )
+                          )
+                        : "Not Available"}
+                    </td>
+                    <td>
+                      {unmatched.Tickets.map((ticket, i) => (
+                        <div key={i} className="mb-2">
+                          <div className="fw-bold text-dark">
+                            {ticket.declaredBy}
+                          </div>
+                          <select className="form-select">
+                            {ticket.ticketNumber.map((num, j) => (
+                              <option key={j} value={num}>
+                                {num}
+                              </option>
                             ))}
                           </select>
-                        </td>
-                        <td>₹{details.prizeAmount}</td>
-                      </tr>
-                    );
-                  })
-                )
-              )}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <p className="text-danger">No unmatched data available</p>
-      )}
+                        </div>
+                      ))}
+                    </td>
+                    <td>Not Available</td>
+                  </tr>
+                ))}
+
+                {/* Display SubPrizes for Matched Entries */}
+                {matchedEntry?.SubPrizes?.map((subPrize, subIndex) => (
+                  <tr
+                    key={`matched-sub-${subIndex}`}
+                    className="bg-success text-white"
+                  >
+                    <td className="fw-bold text-success">
+                      ↳ {subPrize.prizeName}
+                    </td>
+                    <td className="text-success">Matched</td>
+                    <td>
+                      {Object.entries(subPrize.DeclaredPrizes ?? {}).map(
+                        ([declarer, amount]) => (
+                          <div key={declarer}>
+                            {declarer}: {amount}
+                          </div>
+                        )
+                      )}
+                    </td>
+                    <td colSpan="2">Not Available</td>
+                  </tr>
+                ))}
+
+                {/* Display SubPrizes for Unmatched Entries */}
+                {unmatchedEntries.flatMap((unmatched) =>
+                  unmatched.SubPrizes?.map((subPrize, subIndex) => (
+                    <tr
+                      key={`unmatched-sub-${subIndex}`}
+                      className="bg-danger text-white"
+                    >
+                      <td className="fw-bold  text-danger">
+                        ↳ {subPrize.prizeName}
+                      </td>
+                      <td className="text-danger">Unmatched</td>
+                      <td>
+                        {Object.entries(subPrize.DeclaredPrizes ?? {}).map(
+                          ([declarer, amount]) => (
+                            <div key={declarer}>
+                              {declarer}: {amount}
+                            </div>
+                          )
+                        )}
+                      </td>
+                      <td colSpan="2">Not Available</td>
+                    </tr>
+                  ))
+                )}
+              </React.Fragment>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 };
