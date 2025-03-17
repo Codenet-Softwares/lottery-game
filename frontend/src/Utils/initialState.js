@@ -38,3 +38,13 @@ export const getAdminResetPasswordInitialState = (body = {}) => {
       confirmPassword: body.confirmPassword || "", 
     };
   };
+
+  export const getSubAdminResetPasswordInitialState = (body = {}) => {
+    return {
+      userName: body.userName || "",  // Required in payload but not shown in UI
+      oldPassword: body.oldPassword || "",  // Required in payload but not shown in UI
+      newPassword: "",  // Shown in UI
+      confirmPassword: "",  // Shown in UI
+    };
+  };
+  

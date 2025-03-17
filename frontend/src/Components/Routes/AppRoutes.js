@@ -26,6 +26,7 @@ import BetSettleUnsettle from "../SettleUnsettle/BetSettleUnsettle";
 import ViewAllSubadmin from "../ViewAllSubAdmin/ViewAllSUbadmin";
 import WinResult from "../SubAdmin-WinResult/WinResult";
 import SubAdminWinResult from "../SubAdmin-WinResult/SubAdminWinResult";
+import SubAdminReset from "../SubAdminResetPassword/SubAdminReset";
 
 const AppRoutes = () => {
   return (
@@ -44,7 +45,7 @@ const AppRoutes = () => {
       />
       <BrowserRouter>
         <Routes>
-        <Route path="/subAdmin-reset-password" element={<ResetPassword/>}></Route>
+        <Route path="/subAdmin-reset-password" element={<SubAdminReset/>}></Route>
 
           <Route path="/" element={<Login />}></Route>
           <Route path="/login" element={<Login />}></Route>

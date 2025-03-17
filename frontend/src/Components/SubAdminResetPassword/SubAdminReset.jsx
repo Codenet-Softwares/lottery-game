@@ -2,18 +2,18 @@ import React from "react";
 import { useFormik } from "formik";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import { getAdminResetPasswordInitialState } from "../../Utils/initialState";
+import { getAdminResetPasswordInitialState, getSubAdminResetPasswordInitialState } from "../../Utils/initialState";
 import { resetPasswordSchema, resetPasswordSchemaSubAdmin } from "../../Utils/validationSchema";
 import { ResetAdminPassword, ResetSubAdminPassword } from "../../Utils/apiService";
 import { ReusableResetPasswordInput } from "../ReusableInput/ReusableInput";
 import { useAppContext } from "../../contextApi/context";
 const SubAdminReset = () => {
   const { store } = useAppContext();
-
+console.log('line 12',store)
   const navigate = useNavigate();
   const location = useLocation();
   const state = location?.state || {};
-
+console.log('line 16',state.userName)
   const handleResetPassword = async (values) => {
     const { confirmPassword, ...resetValues } = values;
     try {
@@ -45,14 +45,16 @@ const SubAdminReset = () => {
   ];
 
   const formik = useFormik({
-    initialValues: getAdminResetPasswordInitialState({
-      userName: store.admin.userName,
-      oldPassword: state?.password,
-      newPassword: state?.password,
+    initialValues: getSubAdminResetPasswordInitialState({
+      userName: state.userName,
+      oldPassword: state?.password, // Kept in the state but not shown in UI
+      newPassword: "", // Empty initially
+      confirmPassword: "", // Empty initially
     }),
     validationSchema: resetPasswordSchemaSubAdmin,
     onSubmit: handleResetPassword,
   });
+  
   return (
     <div
       className="d-flex align-items-center justify-content-center"
