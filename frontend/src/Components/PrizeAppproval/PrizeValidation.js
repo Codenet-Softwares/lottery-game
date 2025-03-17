@@ -135,17 +135,17 @@ const PrizeValidation = () => {
 
   const filteredApprovalData = selectedMarketApprovals
     ? selectedMarketApprovals.subAdmins.reduce((acc, subAdmin, index) => {
-      if (index % 2 === 0) {
-        acc.push({
-          id: acc.length + 1,
-          subAdmin1: subAdmin.declearBy,
-          subAdmin2: "",
-        });
-      } else {
-        acc[acc.length - 1].subAdmin2 = subAdmin.declearBy;
-      }
-      return acc;
-    }, [])
+        if (index % 2 === 0) {
+          acc.push({
+            id: acc.length + 1,
+            subAdmin1: subAdmin.declearBy,
+            subAdmin2: "",
+          });
+        } else {
+          acc[acc.length - 1].subAdmin2 = subAdmin.declearBy;
+        }
+        return acc;
+      }, [])
     : [];
 
   const approvalColumns = [
@@ -223,7 +223,10 @@ const PrizeValidation = () => {
             text: "Approve",
             onClick: () => handleApproveReject("Approve"),
             className: "btn btn-success",
-            disabled: modalContent?.Unmatched?.length > 0, // Disable if no Matched data
+            disabled:
+              modalContent?.matchedEnteries?.length === 0 || // Disable if no matched entries
+              (modalContent?.matchedEnteries?.length > 0 &&
+                modalContent?.UnmatchedEntries?.length > 0), // Disable if both matched & unmatched exist
           },
           {
             text: "Reject",
