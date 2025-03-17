@@ -76,7 +76,7 @@ export const login = async (req, res) => {
     }
 
     if (existingUser.role !== 'admin' && existingUser.role !== 'subAdmin') {
-      return apiResponseErr(null, false, statusCode.unauthorized, "Unauthorized access", res);
+      return apiResponseErr(null, false, statusCode.unauthorize, "Unauthorized access", res);
     }
 
     const isPasswordValid = await existingUser.validPassword(password);
