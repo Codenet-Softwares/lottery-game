@@ -1458,7 +1458,7 @@ export const getMatchData = async (req, res) => {
     const { marketId } = req.params;
     const { type } = req.query;
 
-    const whereCondition = { marketId, isApproved: false, isReject: false };
+    const whereCondition = { marketId, isApproved: false };
     if (type) whereCondition.type = type;
 
     const existingResults = await WinResultRequest.findAll({
@@ -1476,77 +1476,69 @@ export const getMatchData = async (req, res) => {
       );
     }
 
-    const structuredResults = {
-      marketName: existingResults[0].marketName,
-      marketId: existingResults[0].marketId,
-      declarers: [...new Set(existingResults.map((r) => r.declearBy))],
-      prizes: [],
-    };
-
-    const prizeMap = new Map();
+    const groupedResults = { Matched: [], Unmatched: [] };
 
     existingResults.forEach((result) => {
-      if (!prizeMap.has(result.prizeCategory)) {
-        prizeMap.set(result.prizeCategory, {
-          prizeName: result.prizeCategory,
-          MatchedTickets: [],
-          DeclaredPrizes: {},
-          UnmatchedEntries: [],
-          SubPrizes: [],
-        });
-      }
+      const category = result.type === "Matched" ? "Matched" : "Unmatched";
 
-      const prize = prizeMap.get(result.prizeCategory);
-      prize.DeclaredPrizes[result.declearBy] = result.prizeAmount;
-
-      const unmatchedEntry = prize.UnmatchedEntries.find(
-        (entry) => entry.declaredBy === result.declearBy
+      let marketEntry = groupedResults[category].find(
+        (entry) => entry.marketId === result.marketId
       );
-      if (!unmatchedEntry) {
-        prize.UnmatchedEntries.push({
-          declaredBy: result.declearBy,
-          ticketNumber: [],
-        });
+
+      if (!marketEntry) {
+        marketEntry = {
+          marketName: result.marketName,
+          marketId: result.marketId,
+          type: result.type,
+          isApproved: result.isApproved,
+          createdAt: result.createdAt,
+          updatedAt: result.updatedAt,
+          MatchData: [],
+        };
+        groupedResults[category].push(marketEntry);
       }
 
-      result.ticketNumber.forEach((ticket) => {
-        const isMatched =
-          existingResults.filter((r) => r.ticketNumber.includes(ticket))
-            .length > 1;
-        if (isMatched) {
-          if (!prize.MatchedTickets.includes(ticket)) {
-            prize.MatchedTickets.push(ticket);
-          }
-        } else {
-          prize.UnmatchedEntries.find(
-            (entry) => entry.declaredBy === result.declearBy
-          ).ticketNumber.push(ticket);
-        }
-      });
+      let adminEntry = marketEntry.MatchData.find(
+        (entry) => entry.adminId === result.adminId
+      );
 
-      // Remove empty UnmatchedEntries if no tickets exist for any declarer
-      if (
-        prize.UnmatchedEntries.every((entry) => entry.ticketNumber.length === 0)
-      ) {
-        prize.UnmatchedEntries = [];
+      if (!adminEntry) {
+        adminEntry = {
+          adminId: result.adminId,
+          declearBy: result.declearBy,
+          ticketNumber: {},
+        };
+        marketEntry.MatchData.push(adminEntry);
       }
 
-      if (result.complementaryPrize) {
-        let subPrize = prize.SubPrizes.find(
-          (sp) => sp.prizeName === "Complimentary Prize"
-        );
-        if (!subPrize) {
-          subPrize = { prizeName: "Complimentary Prize", DeclaredPrizes: {} };
-          prize.SubPrizes.push(subPrize);
-        }
-        subPrize.DeclaredPrizes[result.declearBy] = result.complementaryPrize;
+      if (!adminEntry.ticketNumber[result.prizeCategory]) {
+        adminEntry.ticketNumber[result.prizeCategory] = {
+          prizeAmount: result.prizeAmount,
+          ...(result.complementaryPrize !== 0 && {
+            complementaryPrize: result.complementaryPrize,
+          }),
+          tickets: [],
+        };
       }
+
+      if (!adminEntry.ticketNumber[result.prizeCategory]) {
+        adminEntry.ticketNumber[result.prizeCategory] = {
+          prizeAmount: result.prizeAmount,
+          complementaryPrize: result.complementaryPrize,
+          tickets: [],
+        };
+      }
+
+      adminEntry.ticketNumber[result.prizeCategory].tickets = [
+        ...new Set([
+          ...adminEntry.ticketNumber[result.prizeCategory].tickets,
+          ...result.ticketNumber,
+        ]),
+      ];
     });
 
-    structuredResults.prizes = Array.from(prizeMap.values());
-
     return apiResponseSuccess(
-      structuredResults,
+      groupedResults,
       true,
       statusCode.success,
       "Data fetched successfully!",
