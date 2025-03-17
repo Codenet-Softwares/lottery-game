@@ -46,14 +46,12 @@ Admin.beforeCreate(async (admin) => {
 
 Admin.beforeUpdate(async (admin) => {
   if (admin.changed('password')) {
-    const isHashed = admin.password.startsWith('$2b$'); // Check if already hashed
+    const isHashed = admin.password.startsWith('$2b$'); 
     if (!isHashed) {
       admin.password = await bcrypt.hash(admin.password, 10);
     }
   }
 });
-
-
 Admin.prototype.validPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
