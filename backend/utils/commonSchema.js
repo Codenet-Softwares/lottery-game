@@ -12,6 +12,25 @@ export const validateAdminLogin = [
   body('password').notEmpty().withMessage('Password is required'),
 ];
 
+export const resetPasswordSchema = [
+  body("userName")
+    .trim()
+    .notEmpty()
+    .withMessage("Username is required"),
+  body("oldPassword")
+    .trim()
+    .notEmpty()
+    .withMessage("Old Password is required"),
+  body("newPassword")
+    .trim()
+    .notEmpty()
+    .withMessage("New Password is required")
+    .isLength({ min: 8 })
+    .withMessage("New Password must be at least 8 characters long")
+    .isAlphanumeric()
+    .withMessage("New Password must be alphanumeric"),
+];
+
 
 
 export const validateTicketRange = [

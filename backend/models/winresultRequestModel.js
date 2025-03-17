@@ -60,7 +60,12 @@ const WinResultRequest = sequelize.define(
     remarks : {
       type: DataTypes.STRING,
       allowNull: true,
-    }
+    },
+    isRevoke : {
+      type : DataTypes.BOOLEAN,
+      defaultValue : false,
+    },
+
   },
   {
     tableName: 'winResultRequest',
