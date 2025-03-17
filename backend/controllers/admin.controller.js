@@ -1950,3 +1950,65 @@ export const getSubadminResult = async (req, res) => {
     );
   }
 };
+
+
+export const subAdmindateWiseMarkets = async (req, res) => {
+  try {
+    const { date } = req.query;
+    const adminId = req.user?.adminId;
+    let selectedDate, nextDay;
+    if (date) {
+      selectedDate = new Date(date);
+      if (isNaN(selectedDate)) {
+        return apiResponseErr(
+          null,
+          false,
+          statusCode.badRequest,
+          "Invalid date format",
+          res
+        );
+      }
+    } else {
+      selectedDate = new Date();
+    }
+
+    selectedDate.setHours(0, 0, 0, 0);
+    nextDay = new Date(selectedDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    const ticketData = await WinResultRequest.findAll({
+      attributes: [
+        [Sequelize.fn("DISTINCT", Sequelize.col("marketName")), "marketName"],
+        "marketId",
+      ],
+      where: {
+        adminId,
+        createdAt: {
+          [Op.gte]: selectedDate,
+          [Op.lt]: nextDay,
+        },
+      },
+      order: [["createdAt", "DESC"]],
+    });
+
+    if (!ticketData || ticketData.length === 0) {
+      return apiResponseSuccess([], true, statusCode.success, "No data", res);
+    }
+
+    return apiResponseSuccess(
+      ticketData,
+      true,
+      statusCode.success,
+      "Success",
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
