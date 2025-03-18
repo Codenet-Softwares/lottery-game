@@ -27,6 +27,10 @@ import ViewAllSubadmin from "../ViewAllSubAdmin/ViewAllSUbadmin";
 import WinResult from "../SubAdmin-WinResult/WinResult";
 import SubAdminWinResult from "../SubAdmin-WinResult/SubAdminWinResult";
 
+import SubAdminReset from "../SubAdminResetPassword/SubAdminReset";
+import DemoMap from "../demoMap";
+
+
 const AppRoutes = () => {
   return (
     <AppProvider>
@@ -44,6 +48,8 @@ const AppRoutes = () => {
       />
       <BrowserRouter>
         <Routes>
+        <Route path="/subAdmin-reset-password" element={<SubAdminReset/>}></Route>
+
           <Route path="/" element={<Login />}></Route>
           <Route path="/login" element={<Login />}></Route>
           <Route
@@ -83,6 +89,7 @@ const AppRoutes = () => {
             <Route path="/subAdminData" element={<WinResult />} />
             <Route path="/subAdmin-win-result/:marketId" element={<SubAdminWinResult />} />
             <Route path="/subAdmin-win-result" element={<SubAdminWinResult/>} />
+            <Route path="/demo" element={<DemoMap/>} />
            
           </Route>
           {/* not found */}

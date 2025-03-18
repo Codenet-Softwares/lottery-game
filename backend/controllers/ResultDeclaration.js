@@ -8,7 +8,7 @@ import axios from 'axios';
 import TicketRange from '../models/ticketRange.model.js';
 import { TicketService } from '../constructor/ticketService.js';
 import sequelize from '../config/db.js';
-import WinResultRequest from '../models/winResultRequestModel.js';
+import WinResultRequest from '../models/winresultRequestModel.js';
 
 export const ResultDeclare = async (req, res) => {
   try {

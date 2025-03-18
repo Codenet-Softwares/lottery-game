@@ -30,6 +30,10 @@ const Admin = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    isReset: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
   },
   {
     indexes: [], 
@@ -42,10 +46,12 @@ Admin.beforeCreate(async (admin) => {
 
 Admin.beforeUpdate(async (admin) => {
   if (admin.changed('password')) {
-    admin.password = await bcrypt.hash(admin.password, 10);
+    const isHashed = admin.password.startsWith('$2b$'); 
+    if (!isHashed) {
+      admin.password = await bcrypt.hash(admin.password, 10);
+    }
   }
 });
-
 Admin.prototype.validPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };

@@ -1,0 +1,113 @@
+{
+    "marketName": "deployeTest00",
+    "marketId": "f890339b-e7ff-4625-a334-effedf7e275c",
+    "declarers": [
+      "Gulshan01",
+      "Masud01"
+    ],
+    "matchedEntries": [
+      {
+        "prizeName": "First Prize",
+        "Tickets": ["01 A 00006"],
+        "DeclaredPrizes": {
+          "Gulshan01": 100,
+          "Masud01": 100
+        },
+        "SubPrizes": [
+          {
+            "prizeName": "Complimentary Prize",
+            "DeclaredPrizes": {
+              "Gulshan01": 1000,
+              "Masud01": 1000
+            }
+          }
+        ]
+      },
+      {
+        "prizeName": "Third Prize",
+        "Tickets": [
+          "1101", "1102", "1103", "1104", "1105",
+          "1106", "1107", "1108", "1109", "2000"
+        ],
+        "DeclaredPrizes": {
+          "Gulshan01": 450,
+          "Masud01": 450
+        }
+      },
+      {
+        "prizeName": "Fifth Prize",
+        "Tickets": [
+          "3301", "3302", "3303", "3304", "3305",
+          "3306", "3307", "3308", "3309", "4000",
+          "4401", "4402", "4403", "4404", "4405",
+          "4406", "4407", "4408", "4409", "5000",
+          "5501", "5502", "5503", "5504", "5505",
+          "5506", "5507", "5508", "5509", "6000",
+          "6601", "6602", "6603", "6604", "6605",
+          "6606", "6607", "6608", "6609", "7000",
+          "7701", "7702", "7703", "7704", "7705",
+          "7706", "7707", "7708", "7709"
+        ],
+        "DeclaredPrizes": {
+          "Gulshan01": 120,
+          "Masud01": 120
+        }
+      },
+      {
+        "prizeName": "Second Prize",
+        "MatchedTickets": [
+          "29995", "22222", "33333", "44444", "55555",
+          "66666", "77777", "88888", "99999", "10000"
+        ],
+        "DeclaredPrizes": {
+          "Gulshan01": 9000,
+          "Masud01": 9000
+        }
+      },
+      {
+        "prizeName": "Fourth Prize",
+        "MatchedTickets": [
+          "2201", "2202", "2203", "2204", "2205",
+          "2206", "2207", "2208", "2209", "3000"
+        ],
+        "DeclaredPrizes": {
+          "Gulshan01": 250,
+          "Masud01": 250
+        }
+      }
+    ],
+    
+    "UnmatchedEntries": [
+      {
+        "prizeName": "First Prize",
+        "Tickets": [
+          {
+            "declaredBy": "Gulshan01",
+            "ticketNumber": ["01 A 00006"]
+          },
+          {
+            "declaredBy": "Masud01",
+            "ticketNumber": ["01 A 00005"]
+          }
+        ],
+        "DeclaredPrizes": null,
+        "SubPrizes": []
+      },
+      {
+        "prizeName": "Fifth Prize",
+        "Tickets": [
+          {
+            "declaredBy": "Gulshan01",
+            "ticketNumber": ["8001","8002"]
+          },
+          {
+            "declaredBy": "Masud01",
+            "ticketNumber": ["8000"]
+          }
+        ],
+        "DeclaredPrizes": null,
+        "SubPrizes": []
+      }
+    ]
+  }
+  
