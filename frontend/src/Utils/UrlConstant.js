@@ -59,6 +59,8 @@ class UrlConstant {
   getSubAdminWinResult = `${this.url_dev}/subAdmin/get-subAdmin-history`;
   GetResultSubAdmin =`${this.url_dev}/${this.subadmin}/get-result`;
   SubPasswordReset =`${this.url_dev}/${this.subadmin}/reset-password`
+  // subAdminResetPassword =`${this.url_dev}/${this.subadmin}/reset-password`
+
 }
 
 const urls = new UrlConstant();
