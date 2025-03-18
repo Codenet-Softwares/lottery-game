@@ -622,7 +622,7 @@ export async function ApproveReject(
   }
 }
 
-// VIEW ALL SUBADMIN LIST 
+// VIEW ALL SUBADMIN LIST
 export async function ViewAllSubAdmins(
   body = {},
 
@@ -691,8 +691,12 @@ export async function voidBetMarket(body, isToast = true) {
 export async function getUpdateMarket(body, isToast = true) {
   try {
     const callParams = await getAuthCallParams(strings.POST, body, isToast);
-    const response = await makeCall(urls.getUpdateInactive, callParams, isToast);
-      return response;
+    const response = await makeCall(
+      urls.getUpdateInactive,
+      callParams,
+      isToast
+    );
+    return response;
   } catch (error) {
     throw error;
   }
@@ -722,7 +726,6 @@ export async function GetWiningResultSubAdmin(body) {
   } catch (error) {
     throw error;
   }
-
 }
 export async function ResetSubAdminPassword(body = {}, isToast = false) {
   try {
@@ -738,3 +741,18 @@ export async function ResetSubAdminPassword(body = {}, isToast = false) {
     throw error;
   }
 }
+
+export async function ViewSubAdminsTickets(body = {}, marketId, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.GET, body, isToast);
+    const response = await makeCall(
+      `${urls.ViewSubAdminsTicket}/${marketId}?status=${body.status || ""}`,
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+

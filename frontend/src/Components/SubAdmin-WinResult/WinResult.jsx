@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { subAdminWinResult } from "../../Utils/apiService";
+import {
+  subAdminWinResult,
+  ViewSubAdminsTickets,
+} from "../../Utils/apiService";
 import Pagination from "../Common/Pagination";
 import ReusableModal from "../Reusables/ReusableModal";
 import ComparisonTable from "../PrizeAppproval/ComparisonTable";
@@ -12,6 +15,7 @@ const WinResult = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState([]);
   const [loadingModal, setLoadingModal] = useState(false);
+  const [selectedMarketTicket, setSelectedMarketTicket] = useState(null);
 
   const [pagination, setPagination] = useState({
     page: 1,
@@ -50,10 +54,25 @@ const WinResult = () => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchSubAdminResult();
   }, [pagination.page, pagination.limit, searchTerm]);
+
+  const fetchSubAdminTicketData = async (marketId, status) => {
+    try {
+      const response = await ViewSubAdminsTickets({ status }, marketId);
+      console.log("Comparison Data Response:", response);
+
+      if (response?.success) {
+        setModalContent(response.data || []);
+      } else {
+        setModalContent([]);
+      }
+      setShowModal(true);
+    } catch (error) {
+      console.error("Error fetching sub-admin ticket data:", error);
+    }
+  };
 
   useEffect(() => {
     if (statusFilter) {
@@ -144,12 +163,18 @@ const WinResult = () => {
                         <td className="text-start align-top text-wrap">
                           {item.remarks || "No Remark"}
                         </td>
+
                         <td>
                           <button
-                            className="btn btn-primary"
-                            onClick={handleShowDetails}
+                            className="btn btn-primary fw-bold"
+                            onClick={() =>
+                              fetchSubAdminTicketData(
+                                item.marketId,
+                                item.status
+                              )
+                            }
                           >
-                            Show Details
+                            Show Prize 
                           </button>
                         </td>
 
