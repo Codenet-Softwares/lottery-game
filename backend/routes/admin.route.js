@@ -113,7 +113,7 @@ export const adminRoutes = (app) => {
 
   app.get('/api/subadmin/dateWise-markets',authorize([string.SubAdmin], [string.resultView]), subAdmindateWiseMarkets);
 
-  app.get('/api/subadmin/result-status/:marketId',authorize([string.SubAdmin]), subAdminResultStatus);
+  app.get('/api/subadmin/result-status/:marketId',authorize([string.SubAdmin], [string.resultView]), subAdminResultStatus);
 
 
 };
