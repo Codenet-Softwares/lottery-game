@@ -1237,7 +1237,7 @@ export const afterWinLotteries = async (req, res) => {
           if (!Array.isArray(result.ticketNumber)) return false;
 
           if (result.prizeCategory === "First Prize") {
-            return result.ticketNumber.includes(fullTicketNumber);
+            return result.ticketNumber.some(ticket => ticket.includes(fullTicketNumber) || ticket.includes(lastFiveDigits));
           } else if (result.prizeCategory === "Second Prize") {
             return result.ticketNumber.includes(lastFiveDigits);
           } else {
