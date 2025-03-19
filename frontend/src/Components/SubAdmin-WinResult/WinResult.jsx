@@ -1,20 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { subAdminWinResult } from "../../Utils/apiService";
+import {
+  subAdminWinResult,
+  ViewSubAdminsTickets,
+} from "../../Utils/apiService";
 import Pagination from "../Common/Pagination";
-
+import ReusableModal from "../Reusables/ReusableModal";
+import ComparisonTable from "../PrizeAppproval/ComparisonTable";
 const WinResult = () => {
   const [loading, setLoading] = useState(true);
   const [subAdminResult, setSubAdminResult] = useState([]);
   const [allResults, setAllResults] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [modalContent, setModalContent] = useState([]);
+  const [loadingModal, setLoadingModal] = useState(false);
+  const [selectedMarketTicket, setSelectedMarketTicket] = useState(null);
+
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
     totalPages: 0,
     totalItems: 0,
   });
-
+  const handleShowDetails = () => {
+    setTimeout(() => {
+      setShowModal(true);
+    }, 100);
+  };
   const fetchSubAdminResult = async () => {
     try {
       setLoading(true);
@@ -41,10 +54,25 @@ const WinResult = () => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchSubAdminResult();
   }, [pagination.page, pagination.limit, searchTerm]);
+
+  const fetchSubAdminTicketData = async (marketId, status) => {
+    try {
+      const response = await ViewSubAdminsTickets({ status }, marketId);
+      console.log("Comparison Data Response:", response);
+
+      if (response?.success) {
+        setModalContent(response.data || []);
+      } else {
+        setModalContent([]);
+      }
+      setShowModal(true);
+    } catch (error) {
+      console.error("Error fetching sub-admin ticket data:", error);
+    }
+  };
 
   useEffect(() => {
     if (statusFilter) {
@@ -83,7 +111,9 @@ const WinResult = () => {
         className="col-md-10 p-4 rounded shadow"
         style={{ background: "#E6F7FF" }}
       >
-        <h2 className="text-center text-primary mb-3 fw-bold fw-bold text-uppercase">SubAdmin History</h2>
+        <h2 className="text-center text-primary mb-3 fw-bold fw-bold text-uppercase">
+          SubAdmin History
+        </h2>
 
         {/* Search Bar */}
         <div className="d-flex mb-3">
@@ -119,6 +149,7 @@ const WinResult = () => {
                     <th>Market Name</th>
                     <th>Status</th>
                     <th className="test-start">Remark</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -132,6 +163,34 @@ const WinResult = () => {
                         <td className="text-start align-top text-wrap">
                           {item.remarks || "No Remark"}
                         </td>
+
+                        <td>
+                          <button
+                            className="btn btn-primary fw-bold"
+                            onClick={() =>
+                              fetchSubAdminTicketData(
+                                item.marketId,
+                                item.status
+                              )
+                            }
+                          >
+                            Show Prize 
+                          </button>
+                        </td>
+
+                        <ReusableModal
+                          show={showModal}
+                          handleClose={() => {
+                            setShowModal(false);
+                          }}
+                          title="Approval Check"
+                          body={
+                            <ComparisonTable
+                              modalContent={modalContent}
+                              loadingModal={loadingModal}
+                            />
+                          }
+                        />
                       </tr>
                     ))
                   ) : (
