@@ -24,7 +24,9 @@ import {
   login,
   marketWiseSubadmin,
   resetPassword,
+  subAdmindateWiseMarkets,
   subAdminResetPassword,
+  subAdminResultStatus,
   updateMarketStatus,
   winResultMarket,
 } from '../controllers/admin.controller.js';
@@ -108,5 +110,10 @@ export const adminRoutes = (app) => {
   app.get('/api/subAdmin/get-subAdmin-history',authorize([string.SubAdmin], [string.winAnalytics]), getSubAdminHistory);
 
   app.get('/api/subAdmin/get-result/:marketId',authorize([string.SubAdmin], [string.resultView]), getSubadminResult);
+
+  app.get('/api/subadmin/dateWise-markets',authorize([string.SubAdmin], [string.resultView]), subAdmindateWiseMarkets);
+
+  app.get('/api/subadmin/result-status/:marketId',authorize([string.SubAdmin], [string.resultView]), subAdminResultStatus);
+
 
 };
