@@ -47,6 +47,7 @@ export const FromToInput = ({
   fromError,
   toError,
   options,
+  inputType
 }) => {
   console.log("Dropdown Options for", fromName, options);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -65,7 +66,7 @@ export const FromToInput = ({
   }, [fromValue]);
 
   useEffect(() => {
-    setTypedToValue(toValue || "" );
+    setTypedToValue(toValue || "");
   }, [toValue]);
 
   useEffect(() => {
@@ -96,11 +97,11 @@ export const FromToInput = ({
   const filteredOptions =
     activeInput === fromName
       ? options.filter((option) =>
-        option.toString().includes(debouncedFromValue)
-      )
+          option.toString().includes(debouncedFromValue)
+        )
       : options.filter((option) =>
-        option.toString().includes(debouncedToValue)
-      );
+          option.toString().includes(debouncedToValue)
+        );
 
   const Row = ({ columnIndex, rowIndex, style }) => {
     const index = rowIndex * 3 + columnIndex; // 3 columns per row
@@ -128,8 +129,8 @@ export const FromToInput = ({
           console.log("activeInput:", activeInput);
           handleOptionClick(filteredOptions[index], activeInput);
         }}
-      onMouseEnter={(e) => (e.target.style.backgroundColor = "#e6f7ff")}
-      onMouseLeave={(e) => (e.target.style.backgroundColor = "#f8f9fa")}
+        onMouseEnter={(e) => (e.target.style.backgroundColor = "#e6f7ff")}
+        onMouseLeave={(e) => (e.target.style.backgroundColor = "#f8f9fa")}
       >
         {filteredOptions[index]}
       </button>
@@ -157,7 +158,7 @@ export const FromToInput = ({
     setTypedFromValue(value);
     onChangeFrom({ target: { name: fromName, value } });
   };
-  
+
   const handleToChange = (e) => {
     const value = e.target.value;
     setTypedToValue(value);
@@ -169,7 +170,7 @@ export const FromToInput = ({
       <div className="d-flex gap-2">
         <div className="position-relative" style={{ flex: 1 }}>
           <input
-            type="text"
+            type={inputType}
             name={fromName}
             className={`form-control ${fromError ? "is-invalid" : ""}`}
             placeholder={placeholder}
@@ -245,7 +246,7 @@ export const FromToInput = ({
           ref={containerRef}
         >
           <input
-            type="text"
+             type={inputType}
             name={toName}
             className={`form-control ${toError ? "is-invalid" : ""}`}
             placeholder={placeholder}
@@ -349,16 +350,18 @@ export const ReusableResetPasswordInput = ({
         onChange={onChange}
         onBlur={onBlur}
       />
-      
+
       {showEyeIcon && (
         <div
-          className={`bi ${inputType === "password" ? "bi-eye-slash" : "bi-eye"} position-absolute end-0 me-5`}
+          className={`bi ${
+            inputType === "password" ? "bi-eye-slash" : "bi-eye"
+          } position-absolute end-0 me-5`}
           onClick={togglePasswordVisibility}
           style={{
             cursor: "pointer",
-            top: "50%", 
-            transform: "translateY(-100%)", 
-            right: "15px", 
+            top: "50%",
+            transform: "translateY(-100%)",
+            right: "15px",
           }}
         ></div>
       )}
@@ -377,4 +380,3 @@ export const ReusableResetPasswordInput = ({
     </div>
   );
 };
-

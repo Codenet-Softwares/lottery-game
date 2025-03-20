@@ -131,24 +131,28 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
       fromName: "groupFrom",
       toName: "groupTo",
       options: groupOptions,
+      inputType: "number",
     },
     {
       placeholder: "Series (From - To)",
       fromName: "seriesFrom",
       toName: "seriesTo",
       options: seriesOptions,
+      inputType: "text",
     },
     {
       placeholder: "Number (From - To)",
       fromName: "numberFrom",
       toName: "numberTo",
       options: numberOptions,
+      inputType: "number",
     },
     {
       placeholder: "Enter Timer (hh:mm AM/PM)",
       fromName: "timerFrom",
       toName: "timerTo",
       options: timerOptions,
+      inputType: "text",
     },
   ];
 
@@ -210,6 +214,7 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
                     <FromToInput
                       key={input.fromName}
                       placeholder={input.placeholder}
+                      inputType={input.inputType}
                       fromName={input.fromName}
                       toName={input.toName}
                       fromValue={formik.values[input.fromName]}

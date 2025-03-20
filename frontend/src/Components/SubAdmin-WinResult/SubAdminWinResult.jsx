@@ -13,7 +13,6 @@ import { isRevokeLottery } from "../../Utils/apiService";
 const Result = () => {
   const { marketId } = useParams(); // Extract current marketId from URL
 
-  
   const navigate = useNavigate();
   const [markets, setMarkets] = useState([]);
   const [results, setResults] = useState([]);
@@ -26,13 +25,17 @@ const Result = () => {
   const [selectedMarket, setSelectedMarket] = useState(null);
   const [showStats, setShowStats] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [openAccordion, setOpenAccordion] = useState(null); // State to manage accordion toggle
 
   const maxVisibleMarkets = 3;
   const visibleMarkets = markets.slice(
     scrollIndex,
     scrollIndex + maxVisibleMarkets
   );
-
+  // Handle manual accordion toggle
+  const toggleAccordion = (index) => {
+    setOpenAccordion(openAccordion === index ? null : index);
+  };
   // Fetch markets based on the selected date
   const fetchMarkets = async () => {
     try {
@@ -71,7 +74,21 @@ const Result = () => {
     try {
       const response = await GetWiningResultSubAdmin({ marketId });
       if (response && response.success) {
-        setResults(response.data || []);
+        // Sort results based on prizeCategory (1st, 2nd, 3rd, etc.)
+        const sortedResults = response.data.sort((a, b) => {
+          const prizeOrder = [
+            "First Prize",
+            "Second Prize",
+            "Third Prize",
+            "Fourth Prize",
+            "Fifth Prize",
+          ];
+          return (
+            prizeOrder.indexOf(a.prizeCategory) -
+            prizeOrder.indexOf(b.prizeCategory)
+          );
+        });
+        setResults(sortedResults || []);
         setError(null); // Clear any existing error
       } else {
         setResults([]);
@@ -82,20 +99,7 @@ const Result = () => {
       setResults([]);
     }
   };
-  const handleRevokeAnnouncement = async (marketId) => {
-    try {
-      showLoader(); // Show the loader before the API call starts
-      const res = await isRevokeLottery({ marketId: marketId });
-      if (res) {
-        toast.success(res.message);
-        setRefresh((prev) => !prev);
-      }
-    } catch (err) {
-      console.error("Error fetching inactive games:", err);
-    } finally {
-      hideLoader(); // Hide the loader after the API call finishes
-    }
-  };
+
   // Fetch markets when the selected date changes
   useEffect(() => {
     fetchMarkets();
@@ -317,11 +321,12 @@ const Result = () => {
                 <div className="accordion-item" key={result.resultId}>
                   <h2 className="accordion-header" id={`heading${index}`}>
                     <button
-                      className="accordion-button collapsed"
+                      className={`accordion-button ${
+                        openAccordion === index ? "" : "collapsed"
+                      }`}
                       type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target={`#collapse${index}`}
-                      aria-expanded="false"
+                      onClick={() => toggleAccordion(index)}
+                      aria-expanded={openAccordion === index}
                       aria-controls={`collapse${index}`}
                     >
                       {result.prizeCategory} - Amount: ₹{result.prizeAmount}
@@ -334,8 +339,10 @@ const Result = () => {
                   </h2>
                   <div
                     id={`collapse${index}`}
-                    className="accordion-collapse collapse"
-                    aria-labelledby={`heading${index}`}
+                    className={`accordion-collapse collapse ${
+                      openAccordion === index ? "show" : ""
+                    }`}
+                    aria-expanded={openAccordion === index}
                     data-bs-parent="#prizeAccordion"
                   >
                     <div
