@@ -1,8 +1,8 @@
-import { DataTypes, Sequelize } from 'sequelize';
-import sequelize from '../config/db.js';
+import { DataTypes, Sequelize } from "sequelize";
+import sequelize from "../config/db.js";
 
 const TicketRange = sequelize.define(
-  'TicketRange',
+  "TicketRange",
   {
     marketId: {
       type: DataTypes.UUID,
@@ -78,7 +78,7 @@ const TicketRange = sequelize.define(
     gameName: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      defaultValue: 'Lottery',
+      defaultValue: "Lottery",
     },
     winReference: {
       type: DataTypes.BOOLEAN,
@@ -91,7 +91,7 @@ const TicketRange = sequelize.define(
     },
   },
   {
-    tableName: 'TicketRange',
+    tableName: "TicketRange",
     timestamps: true,
   }
 );
