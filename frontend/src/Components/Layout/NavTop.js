@@ -80,12 +80,7 @@ const NavTop = () => {
       permission: "",
     },
     { to: "/trash", icon: "fas fa-trash-alt", label: "Trash", permission: "" },
-    {
-      to: "/reset-password",
-      icon: "fas fa-key",
-      label: "Reset Password",
-      permission: "",
-    },
+
     {
       to: "/create-subadmin",
       icon: "fas fa-user-shield",
@@ -134,6 +129,7 @@ const NavTop = () => {
 
   // Define items that should only be visible to sub-admins
   const subAdminOnlyItems = [
+    "Dashboard",
     "win-Lottery-Result",
     "win-Analytics",
     "result-View",
@@ -141,6 +137,10 @@ const NavTop = () => {
 
   // Filter navigation items based on permissions and roles
   const filteredNavItems = navItems.filter((item) => {
+       // Always show the Dashboard to both admin and subAdmin
+       if (item.label === "Dashboard") {
+        return true;
+      }
     if (subAdminOnlyItems.includes(item.permission)) {
       return userRoles.includes("subAdmin");
     }
