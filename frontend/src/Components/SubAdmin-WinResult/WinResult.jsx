@@ -35,8 +35,9 @@ const WinResult = () => {
         page: pagination.page,
         limit: pagination.limit,
         search: searchTerm,
+        status: statusFilter,  // Add status filter here
       });
-
+  
       if (response?.success) {
         setAllResults(response.data || []);
         setPagination((prev) => ({
@@ -54,25 +55,29 @@ const WinResult = () => {
       setLoading(false);
     }
   };
+  
   useEffect(() => {
     fetchSubAdminResult();
-  }, [pagination.page, pagination.limit, searchTerm]);
-
+  }, [pagination.page, pagination.limit, searchTerm, statusFilter]); 
   const fetchSubAdminTicketData = async (marketId, status) => {
     try {
+      console.log("Fetching ticket data for Market ID:", marketId, "Status:", status);
+      
       const response = await ViewSubAdminsTickets({ status }, marketId);
       console.log("Comparison Data Response:", response);
-
+  
       if (response?.success) {
         setModalContent(response.data || []);
+        setShowModal(true); 
       } else {
         setModalContent([]);
+        console.warn("No data found for this Market ID and Status.");
       }
-      setShowModal(true);
     } catch (error) {
       console.error("Error fetching sub-admin ticket data:", error);
     }
   };
+  
 
   useEffect(() => {
     if (statusFilter) {
@@ -84,6 +89,8 @@ const WinResult = () => {
       setSubAdminResult(allResults);
     }
   }, [statusFilter, allResults]);
+  
+  
 
   const handlePageChange = (page) => {
     setPagination((prev) => ({ ...prev, page }));
