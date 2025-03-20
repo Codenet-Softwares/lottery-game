@@ -10,6 +10,7 @@ import {
   CustomWiningAdmin,
 } from "../../Utils/apiService";
 import ComparisonTable from "./ComparisonTable";
+import { useAppContext } from "../../contextApi/context";
 
 const PrizeValidation = () => {
   const [marketData, setMarketData] = useState([]);
@@ -19,6 +20,7 @@ const PrizeValidation = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState([]);
   const [loadingModal, setLoadingModal] = useState(false);
+  const { store, showLoader, hideLoader } = useAppContext();
 
   // marketnames for the page of Prize Approval Market List
 
@@ -77,6 +79,7 @@ const PrizeValidation = () => {
   //  approve reject fetch and succeded here in this function
   const handleApproveReject = async (type) => {
     if (!selectedMarket) return;
+    showLoader(); // Show the loader before the API call starts
 
     if (type === "Approve") {
       //  Call the first API (ApproveReject)
@@ -110,6 +113,8 @@ const PrizeValidation = () => {
         fetchMarketData();
       }
     }
+    hideLoader(); // Hide the loader after the API call finishes
+
   };
 
   const marketColumns = [
