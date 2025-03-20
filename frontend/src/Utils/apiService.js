@@ -706,7 +706,7 @@ export async function subAdminWinResult(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
     const response = await makeCall(
-      `${urls.getSubAdminWinResult}?page=${body.page}&limit=${body.limit}&search=${body.search}`,
+      `${urls.getSubAdminWinResult}?page=${body.page}&limit=${body.limit}&search=${body.search}&status=${body.status || ""}`,
       callParams
     );
     return response;
@@ -750,6 +750,8 @@ export async function ViewSubAdminsTickets(body = {}, marketId, isToast = false)
       callParams,
       isToast
     );
+    
+    
     return response;
   } catch (error) {
     throw error;
