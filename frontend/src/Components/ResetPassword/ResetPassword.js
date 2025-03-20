@@ -9,7 +9,7 @@ import { ReusableResetPasswordInput } from "../ReusableInput/ReusableInput";
 import { useAppContext } from "../../contextApi/context";
 
 const ResetPassword = () => {
-  const {  store } = useAppContext();
+  const { store } = useAppContext();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,12 +34,12 @@ const ResetPassword = () => {
 
   const inputFields = [
     {
-        id: "oldPassword",
-        name: "oldPassword",
-        type: "password",
-        placeholder: "Enter old password",
-        showEyeIcon: true,
-      },
+      id: "oldPassword",
+      name: "oldPassword",
+      type: "password",
+      placeholder: "Enter old password",
+      showEyeIcon: true,
+    },
     {
       id: "newPassword",
       name: "newPassword",
@@ -60,15 +60,17 @@ const ResetPassword = () => {
     initialValues: getAdminResetPasswordInitialState({
       userName: store.admin.userName,
       oldPassword: state?.password,
-      newPassword: state?.password
+      newPassword: state?.password,
     }),
     validationSchema: resetPasswordSchema,
     onSubmit: handleResetPassword,
   });
 
   return (
-    <div   className="d-flex align-items-center justify-content-center"
-    style={{ background: "#f0f0f0", minHeight: "75vh" }}>
+    <div
+      className="d-flex align-items-center justify-content-center"
+      style={{ background: "#f0f0f0", minHeight: "75vh" }}
+    >
       <div
         className="card shadow-lg p-4 rounded-4"
         style={{ maxWidth: "500px", width: "100%" }}

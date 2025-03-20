@@ -7,20 +7,22 @@ import { resetPasswordSchema } from "../../Utils/validationSchema";
 import { ResetAdminPassword } from "../../Utils/apiService";
 import { ReusableResetPasswordInput } from "../ReusableInput/ReusableInput";
 import { useAppContext } from "../../contextApi/context";
-const ResetPasswordSubAdmin = ({ user, onClose }) => {
-  const { store } = useAppContext();
+
+const ResetPasswordSubAdmin = ({ userName, onClose = () => {} }) => {
 
   const navigate = useNavigate();
   const location = useLocation();
   const state = location?.state || {};
 
-  const handleResetPassword = async (values) => {
+  const handleResetPassword = async (values, { resetForm }) => {
     const { confirmPassword, ...resetValues } = values;
+
     try {
       const response = await ResetAdminPassword(resetValues, true);
       if (response?.success) {
         toast.success("Password changed successfully!");
-        onClose(); // Close modal after success
+        resetForm();
+        onClose(); 
       } else {
         toast.error(response?.message || "Failed to reset password.");
       }
@@ -28,6 +30,7 @@ const ResetPasswordSubAdmin = ({ user, onClose }) => {
       toast.error("An error occurred. Please try again.");
     }
   };
+
   const inputFields = [
     {
       id: "oldPassword",
@@ -53,14 +56,17 @@ const ResetPasswordSubAdmin = ({ user, onClose }) => {
   ];
 
   const formik = useFormik({
-    initialValues: getAdminResetPasswordInitialState({
-      userName: user?.userName || store.admin.userName,
+    initialValues: {
+      userName: userName || "",
       oldPassword: "",
       newPassword: "",
-    }),
+      confirmPassword: "",
+    },
     validationSchema: resetPasswordSchema,
     onSubmit: handleResetPassword,
+    enableReinitialize: true,
   });
+
   return (
     <div
       className="d-flex align-items-center justify-content-center"
@@ -85,7 +91,7 @@ const ResetPasswordSubAdmin = ({ user, onClose }) => {
               animation: "glow 2s infinite alternate",
             }}
           >
-            {/* {formik.values.userName} */}
+            {userName}
           </p>
         </div>
         <form onSubmit={formik.handleSubmit}>
@@ -101,7 +107,6 @@ const ResetPasswordSubAdmin = ({ user, onClose }) => {
               error={formik.touched[field.name] && formik.errors[field.name]}
               showEyeIcon={field.showEyeIcon}
             />
-            
           ))}
           <div className="d-grid mt-3">
             <button
