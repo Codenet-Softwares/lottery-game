@@ -290,15 +290,19 @@ export const deleteTrash = async (req, res) => {
 export const deleteBetAfterWin = async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
+    // Generate JWT token
     const token = jwt.sign(
       { role: req.user.role },
       process.env.JWT_SECRET_KEY,
       { expiresIn: "1h" }
     );
+
     const headers = {
       Authorization: `Bearer ${token}`,
     };
+
     const { purchaseId } = req.body;
+
     const ticketPurchaseId = await PurchaseLottery.findOne({
       where: { purchaseId },
     });
@@ -313,27 +317,48 @@ export const deleteBetAfterWin = async (req, res) => {
       );
     }
 
-    const fullTicketNumber = `${ticketPurchaseId.group} ${ticketPurchaseId.series} ${ticketPurchaseId.number}`;
-    const lastFiveDigits = ticketPurchaseId.number.slice(-5);
-    const lastFourDigits = ticketPurchaseId.number.slice(-4);
+    const fullTicketNumber = `${ticketPurchaseId.group.toString().padStart(2, '0')} ${ticketPurchaseId.series} ${ticketPurchaseId.number}`;
+    const lastFiveDigits = ticketPurchaseId.number?.slice(-5) || '';
+    const lastFourDigits = ticketPurchaseId.number?.slice(-4) || '';
 
+    //  Fetch lottery results
     const lotteryResults = await LotteryResult.findAll({
       where: { marketId: ticketPurchaseId.marketId },
     });
 
+    if (!lotteryResults || lotteryResults.length === 0) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "No lottery results found for the provided marketId",
+        res
+      );
+    }
+
+    let comPrize = null;
     const winningTicket = lotteryResults.find((result) => {
       if (!Array.isArray(result.ticketNumber)) return false;
 
       if (result.prizeCategory === "First Prize") {
-        return result.ticketNumber.includes(fullTicketNumber);
-      } else if (result.prizeCategory === "Second Prize") {
+        if (result.ticketNumber.includes(fullTicketNumber)) {
+          console.log("First Prize matched");
+          return res;
+        }
+
+        else if (result.ticketNumber.some(ticket => ticket.slice(-5) === lastFiveDigits) ) {
+          console.log(" Last 5 digits matched for complementary prize");
+          comPrize = result.complementaryPrize;
+        }
+      }
+      if (result.prizeCategory === "Second Prize") {
         return result.ticketNumber.includes(lastFiveDigits);
       } else {
         return result.ticketNumber.includes(lastFourDigits);
       }
     });
 
-    if (!winningTicket) {
+    if (!winningTicket && !comPrize) {
       return apiResponseErr(
         null,
         false,
@@ -351,9 +376,9 @@ export const deleteBetAfterWin = async (req, res) => {
         marketId: ticketPurchaseId.marketId,
         userId: ticketPurchaseId.userId,
         sem: ticketPurchaseId.sem,
-        prizeAmount: winningTicket.prizeAmount,
-        prizeCategory: winningTicket.prizeCategory,
-        complementaryPrize: winningTicket.complementaryPrize,
+        prizeAmount: winningTicket?.prizeAmount || 0, 
+        prizeCategory: winningTicket?.prizeCategory || '',
+        complementaryPrize: comPrize || 0,
       },
       { headers }
     );
@@ -365,14 +390,15 @@ export const deleteBetAfterWin = async (req, res) => {
     await transaction.commit();
 
     return apiResponseSuccess(
-      ticketPurchaseId,
+      purchaseId,
       true,
       statusCode.success,
-      "Balances updated successfully and Bet Deleted",
+      "Bet deleted successfully and balances updated",
       res
     );
   } catch (error) {
     await transaction.rollback();
+
     if (error.response) {
       return apiResponseErr(
         null,
@@ -392,5 +418,7 @@ export const deleteBetAfterWin = async (req, res) => {
     }
   }
 };
+
+
 
 
