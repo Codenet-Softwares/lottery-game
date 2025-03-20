@@ -58,9 +58,9 @@ class UrlConstant {
   getUpdateInactive = `${this.url_dev}/update-inactive-market-status`
   getSubAdminWinResult = `${this.url_dev}/subAdmin/get-subAdmin-history`;
   GetResultSubAdmin =`${this.url_dev}/${this.subadmin}/get-result`;
-  SubPasswordReset =`${this.url_dev}/${this.subadmin}/reset-password`
   // subAdminResetPassword =`${this.url_dev}/${this.subadmin}/reset-password`
-
+  SubPasswordReset =`${this.url_dev}/${this.subadmin}/reset-password`;
+  ViewSubAdminsTicket=`${this.url_dev}/${this.subadmin}/result-status`
 }
 
 const urls = new UrlConstant();
