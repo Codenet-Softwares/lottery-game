@@ -5,12 +5,16 @@ import ReusableModal from "../Reusables/ReusableModal";
 import ResetPassword from "../ResetPassword/ResetPassword";
 import ReusableMiniModal from "../Reusables/ReusableMiniModal";
 import ResetPasswordSubAdmin from "../ResetPasswordSubAdmin/ResetPasswordSubAdmin";
+import { toast } from "react-toastify";
 
 const ViewAllSubadmin = () => {
   const [subAdmins, setSubAdmins] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [showMiniModal, setShowMiniModal] = useState(false);
   const [error, setError] = useState(null);
+
+  console.log("selectedUser", selectedUser);
 
   useEffect(() => {
     const fetchSubAdmins = async () => {
@@ -24,28 +28,29 @@ const ViewAllSubadmin = () => {
     fetchSubAdmins();
   }, []);
 
+  const handleAction = (userName) => {
+    if (!userName) {
+      toast.error("Invalid user selection");
+      return;
+    }
+    setSelectedUser(userName);
+    setShowModal(true);
+  };
+
   const columns = [
-    { key: "userName", label: "subAdmin names" },
+    { key: "userName", label: "Sub-Admin Names" },
     { key: "role", label: "Role" },
     { key: "permissions", label: "Permissions" },
     {
       key: "actions",
       label: "Action",
       render: (row) => (
-        <div>
-          <button
-            className="btn btn-primary btn-sm mx-2"
-            onClick={() => setShowModal(true)}
-          >
-            <i className="fas fa-key"></i>
-          </button>
-          {/* <button
-            className="btn btn-danger btn-sm mx-2"
-            onClick={() => setShowMiniModal(true)}
-          >
-            <i className="fas fa-trash-alt"></i>
-          </button> */}
-        </div>
+        <button
+          className="btn btn-primary btn-sm mx-2"
+          onClick={() => handleAction(row.userName)}
+        >
+          <i className="fas fa-key"></i> Reset Password
+        </button>
       ),
     },
   ];
@@ -56,11 +61,17 @@ const ViewAllSubadmin = () => {
         <ReusableModal
           show={showModal}
           handleClose={() => {
-            console.log("Closing Modal...");
             setShowModal(false);
           }}
           title="Reset Sub-Admin Password"
-          body={<ResetPasswordSubAdmin />}
+          body={
+            <ResetPasswordSubAdmin
+              userName={selectedUser}
+              onClose={() => {
+                setShowModal(false);
+              }}
+            />
+          }
         />
       </div>
       {/* Sub-Admin Delete Modal Start*/}
@@ -84,6 +95,7 @@ const ViewAllSubadmin = () => {
           tableHeading="Sub Admin List"
           showSearch={true}
           paginationVisible={true}
+          handleAction={handleAction}
         />
       </div>
     </>
