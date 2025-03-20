@@ -390,7 +390,7 @@ export const deleteBetAfterWin = async (req, res) => {
     await transaction.commit();
 
     return apiResponseSuccess(
-      purchaseId,
+      ticketPurchaseId,
       true,
       statusCode.success,
       "Bet deleted successfully and balances updated",
