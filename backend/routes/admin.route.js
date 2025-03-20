@@ -27,6 +27,7 @@ import {
   subAdmindateWiseMarkets,
   subAdminResetPassword,
   subAdminResultStatus,
+  subAdminsResetPassword,
   updateMarketStatus,
   winResultMarket,
 } from "../controllers/admin.controller.js";
@@ -67,6 +68,7 @@ export const adminRoutes = (app) => {
     customErrorHandler,
     subAdminResetPassword
   );
+  app.post('/api/subAdmin-reset-password',resetPasswordSchema, customErrorHandler,authorize([string.Admin]), subAdminsResetPassword);
   app.post(
     "/api/admin/search-ticket",
     validateSearchTickets,

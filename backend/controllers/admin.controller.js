@@ -197,6 +197,65 @@ export const subAdminResetPassword = async (req, res) => {
   }
 };
 
+export const subAdminsResetPassword = async (req, res) => {
+  try {
+    const { userName, oldPassword, newPassword } = req.body;
+
+    const existingUser = await Admin.findOne({ where: { userName } });
+
+    if(!existingUser){
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Admin not Found",
+        res
+      );
+    }
+
+    const isPasswordMatch = await bcrypt.compare(oldPassword, existingUser.password);
+    if (!isPasswordMatch) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Invalid old password.",
+        res
+      );
+    }
+    const passwordIsDuplicate = await bcrypt.compare(newPassword, existingUser.password);
+    if (passwordIsDuplicate) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "New Password Cannot Be The Same As Existing Password",
+        res
+      );
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await existingUser.update({ password: hashedPassword, isReset: true });
+
+    return apiResponseSuccess(
+      null,
+      true,
+      statusCode.success,
+      "Password reset successfully.",
+      res
+    );
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
 export const adminSearchTickets = async ({
   group,
   series,
