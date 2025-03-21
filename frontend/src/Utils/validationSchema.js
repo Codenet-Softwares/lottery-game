@@ -117,33 +117,13 @@ export const validationSchema = Yup.object({
       }
     ),
 
-  timerFrom: Yup.string().required("Timer From is required")
-  .test(
-    "valid-timer-format",
-    "Timer From format 00:00 AM/PM and no more than 8 characters",
-    (value) => {
-      // Check if the input is exactly 8 characters long
-      if (value.length !== 8) return false;
+  timerFrom: Yup.string().required("Timer From is required"),
 
-      // Validate the format using regex
-      return /^\d{2}:\d{2}\s(AM|PM)$/i.test(value);
-    }
-  ),
 
 
   timerTo: Yup.string()
     .required("Timer To is required")
-    .test(
-      "valid-timer-format",
-      "Timer To format 00:00 AM/PM and no more than 8 characters",
-      (value) => {
-        // Check if the input is exactly 8 characters long
-        if (value.length !== 8) return false;
 
-        // Validate the format using regex
-        return /^\d{2}:\d{2}\s(AM|PM)$/i.test(value);
-      }
-    )
     .test(
       "valid-timer-range",
       "Timer To should be greater than Timer From",
@@ -296,32 +276,12 @@ export const validationUpdateSchema = Yup.object({
       }
     ),
 
-  timerFrom: Yup.string().required("Timer From is required")
-  .test(
-    "valid-timer-format",
-    "Timer From format 00:00 AM/PM and no more than 8 characters",
-    (value) => {
-      // Check if the input is exactly 8 characters long
-      if (value.length !== 8) return false;
+  timerFrom: Yup.string().required("Timer From is required"),
 
-      // Validate the format using regex
-      return /^\d{2}:\d{2}\s(AM|PM)$/i.test(value);
-    }
-  ),
 
   timerTo: Yup.string()
-  .required("Timer To is required")
-  .test(
-    "valid-timer-format",
-    "Timer To format 00:00 AM/PM and no more than 8 characters",
-    (value) => {
-      // Check if the input is exactly 8 characters long
-      if (value.length !== 8) return false;
+  .required("Timer To is required"),
 
-      // Validate the format using regex
-      return /^\d{2}:\d{2}\s(AM|PM)$/i.test(value);
-    }
-  ),
   // .test(
   //   "valid-timer-range",
   //   "Timer To should be greater than Timer From",

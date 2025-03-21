@@ -139,7 +139,10 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
                 ),
               })),
             }))
+            
           );
+          
+          
           fetchMarketStats();
           setModalShow(false);
         } else {
