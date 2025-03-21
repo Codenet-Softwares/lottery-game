@@ -4,12 +4,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getAdminResetPasswordInitialState } from "../../Utils/initialState";
 import { resetPasswordSchema } from "../../Utils/validationSchema";
-import { ResetAdminPassword } from "../../Utils/apiService";
+import { SubAdminResetPassword } from "../../Utils/apiService";
 import { ReusableResetPasswordInput } from "../ReusableInput/ReusableInput";
 import { useAppContext } from "../../contextApi/context";
 
 const ResetPasswordSubAdmin = ({ userName, onClose = () => {} }) => {
-
   const navigate = useNavigate();
   const location = useLocation();
   const state = location?.state || {};
@@ -18,11 +17,11 @@ const ResetPasswordSubAdmin = ({ userName, onClose = () => {} }) => {
     const { confirmPassword, ...resetValues } = values;
 
     try {
-      const response = await ResetAdminPassword(resetValues, true);
+      const response = await SubAdminResetPassword(resetValues, true);
       if (response?.success) {
         toast.success("Password changed successfully!");
         resetForm();
-        onClose(); 
+        onClose();
       } else {
         toast.error(response?.message || "Failed to reset password.");
       }
