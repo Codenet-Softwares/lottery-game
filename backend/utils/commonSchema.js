@@ -198,11 +198,19 @@ export const updateMarketValidation = [
       return true;
     }),
 
-  body('number')
+    body('number')
     .optional()
     .custom((value) => {
       if (typeof value !== 'object') throw new Error('Number must be an object with min and/or max values.');
       const { min, max } = value || {};
+
+      if (min !== undefined && (!/^\d{5}$/.test(min))) {
+        throw new Error('Number min must be a 5-digit number.');
+      }
+      if (max !== undefined && (!/^\d{5}$/.test(max))) {
+        throw new Error('Number max must be a 5-digit number.');
+      }
+
       if (min !== undefined && max !== undefined && min >= max) {
         throw new Error('Number min must be less than max.');
       }
