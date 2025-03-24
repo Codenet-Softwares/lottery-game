@@ -820,24 +820,13 @@ export const getInactiveMarket = async (req, res) => {
     };
 
     if (search) {
-      whereClause.marketName = {
-        [Sequelize.Op.like]: `%${search}%`,
-      };
+      whereClause.marketName = { [Op.like]: `%${search}%`,};
     }
 
-    const totalItems = await TicketRange.count({
-      where: whereClause,
-    });
-
     const ticketData = await TicketRange.findAll({
-      attributes: [
-        [Sequelize.fn("DISTINCT", Sequelize.col("marketId")), "marketId"],
-        "marketName",
-        "gameName",
-      ],
+      attributes: ["marketId","marketName","gameName"],
       where: whereClause,
-      limit: parseInt(limit),
-      offset,
+      group: ["marketId","marketName","gameName"],
       order: [["createdAt", "DESC"]],
     });
 
@@ -845,21 +834,28 @@ export const getInactiveMarket = async (req, res) => {
       return apiResponseSuccess([], true, statusCode.success, "No data", res);
     }
 
-    const totalPages = Math.ceil(totalItems / parseInt(limit));
+    const totalItems = ticketData.length;
+    const totalPages = Math.ceil(totalItems / limit);
 
-    const paginatedData = {
-      currentPage: parseInt(page),
+    const validPage = page > totalPages ? 1 : page;
+    const validOffset = (validPage - 1) * limit;
+    
+    const paginatedData = ticketData.slice(validOffset, validOffset + limit);
+
+
+    const pagination = {
+      Page: parseInt(page),
       limit: parseInt(limit),
       totalItems,
       totalPages,
     };
 
     return apiResponsePagination(
-      ticketData,
+      paginatedData,
       true,
       statusCode.success,
       "Success",
-      paginatedData,
+      pagination,
       res
     );
   } catch (error) {
