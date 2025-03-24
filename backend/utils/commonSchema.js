@@ -178,15 +178,23 @@ export const updateMarketValidation = [
       if (typeof value !== 'object') throw new Error('Series must be an object with start and/or end values.');
       const { start, end } = value || {};
       const invalidLetters = ['I', 'F', 'O'];
+
       if (start !== undefined && (start < 'A' || start > 'Z' || invalidLetters.includes(start))) {
         throw new Error('Series start must be an uppercase letter (A-Z), excluding I, F, O.');
       }
+
       if (end !== undefined && (end < 'A' || end > 'Z' || invalidLetters.includes(end))) {
         throw new Error('Series end must be an uppercase letter (A-Z), excluding I, F, O.');
       }
+
+      if (start !== undefined && end !== undefined && start >= end) {
+        throw new Error('Series start must be less than series end.');
+      }
+
       if (start !== undefined && end !== undefined && end.charCodeAt(0) - start.charCodeAt(0) + 1 < 10) {
         throw new Error('Series range must be at least 10 letters.');
       }
+
       return true;
     }),
 
@@ -201,11 +209,27 @@ export const updateMarketValidation = [
       return true;
     }),
 
-  body('start_time').optional().isString().withMessage('Start time must be a string.'),
-  body('end_time').optional().isString().withMessage('End time must be a string.'),
+  body('start_time')
+    .optional()
+    .isString()
+    .withMessage('Start time must be a string.')
+    .custom((startTime, { req }) => {
+      const endTime = req.body.end_time;
+      if (endTime && startTime >= endTime) {
+        throw new Error('Start time must be less than end time.');
+      }
+      return true;
+    }),
+
+  body('end_time')
+    .optional()
+    .isString()
+    .withMessage('End time must be a string.'),
+
   body('marketName').optional().isString().withMessage('Market Name must be a string.'),
   body('price').optional().isNumeric().withMessage('Price must be a number.')
 ];
+
 
 
 
