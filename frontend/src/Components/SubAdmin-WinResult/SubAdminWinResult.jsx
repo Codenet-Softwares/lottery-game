@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   GetResultMarket,
+  GetResultMarketSub,
   GetWiningResultSubAdmin,
   voidBetMarket,
 } from "../../Utils/apiService";
@@ -39,7 +40,7 @@ const Result = () => {
   // Fetch markets based on the selected date
   const fetchMarkets = async () => {
     try {
-      const response = await GetResultMarket({ date: selectedDate });
+      const response = await GetResultMarketSub({ date: selectedDate });
       if (response && response.success && response.data) {
         setMarkets(response.data);
         if (response.data.length > 0) {
