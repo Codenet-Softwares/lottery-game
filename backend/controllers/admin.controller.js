@@ -2127,6 +2127,7 @@ export const subAdmindateWiseMarkets = async (req, res) => {
       ],
       where: {
         adminId,
+        status: "Approve",
         createdAt: {
           [Op.gte]: selectedDate,
           [Op.lt]: nextDay,
