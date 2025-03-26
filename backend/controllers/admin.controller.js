@@ -870,9 +870,9 @@ export const getInactiveMarket = async (req, res) => {
 };
 
 export const updateMarketStatus = async (req, res) => {
-  const { status, marketId } = req.body;
-
   try {
+    const { status, marketId } = req.body;
+
     const [updatedCount] = await TicketRange.update(
       {
         isActive: status,
@@ -890,15 +890,26 @@ export const updateMarketStatus = async (req, res) => {
         "Market not found",
         res
       );
-    } else {
-      return apiResponseErr(
-        status,
-        true,
-        statusCode.success,
-        "Market updated Successfully",
-        res
-      );
     }
+
+    const marketRef = db.collection("lottery").doc(marketId);
+
+    await marketRef.set(
+         {
+          isActive: status,
+          hideMarketUser: status ? true : false,
+          inactiveGame: true,
+        },
+      { merge: true }
+    );
+
+    return apiResponseErr(
+      status,
+      true,
+      statusCode.success,
+      "Market updated successfully",
+      res
+    );
   } catch (error) {
     return apiResponseErr(
       null,
