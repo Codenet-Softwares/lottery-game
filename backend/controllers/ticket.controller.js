@@ -3,6 +3,7 @@ import { apiResponseErr, apiResponseSuccess } from '../utils/response.js';
 import { statusCode } from '../utils/statusCodes.js';
 import TicketRange from '../models/ticketRange.model.js';
 import { v4 as uuidv4 } from 'uuid';
+import { db } from '../config/firebase.js';
 
 export const saveTicketRange = async (req, res) => {
   try {
@@ -63,8 +64,19 @@ export const saveTicketRange = async (req, res) => {
       hideMarketUser : false
     });
 
+    // Save data to Firestore
+    await db.collection('lottery').doc(ticket.marketId).set({
+      start_time: ticket.start_time,
+      end_time: ticket.end_time,
+      marketName: ticket.marketName,
+      date: ticket.date,
+      hideMarketUser: ticket.hideMarketUser,
+      isActive: ticket.isActive
+    });
+
     return apiResponseSuccess(ticket, true, statusCode.create, 'Ticket range generated successfully', res);
   } catch (error) {
+    console.log('Error saving ticket range:', error);
     return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
   }
 };
