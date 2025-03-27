@@ -20,6 +20,7 @@ import bcrypt from "bcrypt";
 import WinResultRequest from "../models/winresultRequestModel.js";
 
 import { string } from "../constructor/string.js";
+import { db } from "../config/firebase.js";
 dotenv.config();
 
 export const createAdmin = async (req, res) => {
@@ -873,15 +874,29 @@ export const updateMarketStatus = async (req, res) => {
   try {
     const { status, marketId } = req.body;
 
+    console.log("status......................",status)
+    console.log("marketId......................",marketId)
+
+
+    if (typeof status === "undefined" || !marketId) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Invalid status or marketId",
+        res
+      );
+    }
+
     const [updatedCount] = await TicketRange.update(
       {
         isActive: status,
         hideMarketUser: status ? true : Sequelize.col("hideMarketUser"),
-        inactiveGame: true,
       },
       { where: { marketId } }
     );
 
+       console.log("...............",updatedCount)
     if (updatedCount === 0) {
       return apiResponseErr(
         null,
@@ -892,18 +907,18 @@ export const updateMarketStatus = async (req, res) => {
       );
     }
 
-    const marketRef = db.collection("lottery").doc(marketId);
+    const marketRef = db.collection("lottery").doc(String(marketId));
 
     await marketRef.set(
-         {
-          isActive: status,
-          hideMarketUser: status ? true : false,
-          inactiveGame: true,
-        },
+      {
+        isActive: Boolean(status), // Ensure it's true/false
+        hideMarketUser: Boolean(status),
+        inactiveGame: true,
+      },
       { merge: true }
     );
 
-    return apiResponseErr(
+    return apiResponseSuccess(
       status,
       true,
       statusCode.success,
@@ -921,45 +936,46 @@ export const updateMarketStatus = async (req, res) => {
   }
 };
 
-export const inactiveMarketStatus = async (req, res) => {
-  const { marketId } = req.body;
 
-  try {
-    const [updatedCount] = await TicketRange.update(
-      {
-        //isActive: false,
-        inactiveGame: false,
-      },
-      { where: { marketId } }
-    );
+// export const inactiveMarketStatus = async (req, res) => {
+//   const { marketId } = req.body;
 
-    if (updatedCount === 0) {
-      return apiResponseErr(
-        null,
-        false,
-        statusCode.badRequest,
-        "Market not found",
-        res
-      );
-    } else {
-      return apiResponseSuccess(
-        { updatedCount },
-        true,
-        statusCode.success,
-        "Market updated successfully",
-        res
-      );
-    }
-  } catch (error) {
-    return apiResponseErr(
-      null,
-      false,
-      statusCode.internalServerError,
-      error.message,
-      res
-    );
-  }
-};
+//   try {
+//     const [updatedCount] = await TicketRange.update(
+//       {
+//         //isActive: false,
+//         inactiveGame: false,
+//       },
+//       { where: { marketId } }
+//     );
+
+//     if (updatedCount === 0) {
+//       return apiResponseErr(
+//         null,
+//         false,
+//         statusCode.badRequest,
+//         "Market not found",
+//         res
+//       );
+//     } else {
+//       return apiResponseSuccess(
+//         { updatedCount },
+//         true,
+//         statusCode.success,
+//         "Market updated successfully",
+//         res
+//       );
+//     }
+//   } catch (error) {
+//     return apiResponseErr(
+//       null,
+//       false,
+//       statusCode.internalServerError,
+//       error.message,
+//       res
+//     );
+//   }
+// };
 
 export const liveMarkets = async (req, res) => {
   try {

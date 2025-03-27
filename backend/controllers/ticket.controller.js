@@ -1,8 +1,9 @@
-import { Op } from 'sequelize';
-import { apiResponseErr, apiResponseSuccess } from '../utils/response.js';
-import { statusCode } from '../utils/statusCodes.js';
-import TicketRange from '../models/ticketRange.model.js';
-import { v4 as uuidv4 } from 'uuid';
+import { Op } from "sequelize";
+import { apiResponseErr, apiResponseSuccess } from "../utils/response.js";
+import { statusCode } from "../utils/statusCodes.js";
+import TicketRange from "../models/ticketRange.model.js";
+import { v4 as uuidv4 } from "uuid";
+import { db } from "../config/firebase.js";
 
 export const saveTicketRange = async (req, res) => {
   try {
@@ -25,7 +26,7 @@ export const saveTicketRange = async (req, res) => {
         null,
         false,
         statusCode.badRequest,
-        'The date must be today or in the future.',
+        "The date must be today or in the future.",
         res
       );
     }
@@ -42,7 +43,7 @@ export const saveTicketRange = async (req, res) => {
         null,
         false,
         statusCode.badRequest,
-        'A market with this name already exists for the selected date.',
+        "A market with this name already exists for the selected date.",
         res
       );
     }
@@ -60,15 +61,50 @@ export const saveTicketRange = async (req, res) => {
       marketName,
       date: providedDate,
       price,
-      hideMarketUser : false
+      hideMarketUser: false,
+      isActive: false,
     });
 
-    return apiResponseSuccess(ticket, true, statusCode.create, 'Ticket range generated successfully', res);
+    const formatDateTime = (date) =>
+      date.toISOString().slice(0, 19).replace("T", " ");
+
+    // Save data to Firestore
+    await db
+      .collection("lottery")
+      .doc(ticket.marketId)
+      .set({
+        start_time: formatDateTime(ticket.start_time),
+        end_time: formatDateTime(ticket.end_time),
+        marketName: ticket.marketName,
+        date: formatDateTime(ticket.end_time),
+        hideMarketUser: ticket.hideMarketUser,
+        isActive: ticket.isActive,
+        price: ticket.price,
+        group_start: ticket.group_start,
+        group_end: ticket.group_end,
+        series_start: ticket.series_start,
+        series_end: ticket.series_end,
+        number_start: ticket.number_start,
+        number_end: ticket.number_end,
+      });
+
+    return apiResponseSuccess(
+      ticket,
+      true,
+      statusCode.create,
+      "Ticket range generated successfully",
+      res
+    );
   } catch (error) {
-    return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
   }
 };
-
 
 export const updateMarket = async (req, res) => {
   try {
@@ -82,50 +118,86 @@ export const updateMarket = async (req, res) => {
         null,
         false,
         statusCode.notFound,
-        'Market not found with the provided marketId.',
+        "Market not found with the provided marketId.",
         res
       );
     }
 
-    const allowedFields = ['group', 'series', 'number', 'start_time', 'end_time', 'marketName', 'date', 'price'];
+    const allowedFields = [
+      "group",
+      "series",
+      "number",
+      "start_time",
+      "end_time",
+      "marketName",
+      "date",
+      "price",
+    ];
     const updates = { isUpdate: true }; // Set isUpdate to true when API is hit
+    const firestoreUpdates = {};
 
     for (const [key, value] of Object.entries(updatedFields)) {
       if (!allowedFields.includes(key)) continue;
 
-      if (['group', 'number'].includes(key)) {
+      if (["group", "number"].includes(key)) {
         const { min, max } = value || {};
         if (min === undefined || max === undefined) {
-          return apiResponseErr(null, false, statusCode.badRequest, `${key} must have both min and max values.`, res);
+          return apiResponseErr(
+            null,
+            false,
+            statusCode.badRequest,
+            `${key} must have both min and max values.`,
+            res
+          );
         }
         updates[`${key}_start`] = min;
         updates[`${key}_end`] = max;
-      } else if (key === 'series') {
+        firestoreUpdates[`${key}_start`] = min;
+        firestoreUpdates[`${key}_end`] = max;
+      } else if (key === "series") {
         const { start, end } = value || {};
         if (start === undefined || end === undefined) {
-          return apiResponseErr(null, false, statusCode.badRequest, 'Series must have both start and end values.', res);
+          return apiResponseErr(
+            null,
+            false,
+            statusCode.badRequest,
+            "Series must have both start and end values.",
+            res
+          );
         }
         updates[`${key}_start`] = start;
         updates[`${key}_end`] = end;
+        firestoreUpdates[`${key}_start`] = start;
+        firestoreUpdates[`${key}_end`] = end;
       } else {
         updates[key] = value;
+        firestoreUpdates[key] = value;
       }
     }
 
-    if (Object.keys(updates).length === 0) {
-      return apiResponseErr(null, false, statusCode.badRequest, 'No valid fields provided for update.', res);
+    if (Object.keys(updates).length === 1) {
+      // Only contains isUpdate if no valid fields are provided
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "No valid fields provided for update.",
+        res
+      );
     }
 
     await ticketRange.update(updates);
+
+    const firestoreRef = db.collection("lottery").doc(marketId);
+    await firestoreRef.update(firestoreUpdates);
 
     return apiResponseSuccess(
       { ...ticketRange.toJSON(), isUpdate: true }, // Send updated data
       true,
       statusCode.success,
-      'Lottery market updated successfully.',
+      "Lottery market updated successfully.",
       res
     );
-
   } catch (error) {
     return apiResponseErr(
       null,
@@ -136,9 +208,6 @@ export const updateMarket = async (req, res) => {
     );
   }
 };
-
-
-
 
 export const geTicketRange = async (req, res) => {
   try {
@@ -156,20 +225,33 @@ export const geTicketRange = async (req, res) => {
 
     if (search) {
       whereCondition.marketName = {
-        [Op.like]: `%${search}%`, 
+        [Op.like]: `%${search}%`,
       };
     }
     const ticketData = await TicketRange.findAll({
-      where: whereCondition, order : [["createdAt", "DESC"]],
+      where: whereCondition,
+      order: [["createdAt", "DESC"]],
     });
 
     if (!ticketData || ticketData.length === 0) {
-      return apiResponseSuccess([], true, statusCode.success, 'No data', res);
+      return apiResponseSuccess([], true, statusCode.success, "No data", res);
     }
 
-    return apiResponseSuccess(ticketData, true, statusCode.success, 'Success', res);
+    return apiResponseSuccess(
+      ticketData,
+      true,
+      statusCode.success,
+      "Success",
+      res
+    );
   } catch (error) {
-    return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
   }
 };
 
@@ -185,41 +267,71 @@ export const geTicketRangeExternal = async (req, res) => {
       },
       isWin: false,
       isVoid: false,
-      inactiveGame: true
+      inactiveGame: true,
     };
 
     if (search) {
       whereCondition.marketName = {
-        [Op.like]: `%${search}%`, 
+        [Op.like]: `%${search}%`,
       };
     }
     const ticketData = await TicketRange.findAll({
-      where: whereCondition, order : [["createdAt", "DESC"]],
+      where: whereCondition,
+      order: [["createdAt", "DESC"]],
     });
 
     if (!ticketData || ticketData.length === 0) {
-      return apiResponseSuccess([], true, statusCode.success, 'No data', res);
+      return apiResponseSuccess([], true, statusCode.success, "No data", res);
     }
 
-    return apiResponseSuccess(ticketData, true, statusCode.success, 'Success', res);
+    return apiResponseSuccess(
+      ticketData,
+      true,
+      statusCode.success,
+      "Success",
+      res
+    );
   } catch (error) {
-    return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
   }
 };
 
-
-
 export const getIsactiveMarket = async (req, res) => {
   try {
-
-    const ticketData = await TicketRange.findAll({where : {isActive : true}, order : [["createdAt","DESC"]]})
-    if(!ticketData){
-    return apiResponseErr(null, false, statusCode.badRequest, 'Ticket not Found', res);
+    const ticketData = await TicketRange.findAll({
+      where: { isActive: true },
+      order: [["createdAt", "DESC"]],
+    });
+    if (!ticketData) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Ticket not Found",
+        res
+      );
     }
 
-    return apiResponseSuccess(ticketData, true, statusCode.success, 'Success', res);
-
+    return apiResponseSuccess(
+      ticketData,
+      true,
+      statusCode.success,
+      "Success",
+      res
+    );
   } catch (error) {
-    return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
   }
 };
