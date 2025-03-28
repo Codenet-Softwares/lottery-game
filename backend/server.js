@@ -11,13 +11,9 @@ import UserRange from './models/user.model.js';
 import { ResultDeclarationModule } from './routes/ResultDeclaration.route.js';
 import { ExternalApiModule } from './routes/externalApis.route.js';
 import { voidGameRoute } from './routes/void.route.js';
-import TicketRange from './models/ticketRange.model.js';
-import cron from 'node-cron'
-import { Op } from 'sequelize';
-import moment from 'moment';
 import { revokeGameRoute } from './routes/revoke.route.js';
 import { deleteGameRoute } from './routes/delete.route.js';
-import { getISTTime } from './utils/commonMethods.js';
+import { updateLottery } from './utils/lotteryCron.js';
 
 if (process.env.NODE_ENV === 'production') {
   dotenv.config({ path: '.env.production' });
@@ -56,7 +52,7 @@ deleteGameRoute(app)
 
 PurchaseLottery.belongsTo(UserRange, {
   foreignKey: 'generateId',
-  targetKey: 'generateId', // Assuming `generateId` links them
+  targetKey: 'generateId',
   as: 'userRange',
 });
 
@@ -69,35 +65,35 @@ UserRange.hasMany(PurchaseLottery, {
 const clients = new Set();
 
 // SSE endpoint
-app.get('/lottery-events', (req, res) => {
-  console.log("[SSE] Client connected to events");
+// app.get('/lottery-events', (req, res) => {
+//   console.log("[SSE] Client connected to events");
 
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
-  res.setHeader('Access-Control-Allow-Origin', 'https://cg.user.dummydoma.in'); // change with server URl 
-  // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3002'); //  Local URL
+//   res.setHeader('Content-Type', 'text/event-stream');
+//   res.setHeader('Cache-Control', 'no-cache');
+//   res.setHeader('Connection', 'keep-alive');
+//   res.setHeader('Access-Control-Allow-Origin', 'https://cg.user.dummydoma.in'); // change with server URl 
+//   // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3002'); //  Local URL
 
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.flushHeaders();
+//   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+//   res.flushHeaders();
 
-  clients.add(res);
-  console.log(`[SSE] Connected clients: ${clients.size}`);
+//   clients.add(res);
+//   console.log(`[SSE] Connected clients: ${clients.size}`);
 
-  const initialMessage = { message: "SSE service is connected successfully!" };
-  res.write(`data: ${JSON.stringify(initialMessage)}\n\n`);
+//   const initialMessage = { message: "SSE service is connected successfully!" };
+//   res.write(`data: ${JSON.stringify(initialMessage)}\n\n`);
 
-  const heartbeatInterval = setInterval(() => {
-    res.write(':\n\n'); // Keep the connection alive
-  }, 2000);
+//   const heartbeatInterval = setInterval(() => {
+//     res.write(':\n\n'); // Keep the connection alive
+//   }, 2000);
 
-  req.on('close', () => {
-    console.log('[SSE] Client disconnected');
-    clearInterval(heartbeatInterval);
-    clients.delete(res);
-  });
-});
+//   req.on('close', () => {
+//     console.log('[SSE] Client disconnected');
+//     clearInterval(heartbeatInterval);
+//     clients.delete(res);
+//   });
+// });
 
 
 sequelize
@@ -108,118 +104,118 @@ sequelize
       console.log(`App is running on - http://localhost:${process.env.PORT || 7000}`);
     });
 
-    const updatedMarketsCache = new Map(); 
+    // const updatedMarketsCache = new Map(); 
 
     // Function to get current time in IST
-    cron.schedule('* * * * * * *', async () => {
-      try {
-        const currentTime = getISTTime();
+    // cron.schedule('* * * * * * *', async () => {
+    //   try {
+    //     const currentTime = getISTTime();
 
-        const suspendMarkets = await TicketRange.findAll({
-          where: {
-            isActive: true,
-            [Op.or]: [
-              { start_time: { [Op.gt]: currentTime } },
-              { end_time: { [Op.lt]: currentTime } }
-            ]
-          },
-        });
+    //     const suspendMarkets = await TicketRange.findAll({
+    //       where: {
+    //         isActive: true,
+    //         [Op.or]: [
+    //           { start_time: { [Op.gt]: currentTime } },
+    //           { end_time: { [Op.lt]: currentTime } }
+    //         ]
+    //       },
+    //     });
 
-        const activeMarkets = await TicketRange.findAll({
-          where: {
-            isActive: false,
-            start_time: { [Op.lte]: currentTime },
-            end_time: { [Op.gte]: currentTime },
-          },
-        });
+    //     const activeMarkets = await TicketRange.findAll({
+    //       where: {
+    //         isActive: false,
+    //         start_time: { [Op.lte]: currentTime },
+    //         end_time: { [Op.gte]: currentTime },
+    //       },
+    //     });
 
-        const updateMarket = [];
+    //     const updateMarket = [];
 
-        // Update active markets
-        for (const market of activeMarkets) {
-          if (!updatedMarketsCache.has(market.marketId) || updatedMarketsCache.get(market.marketId).isActive !== true) {
-            market.isActive = true;
-            market.hideMarketUser = true;
-            market.inactiveGame = true
+    //     // Update active markets
+    //     for (const market of activeMarkets) {
+    //       if (!updatedMarketsCache.has(market.marketId) || updatedMarketsCache.get(market.marketId).isActive !== true) {
+    //         market.isActive = true;
+    //         market.hideMarketUser = true;
+    //         market.inactiveGame = true
            
-            const response = await market.save();
-            updateMarket.push(response.toJSON());
-           updatedMarketsCache.set(market.marketId, response.toJSON());
-          }
-        }
+    //         const response = await market.save();
+    //         updateMarket.push(response.toJSON());
+    //        updatedMarketsCache.set(market.marketId, response.toJSON());
+    //       }
+    //     }
 
-        // Update suspend markets
-        for (const market of suspendMarkets) {
-          if (!updatedMarketsCache.has(market.marketId) || updatedMarketsCache.get(market.marketId).isActive !== false) {
-            market.isActive = false;
-            const response = await market.save();
-            updateMarket.push(response.toJSON());
-           updatedMarketsCache.set(market.marketId, response.toJSON());
-          }
-        }
+    //     // Update suspend markets
+    //     for (const market of suspendMarkets) {
+    //       if (!updatedMarketsCache.has(market.marketId) || updatedMarketsCache.get(market.marketId).isActive !== false) {
+    //         market.isActive = false;
+    //         const response = await market.save();
+    //         updateMarket.push(response.toJSON());
+    //        updatedMarketsCache.set(market.marketId, response.toJSON());
+    //       }
+    //     }
 
-        clients.forEach((client) => {
-          try {
-            client.write(`data: ${JSON.stringify(updateMarket)}\n\n`);
-          } catch (err) {
-            console.error('[SSE] Error sending data to client:', err);
-          }
-        });
+    //     clients.forEach((client) => {
+    //       try {
+    //         client.write(`data: ${JSON.stringify(updateMarket)}\n\n`);
+    //       } catch (err) {
+    //         console.error('[SSE] Error sending data to client:', err);
+    //       }
+    //     });
 
-        //console.log(`[SSE] Updates broadcasted: ${JSON.stringify(updateMarket)}`);
+    //     //console.log(`[SSE] Updates broadcasted: ${JSON.stringify(updateMarket)}`);
 
-      } catch (error) {
-        console.error('Error checking market statuses:', error);
-      }
-    });
+    //   } catch (error) {
+    //     console.error('Error checking market statuses:', error);
+    //   }
+    // });
 
-
+    setInterval(updateLottery, 1000);
   
     
-
+    // setInterval(updateLottery, 1000);
     // Cron job runs every second to reset isUpdate to false
-    cron.schedule('* * * * * *', async () => {  // Runs every second
-      try {
+    // cron.schedule('* * * * * *', async () => {  // Runs every second
+    //   try {
         
-        // Find markets where isUpdate is true
-        const marketsToUpdate = await TicketRange.findAll({ where: { isUpdate: true } });
+    //     // Find markets where isUpdate is true
+    //     const marketsToUpdate = await TicketRange.findAll({ where: { isUpdate: true } });
         
-        // if (marketsToUpdate.length === 0) {
-        //   console.log('No markets found to reset.');
-        //   return;
-        // }
+    //     // if (marketsToUpdate.length === 0) {
+    //     //   console.log('No markets found to reset.');
+    //     //   return;
+    //     // }
     
 
-        const updatedMarketList = [];
+    //     const updatedMarketList = [];
     
-        for (const market of marketsToUpdate) {
-          market.isUpdate = false;
-          const updatedMarket = await market.save(); // Save to D
-          // Push to list (whether it's in cache or not)
-          updatedMarketList.push(updatedMarket.toJSON());
-          // Update cache
-          updatedMarketsCache.set(updatedMarket.marketId, updatedMarket.toJSON());
-        }
+    //     for (const market of marketsToUpdate) {
+    //       market.isUpdate = false;
+    //       const updatedMarket = await market.save(); // Save to D
+    //       // Push to list (whether it's in cache or not)
+    //       updatedMarketList.push(updatedMarket.toJSON());
+    //       // Update cache
+    //       updatedMarketsCache.set(updatedMarket.marketId, updatedMarket.toJSON());
+    //     }
       
-        // Send data to all clients
-        clients.forEach((client) => {
-          try {
-            if (client.writable) {
-              client.write(`data: ${JSON.stringify(updatedMarketList)}\n\n`);
-            } else {
-              console.warn('[SSE] Client not writable, skipping...');
-            }
-          } catch (err) {
-            console.error('[SSE] Error sending data to client:', err);
-          }
-        });
+    //     // Send data to all clients
+    //     clients.forEach((client) => {
+    //       try {
+    //         if (client.writable) {
+    //           client.write(`data: ${JSON.stringify(updatedMarketList)}\n\n`);
+    //         } else {
+    //           console.warn('[SSE] Client not writable, skipping...');
+    //         }
+    //       } catch (err) {
+    //         console.error('[SSE] Error sending data to client:', err);
+    //       }
+    //     });
   
-      } catch (error) {
-        console.error('Error in cron job:', error);
-      }
-      //console.log(`[SSE] Updates broadcasted: ${JSON.stringify(updatedMarketList)}`);
+    //   } catch (error) {
+    //     console.error('Error in cron job:', error);
+    //   }
+    //   //console.log(`[SSE] Updates broadcasted: ${JSON.stringify(updatedMarketList)}`);
 
-    });    
+    // });    
   })
   .catch((err) => {
     console.error('Unable to create tables:', err);

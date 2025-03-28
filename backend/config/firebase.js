@@ -5,7 +5,7 @@ import serviceAccount from '../lottery-firebase.json' assert { type: "json" };
 const initializeFirebase = () => {
   try {
     admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
+      credential: admin.credential.cert(process.env.FIREBASE_CREDENTIALS)
     });
 
     console.log('Firebase Admin SDK initialized successfully');
