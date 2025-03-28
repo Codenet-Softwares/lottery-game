@@ -32,10 +32,10 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
           numberFrom: market?.number_start || "",
           numberTo: market?.number_end || "",
           timerFrom: market?.start_time
-            ? moment.utc(market.start_time).format("HH:mm A")
+            ? moment.utc(market.start_time).format("h:mm A")
             : "",
           timerTo: market?.end_time
-            ? moment.utc(market.end_time).format("HH:mm A")
+            ? moment.utc(market.end_time).format("h:mm A")
             : "",
         }
       : initialUpdateMarketFormStates, // Fallback initial values if market is null
@@ -53,10 +53,10 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
             numberFrom: market?.number_start || "",
             numberTo: market?.number_end || "",
             timerFrom: market?.start_time
-              ? moment.utc(market.start_time).format("HH:mm A")
+              ? moment.utc(market.start_time).format("h:mm A")
               : "",
             timerTo: market?.end_time
-              ? moment.utc(market.end_time).format("HH:mm A")
+              ? moment.utc(market.end_time).format("h:mm A")
               : "",
           }
         : initialUpdateMarketFormStates;
