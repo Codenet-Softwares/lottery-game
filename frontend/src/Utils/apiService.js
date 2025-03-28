@@ -774,4 +774,16 @@ export async function ViewSubAdminsTickets(body = {}, marketId, isToast = false)
   }
 }
 
+export async function GetResultMarketSub(body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.GET, body, isToast);
+    const response = await makeCall(
+      `${urls.SubMarkets}?date=${body.date}`,
+      callParams
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
 
