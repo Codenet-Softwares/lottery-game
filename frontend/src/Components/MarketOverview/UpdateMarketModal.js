@@ -1,7 +1,10 @@
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useFormik } from "formik";
 import moment from "moment";
-import { FromToInput, ReusableInput } from "../ReusableInput/ReusableInput";
+import {
+  FromToInputEdit,
+  ReusableInputEdit,
+} from "../ReusableInput/ReusableInput";
 import {
   convertTimeToISO,
   generateFilterData,
@@ -16,7 +19,6 @@ import "./UpdateMarketModal.css";
 const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
   const { showLoader, hideLoader } = useAppContext();
 
-
   const formik = useFormik({
     initialValues: market
       ? {
@@ -30,44 +32,44 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
           numberFrom: market?.number_start || "",
           numberTo: market?.number_end || "",
           timerFrom: market?.start_time
-            ? moment.utc(market.start_time).format("HH:mm")
+            ? moment.utc(market.start_time).format("h:mm A")
             : "",
           timerTo: market?.end_time
-            ? moment.utc(market.end_time).format("HH:mm")
+            ? moment.utc(market.end_time).format("h:mm A")
             : "",
         }
       : initialUpdateMarketFormStates, // Fallback initial values if market is null
     validationSchema: validationUpdateSchema,
     onSubmit: async (values) => {
       const unchangedValues = market
-      ? {
-          marketName: market?.marketName || "",
-          date: market?.date ? moment(market.date).format("YYYY-MM-DD") : "",
-          priceForEach: market?.price || "",
-          groupFrom: market?.group_start || "",
-          groupTo: market?.group_end || "",
-          seriesFrom: market?.series_start || "",
-          seriesTo: market?.series_end || "",
-          numberFrom: market?.number_start || "",
-          numberTo: market?.number_end || "",
-          timerFrom: market?.start_time
-            ? moment.utc(market.start_time).format("HH:mm")
-            : "",
-          timerTo: market?.end_time
-            ? moment.utc(market.end_time).format("HH:mm")
-            : "",
+        ? {
+            marketName: market?.marketName || "",
+            date: market?.date ? moment(market.date).format("YYYY-MM-DD") : "",
+            priceForEach: market?.price || "",
+            groupFrom: market?.group_start || "",
+            groupTo: market?.group_end || "",
+            seriesFrom: market?.series_start || "",
+            seriesTo: market?.series_end || "",
+            numberFrom: market?.number_start || "",
+            numberTo: market?.number_end || "",
+            timerFrom: market?.start_time
+              ? moment.utc(market.start_time).format("h:mm A")
+              : "",
+            timerTo: market?.end_time
+              ? moment.utc(market.end_time).format("h:mm A")
+              : "",
+          }
+        : initialUpdateMarketFormStates;
+
+      if (JSON.stringify(values) === JSON.stringify(unchangedValues)) {
+        const confirmClose = window.confirm(
+          "You have not edited any fields. Are you sure you want to proceed?"
+        );
+        if (confirmClose) {
+          closeModal(); // Close the modal if user confirms
         }
-      : initialUpdateMarketFormStates;
-  
-    if (JSON.stringify(values) === JSON.stringify(unchangedValues)) {
-      const confirmClose = window.confirm(
-        "You have not edited any fields. Are you sure you want to proceed?"
-      );
-      if (confirmClose) {
-        closeModal(); // Close the modal if user confirms
+        return;
       }
-      return;
-    }
 
       showLoader();
       const startTimeISO = convertTimeToISO(values.timerFrom, values.date);
@@ -120,9 +122,14 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
   const timerOptions = useMemo(() => generateTimerOptions(), []);
 
   const inputConfig = [
-    { placeholder: "Select Date", type: "date", name: "date" },
-    { placeholder: "Market Name", name: "marketName" },
-    { placeholder: "Price For Each SEM", type: "number", name: "priceForEach" },
+    { placeholder: "Select Date", type: "date", name: "date", label: "Date" },
+    { placeholder: "Market Name", name: "marketName", label: "Market Name" },
+    {
+      placeholder: "Price For Each SEM",
+      type: "number",
+      name: "priceForEach",
+      label: "Price For Each SEM",
+    },
   ];
 
   const fromToInputConfig = [
@@ -132,6 +139,7 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
       toName: "groupTo",
       options: groupOptions,
       inputType: "number",
+      label: "Group Range",
     },
     {
       placeholder: "Series (From - To)",
@@ -139,6 +147,7 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
       toName: "seriesTo",
       options: seriesOptions,
       inputType: "text",
+      label: "Series Range",
     },
     {
       placeholder: "Number (From - To)",
@@ -146,6 +155,7 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
       toName: "numberTo",
       options: numberOptions,
       inputType: "number",
+      label: "Number Range",
     },
     {
       placeholder: "Enter Timer (hh:mm AM/PM)",
@@ -153,6 +163,7 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
       toName: "timerTo",
       options: timerOptions,
       inputType: "text",
+      label: "Timer Range",
     },
   ];
 
@@ -174,18 +185,14 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
                   className="modal-title text-uppercase"
                   id="updateMarketModalLabel"
                 >
-                  UPDATE{" "}
-                  <span >
-                    {market?.marketName}
-                  </span>{" "}
-                  STATS
+                  UPDATE <span>{market?.marketName}</span> STATS
                 </h5>
                 <button
                   type="button"
                   className="btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
-                 onClick={() => {
+                  onClick={() => {
                     formik.resetForm(); //  force Reseting form on modal close
                     closeModal();
                   }}
@@ -196,8 +203,9 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
               <div className="modal-body">
                 <form onSubmit={formik.handleSubmit}>
                   {inputConfig.map((input) => (
-                    <ReusableInput
+                    <ReusableInputEdit
                       key={input.name}
+                      label={input.label}
                       placeholder={input.placeholder}
                       type={input.type || "text"}
                       name={input.name}
@@ -211,7 +219,7 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
                   ))}
 
                   {fromToInputConfig.map((input) => (
-                    <FromToInput
+                    <FromToInputEdit
                       key={input.fromName}
                       placeholder={input.placeholder}
                       inputType={input.inputType}
@@ -230,6 +238,7 @@ const UpdateMarketModal = ({ showModal, closeModal, market, onUpdate }) => {
                         formik.touched[input.toName] &&
                         formik.errors[input.toName]
                       } // Show error if touched
+                      label={input.label}
                       options={input.options}
                     />
                   ))}
