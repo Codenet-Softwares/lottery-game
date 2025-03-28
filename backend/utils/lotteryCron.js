@@ -1,4 +1,5 @@
 import { db } from "../config/firebase.js";
+import TicketRange from "../models/ticketRange.model.js";
 import { getISTTime } from "./commonMethods.js";
 
 export async function updateLottery() {
@@ -32,12 +33,20 @@ export async function updateLottery() {
                 updates.hideMarketUser = true;
             } else if (currentTime > endTime && data.isActive) {
                 updates.isActive = false;
-                updates.hideMarketUser = false;
             }
 
             if (Object.keys(updates).length > 0) {
                 await db.collection("lottery").doc(doc.id).update(updates);
             }
+
+            await TicketRange.update(
+                {
+                    isActive: updates.isActive ?? data.isActive,
+                    hideMarketUser: updates.hideMarketUser ?? data.hideMarketUser,
+                },
+                {
+                    where: { marketId: doc.id },
+                })
         });
 
         await Promise.all(updatePromises); 
