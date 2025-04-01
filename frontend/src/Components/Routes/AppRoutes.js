@@ -29,6 +29,7 @@ import SubAdminWinResult from "../SubAdmin-WinResult/SubAdminWinResult";
 
 import SubAdminReset from "../SubAdminResetPassword/SubAdminReset";
 import DemoMap from "../demoMap";
+import SearchCreatedLotto from "../SearchNew/SearchCreatedLotto";
 
 
 const AppRoutes = () => {
@@ -74,6 +75,7 @@ const AppRoutes = () => {
 
             <Route path="/win" element={<Win />} />
             <Route path="/search-lottery" element={<SearchLottery />} />
+            <Route path="/search-lotto" element={<SearchCreatedLotto/>} />
             <Route path="/get-void-market" element={<Void />} />
 
             <Route path="/inactive" element={<Inactive />} />
