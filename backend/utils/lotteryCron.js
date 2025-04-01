@@ -29,8 +29,11 @@ export async function updateLottery() {
             if (currentTime >= startTime && currentTime <= endTime && !data.isActive) {
                 updates.isActive = true;
                 updates.hideMarketUser = true;
-            } else if (currentTime > endTime && data.isActive) {
+                updates.inactiveGame = true
+                updates.updatedAt =  new Date()
+            } else if (currentTime >= endTime && data.isActive) {
                 updates.isActive = false;
+                updates.updatedAt =  new Date()
             }
 
             if (Object.keys(updates).length > 0) {
@@ -41,6 +44,7 @@ export async function updateLottery() {
                 {
                     isActive: updates.isActive ?? data.isActive,
                     hideMarketUser: updates.hideMarketUser ?? data.hideMarketUser,
+                    inactiveGame: updates.inactiveGame ?? data.inactiveGame
                 },
                 {
                     where: { marketId: doc.id },
