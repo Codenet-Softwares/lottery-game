@@ -63,6 +63,7 @@ export const saveTicketRange = async (req, res) => {
       price,
       hideMarketUser: false,
       isActive: false,
+      inactiveGame:false
     });
 
     const formatDateTime = (date) =>
@@ -76,6 +77,7 @@ export const saveTicketRange = async (req, res) => {
         date: formatDateTime(ticket.end_time),
         hideMarketUser: ticket.hideMarketUser,
         isActive: ticket.isActive,
+        inactiveGame: ticket.inactiveGame,
       });
 
     return apiResponseSuccess(

@@ -52,7 +52,8 @@ export const getAllMarkets = async (req, res) => {
         },
         isVoid: false,
         isWin: false,
-        isActive: true
+        // isActive: true,
+        inactiveGame: true
       },
     });
 
