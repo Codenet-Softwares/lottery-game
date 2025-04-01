@@ -92,7 +92,7 @@ const MarketInsight = () => {
       setRefresh((prev) => !prev);
       setSelectedMarket((prevState) => ({
         ...prevState,
-        isActive: newStatus,
+        inactiveGame: newStatus,
       }));
       toast.success(`Market is now ${newStatus ? "Active" : "Inactive"}`);
     } else {
@@ -212,7 +212,7 @@ const MarketInsight = () => {
               >
                 <Card.Body>
                   <Card.Title>{market.marketName}</Card.Title>
-                  {market.isActive ? (
+                  {market.inactiveGame ? (
                     <Badge bg="success" className="ms-2">
                       Active
                     </Badge>
@@ -280,8 +280,8 @@ const MarketInsight = () => {
                     className="form-check-input "
                     type="checkbox"
                     id="flexSwitchCheckActive"
-                    checked={selectedMarket.isActive}
-                    onChange={handleMarketStatusToggle}
+                    checked={selectedMarket.inactiveGame}
+                    onChange={() => handleMarketStatusToggle(selectedMarket.inactiveGame)}
                     style={{ cursor: "pointer" }}
                   />
                   <label
