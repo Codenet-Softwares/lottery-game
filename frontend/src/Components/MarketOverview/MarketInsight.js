@@ -70,12 +70,13 @@ const MarketInsight = () => {
 
   //Api implementation for   toggling market status
   const handleMarketStatusToggle = async () => {
+    console.log("inactiveGame", selectedMarket.inactiveGame)
     const newStatus = !selectedMarket.inactiveGame;
     let response;
     showLoader();
     if (selectedMarket.inactiveGame) {
       response = await getUpdateMarket(
-        { marketId: selectedMarket.marketId },
+        { marketId: selectedMarket.marketId, status: newStatus },
         true
       );
     }
