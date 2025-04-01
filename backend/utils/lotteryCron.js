@@ -3,7 +3,7 @@ import TicketRange from "../models/ticketRange.model.js";
 import { getISTTime } from "./commonMethods.js";
 
 export async function updateLottery() {
-    const currentTime = getISTTime(); 
+    const currentTime = getISTTime();
 
     try {
         const snapshot = await db.collection("lottery").get();
@@ -14,44 +14,51 @@ export async function updateLottery() {
             let startTime = data.start_time;
             let endTime = data.end_time;
 
-            if (!startTime || !endTime) {
-                return; 
-            }
+            if (!startTime || !endTime) return;
 
             startTime = parseDate(startTime);
             endTime = parseDate(endTime);
 
-            if (!startTime || !endTime || isNaN(startTime) || isNaN(endTime)) {
-                return;
-            }
+            if (!startTime || !endTime || isNaN(startTime) || isNaN(endTime)) return;
 
             let updates = {};
-            if (currentTime >= startTime && currentTime <= endTime && !data.isActive) {
-                updates.isActive = true;
-                updates.hideMarketUser = true;
-                updates.inactiveGame = true
-                updates.updatedAt =  new Date()
-            } else if (currentTime >= endTime && data.isActive) {
-                updates.isActive = false;
-                updates.updatedAt =  new Date()
+            let shouldUpdate = false;
+
+            if (currentTime >= startTime && currentTime <= endTime) {
+                if (!data.isActive) { 
+                    updates.isActive = true;
+                    updates.hideMarketUser = true;
+                    updates.inactiveGame = true;
+                    updates.updatedAt = new Date();
+                    shouldUpdate = true;
+                }
+            }
+            
+            else if (currentTime >= endTime) {
+                if (data.isActive) { 
+                    updates.isActive = false;
+                    updates.updatedAt = new Date();
+                    shouldUpdate = true;
+                    clearInterval(lotteryUpdater);
+                }
             }
 
-            if (Object.keys(updates).length > 0) {
+            if (shouldUpdate) {
                 await db.collection("lottery").doc(doc.id).update(updates);
+                await TicketRange.update(
+                    {
+                        isActive: updates.isActive ?? data.isActive,
+                        hideMarketUser: updates.hideMarketUser ?? data.hideMarketUser,
+                        inactiveGame: updates.inactiveGame ?? data.inactiveGame
+                    },
+                    {
+                        where: { marketId: doc.id },
+                    }
+                );
             }
-
-            await TicketRange.update(
-                {
-                    isActive: updates.isActive ?? data.isActive,
-                    hideMarketUser: updates.hideMarketUser ?? data.hideMarketUser,
-                    inactiveGame: updates.inactiveGame ?? data.inactiveGame
-                },
-                {
-                    where: { marketId: doc.id },
-                })
         });
 
-        await Promise.all(updatePromises); 
+        await Promise.all(updatePromises);
     } catch (error) {
         console.error("Error updating lottery:", error);
     }
@@ -71,3 +78,6 @@ function parseDate(dateInput) {
         return null;
     }
 }
+
+
+const lotteryUpdater = setInterval(updateLottery, 1000);
