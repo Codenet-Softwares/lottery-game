@@ -104,6 +104,7 @@ export const saveTicketRange = async (req, res) => {
       res
     );
 };
+}
 
 export const updateMarket = async (req, res) => {
   try {
