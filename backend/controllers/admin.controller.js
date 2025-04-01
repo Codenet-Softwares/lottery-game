@@ -911,9 +911,9 @@ export const updateMarketStatus = async (req, res) => {
 
     await marketRef.set(
       {
-        isActive: Boolean(status),
-        hideMarketUser: Boolean(status),
-        inactiveGame: true,
+        // isActive: Boolean(status),
+        // hideMarketUser: Boolean(status),
+        // inactiveGame: true,
         updatedAt: new Date()
       },
       { merge: true }

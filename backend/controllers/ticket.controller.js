@@ -69,23 +69,13 @@ export const saveTicketRange = async (req, res) => {
       date.toISOString().slice(0, 19).replace("T", " ");
 
     // Save data to Firestore
-    await db
-      .collection("lottery")
-      .doc(ticket.marketId)
-      .set({
+    await db.collection("lottery").doc(ticket.marketId).set({
         start_time: formatDateTime(ticket.start_time),
         end_time: formatDateTime(ticket.end_time),
         marketName: ticket.marketName,
         date: formatDateTime(ticket.end_time),
         hideMarketUser: ticket.hideMarketUser,
         isActive: ticket.isActive,
-        price: ticket.price,
-        group_start: ticket.group_start,
-        group_end: ticket.group_end,
-        series_start: ticket.series_start,
-        series_end: ticket.series_end,
-        number_start: ticket.number_start,
-        number_end: ticket.number_end,
       });
 
     return apiResponseSuccess(
@@ -189,10 +179,10 @@ export const updateMarket = async (req, res) => {
     await ticketRange.update(updates);
 
     const firestoreRef = db.collection("lottery").doc(marketId);
-    await firestoreRef.set({updatedAt: new Date()});
+    await firestoreRef.set({updatedAt: new Date()}, { merge: true });
 
     return apiResponseSuccess(
-      { ...ticketRange.toJSON(), isUpdate: true }, // Send updated data
+      { ...ticketRange.toJSON(), isUpdate: true },
       true,
       statusCode.success,
       "Lottery market updated successfully.",
