@@ -16,4 +16,4 @@ const initializeFirebase = () => {
   }
 };
 
-export const db = initializeFirebase();
+export const db = initializeFirebase(); 
