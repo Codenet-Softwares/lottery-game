@@ -15,7 +15,6 @@ export async function updateLottery() {
             let endTime = data.end_time;
 
             if (!startTime || !endTime) {
-                console.warn(`Missing start_time or end_time for document: ${doc.id}`);
                 return; 
             }
 
