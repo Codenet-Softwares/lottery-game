@@ -73,9 +73,8 @@ const MarketInsight = () => {
     const newStatus = !selectedMarket.isActive;
     let response;
     showLoader();
-
-    response = await getUpdateMarket(
-      { marketId: selectedMarket.marketId },
+    response = await isActiveLottery(
+      { status: newStatus, marketId: selectedMarket.marketId },
       true
     );
 
@@ -93,6 +92,12 @@ const MarketInsight = () => {
 
     hideLoader();
   };
+
+
+
+
+
+
 
   useEffect(() => {
     if (!refresh) {
