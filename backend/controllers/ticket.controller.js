@@ -134,7 +134,7 @@ export const updateMarket = async (req, res) => {
       "price",
     ];
     const updates = { isUpdate: true }; // Set isUpdate to true when API is hit
-    const firestoreUpdates = {};
+    // const firestoreUpdates = {};
 
     for (const [key, value] of Object.entries(updatedFields)) {
       if (!allowedFields.includes(key)) continue;
@@ -152,8 +152,8 @@ export const updateMarket = async (req, res) => {
         }
         updates[`${key}_start`] = min;
         updates[`${key}_end`] = max;
-        firestoreUpdates[`${key}_start`] = min;
-        firestoreUpdates[`${key}_end`] = max;
+        // firestoreUpdates[`${key}_start`] = min;
+        // firestoreUpdates[`${key}_end`] = max;
       } else if (key === "series") {
         const { start, end } = value || {};
         if (start === undefined || end === undefined) {
@@ -167,11 +167,11 @@ export const updateMarket = async (req, res) => {
         }
         updates[`${key}_start`] = start;
         updates[`${key}_end`] = end;
-        firestoreUpdates[`${key}_start`] = start;
-        firestoreUpdates[`${key}_end`] = end;
+        // firestoreUpdates[`${key}_start`] = start;
+        // firestoreUpdates[`${key}_end`] = end;
       } else {
         updates[key] = value;
-        firestoreUpdates[key] = value;
+        // firestoreUpdates[key] = value;
       }
     }
 
@@ -189,7 +189,7 @@ export const updateMarket = async (req, res) => {
     await ticketRange.update(updates);
 
     const firestoreRef = db.collection("lottery").doc(marketId);
-    await firestoreRef.update(firestoreUpdates);
+    await firestoreRef.set({updatedAt: new Date()});
 
     return apiResponseSuccess(
       { ...ticketRange.toJSON(), isUpdate: true }, // Send updated data
