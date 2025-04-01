@@ -287,7 +287,7 @@ const MarketInsight = () => {
                     className="form-check-label"
                     htmlFor="flexSwitchCheckActive"
                   >
-                    {selectedMarket.isActive ? "Active" : "Inactive"}
+                    {selectedMarket.inactiveGame ? "Active" : "Inactive"}
                   </label>
                 </div>
               </div>
