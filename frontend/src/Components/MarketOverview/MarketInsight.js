@@ -73,18 +73,11 @@ const MarketInsight = () => {
     const newStatus = !selectedMarket.isActive;
     let response;
     showLoader();
-    if (selectedMarket.isActive) {
-      response = await getUpdateMarket(
-        { marketId: selectedMarket.marketId },
-        true
-      );
-    }
-    else {
-      response = await isActiveLottery(
-        { status: newStatus, marketId: selectedMarket.marketId },
-        true
-      );
-    }
+
+    response = await getUpdateMarket(
+      { marketId: selectedMarket.marketId },
+      true
+    );
 
     console.log("line number 71", response);
     if (response && response.success) {
