@@ -70,15 +70,21 @@ const MarketInsight = () => {
 
   //Api implementation for   toggling market status
   const handleMarketStatusToggle = async () => {
-    const newStatus = !selectedMarket.isActive;
+    const newStatus = !selectedMarket.inactiveGame;
     let response;
     showLoader();
-
-    response = await isActiveLottery(
-      { status: newStatus, marketId: selectedMarket.marketId },
-      true
-    );
-
+    if (selectedMarket.inactiveGame) {
+      response = await getUpdateMarket(
+        { marketId: selectedMarket.marketId },
+        true
+      );
+    }
+    else {
+      response = await isActiveLottery(
+        { status: newStatus, marketId: selectedMarket.marketId },
+        true
+      );
+    }
 
     console.log("line number 71", response);
     if (response && response.success) {
@@ -94,18 +100,6 @@ const MarketInsight = () => {
 
     hideLoader();
   };
-
-
-
-
-
-
-
-
-
-
-
-
 
   useEffect(() => {
     if (!refresh) {
