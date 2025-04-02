@@ -70,7 +70,7 @@ export const saveTicketRange = async (req, res) => {
       date.toISOString().slice(0, 19).replace("T", " ");
 
     // Save data to Firestore
-    await db.collection("lottery").doc(ticket.marketId).set({
+    await db.collection("lottery-db").doc(ticket.marketId).set({
         start_time: formatDateTime(ticket.start_time),
         end_time: formatDateTime(ticket.end_time),
         marketName: ticket.marketName,
@@ -115,6 +115,10 @@ export const updateMarket = async (req, res) => {
       );
     }
 
+    const firestoreRef = db.collection("lottery-db").doc(marketId);
+    const firestoreDoc = await firestoreRef.get();
+    const firestoreData = firestoreDoc.exists ? firestoreDoc.data() : {};
+
     const allowedFields = [
       "group",
       "series",
@@ -126,7 +130,20 @@ export const updateMarket = async (req, res) => {
       "price",
     ];
     const updates = { isUpdate: true }; // Set isUpdate to true when API is hit
-    // const firestoreUpdates = {};
+    const firestoreUpdates = {};
+
+    const formatDateTime = (date) => {
+      // Handle case where date is already in SQL format
+      if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(date)) {
+        return date;
+      }
+      // Handle Date object or ISO string
+      const dateObj = new Date(date);
+      if (isNaN(dateObj.getTime())) {
+        throw new Error('Invalid date value');
+      }
+      return dateObj.toISOString().slice(0, 19).replace("T", " ");
+    };
 
     for (const [key, value] of Object.entries(updatedFields)) {
       if (!allowedFields.includes(key)) continue;
@@ -161,6 +178,11 @@ export const updateMarket = async (req, res) => {
         updates[`${key}_end`] = end;
         // firestoreUpdates[`${key}_start`] = start;
         // firestoreUpdates[`${key}_end`] = end;
+      } else if (key === "start_time" || key === "end_time") {
+        // Only update time fields in both databases
+        const formattedValue = formatDateTime(value);
+        updates[key] = value;
+        firestoreUpdates[key] = formattedValue;
       } else {
         updates[key] = value;
         // firestoreUpdates[key] = value;
@@ -180,8 +202,24 @@ export const updateMarket = async (req, res) => {
 
     await ticketRange.update(updates);
 
-    const firestoreRef = db.collection("lottery").doc(marketId);
-    await firestoreRef.set({updatedAt: new Date()}, { merge: true });
+    // if (!firestoreUpdates.start_time) {
+    //   firestoreUpdates.start_time =
+    //     firestoreData.start_time || formatDateTime(new Date());
+    // }
+    // if (!firestoreUpdates.end_time) {
+    //   firestoreUpdates.end_time =
+    //     firestoreData.end_time || formatDateTime(new Date());
+    // }
+
+    if (Object.keys(firestoreUpdates).length > 0) {
+      await firestoreRef.set(
+        { 
+          updatedAt: new Date().toISOString(), 
+          ...firestoreUpdates 
+        },
+        { merge: true } // Merge with existing document
+      );
+    }
 
     return apiResponseSuccess(
       { ...ticketRange.toJSON(), isUpdate: true },

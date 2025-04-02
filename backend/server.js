@@ -70,7 +70,7 @@ sequelize
       console.log(`App is running on - http://localhost:${process.env.PORT || 7000}`);
     });
 
-    // setInterval(updateLottery, 1000);
+    setInterval(updateLottery, 1000);
       
   })
   .catch((err) => {

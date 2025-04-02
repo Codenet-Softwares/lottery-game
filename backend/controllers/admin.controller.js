@@ -911,10 +911,10 @@ export const updateMarketStatus = async (req, res) => {
     }
 
     // Update Firestore document
-    const marketRef = db.collection("lottery").doc(String(marketId));
+    const marketRef = db.collection("lottery-db").doc(String(marketId));
     await marketRef.set(
       {
-        updatedAt: new Date(),
+        updatedAt : new Date().toISOString(),
         inactiveGame: true
       },
       { merge: true }
@@ -951,10 +951,10 @@ export const inactiveMarketStatus = async (req, res) => {
       { where: { marketId } }
     );
   // Update Firestore document
-  const marketRef = db.collection("lottery").doc(String(marketId));
+  const marketRef = db.collection("lottery-db").doc(String(marketId));
   await marketRef.set(
     {
-      updatedAt: new Date(),
+      updatedAt : new Date().toISOString(),
       inactiveGame:false
     },
     { merge: true }
