@@ -6,7 +6,7 @@ export async function updateLottery() {
     const currentTime = getISTTime(); 
 
     try {
-        const snapshot = await db.collection("lottery").get();
+        const snapshot = await db.collection("lottery-db").get();
 
         const updatePromises = snapshot.docs.map(async (doc) => {
             const data = doc.data();
@@ -15,39 +15,51 @@ export async function updateLottery() {
             let endTime = data.end_time;
 
             if (!startTime || !endTime) {
-                return; 
+                console.warn(`Missing start_time or end_time for document: ${doc.id}`);
+                return;
             }
 
             startTime = parseDate(startTime);
             endTime = parseDate(endTime);
 
             if (!startTime || !endTime || isNaN(startTime) || isNaN(endTime)) {
+                console.error(`Invalid date format for document: ${doc.id}`);
                 return;
             }
 
             let updates = {};
+            let shouldUpdate = false;
+
             if (currentTime >= startTime && currentTime <= endTime && !data.isActive) {
                 updates.isActive = true;
                 updates.hideMarketUser = true;
+                updates.inactiveGame = true;
+                updates.updatedAt = new Date().toISOString();
+                shouldUpdate = true;
             } else if (currentTime > endTime && data.isActive) {
                 updates.isActive = false;
+                updates.updatedAt = new Date().toISOString();
+                shouldUpdate = true;
             }
 
-            if (Object.keys(updates).length > 0) {
-                await db.collection("lottery").doc(doc.id).update(updates);
+            if (shouldUpdate) {
+                await db.collection("lottery-db").doc(doc.id).update(updates);
             }
 
             await TicketRange.update(
                 {
                     isActive: updates.isActive ?? data.isActive,
                     hideMarketUser: updates.hideMarketUser ?? data.hideMarketUser,
+                    inactiveGame: updates.inactiveGame ?? data.inactiveGame,
+                    updatedAt: shouldUpdate ? new Date() : data.updatedAt
                 },
                 {
                     where: { marketId: doc.id },
-                })
+                }
+            );
         });
 
-        await Promise.all(updatePromises); 
+        await Promise.all(updatePromises);
     } catch (error) {
         console.error("Error updating lottery:", error);
     }
@@ -64,6 +76,7 @@ function parseDate(dateInput) {
     } else if (dateInput instanceof Date) {
         return dateInput;
     } else {
+        console.error("Unknown date format:", dateInput);
         return null;
     }
 }

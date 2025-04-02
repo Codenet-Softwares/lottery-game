@@ -70,22 +70,29 @@ const MarketInsight = () => {
 
   //Api implementation for   toggling market status
   const handleMarketStatusToggle = async () => {
-    const newStatus = !selectedMarket.isActive;
+    console.log("inactiveGame", selectedMarket.inactiveGame)
+    const newStatus = !selectedMarket.inactiveGame;
     let response;
     showLoader();
-
-    response = await isActiveLottery(
-      { status: newStatus, marketId: selectedMarket.marketId },
-      true
-    );
-
+    if (selectedMarket.inactiveGame) {
+      response = await getUpdateMarket(
+        { marketId: selectedMarket.marketId, status: newStatus },
+        true
+      );
+    }
+    else {
+      response = await isActiveLottery(
+        { status: newStatus, marketId: selectedMarket.marketId },
+        true
+      );
+    }
 
     console.log("line number 71", response);
     if (response && response.success) {
       setRefresh((prev) => !prev);
       setSelectedMarket((prevState) => ({
         ...prevState,
-        isActive: newStatus,
+        inactiveGame: newStatus,
       }));
       toast.success(`Market is now ${newStatus ? "Active" : "Inactive"}`);
     } else {
@@ -94,18 +101,6 @@ const MarketInsight = () => {
 
     hideLoader();
   };
-
-
-
-
-
-
-
-
-
-
-
-
 
   useEffect(() => {
     if (!refresh) {
@@ -217,7 +212,7 @@ const MarketInsight = () => {
               >
                 <Card.Body>
                   <Card.Title>{market.marketName}</Card.Title>
-                  {market.isActive ? (
+                  {market.inactiveGame ? (
                     <Badge bg="success" className="ms-2">
                       Active
                     </Badge>
@@ -285,15 +280,15 @@ const MarketInsight = () => {
                     className="form-check-input "
                     type="checkbox"
                     id="flexSwitchCheckActive"
-                    checked={selectedMarket.isActive}
-                    onChange={handleMarketStatusToggle}
+                    checked={selectedMarket.inactiveGame}
+                    onChange={() => handleMarketStatusToggle(selectedMarket.inactiveGame)}
                     style={{ cursor: "pointer" }}
                   />
                   <label
                     className="form-check-label"
                     htmlFor="flexSwitchCheckActive"
                   >
-                    {selectedMarket.isActive ? "Active" : "Inactive"}
+                    {selectedMarket.inactiveGame ? "Active" : "Inactive"}
                   </label>
                 </div>
               </div>

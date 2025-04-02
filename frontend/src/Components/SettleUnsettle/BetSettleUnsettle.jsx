@@ -3,6 +3,7 @@ import Pagination from "../Common/Pagination";
 import { GetBetMarketStats, DeleteLiveBetMarket } from "../../Utils/apiService";
 import ReusableModal from "../Reusables/ReusableModal";
 import { useAppContext } from "../../contextApi/context";
+import "./BetSettleUnsettle.css";
 
 const BetSettleUnsettle = ({ marketId, backButton }) => {
   const [betStats, setBetStats] = useState(null);
@@ -18,19 +19,24 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
     totalItems: 0,
   });
 
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
   const fetchLiveBetMarketStats = async () => {
     try {
       const response = await GetBetMarketStats({
         marketId,
         page: pagination.page,
         limit: pagination.limit,
-        search:searchTerm,
+        search: debouncedSearchTerm,
       });
 
-      console.log("API Response===========================", response);
-
       if (response?.success) {
-        
         setBetStats(response.data);
         setPagination((prev) => ({
           page: response.pagination?.page || prev.page,
@@ -45,17 +51,18 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
       console.error("Error fetching market stats:", error);
     }
   };
+
   useEffect(() => {
     if (marketId) {
       fetchLiveBetMarketStats();
     }
-  }, [marketId, pagination.page, pagination.limit, searchTerm]);
-  
+  }, [marketId, pagination.page, pagination.limit, debouncedSearchTerm]);
+
   const handleShowTickets = (details) => {
     const ticketsBody = details.map((detail) => (
-      <div key={detail.sem} className="mb-4 ticket-section">
+      <div key={detail.sem} className="bet-settle-ticket-section mb-4">
         <div>
-          <div className="ticket-header d-flex justify-content-between align-items-center">
+          <div className="bet-settle-ticket-header">
             <h6 className="text-primary fw-bold mb-0">
               SEM: {detail.sem} | Amount: ₹{detail.lotteryPrice}
             </h6>
@@ -67,7 +74,7 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
             </button>
           </div>
         </div>
-        <div className="ticket-scroll-container">
+        <div className="bet-settle-ticket-scroll-container">
           <ul className="list-group">
             {detail.tickets.map((ticket, idx) => (
               <li
@@ -84,91 +91,74 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
 
     setModalContent({
       title: "Purchased Tickets",
-      body: <div className="modal-body-container">{ticketsBody}</div>,
+      body: (
+        <div className="bet-settle-modal-body-container">{ticketsBody}</div>
+      ),
     });
     setModalShow(true);
   };
-  const handleDeleteTicket = async (purchaseId) => {
-    const confirmDeletion = window.confirm(
-      "Are you sure you want to delete this live bet? This action is irreversible."
-    );
-  
-    if (confirmDeletion) {
-      try {
-        showLoader();  
-        const response = await DeleteLiveBetMarket({ purchaseId }, false);  
-        if (response.success) {
-          alert("Live bet deleted successfully!"); 
-          // Remove the deleted item from the state instead of refreshing
-          setBetStats((prevStats) =>
-            prevStats
-              .map((user) => ({
-                ...user,
-                details: user.details.filter(
-                  (detail) => detail.purchaseId !== purchaseId
-                ),
-              }))
-              .filter((user) => user.details.length > 0) // Remove users with no remaining bets
-          );  
-          // Close modal
-          setModalShow(false);
-        } else {
-          alert("Failed to delete live bet. Please try again.");
+    const handleDeleteTicket = async (purchaseId) => {
+      const confirmDeletion = window.confirm(
+        "Are you sure you want to delete this live bet? This action is irreversible."
+      );
+      if (confirmDeletion) {
+        try {
+          showLoader();
+          const response = await DeleteLiveBetMarket({ purchaseId }, false);
+          if (response.success) {
+            alert("Live bet deleted successfully!");
+            // Remove the deleted item from the state instead of refreshing
+            setBetStats(
+              (prevStats) =>
+                prevStats
+                  .map((user) => ({
+                    ...user,
+                    details: user.details.filter(
+                      (detail) => detail.purchaseId !== purchaseId
+                    ),
+                  }))
+                  .filter((user) => user.details.length > 0) // Remove users with no remaining bets
+            );
+            // Close modal
+            setModalShow(false);
+          } else {
+            alert("Failed to delete live bet. Please try again.");
+          }
+        } catch (error) {
+          console.error("Error deleting live bet:", error);
+          alert("An error occurred while deleting the live bet.");
+        } finally {
+          hideLoader();
         }
-      } catch (error) {
-        console.error("Error deleting live bet:", error);
-        alert("An error occurred while deleting the live bet.");
-      } finally {
-        hideLoader();
       }
-    }
-  };
-  
-  useEffect(() => {
-    console.log("Market ID================", marketId);
-    if (marketId) {
-      fetchLiveBetMarketStats();
-    }
-  }, [marketId, pagination.page, pagination.limit]);
+    };
 
   const handlePageChange = (page) => {
     setPagination((prev) => ({ ...prev, page }));
   };
+
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
     setPagination((prev) => ({ ...prev, page: 1 }));
   };
+
   const filteredStats = betStats?.filter((user) =>
     user.userName.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
   );
-  const startIndex = (pagination.page - 1) * pagination.limit + 1;
-  const endIndex = Math.min(
-    pagination.page * pagination.limit,
-    pagination.totalItems
-  );
+
+  const startIndex = pagination.totalItems > 0 ? (pagination.page - 1) * pagination.limit + 1 : 0;
+const endIndex = pagination.totalItems > 0 ? Math.min(pagination.page * pagination.limit, pagination.totalItems) : 0;
+
   return (
-    <div className="container mt-4 rounded" style={{ overflow: "hidden",background:"#F0F0F0" }}>
+    <div className="container mt-4 rounded bet-settle-container">
       {betStats ? (
-        <div className="container " style={{ overflow: "hidden" }}>
+        <div className="container border-0" style={{ overflow: "hidden" }}>
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <div
-              className="d-flex justify-content-start mt-5 px-5"
-              style={{ position: "absolute", left: "40px" }}
-            >
+            <div className="bet-settle-back-button d-flex justify-content-start">
               {backButton}
             </div>
 
-            <h3
-              className="text-custom fw-bold d-flex align-items-center mt-3"
-              style={{
-                fontFamily: '"Arial", sans-serif',
-                fontSize: "2rem",
-                color: "#5a8f7d",
-                textShadow: "1px 1px 4px rgba(0, 0, 0, 0.2)",
-                marginLeft: "auto",
-                marginRight: "auto",
-              }}
-            >
+            <h3 className="bet-settle-header fw-bold d-flex align-items-center mt-3">
               Market Stats For {betStats[0]?.marketName}
             </h3>
           </div>
@@ -176,93 +166,41 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
           <div className="d-flex align-items-center mb-3">
             <input
               type="text"
-              className="form-control"
+              className="form-control bet-settle-search-input"
               placeholder="Search by username"
               aria-label="Search"
               aria-describedby="button-search"
               value={searchTerm}
               onChange={handleSearchChange}
-              style={{
-                borderRadius: "50px",
-                border: "1px solid #4682B4",
-                paddingLeft: "30px",
-                background: "linear-gradient(to right, #e6f7ff, #4682B4)",
-                boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-                transition: "all 0.3s ease",
-              }}
-              onFocus={(e) =>
-                (e.target.style.boxShadow = "0 4px 15px rgba(0, 0, 0, 0.2)")
-              }
-              onBlur={(e) =>
-                (e.target.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.1)")
-              }
             />
           </div>
 
           <div className="table-responsive">
             <table className="table table-striped table-bordered table-hover shadow m-0">
-              <thead className="bg-primary text-white">
+              <thead className="bet-settle-table-header">
                 <tr>
-                  <th style={{ textAlign: "center", border: "none" }}>
-                    Serial Number
-                  </th>
-                  <th
-                    style={{
-                      width: "29.3%",
-                      textAlign: "center",
-                      border: "none",
-                    }}
-                  >
-                    Username
-                  </th>
-                  <th
-                    style={{
-                      width: "30%",
-                      textAlign: "center",
-                      border: "none",
-                    }}
-                  >
-                    Total Amount
-                  </th>
-                  <th
-                    style={{
-                      width: "31.1%",
-                      textAlign: "center",
-                      border: "none",
-                    }}
-                  >
-                    Actions
-                  </th>
+                  <th>Serial Number</th>
+                  <th>Username</th>
+                  <th>Total Amount</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
             </table>
 
-            <div
-              style={{
-                maxHeight: "300px",
-                overflowY: "auto",
-                borderTop: "1px solid #dee2e6",
-              }}
-            >
+            <div className="bet-settle-table-container">
               <table className="table table-striped table-bordered table-hover shadow m-0">
                 <tbody>
                   {filteredStats?.length > 0 ? (
                     filteredStats.map((user, idx) => (
                       <tr key={idx} style={{ border: "none" }}>
                         <td>{startIndex + idx}</td>
-                        <td
-                          className="fw-bold text-secondary"
-                          style={{ width: "30%", textAlign: "center" }}
-                        >
+                        <td className="bet-settle-username-cell">
                           {user.userName}
                         </td>
-                        <td
-                          className="fw-bold text-success"
-                          style={{ width: "30%", textAlign: "center" }}
-                        >
+                        <td className="bet-settle-amount-cell">
                           ₹{user.amount}
                         </td>
-                        <td style={{ width: "30%", textAlign: "center" }}>
+                        <td className="bet-settle-actions-cell">
                           <button
                             className="btn btn-info"
                             onClick={() => handleShowTickets(user.details)}

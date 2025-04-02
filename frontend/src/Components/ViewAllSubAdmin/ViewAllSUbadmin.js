@@ -87,12 +87,15 @@ const ViewAllSubadmin = () => {
       </div> */}
       {/* Sub-Admin Delete Modal End*/}
 
-      <div>
+      <div
+        className="p-4 rounded-4 text-center shadow-lg"
+        style={{ background: "#F9F9F9", border: "2px solid gray" }}
+      >
         <ReusableTable
           data={subAdmins}
           columns={columns}
           itemsPerPage={5}
-          tableHeading="Sub Admin List"
+          tableHeading="SUB ADMIN LIST"
           showSearch={true}
           paginationVisible={true}
           handleAction={handleAction}

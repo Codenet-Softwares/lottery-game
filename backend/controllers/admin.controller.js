@@ -874,11 +874,11 @@ export const updateMarketStatus = async (req, res) => {
   try {
     const { status, marketId } = req.body;
 
-    console.log("status......................",status)
-    console.log("marketId......................",marketId)
+    console.log("status......................", status);
+    console.log("marketId......................", marketId);
 
-
-    if (typeof status === "undefined" || !marketId) {
+    // Validate that status is boolean and marketId exists
+    if (typeof status !== 'boolean' || !marketId) {
       return apiResponseErr(
         null,
         false,
@@ -888,15 +888,18 @@ export const updateMarketStatus = async (req, res) => {
       );
     }
 
+    // Update in the TicketRange model
     const [updatedCount] = await TicketRange.update(
       {
         isActive: status,
-        hideMarketUser: status ? true : Sequelize.col("hideMarketUser"),
+        hideMarketUser: status,
+        inactiveGame:true
       },
       { where: { marketId } }
     );
 
-       console.log("...............",updatedCount)
+    console.log("...............", updatedCount);
+    
     if (updatedCount === 0) {
       return apiResponseErr(
         null,
@@ -907,14 +910,12 @@ export const updateMarketStatus = async (req, res) => {
       );
     }
 
-    const marketRef = db.collection("lottery").doc(String(marketId));
-
+    // Update Firestore document
+    const marketRef = db.collection("lottery-db").doc(String(marketId));
     await marketRef.set(
       {
-        // isActive: Boolean(status),
-        // hideMarketUser: Boolean(status),
-        // inactiveGame: true,
-        updatedAt: new Date()
+        updatedAt : new Date().toISOString(),
+        inactiveGame: true
       },
       { merge: true }
     );
@@ -938,45 +939,53 @@ export const updateMarketStatus = async (req, res) => {
 };
 
 
-// export const inactiveMarketStatus = async (req, res) => {
-//   const { marketId } = req.body;
+export const inactiveMarketStatus = async (req, res) => {
+  const { marketId } = req.body;
 
-//   try {
-//     const [updatedCount] = await TicketRange.update(
-//       {
-//         //isActive: false,
-//         inactiveGame: false,
-//       },
-//       { where: { marketId } }
-//     );
-
-//     if (updatedCount === 0) {
-//       return apiResponseErr(
-//         null,
-//         false,
-//         statusCode.badRequest,
-//         "Market not found",
-//         res
-//       );
-//     } else {
-//       return apiResponseSuccess(
-//         { updatedCount },
-//         true,
-//         statusCode.success,
-//         "Market updated successfully",
-//         res
-//       );
-//     }
-//   } catch (error) {
-//     return apiResponseErr(
-//       null,
-//       false,
-//       statusCode.internalServerError,
-//       error.message,
-//       res
-//     );
-//   }
-// };
+  try {
+    const [updatedCount] = await TicketRange.update(
+      {
+        //isActive: false,
+        inactiveGame: false,
+      },
+      { where: { marketId } }
+    );
+  // Update Firestore document
+  const marketRef = db.collection("lottery-db").doc(String(marketId));
+  await marketRef.set(
+    {
+      updatedAt : new Date().toISOString(),
+      inactiveGame:false
+    },
+    { merge: true }
+  );
+    if (updatedCount === 0) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Market not found",
+        res
+      );
+    } else {
+      return apiResponseSuccess(
+        { updatedCount },
+        true,
+        statusCode.success,
+        "Market updated successfully",
+        res
+      );
+    }
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
 
 export const liveMarkets = async (req, res) => {
   try {
