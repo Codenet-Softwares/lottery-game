@@ -1,78 +1,102 @@
 import { useEffect, useState, useCallback } from "react";
-import { toast } from "react-toastify";
-import { generateLotteryOptions } from "../../Utils/helper";
 import { LotteryRange, SearchLotteryTicket } from "../../Utils/apiService";
 import { getInitialLotteryData } from "../../Utils/getInitialState";
+import { generateLotteryOptions } from "../../Utils/helper";
+import * as Yup from "yup";
 
-const UseSearchData = (MarketId) => {
-  const [lotteryData, setLotteryData] = useState(getInitialLotteryData());
+const UseSearchData = () => {
+  const [state, setState] = useState({
+    lotteryData: getInitialLotteryData(),
+    allMarkets: [],
+    searchTerm: "",
+    debouncedSearchTerm: "",
+    selectedMarket: null,
+    showSearch: true,
+  });
 
-  //all input boxes with dropdown defined here
+  const validationSchema = Yup.object().shape({
+    selectedSem: Yup.string().required("SEM is required"),
+    selectedGroup: Yup.string().required("Group is required"),
+    selectedSeries: Yup.string().required("Series is required"),
+    selectedNumber: Yup.string().required("Number is required"),
+  });
+
   const DROPDOWN_FIELDS = [
-    { label: "Sem Value", stateKey: "semValues", field: "selectedSem" },
+    { label: "SEM", stateKey: "semValues", field: "selectedSem" },
     { label: "Group", stateKey: "groups", field: "selectedGroup" },
     { label: "Series", stateKey: "series", field: "selectedSeries" },
     { label: "Number", stateKey: "numbers", field: "selectedNumber" },
   ];
 
-  // FETCHING ALL THE DROPDOWN DATA WITH RESPECT TO EACH MARKETID ONLY
-  const fetchLotteryData = useCallback(async () => {
-    const response = await LotteryRange();
+  // FETCHING ALL THE MARKETNAMES INSIDE THE LEFT SIDEBAR OF THE THE SEARCH LOTTERY 
+  const fetchAllMarkets = useCallback(async () => {
+    const response = await LotteryRange({ search: state.debouncedSearchTerm });
+    setState((prev) => ({ ...prev, allMarkets: response?.data || [] }));
+  }, [state.debouncedSearchTerm]);
 
-    const marketData = response?.data?.find(
-      (market) => market?.marketId === MarketId
-    );
+  const updateLotteryData = useCallback((marketData) => {
+    if (!marketData) return;
 
-    if (marketData) {
-      const {
-        group_start,
-        group_end,
-        series_start,
-        series_end,
-        number_start,
-        number_end,
-        marketName,
-        start_time,
-        end_time,
-        isActive,
-        price,
-      } = marketData;
+    const { groupOptions, seriesOptions, numberOptions } =
+      generateLotteryOptions(
+        marketData.group_start,
+        marketData.group_end,
+        marketData.series_start,
+        marketData.series_end,
+        marketData.number_start,
+        marketData.number_end
+      );
 
-      const { groupOptions, seriesOptions, numberOptions } =
-        generateLotteryOptions(
-          group_start,
-          group_end,
-          series_start,
-          series_end,
-          number_start,
-          number_end
-        );
-
-      setLotteryData((prevData) => ({
-        ...prevData,
+    setState((prev) => ({
+      ...prev,
+      lotteryData: {
+        ...prev.lotteryData,
         groups: groupOptions,
         series: seriesOptions,
         numbers: numberOptions,
-        marketName: marketName || "Unknown Market",
-
-        endTimeForShowCountdown: end_time,
-        startTimeForShowCountdown: start_time,
-        isSuspend: !isActive,
-        price: price,
-      }));
-    }
-  }, [MarketId]);
+        semValues: ["5", "10", "25", "50", "100", "200"],
+        marketName: marketData.marketName,
+        price: marketData.price,
+        isSuspend: !marketData.isActive,
+        endTimeForShowCountdown: marketData.end_time,
+        startTimeForShowCountdown: marketData.start_time,
+      },
+      selectedMarket: marketData,
+    }));
+  }, []);
 
   useEffect(() => {
-    setLotteryData(getInitialLotteryData());
-    fetchLotteryData();
-  }, [MarketId, lotteryData.isUpdate]);
+    const timer = setTimeout(() => {
+      setState((prev) => ({ ...prev, debouncedSearchTerm: prev.searchTerm }));
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [state.searchTerm]);
 
-  // API FETCHING FOR THE SEARCH BUTTON AFTER WHICH THE SEARCHRESULTSNEW PAGE IS EXECUTED
+  useEffect(() => {
+    fetchAllMarkets();
+  }, [fetchAllMarkets]);
+
+  const handleSearchChange = (event) => {
+    setState((prev) => ({ ...prev, searchTerm: event.target.value }));
+  };
+
+  const handleMarketClick = useCallback(
+    (market) => {
+      setState((prev) => ({
+        ...prev,
+        showSearch: true, // Add this line to ensure form is shown
+        selectedMarket: market,
+      }));
+      updateLotteryData(market);
+    },
+    [updateLotteryData]
+  );
+
+ // FETCHING EACH MARKET TICKETS  WITH RESPECT TO THE MARKETID 
   const handleSubmit = useCallback(
     async (values, { setSubmitting, resetForm }) => {
       const requestBody = {
-        marketId: MarketId,
+        marketId: state.selectedMarket?.marketId,
         sem: values.selectedSem ? parseInt(values.selectedSem) : null,
         group: values.selectedGroup,
         series: values.selectedSeries,
@@ -81,35 +105,46 @@ const UseSearchData = (MarketId) => {
 
       const response = await SearchLotteryTicket(requestBody);
 
-      setLotteryData((prevData) => ({
-        ...prevData,
-        searchResult: response?.data || null, // Store search results
+      setState((prev) => ({
+        ...prev,
+        lotteryData: {
+          ...prev.lotteryData,
+          searchResult: response?.data || null,
+          refreshKey: prev.lotteryData.refreshKey + 1,
+        },
+        showSearch: false,
       }));
 
       resetForm();
       setSubmitting(false);
-      setLotteryData((prevData) => ({
-        ...prevData,
-        refreshKey: prevData.refreshKey + 1, // Trigger refresh
-      }));
+      return response;
     },
-    [MarketId, setLotteryData]
+    [state.selectedMarket]
   );
 
-  //back button after search button clicked
   const handleBack = () => {
-    setLotteryData((prevData) => ({
-      ...prevData,
-      searchResult: null,
+    setState((prev) => ({
+      ...prev,
+      showSearch: true,
+      lotteryData: {
+        ...prev.lotteryData,
+        searchResult: null,
+      },
     }));
   };
 
   return {
-    lotteryData,
-    fetchLotteryData,
+    lotteryData: state.lotteryData,
+    allMarkets: state.allMarkets,
+    searchTerm: state.searchTerm,
+    selectedMarket: state.selectedMarket,
+    showSearch: state.showSearch,
+    validationSchema,
+    DROPDOWN_FIELDS,
+    handleSearchChange,
+    handleMarketClick,
     handleSubmit,
     handleBack,
-    DROPDOWN_FIELDS,
   };
 };
 
