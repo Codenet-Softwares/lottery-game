@@ -27,7 +27,7 @@ const DashCard = [
     name: "Search Lottery",
     description: "Search for created lotteries quickly.",
     buttonName: "Search",
-    buttonLink: "/search-lottery",
+    buttonLink: "/search-lotto",
     cardstyle: {
       borderRadius: "20px",
       backgroundColor: "rgb(209 99 107)",

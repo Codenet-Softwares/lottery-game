@@ -97,3 +97,20 @@ export function getLotteryRange(body = {}) {
     number_end: "",
   };
 }
+// for search lottery admin 
+export function getInitialLotteryData() {
+  return {
+    groups: [],
+    series: [],
+    numbers: [],
+    semValues: ["5 sem", "10 sem", "25 sem", "50 sem", "100 sem", "200 sem"],
+    refreshKey: 0,
+    marketName: "",
+    searchResult: null,
+    price: null,
+    startTimeForShowCountdown: null,
+    endTimeForShowCountdown: null,
+    isSuspend: false, // Added this field
+    isUpdate: null
+  };
+}

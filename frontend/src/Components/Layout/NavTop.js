@@ -61,7 +61,7 @@ const NavTop = () => {
       permission: "",
     },
     {
-      to: "/search-lottery",
+      to: "/search-lotto",
       icon: "fas fa-search",
       label: "Search Lottery",
       permission: "",
