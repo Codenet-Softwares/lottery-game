@@ -19,13 +19,21 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
     totalItems: 0,
   });
 
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
   const fetchLiveBetMarketStats = async () => {
     try {
       const response = await GetBetMarketStats({
         marketId,
         page: pagination.page,
         limit: pagination.limit,
-        search: searchTerm,
+        search: debouncedSearchTerm,
       });
 
       if (response?.success) {
@@ -48,7 +56,7 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
     if (marketId) {
       fetchLiveBetMarketStats();
     }
-  }, [marketId, pagination.page, pagination.limit, searchTerm]);
+  }, [marketId, pagination.page, pagination.limit, debouncedSearchTerm]);
 
   const handleShowTickets = (details) => {
     const ticketsBody = details.map((detail) => (
@@ -89,41 +97,41 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
     });
     setModalShow(true);
   };
-  const handleDeleteTicket = async (purchaseId) => {
-    const confirmDeletion = window.confirm(
-      "Are you sure you want to delete this live bet? This action is irreversible."
-    );
-    if (confirmDeletion) {
-      try {
-        showLoader();
-        const response = await DeleteLiveBetMarket({ purchaseId }, false);
-        if (response.success) {
-          alert("Live bet deleted successfully!");
-          // Remove the deleted item from the state instead of refreshing
-          setBetStats(
-            (prevStats) =>
-              prevStats
-                .map((user) => ({
-                  ...user,
-                  details: user.details.filter(
-                    (detail) => detail.purchaseId !== purchaseId
-                  ),
-                }))
-                .filter((user) => user.details.length > 0) // Remove users with no remaining bets
-          );
-          // Close modal
-          setModalShow(false);
-        } else {
-          alert("Failed to delete live bet. Please try again.");
+    const handleDeleteTicket = async (purchaseId) => {
+      const confirmDeletion = window.confirm(
+        "Are you sure you want to delete this live bet? This action is irreversible."
+      );
+      if (confirmDeletion) {
+        try {
+          showLoader();
+          const response = await DeleteLiveBetMarket({ purchaseId }, false);
+          if (response.success) {
+            alert("Live bet deleted successfully!");
+            // Remove the deleted item from the state instead of refreshing
+            setBetStats(
+              (prevStats) =>
+                prevStats
+                  .map((user) => ({
+                    ...user,
+                    details: user.details.filter(
+                      (detail) => detail.purchaseId !== purchaseId
+                    ),
+                  }))
+                  .filter((user) => user.details.length > 0) // Remove users with no remaining bets
+            );
+            // Close modal
+            setModalShow(false);
+          } else {
+            alert("Failed to delete live bet. Please try again.");
+          }
+        } catch (error) {
+          console.error("Error deleting live bet:", error);
+          alert("An error occurred while deleting the live bet.");
+        } finally {
+          hideLoader();
         }
-      } catch (error) {
-        console.error("Error deleting live bet:", error);
-        alert("An error occurred while deleting the live bet.");
-      } finally {
-        hideLoader();
       }
-    }
-  };
+    };
 
   const handlePageChange = (page) => {
     setPagination((prev) => ({ ...prev, page }));
@@ -138,11 +146,8 @@ const BetSettleUnsettle = ({ marketId, backButton }) => {
     user.userName.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
   );
 
-  const startIndex = (pagination.page - 1) * pagination.limit + 1;
-  const endIndex = Math.min(
-    pagination.page * pagination.limit,
-    pagination.totalItems
-  );
+  const startIndex = pagination.totalItems > 0 ? (pagination.page - 1) * pagination.limit + 1 : 0;
+const endIndex = pagination.totalItems > 0 ? Math.min(pagination.page * pagination.limit, pagination.totalItems) : 0;
 
   return (
     <div className="container mt-4 rounded bet-settle-container">

@@ -86,10 +86,16 @@
 }
 
 .bet-settle-ticket-scroll-container {
-  max-height: 200px;
+  max-height: 300px;
   overflow-y: auto;
+  padding-right: 15px;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
 }
 
 .bet-settle-modal-body-container {
-  padding: 1rem;
+  max-height: 400px;
+    overflow-y: auto;
+    padding: 15px;
 }
