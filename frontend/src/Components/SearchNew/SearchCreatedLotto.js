@@ -78,10 +78,10 @@ const SearchCreatedLotto = () => {
                 <Formik
                   key={selectedMarket?.marketId || "form"}
                   initialValues={{
-                    selectedSem: "",
-                    selectedGroup: "",
-                    selectedSeries: "",
-                    selectedNumber: "",
+                  Sem: "",
+                  Group: "",
+                  Series: "",
+                  Number: "",
                   }}
                   validationSchema={validationSchema}
                   onSubmit={handleSubmit}
