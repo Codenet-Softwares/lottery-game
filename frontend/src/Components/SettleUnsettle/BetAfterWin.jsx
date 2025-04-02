@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { GetliveMarketBet } from "../../Utils/apiService";
 import Pagination from "../Common/Pagination";
 import BetSettleUnsettle from "./BetSettleUnsettle";
+import "./BetAfterWin.css";
 
 const BetAfterWin = () => {
   const [betMarkets, setBetMarkets] = useState([]);
@@ -57,22 +58,16 @@ const BetAfterWin = () => {
     setPagination((prev) => ({ ...prev, page }));
   };
 
-  // const toggleLiveState = () => {
-  //   setLiveState((prevState) => !prevState);
-  // };
-
   return (
-    <div className="text-center bet_page rounded-4" >
-      <div className="container-fluid p-3 px-5">
+    <div className="bet-after-win-container">
+      <div className="bet-after-win-inner-container container-fluid ">
         {!selectedMarketId && (
           <>
-            <h1 className="fw-bold heading py-3 text-uppercase text-black">
-              Bet After Win
-            </h1>
-            <div className="search-container-search-live d-flex justify-content-center align-items-center">
+            <h2 className="bet-after-win-heading fw-bold">Bet After Win</h2>
+            <div className="bet-after-win-search-container">
               <input
                 type="text"
-                className="form-control search-input-live"
+                className="form-control bet-after-win-search-input"
                 placeholder="Search by market name"
                 value={searchTerm}
                 onChange={handleSearchChange}
@@ -82,40 +77,30 @@ const BetAfterWin = () => {
         )}
 
         {selectedMarketId ? (
-          <div>
+          <div className="bet-after-win-settle-container">
             <BetSettleUnsettle
               marketId={selectedMarketId}
               backButton={
                 <button
-                  className="back-button"
+                  className="bet-after-win-back-button"
                   onClick={() => setSelectedMarketId(null)}
-                  style={{
-                    padding: "10px 20px",
-                    fontSize: "1rem",
-                    backgroundColor: "#4682B4",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                    marginRight: "20px",
-                    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-                    width: "auto",
-                    whiteSpace: "nowrap",
-                  }}
                 >
-                  Back
+                  <i className="fas fa-arrow-left bg-none"></i>
                 </button>
               }
             />
           </div>
         ) : liveBetMarkets.length > 0 ? (
           <>
-            <ul className="market-list">
+            <ul className="bet-after-win-market-list">
               {liveBetMarkets.map((market) => (
-                <li key={market.marketId} className="market-item">
+                <li
+                  key={market.marketId}
+                  className="bet-after-win-market-item fw-bold"
+                >
                   {market.marketName}
                   <button
-                    className="live-stats-button"
+                    className="bet-after-win-live-stats-button"
                     onClick={() => handleLiveStatsClick(market.marketId)}
                   >
                     Win Stats
@@ -136,9 +121,9 @@ const BetAfterWin = () => {
             />
           </>
         ) : (
-          <div className="no-market-container">
+          <div className="bet-after-win-no-market-container">
             <div className="tv-static"></div>
-            <div className="no-market-text">
+            <div className="bet-after-win-no-market-text">
               <span>No Live Market Found with this name</span>
             </div>
           </div>

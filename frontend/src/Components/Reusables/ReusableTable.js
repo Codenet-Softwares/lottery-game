@@ -34,7 +34,7 @@ const ReusableTable = ({
   return (
     <div className="table-container-reusable">
       {/* Table Heading */}
-      {tableHeading && <h2 className="table-heading ">{tableHeading}</h2>}
+      {tableHeading && <h2 className="table-heading fw-bold">{tableHeading}</h2>}
 
       {/* Search Input (conditionally rendered) */}
       {showSearch && (
