@@ -15,17 +15,17 @@ const UseSearchData = () => {
   });
 
   const validationSchema = Yup.object().shape({
-    selectedSem: Yup.string().required("SEM is required"),
-    selectedGroup: Yup.string().required("Group is required"),
-    selectedSeries: Yup.string().required("Series is required"),
-    selectedNumber: Yup.string().required("Number is required"),
+    Sem: Yup.string().required("SEM is required"),
+    Group: Yup.string().required("Group is required"),
+    Series: Yup.string().required("Series is required"),
+    Number: Yup.string().required("Number is required"),
   });
 
   const DROPDOWN_FIELDS = [
-    { label: "SEM", stateKey: "semValues", field: "selectedSem" },
-    { label: "Group", stateKey: "groups", field: "selectedGroup" },
-    { label: "Series", stateKey: "series", field: "selectedSeries" },
-    { label: "Number", stateKey: "numbers", field: "selectedNumber" },
+    { label: "SEM", stateKey: "semValues", field: "Sem" },
+    { label: "Group", stateKey: "groups", field: "Group" },
+    { label: "Series", stateKey: "series", field: "Series" },
+    { label: "Number", stateKey: "numbers", field: "Number" },
   ];
 
   // FETCHING ALL THE MARKETNAMES INSIDE THE LEFT SIDEBAR OF THE THE SEARCH LOTTERY 
@@ -97,10 +97,10 @@ const UseSearchData = () => {
     async (values, { setSubmitting, resetForm }) => {
       const requestBody = {
         marketId: state.selectedMarket?.marketId,
-        sem: values.selectedSem ? parseInt(values.selectedSem) : null,
-        group: values.selectedGroup,
-        series: values.selectedSeries,
-        number: values.selectedNumber,
+        sem: values.Sem ? parseInt(values.Sem) : null,
+        group: values.Group,
+        series: values.Series,
+        number: values.Number,
       };
 
       const response = await SearchLotteryTicket(requestBody);

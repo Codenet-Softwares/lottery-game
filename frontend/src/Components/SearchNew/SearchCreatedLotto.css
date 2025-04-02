@@ -41,7 +41,7 @@
     grid-template-columns: 1fr;
     gap: 10px;
     overflow-y: auto;
-    flex-grow: 1;
+    /* flex-grow: 1; */
     max-height: 60vh;
     padding-left: 8px;
     padding-right: 8px;
