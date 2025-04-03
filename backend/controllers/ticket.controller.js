@@ -334,8 +334,19 @@ export const geTicketRangeExternal = async (req, res) => {
 
 export const getIsactiveMarket = async (req, res) => {
   try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
     const ticketData = await TicketRange.findAll({
-      where: { isActive: true },
+      where: {
+        date: {
+          [Op.gte]: today,
+        },
+        isVoid: false,
+        isWin: false,
+        // isActive: true,
+        inactiveGame: true
+      },
       order: [["createdAt", "DESC"]],
     });
     if (!ticketData) {
