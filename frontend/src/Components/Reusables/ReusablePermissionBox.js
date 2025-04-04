@@ -22,14 +22,14 @@ export const ReusablePermissionBox = ({ permissions, onChange, error, permission
                 checked={permissions.includes(perm)}
                 onChange={() => togglePermission(perm)}
               />
-              <span>{perm}</span>
+              <span className="text-uppercase">{perm}</span>
             </div>
           ))
         ) : (
           <p className="no-permissions">No permissions available</p>
         )}
       </div>
-      {error && <div className="error-message">{error}</div>}
+    <h6 className="fw-bold text-center">{error && <div className="error-message">{error}</div>}</h6>  
     </div>
     
   );
