@@ -74,9 +74,11 @@ const Dashboard = () => {
       </div>
 
       <div className="cards-container">
-        <button className="arrow left-arrow" onClick={() => scroll("left")}>
-          <span>&#x2190;</span>
-        </button>
+        {store.admin.roles === "admin" && (
+          <button className="arrow left-arrow" onClick={() => scroll("left")}>
+            <span>&#x2190;</span>
+          </button>
+        )}
 
         <div className="cards-wrapper" ref={cardsRef}>
           {filteredDashCards.map((card, index) => (
@@ -97,9 +99,11 @@ const Dashboard = () => {
           ))}
         </div>
 
-        <button className="arrow right-arrow" onClick={() => scroll("right")}>
-          <span>&#x2192;</span>
-        </button>
+        {store.admin.roles === "admin" && (
+          <button className="arrow right-arrow" onClick={() => scroll("right")}>
+            <span>&#x2192;</span>
+          </button>
+        )}
       </div>
 
       <div className="footer-section">

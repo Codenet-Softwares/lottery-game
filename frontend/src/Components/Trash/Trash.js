@@ -146,7 +146,7 @@ const Trash = () => {
 
   return (
     <div className={`trash-container ${isBinOpen ? "paper-mode" : ""}`}>
-      {!isBinOpen && (
+      {/* {!isBinOpen && (
         <div className="dustbin">
           <div className="small-lid"></div>
           <div className="lid" onClick={openCrumpledPaper}>
@@ -156,9 +156,8 @@ const Trash = () => {
             <p className="bin-text">Use me for deleting markets to store!</p>
           </div>
         </div>
-      )}
+      )} */}
 
-      {isBinOpen && (
         <div className="main-container-trash">
           <div
             className="search-bar-container-shrink-2"
@@ -200,9 +199,9 @@ const Trash = () => {
             />
           </div>
           <div className="crumpled-paper">
-            <button className="back-to-bin" onClick={closeCrumpledPaper}>
+            {/* <button className="back-to-bin" onClick={closeCrumpledPaper}>
               Back to Trash
-            </button>
+            </button> */}
             <aside className="market-sidebar">
               <h3>Deleted Markets</h3>
               <ul className="market-list-custom">
@@ -246,7 +245,6 @@ const Trash = () => {
             </div>
           </div>
         </div>
-      )}
     </div>
   );
 };

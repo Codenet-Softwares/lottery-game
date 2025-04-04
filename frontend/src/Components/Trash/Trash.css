@@ -28,7 +28,7 @@
 }
 
 /* Dustbin Design */
-.dustbin {
+/* .dustbin {
   width: 200px;
   height: 320px;
   position: relative;
@@ -70,10 +70,10 @@
   font-weight: bold;
   color: white;
   text-shadow: 1px 1px 2px black;
-}
+} */
 
 /* Bin Body with Trapezoid Shape */
-.bin-body {
+/* .bin-body {
   width: 1000px;
   height: 500px;
   background: #333;
@@ -83,7 +83,7 @@
   align-items: center;
   box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.4);
   position: relative;
-  border-radius: 0 0 10px 10px; /* Rounded bottom edges */
+  border-radius: 0 0 10px 10px;
 }
 
 .bin-text {
@@ -92,7 +92,7 @@
   text-align: center;
   padding: 0 10px;
   font-family: "Arial", sans-serif;
-}
+} */
 
 /* Crumpled Paper Mode */
 /* .crumpled-paper {
@@ -266,13 +266,6 @@
   color: #333;
   overflow-y: none;
 }
-
-
-
-
-
-
-  
 
 /* Keyframe Animations */
 @keyframes paperRise {

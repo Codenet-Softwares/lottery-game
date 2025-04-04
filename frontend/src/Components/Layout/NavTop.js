@@ -150,12 +150,21 @@ const NavTop = () => {
   });
 
   // Handle scroll update
-  const handleUpdate = ({ getItemById }) => {
-    setScrollState({
-      start: getItemById(navItems[0]?.to)?.visible ?? true,
-      end: getItemById(navItems[navItems.length - 1]?.to)?.visible ?? false,
-    });
-  };
+  // const handleUpdate = ({ getItemById }) => {
+  //   setScrollState({
+  //     start: getItemById(navItems[0]?.to)?.visible ?? true,
+  //     end: getItemById(navItems[navItems.length - 1]?.to)?.visible ?? false,
+  //   });
+  // };
+const handleUpdate = ({ getItemById }) => {
+  const firstVisible = getItemById(filteredNavItems[0]?.to);
+  const lastVisible = getItemById(filteredNavItems[filteredNavItems.length - 1]?.to);
+
+  setScrollState({
+    start: firstVisible?.visible ?? true,
+    end: lastVisible?.visible ?? false,
+  });
+};
 
   return (
     <SimpleBar className="navtop-container-Y">

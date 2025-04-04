@@ -96,10 +96,7 @@
   }
   
   .sc-lotto-no-markets {
-    text-align: center;
-    padding: 20px;
-    color: #666;
-    font-style: italic;
+    /* width: 100%; */
   }
   
   /* Main content styles */
@@ -118,11 +115,18 @@
     justify-content: center;
     align-items: center;
     height: 100%;
-    color: #666;
     font-size: 1.2rem;
     text-align: center;
+
   }
-  
+  /* Select Message */
+.sc-select-message{
+  background-color: #E6F7FF;
+  color:#2B3A67 ;
+  border-radius: 12px;
+  padding: 60px;
+
+}
   /* Search form styles */
   .sc-lotto-search-form {
     max-width: 600px;
@@ -136,7 +140,10 @@
     justify-content: center; /* Center vertically */
     min-height: 400px; /* Give it some minimum height */
 }
-  
+  .sc-lotto-search-border-form{
+    max-width: 653px;
+    margin: 0 auto;
+  }
   .sc-lotto-form-header h6 {
     color: #4682B4;
     font-weight: bold;
@@ -346,14 +353,13 @@
 
 .sc-lotto-market-search-container {
   width: 100%;
-  max-width: 600px;
 }
 
 .sc-lotto-market-search {
   width: 100%;
   padding: 10px 15px;
   border: 1px solid #ddd;
-  border-radius: 5px;
+  border-radius: 20px;
   font-size: 0.9rem;
 }
 
