@@ -177,7 +177,7 @@ const DashCard = [
     icon: "fas fa-balance-scale", // icon for Lucky Hour
   },
   {
-    name: "View All subAdmin",
+    name: "View All SubAdmin",
     description:
       "View all your created sub-Admins with a feature of resetting the password",
     buttonName: "View-All Sub-Admin",

@@ -7,7 +7,7 @@ import {
 import Trashmarketdetails from "./Trashmarketdetails";
 
 const Trash = () => {
-  const [isBinOpen, setIsBinOpen] = useState(false);
+  // const [isBinOpen, setIsBinOpen] = useState(false);
   const [markets, setMarkets] = useState([]);
   const [selectedMarketId, setSelectedMarketId] = useState(null); // Track selected marketId
   const [selectedMarketDetails, setSelectedMarketDetails] = useState(null);
@@ -105,10 +105,9 @@ const Trash = () => {
   ]);
   // Refetch markets if search term is cleared
   useEffect(() => {
-    if (debouncedSearchMarketTerm === "") {
-      fetchMarkets(); // Ensure markets are fetched if no market list search term
-    }
+    fetchMarkets(); // Always fetch when debounced value changes
   }, [debouncedSearchMarketTerm]);
+  
   // Refetch markets if search term is cleared
   useEffect(() => {
     if (debouncedSearchTerm === "") {
@@ -119,20 +118,9 @@ const Trash = () => {
   }, [debouncedSearchTerm]);
 
   // Fetch markets when the bin is opened and reset details when the bin is closed
-  useEffect(() => {
-    if (isBinOpen) {
-      fetchMarkets();
-    } else {
-      setSelectedMarketDetails(null); // Reset selected details when the bin is closed
-    }
-  }, [isBinOpen,debouncedSearchMarketTerm]);
+ 
 
-  const openCrumpledPaper = () => setIsBinOpen(true);
-  const closeCrumpledPaper = () => {
-    setIsBinOpen(false);
-    setSelectedMarketDetails(null); // Reset details on closing the bin
-    setSelectedMarketId(null); // Reset the selected market ID
-  };
+
 
   const startIndex = (pagination.page - 1) * pagination.limit + 1;
   const endIndex = Math.min(
@@ -145,19 +133,7 @@ const Trash = () => {
   };
 
   return (
-    <div className={`trash-container ${isBinOpen ? "paper-mode" : ""}`}>
-      {/* {!isBinOpen && (
-        <div className="dustbin">
-          <div className="small-lid"></div>
-          <div className="lid" onClick={openCrumpledPaper}>
-            <span className="lid-text">Open Me to see deleted markets</span>
-          </div>
-          <div className="bin-body">
-            <p className="bin-text">Use me for deleting markets to store!</p>
-          </div>
-        </div>
-      )} */}
-
+    <div className="trash-container">
         <div className="main-container-trash">
           <div
             className="search-bar-container-shrink-2"
@@ -245,6 +221,7 @@ const Trash = () => {
             </div>
           </div>
         </div>
+  
     </div>
   );
 };
