@@ -62,17 +62,51 @@ UserRange.hasMany(PurchaseLottery, {
   as: 'purchases',
 });
 
+const closeDB = async () => {
+  try {
+    await sequelize.close();
+    console.log('DB connection closed.');
+  } catch (err) {
+    console.error('Error closing DB connection:', err);
+  }
+};
+
+process.on('SIGINT', async () => {
+  await closeDB();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  await closeDB();
+  process.exit(0);
+});
+
+let lotteryInterval;
+
 sequelize
   .sync({ alter: false })
   .then(() => {
-    console.log('Database & tables created!');
+    console.log('DB Synced!');
+
     app.listen(process.env.PORT, () => {
-      console.log(`App is running on - http://localhost:${process.env.PORT || 7000}`);
+      console.log(`Server running at http://localhost:${process.env.PORT}`);
     });
 
-    setInterval(updateLottery, 1000);
-      
+    lotteryInterval = setInterval(updateLottery, 1000);
   })
   .catch((err) => {
-    console.error('Unable to create tables:', err);
+    console.error('DB Sync Error:', err);
   });
+
+process.on('SIGINT', async () => {
+  clearInterval(lotteryInterval);
+  await closeDB();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  clearInterval(lotteryInterval);
+  await closeDB();
+  process.exit(0);
+});
+
