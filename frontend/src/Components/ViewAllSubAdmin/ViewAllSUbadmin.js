@@ -48,8 +48,9 @@ const ViewAllSubadmin = () => {
         <button
           className="btn btn-primary btn-sm mx-2"
           onClick={() => handleAction(row.userName)}
+          title="Reset Password"
         >
-          <i className="fas fa-key"></i> Reset Password
+          <i className="fas fa-key"></i>
         </button>
       ),
     },

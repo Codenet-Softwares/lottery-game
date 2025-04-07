@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ScrollMenu } from "react-horizontal-scrolling-menu";
 import { useAppContext } from "../../contextApi/context";
@@ -15,6 +15,23 @@ const NavTop = () => {
   const navigate = useNavigate();
   const scrollRef = useRef(null);
   const [scrollState, setScrollState] = useState({ start: true, end: false });
+   const [activeItem, setActiveItem] = useState(null);
+
+// rerendering to the topNav as with required pathname 
+    useEffect(() => {
+       setActiveItem(location.pathname);
+     }, [location.pathname]);
+    useEffect(() => {
+       if (activeItem && scrollRef.current) {
+         // Use the scrollToItem method provided by the library
+         scrollRef.current.scrollToItem(
+           scrollRef.current.getItemById(activeItem),
+           "auto",
+           "center",
+           "nearest"
+         );
+       }
+     }, [activeItem]);
 
   const handleLogout = () => {
     const confirmLogout = window.confirm("Are you sure you want to log out?");

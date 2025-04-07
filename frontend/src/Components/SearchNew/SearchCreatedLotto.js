@@ -132,7 +132,7 @@ const SearchCreatedLotto = () => {
         ) : (
           <div className="sc-lotto-results-view">
             <div className="sc-lotto-back-button bg-secondary px-2 rounded" onClick={handleBack}>
-            <i className="bi bi-arrow-left"><strong> Back To {selectedMarket?.marketName || ""}</strong></i>
+            <i className="bi bi-arrow-left"> Back To <strong>  {selectedMarket?.marketName || ""}</strong></i>
             </div>
             <div className="sc-lotto-search-border-form border border-2 border-secondary py-4 rounded-3">
               <div className="sc-lotto-results-container">
