@@ -86,7 +86,7 @@ const AppRoutes = () => {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/create-subadmin" element={<CreateSubadmin />} />
             <Route path="/prize-validation" element={<PrizeValidation />} />
-            <Route path="/bet-tracker" element={<BetAfterWin />} />
+            <Route path="/bet-tracker/:marketId?" element={<BetAfterWin />} />
             <Route path="/view-all-subadmin" element={<ViewAllSubadmin />} />
             <Route path="/subAdminData" element={<WinResult />} />
             <Route path="/subAdmin-win-result/:marketId" element={<SubAdminWinResult />} />

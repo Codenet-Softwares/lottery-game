@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { GetliveMarketBet } from "../../Utils/apiService";
 import Pagination from "../Common/Pagination";
 import BetSettleUnsettle from "./BetSettleUnsettle";
 import "./BetAfterWin.css";
 
 const BetAfterWin = () => {
+  const navigate = useNavigate();
+  const { marketId } = useParams(); // Get marketId from URL
+
   const [betMarkets, setBetMarkets] = useState([]);
   const [liveBetMarkets, setLiveBetMarkets] = useState([]);
-  const [selectedMarketId, setSelectedMarketId] = useState(null);
+  const [selectedMarketId, setSelectedMarketId] = useState(marketId || null);
   const [searchTerm, setSearchTerm] = useState("");
   const [pagination, setPagination] = useState({
     page: 1,
@@ -45,10 +48,14 @@ const BetAfterWin = () => {
     }
   };
 
+  // const handleLiveStatsClick = (marketId) => {
+  //   setSelectedMarketId(marketId);
+  // };
+
   const handleLiveStatsClick = (marketId) => {
     setSelectedMarketId(marketId);
+    navigate(`/bet-tracker/${marketId}`);
   };
-
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
     setPagination((prev) => ({ ...prev, page: 1 }));

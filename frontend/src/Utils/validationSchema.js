@@ -341,7 +341,7 @@ export const createSubadminSchema = Yup.object({
     .required("Password is required")
     .min(8, "Password must be at least 8 characters"),
   permissions: Yup.array()
-    .min(1, "At least one permission is required")
+    .min(1, "At Least One Permission Is Required")
     .required("Permissions are required"),
 });
 export const resetPasswordSchemaSubAdmin = Yup.object().shape({
