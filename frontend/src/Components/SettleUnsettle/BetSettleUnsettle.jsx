@@ -4,10 +4,10 @@ import { GetBetMarketStats, DeleteLiveBetMarket } from "../../Utils/apiService";
 import ReusableModal from "../Reusables/ReusableModal";
 import { useAppContext } from "../../contextApi/context";
 import "./BetSettleUnsettle.css";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 const BetSettleUnsettle = ({ marketId, backButton, onAllDataDeleted }) => {
-  const {navigate}= useNavigate();
+  // const {navigate}= useNavigate();
   const [betStats, setBetStats] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -129,8 +129,8 @@ const BetSettleUnsettle = ({ marketId, backButton, onAllDataDeleted }) => {
 
               if (updatedStats.length === 0) {
                 // Redirect to BetAfterWin page
-                // window.location.href = "/bet-tracker";
-                navigate("/bet-tracker");
+                window.location.href = "/bet-tracker";
+                // navigate("/bet-tracker");
               }
 
             return updatedStats;
