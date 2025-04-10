@@ -79,6 +79,11 @@ sequelize
     };
     
     runLottery(); // Kick off the loop
+    process.on('SIGINT', async () => {
+      await sequelize.close();
+      process.exit(0);
+    });
+    
     
   })
   .catch((err) => {
