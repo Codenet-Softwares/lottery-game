@@ -76,18 +76,18 @@ sequelize
     const runLottery = async () => {
       await updateLottery(); // Waits for previous run to complete
       setTimeout(runLottery, 1000); // Runs every second (safely)
-    };
-    
-    runLottery(); // Kick off the loop
-    process.on('SIGINT', async () => {
-      await sequelize.close();
-      process.exit(0);
-    });
-    
-    
+    }; 
+    runLottery(); // Kick off the loop 
   })
   .catch((err) => {
     console.error('DB Sync Error:', err);
+  });
+
+
+  
+  process.on('SIGINT', async () => {
+    await sequelize.close();
+    process.exit(0);
   });
 
 
