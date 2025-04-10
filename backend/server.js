@@ -13,7 +13,7 @@ import { ExternalApiModule } from './routes/externalApis.route.js';
 import { voidGameRoute } from './routes/void.route.js';
 import { revokeGameRoute } from './routes/revoke.route.js';
 import { deleteGameRoute } from './routes/delete.route.js';
-import { updateLottery } from './utils/lotteryCron.js';
+
 
 if (process.env.NODE_ENV === 'production') {
   dotenv.config({ path: '.env.production' });
@@ -49,12 +49,6 @@ ExternalApiModule(app);
 voidGameRoute(app)
 revokeGameRoute(app)
 deleteGameRoute(app)
-
-setInterval(() => {
-  updateLottery().catch((err) => {
-    console.error('Lottery Cron Error:', err);
-  });
-}, 1000); 
 
 PurchaseLottery.belongsTo(UserRange, {
   foreignKey: 'generateId',
