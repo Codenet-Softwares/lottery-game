@@ -2,6 +2,7 @@ import { db } from "../config/firebase.js";
 import TicketRange from "../models/ticketRange.model.js";
 import { getISTTime } from "./commonMethods.js";
 
+
 export async function updateLottery() {
     const currentTime = getISTTime(); 
 

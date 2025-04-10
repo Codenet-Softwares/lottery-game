@@ -50,6 +50,12 @@ voidGameRoute(app)
 revokeGameRoute(app)
 deleteGameRoute(app)
 
+setInterval(() => {
+  updateLottery().catch((err) => {
+    console.error('Lottery Cron Error:', err);
+  });
+}, 1000); 
+
 PurchaseLottery.belongsTo(UserRange, {
   foreignKey: 'generateId',
   targetKey: 'generateId',
@@ -62,27 +68,6 @@ UserRange.hasMany(PurchaseLottery, {
   as: 'purchases',
 });
 
-const closeDB = async () => {
-  try {
-    await sequelize.close();
-    console.log('DB connection closed.');
-  } catch (err) {
-    console.error('Error closing DB connection:', err);
-  }
-};
-
-process.on('SIGINT', async () => {
-  await closeDB();
-  process.exit(0);
-});
-
-process.on('SIGTERM', async () => {
-  await closeDB();
-  process.exit(0);
-});
-
-let lotteryInterval;
-
 sequelize
   .sync({ alter: false })
   .then(() => {
@@ -91,22 +76,9 @@ sequelize
     app.listen(process.env.PORT, () => {
       console.log(`Server running at http://localhost:${process.env.PORT}`);
     });
-
-    lotteryInterval = setInterval(updateLottery, 1000);
   })
   .catch((err) => {
     console.error('DB Sync Error:', err);
   });
 
-process.on('SIGINT', async () => {
-  clearInterval(lotteryInterval);
-  await closeDB();
-  process.exit(0);
-});
-
-process.on('SIGTERM', async () => {
-  clearInterval(lotteryInterval);
-  await closeDB();
-  process.exit(0);
-});
 
