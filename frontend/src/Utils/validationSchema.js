@@ -323,6 +323,7 @@ export const resetPasswordSchema = Yup.object().shape({
   oldPassword: Yup.string().required("Old password is required"),
   newPassword: Yup.string()
     .required("New password is required")
+    .min(8, "New password must be at least 8 characters")
     .notOneOf(
       [Yup.ref("oldPassword"), null],
       "New password cannot be the same as the old password"

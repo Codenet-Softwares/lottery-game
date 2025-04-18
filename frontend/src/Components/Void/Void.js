@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Card, Col, Row, Accordion } from "react-bootstrap";
 import Pagination from "../Common/Pagination";
 import { GetVoidMarketData } from "../../Utils/apiService";
+import moment from "moment";
 
 const Void = () => {
   const [voidMarkets, setVoidMarkets] = useState([]);
@@ -11,7 +12,7 @@ const Void = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-    const [searchMarketTerm, setSearchMarketTerm] = useState("");
+  const [searchMarketTerm, setSearchMarketTerm] = useState("");
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -19,27 +20,30 @@ const Void = () => {
     totalItems: 0,
   });
 
-    // Debounce search term
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        setDebouncedSearchTerm(searchTerm);
-      }, 500);
-  
-      return () => clearTimeout(timer);
-    }, [searchTerm]);
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   useEffect(() => {
     fetchVoidMarkets();
-  }, [pagination.page, pagination.limit,  debouncedSearchTerm,]);
+  }, [pagination.page, pagination.limit, debouncedSearchTerm]);
 
   const fetchVoidMarkets = async () => {
     try {
       setIsLoading(true);
-      const response = await GetVoidMarketData({
-        page: pagination.page,
-        limit: pagination.limit,
-        search: debouncedSearchTerm,
-      }, false);
+      const response = await GetVoidMarketData(
+        {
+          page: pagination.page,
+          limit: pagination.limit,
+          search: debouncedSearchTerm,
+        },
+        false
+      );
       if (response.success) {
         setVoidMarkets(response.data);
         setPagination({
@@ -50,7 +54,6 @@ const Void = () => {
         });
       }
     } catch (err) {
-    
     } finally {
       setIsLoading(false);
     }
@@ -73,33 +76,33 @@ const Void = () => {
   return (
     <div className="container my-5">
       <div className="card shadow-sm">
-      <div
-  className="card-header d-flex align-items-center justify-content-between p-3"
-  style={{ backgroundColor: "#0E1A35", color: "#FFFFFF" }}
->
-  <h3 className="mb-0 fw-bold fs-5 text-start">VOID GAME LIST</h3>
-  <input
-    type="text"
-    className="search-bar-shrink-1"
-    placeholder="Search Void marketnames..."
-    value={searchTerm}
-    onChange={handleSearchMarketChange}
-    style={{
-      width: "50%", // Full width of the container
-      padding: "10px 20px", // Adds more padding for a pill shape
-      borderRadius: "50px", // Pill shape
-      border: "1px solid #4682B4", // Steel Blue border
-      backgroundColor: "#f1f7ff", // Light blue background for a professional look
-      color: "#4682B4", // Text color matches the button color
-      fontSize: "16px", // Adjust text size
-      outline: "none", // Removes default focus outline
-      boxShadow: "none", // Removes shadow from input
-      transition: "all 0.3s ease-in-out", // Smooth transition for hover and focus
-    }}
-    onFocus={(e) => (e.target.style.borderColor = "#1e5c8a")} // Focus color change
-    onBlur={(e) => (e.target.style.borderColor = "#4682B4")} // Reverts border on blur
-  />
-</div>
+        <div
+          className="card-header d-flex align-items-center justify-content-between p-3"
+          style={{ backgroundColor: "#0E1A35", color: "#FFFFFF" }}
+        >
+          <h3 className="mb-0 fw-bold fs-5 text-start">VOID GAME LIST</h3>
+          <input
+            type="text"
+            className="search-bar-shrink-1"
+            placeholder="Search Void marketnames..."
+            value={searchTerm}
+            onChange={handleSearchMarketChange}
+            style={{
+              width: "50%", // Full width of the container
+              padding: "10px 20px", // Adds more padding for a pill shape
+              borderRadius: "50px", // Pill shape
+              border: "1px solid #4682B4", // Steel Blue border
+              backgroundColor: "#f1f7ff", // Light blue background for a professional look
+              color: "#4682B4", // Text color matches the button color
+              fontSize: "16px", // Adjust text size
+              outline: "none", // Removes default focus outline
+              boxShadow: "none", // Removes shadow from input
+              transition: "all 0.3s ease-in-out", // Smooth transition for hover and focus
+            }}
+            onFocus={(e) => (e.target.style.borderColor = "#1e5c8a")} // Focus color change
+            onBlur={(e) => (e.target.style.borderColor = "#4682B4")} // Reverts border on blur
+          />
+        </div>
 
         <div className="card-body p-3">
           {isLoading ? (
@@ -217,7 +220,13 @@ const Void = () => {
                                         <p className="mb-1 fw-bold text-dark">
                                           <strong>Date</strong>
                                         </p>
-                                        <p>{market.date}</p>
+                                        <p>
+                                          {market
+                                            ? moment(market.date).format(
+                                                "MMMM Do YYYY"
+                                              )
+                                            : "N/A"}
+                                        </p>
                                       </div>
                                     </Card.Body>
                                   </Card>
