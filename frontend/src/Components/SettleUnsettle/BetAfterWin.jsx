@@ -115,6 +115,7 @@ const BetAfterWin = () => {
                 </li>
               ))}
             </ul>
+            {pagination.totalItems > 0 && (
             <Pagination
               currentPage={pagination.page}
               totalPages={pagination.totalPages}
@@ -126,6 +127,7 @@ const BetAfterWin = () => {
               )}
               totalData={pagination.totalItems}
             />
+          )}
           </>
         ) : (
           <div className="bet-after-win-no-market-container">

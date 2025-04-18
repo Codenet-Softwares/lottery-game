@@ -315,18 +315,15 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
               </table>
             </div>
             {pagination.totalItems > 0 && (
-      <Pagination
-        currentPage={pagination.page}
-        totalPages={pagination.totalPages}
-        handlePageChange={handlePageChange}
-        startIndex={(pagination.page - 1) * pagination.limit + 1}
-        endIndex={Math.min(
-          pagination.page * pagination.limit,
-          pagination.totalItems
-        )}
-        totalData={pagination.totalItems}
-      />
-    )}
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.totalPages}
+              handlePageChange={handlePageChange}
+              startIndex={startIndex}
+              endIndex={endIndex}
+              totalData={pagination.totalItems}
+            />
+          )}
           </div>
 
           <ReusableModal
