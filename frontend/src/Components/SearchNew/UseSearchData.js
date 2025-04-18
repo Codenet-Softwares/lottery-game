@@ -5,6 +5,9 @@ import { generateLotteryOptions } from "../../Utils/helper";
 import * as Yup from "yup";
 
 const UseSearchData = () => {
+  // Get marketId from URL parameters
+  const marketIdFromURL = new URLSearchParams(window.location.search).get("marketId");
+
   const [state, setState] = useState({
     lotteryData: getInitialLotteryData(),
     allMarkets: [],
@@ -65,6 +68,16 @@ const UseSearchData = () => {
     }));
   }, []);
 
+  // Effect to handle URL parameter on initial load
+  useEffect(() => {
+    if (marketIdFromURL && state.allMarkets.length > 0) {
+      const market = state.allMarkets.find(m => m.marketId === marketIdFromURL);
+      if (market) {
+        handleMarketClick(market);
+      }
+    }
+  }, [state.allMarkets, marketIdFromURL]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setState((prev) => ({ ...prev, debouncedSearchTerm: prev.searchTerm }));
@@ -82,9 +95,14 @@ const UseSearchData = () => {
 
   const handleMarketClick = useCallback(
     (market) => {
+      // Update URL with marketId when a market is selected
+      const url = new URL(window.location);
+      url.searchParams.set('marketId', market.marketId);
+      window.history.pushState({}, '', url);
+
       setState((prev) => ({
         ...prev,
-        showSearch: true, // Add this line to ensure form is shown
+        showSearch: true,
         selectedMarket: market,
       }));
       updateLotteryData(market);
@@ -92,7 +110,7 @@ const UseSearchData = () => {
     [updateLotteryData]
   );
 
- // FETCHING EACH MARKET TICKETS  WITH RESPECT TO THE MARKETID 
+  // FETCHING EACH MARKET TICKETS WITH RESPECT TO THE MARKETID 
   const handleSubmit = useCallback(
     async (values, { setSubmitting, resetForm }) => {
       const requestBody = {

@@ -163,7 +163,7 @@ const Inactive = () => {
                     })
                   ) : (
                     <tr>
-                      <td colSpan="4" className="text-center">
+                      <td colSpan="4" className="text-center text-danger fw-bold">
                         No inactive games found.
                       </td>
                     </tr>

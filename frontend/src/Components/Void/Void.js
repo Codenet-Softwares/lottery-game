@@ -105,7 +105,7 @@ const Void = () => {
           {isLoading ? (
             <div className="text-center">Loading...</div>
           ) : voidMarkets.length == 0 ? (
-            <div className=" text-center">No Data</div>
+            <div className=" text-center fw-bold text-danger">No Data Found</div>
           ) : (
             <>
               {/* Search and Pagination Controls */}

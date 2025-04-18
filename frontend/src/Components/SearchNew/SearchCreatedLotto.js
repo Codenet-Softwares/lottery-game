@@ -73,7 +73,7 @@ const SearchCreatedLotto = () => {
         </div>
 
         {showSearch ? (
-          selectedMarket ? (
+          selectedMarket && filteredMarkets.some(m => m.marketId === selectedMarket.marketId) ? (
             <div className="form-wrapper">
               <div className="sc-lotto-search-border-form border border-2 border-secondary py-4 rounded-3">
                 <div className="sc-lotto-search-form ">
