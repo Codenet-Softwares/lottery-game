@@ -314,7 +314,7 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
                 </tbody>
               </table>
             </div>
-
+            {pagination.totalItems > 0 && (
             <Pagination
               currentPage={pagination.page}
               totalPages={pagination.totalPages}
@@ -323,6 +323,7 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
               endIndex={endIndex}
               totalData={pagination.totalItems}
             />
+          )}
           </div>
 
           <ReusableModal

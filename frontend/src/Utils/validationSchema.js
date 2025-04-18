@@ -2,7 +2,7 @@ import * as Yup from "yup";
 
 export const validationSchema = Yup.object({
   date: Yup.string()
-    .required("Date is required")
+    .required("Date Is Required")
     .test("future-date", "Date cannot be in the past", function (value) {
       if (!value) return true; // Skip validation if no date is provided
       const selectedDate = new Date(value); // Parse the user-selected date
@@ -17,17 +17,17 @@ export const validationSchema = Yup.object({
       "Market name can only contain letters, numbers,  spaces and dot (.,:)"
     )
     .max(20, "Market name cannot exceed 20 characters") // Maximum 20 characters
-    .required("Market name is required"),
+    .required("Market Name Is Required"),
 
   groupFrom: Yup.number()
-  .required("Group From is required")
+  .required("Group From Is Required")
   .test(
     "max-digits",
     "Group From cannot have more than 2 digits",
     (value) => !value || value.toString().length <= 2
   ),
   groupTo: Yup.number()
-    .required("Group To is required")
+    .required("Group To Is Required")
     .test(
       "max-digits",
       "Group To cannot have more than 2 digits",
@@ -53,13 +53,13 @@ export const validationSchema = Yup.object({
     ),
 
   seriesFrom: Yup.string()
-    .required("Series From is required")
+    .required("Series From Is Required")
     .matches(/^[A-Za-z]$/, "Series From must be exactly one letter(A-Z)") // Ensure only one letter
     .test("valid-series", "Invalid series selection", function (value) {
       return /^[A-Za-z]$/.test(value);
     }),
   seriesTo: Yup.string()
-    .required("Series To is required")
+    .required("Series To Is Required")
     .matches(/^[A-Za-z]$/, "Series To must be exactly one letter(A-z)")
     .test(
       "valid-series-range",
@@ -82,14 +82,14 @@ export const validationSchema = Yup.object({
       }
     ),
 
-  numberFrom: Yup.number().required("Number From is required")
+  numberFrom: Yup.number().required("Number From Is Required")
   .test(
     "max-digits",
     "Number From cannot have more than 5 digits",
     (value) => !value || value.toString().length <= 5 // Check for maximum 5 digits
   ),
   numberTo: Yup.number()
-    .required("Number To is required")
+    .required("Number To Is Required")
     .test(
       "max-digits",
       "Number To cannot have more than 5 digits",
@@ -117,12 +117,12 @@ export const validationSchema = Yup.object({
       }
     ),
 
-  timerFrom: Yup.string().required("Timer From is required"),
+  timerFrom: Yup.string().required("Timer From Is Required"),
 
 
 
   timerTo: Yup.string()
-    .required("Timer To is required")
+    .required("Timer To Is Required")
 
     .test(
       "valid-timer-range",
@@ -153,7 +153,7 @@ export const validationSchema = Yup.object({
       }
     ),
 
-  priceForEach: Yup.number().required("Price is required")
+  priceForEach: Yup.number().required("Price Is Required")
   .test(
     "max-value",
     "Price cannot exceed 1 lakh (100,000)",
@@ -162,7 +162,7 @@ export const validationSchema = Yup.object({
 });
 export const validationUpdateSchema = Yup.object({
   date: Yup.string()
-    .required("Date is required")
+    .required("Date Is Required")
     .test("future-date", "Date cannot be in the past", function (value) {
       if (!value) return true; // Skip validation if no date is provided
       const selectedDate = new Date(value); // Parse the user-selected date
@@ -177,16 +177,16 @@ export const validationUpdateSchema = Yup.object({
       "Market name can only contain letters, numbers,  spaces and dot (.,:)"
     )
     .max(20, "Market name cannot exceed 20 characters")
-    .required("Market name is required"),
+    .required("Market name Is Required"),
 
-  groupFrom: Yup.number().required("Group From is required")
+  groupFrom: Yup.number().required("Group From Is Required")
   .test(
     "max-digits",
     "Group From cannot have more than 2 digits",
     (value) => !value || value.toString().length <= 2
   ),
   groupTo: Yup.number()
-    .required("Group To is required")
+    .required("Group To Is Required")
     .test(
       "max-digits",
       "Group To cannot have more than 2 digits",
@@ -212,13 +212,13 @@ export const validationUpdateSchema = Yup.object({
     ),
 
   seriesFrom: Yup.string()
-    .required("Series From is required")
+    .required("Series From Is Required")
     .matches(/^[A-Za-z]$/, "Series From must be exactly one letter(A-Z)")
     .test("valid-series", "Invalid series selection", function (value) {
       return /^[A-Za-z]$/.test(value);
     }),
   seriesTo: Yup.string()
-    .required("Series To is required")
+    .required("Series To Is Required")
     .matches(/^[A-Za-z]$/, "Series To must be exactly one letter(A-z)")
     .test(
       "valid-series-range",
@@ -241,14 +241,14 @@ export const validationUpdateSchema = Yup.object({
       }
     ),
 
-  numberFrom: Yup.number().required("Number From is required")
+  numberFrom: Yup.number().required("Number From Is Required")
   .test(
     "max-digits",
     "Number From cannot have more than 5 digits",
     (value) => !value || value.toString().length <= 5 // Check for maximum 5 digits
   ),
   numberTo: Yup.number()
-    .required("Number To is required")
+    .required("Number To Is Required")
     .test(
       "max-digits",
       "Number To cannot have more than 5 digits",
@@ -276,11 +276,11 @@ export const validationUpdateSchema = Yup.object({
       }
     ),
 
-  timerFrom: Yup.string().required("Timer From is required"),
+  timerFrom: Yup.string().required("Timer From Is Required"),
 
 
   timerTo: Yup.string()
-  .required("Timer To is required")
+  .required("Timer To Is Required")
 
   .test(
     "valid-timer-range",
@@ -311,7 +311,7 @@ export const validationUpdateSchema = Yup.object({
     }
   ),
 
-  priceForEach: Yup.number().required("Price is required")
+  priceForEach: Yup.number().required("Price Is Required")
   .test(
     "max-value",
     "Price cannot exceed 1 lakh (100,000)",
@@ -320,38 +320,39 @@ export const validationUpdateSchema = Yup.object({
 });
 
 export const resetPasswordSchema = Yup.object().shape({
-  oldPassword: Yup.string().required("Old password is required"),
+  oldPassword: Yup.string().required("Old password Is Required"),
   newPassword: Yup.string()
-    .required("New password is required")
+    .required("New password Is Required")
+    .min(8, "New password must be at least 8 characters")
     .notOneOf(
       [Yup.ref("oldPassword"), null],
       "New password cannot be the same as the old password"
     ),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
-    .required("Confirm password is required"),
+    .required("Confirm password Is Required"),
 });
 
 
 export const createSubadminSchema = Yup.object({
   userName: Yup.string()
-    .required("Username is required")
+    .required("Username Is Required")
     .min(4, "Must be at least 4 characters"),
   password: Yup.string()
-    .required("Password is required")
+    .required("Password Is Required")
     .min(8, "Password must be at least 8 characters"),
   permissions: Yup.array()
     .min(1, "At Least One Permission Is Required")
-    .required("Permissions are required"),
+    .required("Permissions Are Required"),
 });
 export const resetPasswordSchemaSubAdmin = Yup.object().shape({
   newPassword: Yup.string()
-    .required("New password is required")
+    .required("New password Is Required")
     .notOneOf(
       [Yup.ref("oldPassword"), null],
       "New password cannot be the same as the old password"
     ),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
-    .required("Confirm password is required"),
+    .required("Confirm password Is Required"),
 });

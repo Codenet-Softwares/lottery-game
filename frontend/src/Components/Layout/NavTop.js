@@ -98,12 +98,7 @@ const NavTop = () => {
     },
     { to: "/trash", icon: "fas fa-trash-alt", label: "Trash", permission: "" },
 
-    {
-      to: "/create-subadmin",
-      icon: "fas fa-user-shield",
-      label: "Create Sub-Admin",
-      permission: "",
-    },
+    
     {
       to: "/prize-validation",
       icon: "fas fa-clipboard-check",
@@ -117,6 +112,12 @@ const NavTop = () => {
       permission: "",
     },
     {
+      to: "/create-subadmin",
+      icon: "fas fa-user-shield",
+      label: "Create Sub-Admin",
+      permission: "",
+    },
+    {
       to: "/view-all-subadmin",
       icon: "fas fa-users-cog",
       label: "Sub-Admins",
@@ -127,13 +128,14 @@ const NavTop = () => {
       icon: "fas fa-database",
       label: "SubAdmin Data",
       permission: "win-Analytics",
-    },
+    }, 
     {
       to: "/subAdmin-win-result",
       icon: "fas fa-trophy",
       label: "SubAdmin Result",
       permission: "result-View",
     },
+    
   ];
 
   // Get roles and permissions as arrays

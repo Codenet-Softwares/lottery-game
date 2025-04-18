@@ -170,7 +170,8 @@ const WinResult = () => {
                         </td>
                         <td className="text-center align-top">{item.status}</td>
                         <td className="text-start align-top text-wrap">
-                          {item.remarks || "Your submission is not yet approved."}
+                          {item.remarks ||
+                            "Your submission is not yet approved."}
                         </td>
 
                         <td>
@@ -210,7 +211,7 @@ const WinResult = () => {
                   ) : (
                     <tr>
                       <td
-                        colSpan="3"
+                        colSpan="4"
                         className="text-center text-danger fw-bold"
                       >
                         No Data Available for Selected Status

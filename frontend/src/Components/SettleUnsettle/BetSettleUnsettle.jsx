@@ -241,7 +241,7 @@ const BetSettleUnsettle = ({ marketId, backButton, onAllDataDeleted }) => {
                 </tbody>
               </table>
             </div>
-
+            {pagination.totalItems > 0 && (
             <Pagination
               currentPage={pagination.page}
               totalPages={pagination.totalPages}
@@ -250,6 +250,7 @@ const BetSettleUnsettle = ({ marketId, backButton, onAllDataDeleted }) => {
               endIndex={endIndex}
               totalData={pagination.totalItems}
             />
+          )}
           </div>
 
           <ReusableModal

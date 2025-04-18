@@ -70,7 +70,7 @@ const MarketInsight = () => {
 
   //Api implementation for   toggling market status
   const handleMarketStatusToggle = async () => {
-    console.log("inactiveGame", selectedMarket.inactiveGame)
+    console.log("inactiveGame", selectedMarket.inactiveGame);
     const newStatus = !selectedMarket.inactiveGame;
     let response;
     showLoader();
@@ -79,8 +79,7 @@ const MarketInsight = () => {
         { marketId: selectedMarket.marketId, status: newStatus },
         true
       );
-    }
-    else {
+    } else {
       response = await isActiveLottery(
         { status: newStatus, marketId: selectedMarket.marketId },
         true
@@ -268,8 +267,6 @@ const MarketInsight = () => {
                   cursor: "pointer",
                   textShadow: "2px 2px 2px rgba(0, 0, 0, 0.15)", // Slight depth effect
                   transform: "scale(1.1)", // Slightly enlarges the icon
-
-
                 }}
                 onClick={() => openModal(selectedMarket)} // Open modal with market details
               ></i>
@@ -281,7 +278,9 @@ const MarketInsight = () => {
                     type="checkbox"
                     id="flexSwitchCheckActive"
                     checked={selectedMarket.inactiveGame}
-                    onChange={() => handleMarketStatusToggle(selectedMarket.inactiveGame)}
+                    onChange={() =>
+                      handleMarketStatusToggle(selectedMarket.inactiveGame)
+                    }
                     style={{ cursor: "pointer" }}
                   />
                   <label
@@ -361,8 +360,8 @@ const MarketInsight = () => {
                         Start:{" "}
                         {selectedMarket.start_time
                           ? moment
-                            .utc(selectedMarket.start_time)
-                            .format("HH:mm")
+                              .utc(selectedMarket.start_time)
+                              .format("HH:mm")
                           : "N/A"}
                         | End:{" "}
                         {selectedMarket.end_time
