@@ -75,7 +75,7 @@ const BetAfterWin = () => {
               <input
                 type="text"
                 className="form-control bet-after-win-search-input"
-                placeholder="Search by market name"
+                placeholder="Search By Market Name"
                 value={searchTerm}
                 onChange={handleSearchChange}
               />

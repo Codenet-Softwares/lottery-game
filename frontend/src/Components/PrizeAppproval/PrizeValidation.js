@@ -182,7 +182,7 @@ const PrizeValidation = () => {
             Back to Market List
           </button>
           <h3 className="text-uppercase">
-            Approval List for {selectedMarket.marketName}
+            Approval List For {selectedMarket.marketName}
           </h3>
           <ReusableTable
             data={filteredApprovalData}

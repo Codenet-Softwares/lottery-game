@@ -5,11 +5,11 @@
   flex-direction: row;
   width: 100%; /* Full width to allow space distribution */
   height: 100%;
-  background: url("https://www.creativefabrica.com/wp-content/uploads/2023/01/19/Vintage-Crumpled-Paper-Background-58171796-1.png");
+  /* background: url("https://www.creativefabrica.com/wp-content/uploads/2023/01/19/Vintage-Crumpled-Paper-Background-58171796-1.png"); */
   background-color: #f9f7f7;
   border-radius: 10px;
   padding: 20px;
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5);
+  /* box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5); */
   overflow: hidden;
   gap: 20px; /* Space between sidebar and content */
 
@@ -18,7 +18,7 @@
 }
 
 .trash-container {
-  background: linear-gradient(135deg, #f8fbff, #dde7f0);
+  /* background: linear-gradient(135deg, #f8fbff, #dde7f0); */
   height: 75vh;
   display: flex;
   justify-content: center;
@@ -121,11 +121,11 @@
   flex-direction: row;
   width: 100%; /* Full width to allow space distribution */
   height: 100%;
-  background: url("https://www.creativefabrica.com/wp-content/uploads/2023/01/19/Vintage-Crumpled-Paper-Background-58171796-1.png");
+  /* background: url("https://www.creativefabrica.com/wp-content/uploads/2023/01/19/Vintage-Crumpled-Paper-Background-58171796-1.png"); */
   background-color: #f9f7f7;
   border-radius: 10px;
   padding: 20px;
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5);
+  /* box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5); */
   overflow: hidden;
   gap: 20px; /* Space between sidebar and content */
 }

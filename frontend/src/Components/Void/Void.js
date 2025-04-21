@@ -84,7 +84,7 @@ const Void = () => {
           <input
             type="text"
             className="search-bar-shrink-1"
-            placeholder="Search Void marketnames..."
+            placeholder="Search Void Marketnames..."
             value={searchTerm}
             onChange={handleSearchMarketChange}
             style={{

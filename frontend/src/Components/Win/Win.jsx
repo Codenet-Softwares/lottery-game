@@ -248,13 +248,13 @@ const Win = () => {
       <div
         className="text-center w-100"
         style={{
-          backgroundColor: "#e6f7ff",
+          // backgroundColor: "#e6f7ff",
           padding: "20px 0",
-          borderBottom: "3px solid #4682B4",
+          // borderBottom: "3px solid #4682B4",
           borderBottomLeftRadius: "15px",
           borderBottomRightRadius: "15px",
           marginBottom: "20px",
-          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+          // boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
         }}
       >
         {/* <h2

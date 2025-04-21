@@ -90,7 +90,7 @@ const Inactive = () => {
           <input
             type="text"
             className="search-bar-shrink-1"
-            placeholder="Search Revoke marketnames..."
+            placeholder="Search Revoke Marketnames..."
             value={searchTerm}
             onChange={handleSearchMarketChange}
             style={{
