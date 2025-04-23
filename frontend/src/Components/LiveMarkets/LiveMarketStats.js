@@ -186,7 +186,7 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
                 marginRight: "auto",
               }}
             >
-              Market Stats for {stats[0]?.marketName}
+              Market Stats For {stats[0]?.marketName}
             </h3>
           </div>
 
@@ -194,7 +194,7 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
             <input
               type="text"
               className="form-control"
-              placeholder="Search by username"
+              placeholder="Search By Username"
               aria-label="Search"
               aria-describedby="button-search"
               value={searchTerm}
@@ -306,8 +306,8 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
                   ) : (
                     <tr>
                       <td colSpan="4" className="text-center text-danger">
-                        The search you are trying to search does not exist.
-                        Search existing live markets.
+                        The Search You Are Trying To Search Does Not Exist.
+                        Search Existing Live Markets.
                       </td>
                     </tr>
                   )}

@@ -155,7 +155,7 @@ const Trash = () => {
             <input
               type="text"
               className="search-bar-shrink-1"
-              placeholder="Search deleted markets..."
+              placeholder="Search Deleted Markets..."
               value={searchMarketTerm}
               onChange={handleSearchMarketChange}
               style={{
@@ -179,7 +179,7 @@ const Trash = () => {
               Back to Trash
             </button> */}
             <aside className="market-sidebar">
-              <h3>Deleted Markets</h3>
+              <h3 className="fw-bold">Deleted Markets</h3>
               <ul className="market-list-custom">
                 {markets.map((market, index) => (
                   <li
@@ -196,14 +196,14 @@ const Trash = () => {
               </ul>
               {noMarketsFound && (
                  <div className="no-markets-message">
-                 <i className="fas fa-exclamation-circle"></i> No markets with this name exist.
+                 <i className="fas fa-exclamation-circle"></i> No Markets With This Name Exist.
                </div>
               )}
             </aside>
             <div className="paper-content">
               {selectedMarketDetails === null ? (
                 <p className="highlighted-message">
-                  Select a market from the left to view its details
+                  Select Market From The Left To View Its Details
                 </p>
               ) : (
                 <Trashmarketdetails

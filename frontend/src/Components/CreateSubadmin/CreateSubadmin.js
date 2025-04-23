@@ -24,15 +24,17 @@ const CreateSubadmin = ({
       permissions: [],
     },
     validationSchema: createSubadminSchema,
+    validationContext: { permissionsList }, // 👈 pass context here
     onSubmit: (values) => {
       const requestBody = {
         ...values,
-        permissions: values.permissions.map(String).join(","), // Ensure each permission is a string
+        permissions: values.permissions.map(String).join(","),
       };
       createSubAdmin(requestBody);
       formik.resetForm();
     },
   });
+  
 
   return (
     <div

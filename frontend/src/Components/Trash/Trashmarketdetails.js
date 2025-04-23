@@ -113,14 +113,14 @@ const Trashmarketdetails = ({
   return (
     <div className="market-details-container px-5">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3 className="market-details-title text-start">
-          Trash Market Details of {marketName}
+        <h3 className="market-details-title text-start fw-bold">
+          Trash Market Details Of {marketName}
         </h3>
         <div className="search-container">
           <input
             type="text"
             className="search-bar"
-            placeholder="Search by username..."
+            placeholder="Search By Username..."
             value={SearchTerm}
             onChange={handleSearchChange}
           />
