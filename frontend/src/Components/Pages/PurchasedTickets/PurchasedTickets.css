@@ -75,12 +75,12 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #4682b4; /* Scrollbar color */
+  background: #284B63; /* Scrollbar color */
   border-radius: 4px; /* Rounded corners */
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #315f82; /* Darker color on hover */
+  background: #284B63; /* Darker color on hover */
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {

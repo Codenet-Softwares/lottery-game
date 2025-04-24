@@ -89,7 +89,7 @@ const ViewAllSubadmin = () => {
       {/* Sub-Admin Delete Modal End*/}
 
       <div
-        className="p-4 rounded-4 text-center shadow-lg"
+        className="p-4 rounded-4 text-center shadow-lg m-5"
         style={{ background: "#F9F9F9", border: "2px solid gray" }}
       >
         <ReusableTable

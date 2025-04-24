@@ -171,10 +171,10 @@ const BetSettleUnsettle = ({ marketId, backButton, onAllDataDeleted }) => {
       {betStats ? (
         <div className="container border-0" style={{ overflow: "hidden" }}>
           <div className="d-flex justify-content-between align-items-center mb-4">
+
             <div className="bet-settle-back-button d-flex justify-content-start">
               {backButton}
             </div>
-
             <h3 className="bet-settle-header fw-bold d-flex align-items-center mt-3">
               Market Stats For {betStats[0]?.marketName}
             </h3>
@@ -184,7 +184,7 @@ const BetSettleUnsettle = ({ marketId, backButton, onAllDataDeleted }) => {
             <input
               type="text"
               className="form-control bet-settle-search-input"
-              placeholder="Search by username"
+              placeholder="Search By Username"
               aria-label="Search"
               aria-describedby="button-search"
               value={searchTerm}
@@ -233,8 +233,8 @@ const BetSettleUnsettle = ({ marketId, backButton, onAllDataDeleted }) => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="4" className="text-center text-danger">
-                        The search you are trying to search does not exist. Search existing live markets.
+                      <td colSpan="4" className="text-center text-danger fw-bold">
+                        The Search You Are Trying To Search Does Not Exist. Search Existing Live Markets.
                       </td>
                     </tr>
                   )}

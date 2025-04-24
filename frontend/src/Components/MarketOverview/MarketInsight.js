@@ -196,17 +196,16 @@ const MarketInsight = () => {
       {/* Sidebar */}
       <aside className="alt-sidebar p-4">
         <h5
-          className="text-center text-white"
-          style={{ fontWeight: "800", letterSpacing: "1px" }}
+          className="text-center text-dark fw-bolder"
         >
-          LOTTERY MARKETS
+         LOTTERY MARKETS
         </h5>
         <div className="market-card-grid">
           {marketTimes.length > 0 ? (
             marketTimes.map((market) => (
               <Card
                 key={market.marketId}
-                className="market-card shadow"
+                className="market-card shadow FW-BOLD"
                 onClick={() => handleMarketClick(market)}
               >
                 <Card.Body>
@@ -230,7 +229,7 @@ const MarketInsight = () => {
             >
               <h4
                 className="text-center bg-white p-5 rounded-5"
-                style={{ color: "#2b3a67", fontWeight: "900" }}
+                style={{ color: "#284B63", fontWeight: "900" }}
               >
                 No <br />
                 Market <br />

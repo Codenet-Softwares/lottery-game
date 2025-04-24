@@ -27,7 +27,7 @@ const SearchCreatedLotto = () => {
     <div className="sc-lotto-container">
       <aside className="sc-lotto-sidebar">
         <div className="sc-lotto-sidebar-header">
-          <h5 className="sc-lotto-sidebar-title">LOTTERY MARKETS</h5>
+          <h5 className="sc-lotto-sidebar-title fw-bold text-dark">LOTTERY MARKETS</h5>
         </div>
         <div className="sc-lotto-market-card-grid">
           {filteredMarkets.length > 0 ? (
@@ -40,7 +40,7 @@ const SearchCreatedLotto = () => {
                 onClick={() => handleMarketClick(market)}
               >
                 <div className="sc-lotto-market-card-body">
-                  <h6>{market.marketName}</h6>
+                  <h6 className="">{market.marketName}</h6>
                 </div>
               </div>
             ))
@@ -48,7 +48,7 @@ const SearchCreatedLotto = () => {
             <div className="d-flex justify-content-center align-items-center ">
               <h4
                 className="text-center bg-white p-5 rounded-4"
-                style={{ color: "#2b3a67", fontWeight: "900" }}
+                style={{ color: "#284B63", fontWeight: "900" }}
               >
                 No <br />
                 Markets <br />

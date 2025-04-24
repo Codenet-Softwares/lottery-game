@@ -24,20 +24,21 @@ const CreateSubadmin = ({
       permissions: [],
     },
     validationSchema: createSubadminSchema,
+    validationContext: { permissionsList }, // 👈 pass context here
     onSubmit: (values) => {
       const requestBody = {
         ...values,
-        permissions: values.permissions.map(String).join(","), // Ensure each permission is a string
+        permissions: values.permissions.map(String).join(","),
       };
       createSubAdmin(requestBody);
       formik.resetForm();
     },
   });
+  
 
   return (
     <div
-      className="d-flex align-items-center justify-content-center"
-      style={{ background: "#f0f0f0", minHeight: "75vh" }}
+      className="d-flex align-items-center justify-content-center mt-5"
     >
       <div
         className="container mt-3 p-4 shadow rounded"
@@ -102,7 +103,8 @@ const CreateSubadmin = ({
           <div className="text-center mt-4">
             <button
               type="submit"
-              className=" btn btn-info createsubadmin-button"
+              className=" btn createsubadmin-button text-white"
+              style={{background:"#284B63"}}
             >
               Submit
             </button>

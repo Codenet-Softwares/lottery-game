@@ -1,21 +1,25 @@
 /* General Layout */
 .alt-dashboard-container {
   display: flex;
-  background-color: #f7f9fc;
+  /* background-color: #f7f9fc; */
   /* flex-direction: column; */
-  padding: 20px;
-  overflow-x: hidden;
-
-  height: 75vh;
+  padding: 30px;
+  overflow-y: hidden;
+ 
 }
 
 .alt-sidebar {
-  width: 280px;
-  background-color: #2b3a67;
+  width: 270px;
   color: white;
   border-radius: 12px;
   overflow-y: auto;
+  height: 83vh;
+  background-color: rgba(230, 230, 230, 0.35); /* deeper transparency for more depth */
+  box-shadow: 0 2px 24px rgba(2, 51, 83, 0.4); /* softer, deeper shadow for watery depth */
+  backdrop-filter: blur(10px) saturate(150%); /* stronger blur + color saturation for a watery glass effect */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* subtle inner glow edge */
 }
+
 
 .alt-main-content {
   flex: 1;
@@ -25,15 +29,15 @@
 .market-card-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
-  padding-top: 20px;
+  gap: 5px;
+  padding-top: 8px;
 }
 
 .market-card {
   width: 100%;
   margin-bottom: 10px;
-  background-color: #3f4a85;
-  color: white;
+  background-color: #E6F7FF;
+  color: #284B63;
   cursor: pointer;
   transition: transform 0.3s;
   border-radius: 10px;
@@ -41,7 +45,8 @@
 
 .market-card:hover {
   transform: scale(1.05);
-  background-color: #5862a6;
+  background-color: #284B63;
+  color: #FFF;
 }
 
 .market-title {
@@ -59,8 +64,9 @@
   padding: 30px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   max-width: 800px;
-  margin: auto;
+  /* margin: auto; */
   animation: slideIn 0.4s ease-in-out;
+  
 }
 
 .stats-grid {
@@ -83,7 +89,7 @@
 
 .stat-icon {
   font-size: 2rem;
-  color: #4a66c3;
+  color: #284B63;
   margin-bottom: 10px;
 }
 
@@ -120,6 +126,7 @@
 .close-btn {
   display: block;
   margin: auto;
+  
 }
 
 /* Animation */

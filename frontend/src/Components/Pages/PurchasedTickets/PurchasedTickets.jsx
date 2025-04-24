@@ -198,7 +198,7 @@ const PurchasedTickets = () => {
   return (
     <div
       className="d-flex align-items-center justify-content-center"
-      style={{ background: "#f0f0f0", minHeight: "75vh" }}
+      // style={{ background: "#f0f0f0", minHeight: "100vh" }}
     >
       <div
         className="container mt-5 p-3"
@@ -247,7 +247,7 @@ const PurchasedTickets = () => {
               <h4
                 className="fw-bold"
                 style={{
-                  color: "#4682B4",
+                  color: "#284B63",
                 }}
               >
                 LOTTERY MARKETS
@@ -339,7 +339,7 @@ const PurchasedTickets = () => {
         {visibleMarkets.length > 0 ? (
           <>
             <div className="d-flex justify-content-between align-items-center mb-3">
-              <h2 className="fw-bold" style={{ color: "#4682B4" }}>
+              <h2 className="fw-bold" style={{ color: "#284B63" }}>
                 PURCHASED LOTTERY TICKETS
               </h2>
               <div className="w-50">

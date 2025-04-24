@@ -139,23 +139,21 @@ const Trash = () => {
             className="search-bar-container-shrink-2"
             style={{
               position: "absolute",
-              top: "-10px", // Adjust the distance from the top as needed
+              top: "40px", // Adjust the distance from the top as needed
               left: "50%",
               transform: "translateX(-50%)", // This centers it horizontally
               width: "50%", // Take up a larger width but still centered
               zIndex: 10, // Ensures it’s on top
               display: "flex", // Flexbox for better control
               justifyContent: "center", // Centers the content inside the div
-              backgroundColor: "#f1f7ff", // Light background color for the 'merged' effect
               padding: "10px", // Padding around the search bar
               borderRadius: "50px", // Pill shape
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Adds subtle shadow for a more refined look
             }}
           >
             <input
               type="text"
               className="search-bar-shrink-1"
-              placeholder="Search deleted markets..."
+              placeholder="Search Deleted Markets..."
               value={searchMarketTerm}
               onChange={handleSearchMarketChange}
               style={{
@@ -179,7 +177,7 @@ const Trash = () => {
               Back to Trash
             </button> */}
             <aside className="market-sidebar">
-              <h3>Deleted Markets</h3>
+              <h3 className="fw-bold">Deleted Markets</h3>
               <ul className="market-list-custom">
                 {markets.map((market, index) => (
                   <li
@@ -196,15 +194,15 @@ const Trash = () => {
               </ul>
               {noMarketsFound && (
                  <div className="no-markets-message">
-                 <i className="fas fa-exclamation-circle"></i> No markets with this name exist.
+                 <i className="fas fa-exclamation-circle"></i> No Markets With This Name Exist.
                </div>
               )}
             </aside>
             <div className="paper-content">
               {selectedMarketDetails === null ? (
-                <p className="highlighted-message">
-                  Select a market from the left to view its details
-                </p>
+                <h3 className="highlighted-message">
+                  Select Market From The Left To View  Its Details
+                </h3>
               ) : (
                 <Trashmarketdetails
                   details={selectedMarketDetails}

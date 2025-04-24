@@ -1,7 +1,11 @@
 .white_box {
-  background: hsl(200, 18%, 46%);         
+  /* background: hsl(200, 18%, 46%);          */
   border-radius: 8px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 24px rgba(2, 51, 83, 0.4); /* softer, deeper shadow for watery depth */
+  backdrop-filter: blur(10px) saturate(150%); /* stronger blur + color saturation for a watery glass effect */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* subtle inner glow edge */
+  background-color: #284B63; /* deeper transparency for more depth */
+
 }
 
 .pagination-custom .page-item {

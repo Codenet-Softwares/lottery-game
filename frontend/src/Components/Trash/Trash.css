@@ -4,115 +4,27 @@
   display: flex;
   flex-direction: row;
   width: 100%; /* Full width to allow space distribution */
-  height: 100%;
-  background: url("https://www.creativefabrica.com/wp-content/uploads/2023/01/19/Vintage-Crumpled-Paper-Background-58171796-1.png");
-  background-color: #f9f7f7;
+  height: 100vh;
+  /* background: url("https://www.creativefabrica.com/wp-content/uploads/2023/01/19/Vintage-Crumpled-Paper-Background-58171796-1.png"); */
+  /* background-color: #f9f7f7; */
   border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5);
+  padding: 50px;
+  /* box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5); */
   overflow: hidden;
   gap: 20px; /* Space between sidebar and content */
-
-
-
 }
 
 .trash-container {
-  background: linear-gradient(135deg, #f8fbff, #dde7f0);
-  height: 75vh;
+  /* background: linear-gradient(135deg, #f8fbff, #dde7f0); */
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
   overflow: hidden;
+  /* margin: 30px; */
 }
 
-/* Dustbin Design */
-/* .dustbin {
-  width: 200px;
-  height: 320px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.small-lid {
-  width: 200px;
-  height: 20px;
-  background: #444;
-  border-radius: 5px;
-  position: absolute;
-  top: -70px;
-  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
-}
-
-.lid {
-  width: 1100px;
-  height: 50px;
-  background: #444;
-  border-radius: 10px;
-  position: absolute;
-  top: -50px;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: transform 0.5s ease-in-out;
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
-}
-
-.lid:hover {
-  background: #555;
-}
-
-.lid-text {
-  font-size: 1rem;
-  font-weight: bold;
-  color: white;
-  text-shadow: 1px 1px 2px black;
-} */
-
-/* Bin Body with Trapezoid Shape */
-/* .bin-body {
-  width: 1000px;
-  height: 500px;
-  background: #333;
-  clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 10% 100%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.4);
-  position: relative;
-  border-radius: 0 0 10px 10px;
-}
-
-.bin-text {
-  font-size: 0.9rem;
-  color: #fff;
-  text-align: center;
-  padding: 0 10px;
-  font-family: "Arial", sans-serif;
-} */
-
-/* Crumpled Paper Mode */
-/* .crumpled-paper {
-    display: flex;
-    flex-direction: row; 
-  width: 90%;
-  height: 90%;
-  background: url("https://www.creativefabrica.com/wp-content/uploads/2023/01/19/Vintage-Crumpled-Paper-Background-58171796-1.png");
-  background-color: #f9f7f7;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  animation: paperRise 0.8s ease-out forwards;
-  overflow: hidden;
-
-} */
 
 
 /* Adjust container for sidebar and content separation */
@@ -120,12 +32,12 @@
   display: flex;
   flex-direction: row;
   width: 100%; /* Full width to allow space distribution */
-  height: 100%;
-  background: url("https://www.creativefabrica.com/wp-content/uploads/2023/01/19/Vintage-Crumpled-Paper-Background-58171796-1.png");
-  background-color: #f9f7f7;
+;
+  /* background: url("https://www.creativefabrica.com/wp-content/uploads/2023/01/19/Vintage-Crumpled-Paper-Background-58171796-1.png"); */
+  /* background-color: #f9f7f7; */
   border-radius: 10px;
   padding: 20px;
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5);
+  /* box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5); */
   overflow: hidden;
   gap: 20px; /* Space between sidebar and content */
 }
@@ -234,16 +146,19 @@
    /* Sidebar styling */
 .market-sidebar {
   flex: 1; 
-  max-width: 300px; 
-  background: rgba(255, 255, 255, 0.7);
+  max-width: 270px; 
   border-radius: 10px;
-  padding: 20px;
+  padding: 30px;
   position: absolute;
   overflow-y: auto; 
-  box-shadow: inset 0px 4px 10px rgba(0, 0, 0, 0.2);
+  background-color: rgba(230, 230, 230, 0.35); /* deeper transparency for more depth */
+  box-shadow: 0 2px 24px rgba(2, 51, 83, 0.4); /* softer, deeper shadow for watery depth */
+  backdrop-filter: blur(10px) saturate(150%); /* stronger blur + color saturation for a watery glass effect */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* subtle inner glow edge */
   height: 100%;
-  left: 0;
-  top: 0;
+  left: 35px;
+  top:35px;
+  height: 83vh;
 }
   /* Content Area for Crumpled Paper */
   .paper-content {
@@ -280,23 +195,24 @@
 }
 
 .highlighted-message {
-  color: #ff4500; /* Bright orange for visibility */
-  font-weight: bold;
+  color: #284B63; /* Bright orange for visibility */
+  font-weight: 900;
   font-size: 1.2em;
   text-align: center;
-  margin-top: 20px;
-  background-color: #fffbe6; /* Light yellow background */
-  padding: 10px;
-  border: 2px solid #ffa500; /* Matching border */
-  border-radius: 8px;
+  margin-top: 200px;
+  background-color: #ffffff; /* Light yellow background */
+  padding: 40px;
+  border-radius: 30px;
+  width: 300px;
+  margin-left: 300px;
 }
 
 .no-markets-message {
   text-align: center;
   font-size: 18px;
-  color: #d9534f; /* Red color to highlight the message */
+  color: #284B63; /* Red color to highlight the message */
   font-weight: bold;
-  background-color: #f8d7da; /* Light red background */
+  background-color: #ffffff; /* Light red background */
   padding: 15px;
   border-radius: 8px;
   margin-top: 20px;

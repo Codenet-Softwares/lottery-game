@@ -183,14 +183,7 @@ const Result = () => {
   };
 
   return (
-    <div
-      style={{
-        fontFamily: "Arial, sans-serif",
-        margin: "20px",
-        background: "#f0f0f0",
-        minHeight: "75vh",
-      }}
-    >
+    <div className="m-5">
       <div
         className="container-result mt-5 p-3"
         style={{
@@ -203,7 +196,7 @@ const Result = () => {
         <div
           className="d-flex align-items-center"
           style={{
-            backgroundColor: "#4682B4",
+            backgroundColor: "#284B63",
             padding: "10px",
             borderRadius: "8px",
             boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",

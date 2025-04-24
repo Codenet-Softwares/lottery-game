@@ -1,17 +1,14 @@
 /* General Layout */
 .alt-dashboard-container {
   display: flex;
-  background-color: #f7f9fc;
-
   padding: 20px;
-  /* overflow-x: hidden; */
-
-  height: 75vh;
+  /* height: 100vh; */
+  overflow-y: hidden;
 }
 
 .alt-sidebar {
   width: 280px;
-  background-color: #2b3a67;
+  background-color: #b5b8c2;
   color: white;
   border-radius: 12px;
   overflow-y: auto;

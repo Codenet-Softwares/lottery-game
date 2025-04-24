@@ -1,10 +1,11 @@
 /* Main container styles */
 .bet-after-win-container {
-  height: 75vh;
+  /* height: 100vh; */
   overflow: hidden;
   text-align: center;
   border-radius: 1rem;
   border: 2px solid gray;
+
 }
 
 /* Inner container styles */

@@ -77,14 +77,14 @@ const Void = () => {
     <div className="container my-5">
       <div className="card shadow-sm">
         <div
-          className="card-header d-flex align-items-center justify-content-between p-3"
-          style={{ backgroundColor: "#0E1A35", color: "#FFFFFF" }}
+          className="void-card-header d-flex align-items-center justify-content-between p-3"
+          // style={{ backgroundColor: "#284B63", color: "#FFFFFF" }}
         >
           <h3 className="mb-0 fw-bold fs-5 text-start">VOID GAME LIST</h3>
           <input
             type="text"
             className="search-bar-shrink-1"
-            placeholder="Search Void marketnames..."
+            placeholder="Search Void Marketnames..."
             value={searchTerm}
             onChange={handleSearchMarketChange}
             style={{
@@ -136,10 +136,7 @@ const Void = () => {
               >
                 <table
                   className="table table-striped table-hover rounded-table"
-                  style={{
-                    border: "2px solid #6c757d",
-                    borderRadius: "10px",
-                  }}
+                  
                 >
                   <tbody>
                     {voidMarkets.map((market, index) => (

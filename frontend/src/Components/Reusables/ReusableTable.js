@@ -77,8 +77,8 @@ const ReusableTable = ({
             })
           ) : (
             <tr>
-              <td colSpan={columns.length} className="text-center">
-                No data found
+              <td colSpan={columns.length} className="text-center fw-bold text-danger">
+                No Data Found
               </td>
             </tr>
           )}

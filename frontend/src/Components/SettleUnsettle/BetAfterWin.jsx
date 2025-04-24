@@ -66,7 +66,7 @@ const BetAfterWin = () => {
   };
 
   return (
-    <div className="bet-after-win-container">
+    <div className="bet-after-win-container m-5">
       <div className="bet-after-win-inner-container container-fluid ">
         {!selectedMarketId && (
           <>
@@ -75,7 +75,7 @@ const BetAfterWin = () => {
               <input
                 type="text"
                 className="form-control bet-after-win-search-input"
-                placeholder="Search by market name"
+                placeholder="Search By Market Name"
                 value={searchTerm}
                 onChange={handleSearchChange}
               />

@@ -35,21 +35,19 @@ const CreateMarkets = () => {
         end_time: endTimeISO,
         price: parseFloat(values.priceForEach),
       };
-try {
-
-  const response = await generateLotteryNumber(requestBody);
-  if (response.success) {
-    console.log("Market created successfully!");
-    formik.resetForm();
-  } else {
-    console.error("Error creating market:", response.message);
-  }
-}catch (error) {
-  console.error("Error during the API request:", error);
-} finally {
-  hideLoader(); // Hide loader after the request completes
-}
-     
+      try {
+        const response = await generateLotteryNumber(requestBody);
+        if (response.success) {
+          console.log("Market created successfully!");
+          formik.resetForm();
+        } else {
+          console.error("Error creating market:", response.message);
+        }
+      } catch (error) {
+        console.error("Error during the API request:", error);
+      } finally {
+        hideLoader(); // Hide loader after the request completes
+      }
     },
   });
 
@@ -67,7 +65,6 @@ try {
     []
   );
   const timerOptions = useMemo(() => generateTimerOptions(), []);
-
 
   useEffect(() => {
     formik.setFieldValue("groupOptions", groupOptions);
@@ -113,10 +110,7 @@ try {
   ];
 
   return (
-    <div
-      className="d-flex align-items-center justify-content-center"
-      style={{ background: "#f0f0f0", minHeight: "75vh" }}
-    >
+    <div className="d-flex align-items-center justify-content-center mt-5">
       <div
         className="container mt-3 p-4 shadow rounded"
         style={{
@@ -127,7 +121,7 @@ try {
           position: "relative",
         }}
       >
-        <h3 className="text-center mb-4">CREATE LOTTERY MARKETS</h3>
+        <h3 className="text-center mb-4 fw-bold">CREATE LOTTERY MARKETS</h3>
         <form onSubmit={formik.handleSubmit}>
           {inputConfig.map((input) => (
             <ReusableInput
