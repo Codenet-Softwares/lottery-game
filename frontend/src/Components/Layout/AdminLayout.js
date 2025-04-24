@@ -1,50 +1,42 @@
-import React from 'react';
-import Footer from './Footer';
-import Layout from './Layout';
-import NavTop from './NavTop';
-
+import React from "react";
+import Footer from "./Footer";
+import Layout from "./Layout";
+import NavTop from "./NavTop";
+import Sidebar from "./Sidebar";
+import "./AdminLayout.css";
+import TopNavbar from "./TopNavbar";
 
 const AdminLayout = () => {
   return (
-    <div className="d-flex flex-column vh-100">
-      {/* Sticky Top Navigation */}
-      <div
-        className="sticky-top" 
-        style={{
-          zIndex: 1030,
-          backgroundColor: '#fff', 
-          boxShadow: '0px 1px 5px rgba(0,0,0,0.1)', 
-        }}
-      >
-        <NavTop />
-      </div>
+    <div className="container-fluid vh-100 d-flex flex-column p-0">
+      {/* Main row: Sidebar + Right section */}
+      <div className="row flex-grow-1 m-0">
+        {/* Sidebar */}
+        <div className="col-2 p-0 bg-dark">
+          <Sidebar />
+        </div>
 
-      {/* Main Content Area */}
+        {/* Main content: NavTop + Layout */}
+        <div className="col-10 p-0 d-flex flex-column">
+          {/* Top Navigation Bar */}
+          <div className="navtop-wrapper">
+            {/* <NavTop /> */}
+            <TopNavbar/>
+          </div>
 
-      <div
-        className="flex-grow-1 overflow-auto"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <div className="p-4" style={{ flex: 1, minHeight: 0 }}>
-
-          <Layout />
+          {/* Main Layout Content */}
+          <div className="flex-grow-1 overflow-auto">
+            <Layout />
+          </div>
         </div>
       </div>
 
-      {/* Sticky Footer */}
-      <div
-        className="sticky-bottom mt-auto"
-        style={{
-          backgroundColor: '#f8f9fa',
-          boxShadow: '0px -1px 5px rgba(0,0,0,0.1)',
-          padding: '20px',
-        }}
-      >
+      {/* Optional Footer */}
+      {/* 
+      <div className="sticky-bottom mt-auto">
         <Footer />
-      </div>
+      </div> 
+      */}
     </div>
   );
 };

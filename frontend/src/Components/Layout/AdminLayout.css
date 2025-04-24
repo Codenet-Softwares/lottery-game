@@ -1,0 +1,31 @@
+.admin-layout-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  /* Sidebar is already styled in Sidebar.css with position: fixed */
+  
+  .main-content-area {
+    flex-grow: 1;
+    margin-left: 220px; /* Sidebar width */
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .top-nav-area {
+    height: 60px;
+    background-color: #f8f9fa;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    z-index: 500;
+  }
+  
+  .layout-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background-color: #f4f5f9;
+  }
+  
