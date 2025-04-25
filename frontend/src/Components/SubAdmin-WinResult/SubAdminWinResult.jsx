@@ -192,7 +192,7 @@ const Result = () => {
         <div
           className="d-flex align-items-center"
           style={{
-            backgroundColor: "#4682B4",
+            backgroundColor: "#284B63",
             padding: "10px",
             borderRadius: "8px",
             boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",

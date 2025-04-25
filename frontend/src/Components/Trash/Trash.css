@@ -1,218 +1,136 @@
-/* Full Page Container */
-.main-container-trash{
-
-  display: flex;
-  flex-direction: row;
-  width: 100%; /* Full width to allow space distribution */
-  height: 100vh;
-  /* background: url("https://www.creativefabrica.com/wp-content/uploads/2023/01/19/Vintage-Crumpled-Paper-Background-58171796-1.png"); */
-  /* background-color: #f9f7f7; */
-  border-radius: 10px;
-  padding: 50px;
-  /* box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5); */
-  overflow: hidden;
-  gap: 20px; /* Space between sidebar and content */
-}
-
 .trash-container {
-  /* background: linear-gradient(135deg, #f8fbff, #dde7f0); */
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
   overflow: hidden;
-  /* margin: 30px; */
 }
 
+.main-container-trash {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100vh;
+  padding: 50px 20px;
+  gap: 20px;
+  box-sizing: border-box;
+}
 
-
-/* Adjust container for sidebar and content separation */
 .crumpled-paper {
   display: flex;
   flex-direction: row;
-  width: 100%; /* Full width to allow space distribution */
+  width: 100%;
   height: 100%;
-  background: url("https://www.creativefabrica.com/wp-content/uploads/2023/01/19/Vintage-Crumpled-Paper-Background-58171796-1.png");
-  background-color: #f9f7f7;
-  border-radius: 10px;
-  padding: 20px;
-  /* box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5); */
-  overflow: hidden;
-  gap: 20px; /* Space between sidebar and content */
+  gap: 20px;
 }
 
-.crumpled-paper h3 {
+.market-sidebar {
+  flex: 1;
+  max-width: 270px;
+  padding: 30px;
+  border-radius: 10px;
+  background-color: rgba(230, 230, 230, 0.35);
+  box-shadow: 0 2px 24px rgba(2, 51, 83, 0.4);
+  backdrop-filter: blur(10px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: 83vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.market-sidebar h3 {
   font-size: 1.5rem;
-  color: #333;
   margin-bottom: 20px;
+  color: #333;
 }
 
 .market-list-custom {
   list-style: none;
   padding: 0;
   margin: 0;
-  align-items: flex-start;
 }
 
 .market-item-custom {
   font-size: 1.1rem;
   font-weight: bold;
   color: #333;
-  background: linear-gradient(135deg, #f0f9ff, #cce7f6);
   margin: 10px 0;
-  padding: 10px 55px;
+  padding: 12px 20px;
   border-radius: 8px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
-  text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #f0f9ff, #cce7f6);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   font-family: "Georgia", serif;
-  padding-left: 20px;
-  position: relative;
 }
 
 .market-item-custom:hover {
   transform: scale(1.05);
-  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   background: linear-gradient(135deg, #cce7f6, #a1cfee);
 }
 
 .market-item-custom:active {
   transform: scale(0.98);
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.market-delete-icon {
-  position: absolute;
-  top: 10%;
-  left: 1px;
-  transform: translateY(-50%);
-  color: #ff4d4f; /* Red color for delete */
-  cursor: pointer;
-  font-size: 20px; /* Icon size */
-  transition: color 0.3s ease;
+.paper-content {
+  flex: 3;
+  margin-top: 5vw;
+  margin-left: 30px;
+  margin-right: 30px;
 }
 
-.market-delete-icon:hover {
-  color: #d9363e; /* Slightly darker red on hover */
+.search-bar-container-shrink-2 {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
-/* Back to Trash Button */
-.back-to-bin {
-  position: absolute;
-  top: 20px; /* Align to the top */
-  right: 20px; /* Align to the right */
-  z-index: 1000;
-  padding: 12px 25px;
-  background: linear-gradient(135deg, #4682b4, #5a9fd3);
-  color: white;
-  font-size: 1.2rem;
-  font-weight: bold;
-  border: none;
-  border-radius: 30px;
-  cursor: pointer;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
-  transition: transform 0.3s ease, background 0.3s ease;
-  font-family: "Arial", sans-serif;
-}
-
-.back-to-bin:hover {
-  transform: scale(1.1);
-  background: linear-gradient(135deg, #366d99, #4e8bc1);
-}
-
-.back-to-bin:active {
-  transform: scale(0.95);
-  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
+.search-bar-shrink-1 {
+  width: 100%;
+  max-width: 100%;
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: 1px solid #4682B4;
+  background-color: #f1f7ff;
+  color: #4682B4;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s ease-in-out;
 }
 
 
-/* Sidebar for Deleted Markets */
-/* .market-sidebar {
-    width: 300px;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.7); 
-    padding: 20px;
-    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.1);
-    overflow-y: auto; 
-    border-right: 1px solid #ccc; 
-    position: absolute; 
-    left: 0;
-    top: 0;
-  }
-   */
-
-   /* Sidebar styling */
-.market-sidebar {
-  flex: 1; 
-  max-width: 270px; 
-  border-radius: 10px;
-  padding: 30px;
-  position: absolute;
-  overflow-y: auto; 
-  background-color: rgba(230, 230, 230, 0.35); /* deeper transparency for more depth */
-  box-shadow: 0 2px 24px rgba(2, 51, 83, 0.4); /* softer, deeper shadow for watery depth */
-  backdrop-filter: blur(10px) saturate(150%); /* stronger blur + color saturation for a watery glass effect */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* subtle inner glow edge */
-  height: 100%;
-  left: 35px;
-  top:35px;
-  height: 83vh;
-}
-  /* Content Area for Crumpled Paper */
-  .paper-content {
-    flex-grow: 1; 
-    /* display: flex; */
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-left: 350px; 
-    margin-right: 320px; 
-   margin-top: 5vw;
-   /* border: 2px solid red; */
-  }
-
-
-
-.market-sidebar h3 {
-  font-size: 1.5rem;
-  margin-bottom: 10px;
-  color: #333;
-  overflow-y: none;
-}
-
-/* Keyframe Animations */
-@keyframes paperRise {
-  0% {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.search-bar-shrink-1:focus {
+  border-color: #1e5c8a;
 }
 
 .highlighted-message {
-  color: #284B63; /* Bright orange for visibility */
+  color: #284B63;
   font-weight: 900;
   font-size: 1.2em;
   text-align: center;
-  margin-top: 200px;
-  background-color: #ffffff; /* Light yellow background */
+  margin: 200px auto 0;
+  background-color: #E6F7FF;
   padding: 40px;
-  border-radius: 30px;
+  border-radius: 12px;
   width: 300px;
-  margin-left: 300px;
+
 }
 
 .no-markets-message {
   text-align: center;
   font-size: 18px;
-  color: #284B63; /* Red color to highlight the message */
+  color: #284B63;
   font-weight: bold;
-  background-color: #ffffff; /* Light red background */
+  background-color: #ffffff;
   padding: 15px;
   border-radius: 8px;
   margin-top: 20px;
@@ -223,9 +141,80 @@
 }
 
 .no-markets-message i {
-  margin-right: 10px; /* Space between icon and text */
+  margin-right: 10px;
+}
+.search-bar-container {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 50px;
+  box-sizing: border-box;
 }
 
+.search-bar-input {
+  width: 100%;
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: 1px solid #4682B4;
+  background-color: #f1f7ff;
+  color: #4682B4;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s ease-in-out;
+}
 
+.search-bar-input:focus {
+  border-color: #1e5c8a;
+}
 
+/* ========== Responsive Design ========== */
 
+@media (max-width: 1024px) {
+  .main-container-trash {
+    flex-direction: column;
+    padding: 30px 20px;
+  }
+
+  .crumpled-paper {
+    flex-direction: column;
+  }
+
+  .market-sidebar {
+    max-width: 100%;
+    height: auto;
+    position: static;
+  }
+
+  .paper-content {
+    margin: 20px 0 0 0;
+  }
+
+  .search-bar-container-shrink-2 {
+    width: 90%;
+    top: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .search-bar-shrink-1 {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+
+  .highlighted-message {
+    padding: 20px;
+    font-size: 1em;
+    width: 90%;
+  }
+
+  .market-item-custom {
+    font-size: 1rem;
+    padding: 10px 16px;
+  }
+}

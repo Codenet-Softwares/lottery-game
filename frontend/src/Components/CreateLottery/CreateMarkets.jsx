@@ -114,8 +114,8 @@ const CreateMarkets = () => {
       <div
         className="container mt-3 p-4 shadow rounded"
         style={{
-          background: "#fff",
-          border: "2px solid black",
+  background: "linear-gradient(135deg, #f0f9ff, #cce7f6)",
+          border: "2px solid #284B63",
           boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
           maxWidth: "900px",
           position: "relative",
@@ -170,7 +170,7 @@ const CreateMarkets = () => {
               type="submit"
               className="btn btn-primary px-4"
               style={{
-                background: "#4682B4",
+                background: "#284B63",
                 position: "absolute",
                 bottom: "-20px",
                 left: "50%",

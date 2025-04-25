@@ -42,7 +42,7 @@ const ViewTicketsModal = ({ isOpen, onClose, ticketNumbers }) => {
                     {ticketNumbers.map((ticket, index) => (
                       <div key={index} className="col">
                         <div className="card border-1 shadow-sm text-center p-1">
-                          <div className="card-body py-1 fw-bold text-info">
+                          <div className="card-body py-1 fw-bold text-dark">
                             {ticket}
                           </div>
                         </div>

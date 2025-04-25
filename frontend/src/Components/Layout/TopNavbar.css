@@ -2,7 +2,14 @@
     position: relative;
     margin-left: 15px;
   }
-  
+  .header_right {
+    background-color: #284B63;
+    width: 100%;
+  }
+  .profile_info {
+    position: relative;
+    margin-left: auto; /* Pushes profile image to the right */
+  }
   .profile_info_iner {
     position: absolute;
     right: 0;

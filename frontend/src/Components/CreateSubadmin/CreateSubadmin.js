@@ -44,6 +44,8 @@ const CreateSubadmin = ({
         className="container mt-3 p-4 shadow rounded"
         style={{
           background: "#fff",
+          // background: "linear-gradient(135deg, #f0f9ff, #cce7f6):,
+
           border: "2px solid black",
           boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
           maxWidth: "900px",

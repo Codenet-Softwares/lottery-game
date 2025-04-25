@@ -205,7 +205,7 @@ const MarketInsight = () => {
             marketTimes.map((market) => (
               <Card
                 key={market.marketId}
-                className="market-card shadow FW-BOLD"
+                className="market-card shadow"
                 onClick={() => handleMarketClick(market)}
               >
                 <Card.Body>

@@ -104,7 +104,7 @@ const Void = () => {
           />
         </div>
 
-        <div className="card-body p-3">
+        <div className="card-body p-3" style={{background:"linear-gradient(135deg, #f0f9ff, #cce7f6)"}}>
           {isLoading ? (
             <div className="text-center">Loading...</div>
           ) : voidMarkets.length == 0 ? (

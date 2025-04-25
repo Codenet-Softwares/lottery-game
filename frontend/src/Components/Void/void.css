@@ -9,3 +9,6 @@ accordion-flush>.accordion-item>.accordion-header .accordion-button, .accordion-
     background-color: #284B63;
     color: #fff;
 }
+.acco_body{
+  background-color:  linear-gradient(135deg, #f0f9ff, #cce7f6); 
+}

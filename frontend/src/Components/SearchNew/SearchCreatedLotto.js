@@ -81,7 +81,7 @@ const SearchCreatedLotto = () => {
                     PRICE: <strong>{selectedMarket.price}</strong>
                   </div>
                   <div className="sc-lotto-form-header">
-                    <h6>{selectedMarket.marketName}</h6>
+                    <h6 className=" fw-bold">{selectedMarket.marketName}</h6>
                   </div>
                   <Formik
                     key={selectedMarket?.marketId || "form"}
@@ -137,7 +137,7 @@ const SearchCreatedLotto = () => {
             <div className="sc-lotto-search-border-form border border-2 border-secondary py-4 rounded-3">
               <div className="sc-lotto-results-container">
                 <h4>Search Results:</h4>
-                <h5>Tickets:</h5>
+                <h5 className="fw-bold">Tickets:</h5>
 
                 {lotteryData.searchResult?.tickets?.length ? (
                   <div className="ticket-grid-container">

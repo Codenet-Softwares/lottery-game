@@ -85,7 +85,6 @@ const DashCard = [
     icon: "fas fa-user-shield", // icon for Lucky Hour
   },
 
-
   {
     name: "Prize-Approval",
     description:
@@ -104,10 +103,10 @@ const DashCard = [
     icon: "fas fa-balance-scale", // icon for Lucky Hour
   },
   {
-    name: "View All SubAdmin",
+    name: "View All Sub-Admin",
     description:
       "View all your created sub-Admins with a feature of resetting the password",
-    buttonName: "View-All Sub-Admin",
+    buttonName: "View Sub-Admin",
     buttonLink: "/view-all-subadmin",
     icon: "fas fa-users-cog", // icon for Lucky Hour
   },
@@ -115,20 +114,15 @@ const DashCard = [
   {
     name: "Sub-Admin Data",
     description: "Get to see the status each Approve & Reject with pending with the ticket details",
-    buttonName: "unleash status",
+    buttonName: "Unleash Status",
     buttonLink: "/subAdminData",
-    cardstyle: {
-      borderRadius: "20px",
-      boxShadow: "0 4px rgb(2, 2, 2)0, 0.1)",
-      color: "#fff",
-    },
     icon: "fas fa-database", // icon for Lucky Hour
   },
 
   {
     name: "Sub-Admin Result",
     description: "Get to see the results in detail of each approved status markets",
-    buttonName: "unleash status",
+    buttonName: "Unleash Status",
     buttonLink: "/subAdmin-win-result",
     icon: "fas fa-trophy", // icon for Lucky Hour
   },

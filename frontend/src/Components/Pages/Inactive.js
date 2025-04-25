@@ -109,7 +109,7 @@ const Inactive = () => {
             onBlur={(e) => (e.target.style.borderColor = "#4682B4")}
           />
         </div>
-        <div className="card-body">
+        <div className="card-body" style={{background:"linear-gradient(135deg, #f0f9ff, #cce7f6)"}}>
           {/* Table */}
           <SingleCard
             className=" mb-5 "
@@ -123,7 +123,7 @@ const Inactive = () => {
 
               >
                 <thead
-                  className="table-primary"
+                  className="table-dark"
                   style={{
                     position: "sticky",
                     top: 0,

@@ -36,17 +36,21 @@
 .market-card {
   width: 100%;
   margin-bottom: 10px;
-  background-color: #E6F7FF;
-  color: #284B63;
+  background: linear-gradient(135deg, #f0f9ff, #cce7f6);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+ color: black;
   cursor: pointer;
   transition: transform 0.3s;
   border-radius: 10px;
+  font-family: "Georgia", serif;
+font-weight:bolder;
 }
 
 .market-card:hover {
   transform: scale(1.05);
-  background-color: #284B63;
-  color: #FFF;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #cce7f6, #a1cfee);
 }
 
 .market-title {
@@ -59,7 +63,7 @@
 
 /* User Stats Pop-Up */
 .stats-popup {
-  background-color: #ffffff;
+  background: linear-gradient(135deg, #f0f9ff, #cce7f6);
   border-radius: 12px;
   padding: 30px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);

@@ -1,365 +1,375 @@
 /* Main container styles */
 .sc-lotto-container {
-    display: flex;
-    /* height: 100vh; */
-    /* background-color: #f5f5f5; */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 30px;
-    
-  }
-  
-  /* Sidebar styles */
-  .sc-lotto-sidebar {
-    width: 250px;
-    background-color: rgba(230, 230, 230, 0.35); /* deeper transparency for more depth */
-    padding: 20px;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    border-right: 1px solid #e0e0e0;
-    display: flex;
-    border-radius: 12px;
-    overflow-y: auto;
-    flex-direction: column;
-     overflow-y: auto;
+  display: flex;
+  /* height: 100vh; */
+  /* background-color: #f5f5f5; */
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  padding: 30px;
+}
+
+/* Sidebar styles */
+.sc-lotto-sidebar {
+  width: 250px;
+  background-color: rgba(
+    230,
+    230,
+    230,
+    0.35
+  ); /* deeper transparency for more depth */
+  padding: 20px;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  border-radius: 12px;
+  overflow-y: auto;
+  flex-direction: column;
+  overflow-y: auto;
   height: 83vh;
   box-shadow: 0 2px 24px rgba(2, 51, 83, 0.4); /* softer, deeper shadow for watery depth */
   backdrop-filter: blur(10px) saturate(150%); /* stronger blur + color saturation for a watery glass effect */
   border: 1px solid rgba(255, 255, 255, 0.1); /* subtle inner glow edge */
-  }
-  
-  .sc-lotto-sidebar-header {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-  }
-  .sc-lotto-sidebar-title {
-    font-weight: 800;
-    letter-spacing: 1px;
-    color: hsl(0, 0%, 100%);
-    margin-bottom: 18px;
-    text-align: left;
-  }
-  
-  .sc-lotto-market-card-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-    overflow-y: auto;
-    /* flex-grow: 1; */
-    padding-left: 5px;
-    padding-right: 8px;
-  }
-  
-  /* Custom scrollbar */
-  .sc-lotto-market-card-grid::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .sc-lotto-market-card-grid::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-  }
-  
-  .sc-lotto-market-card-grid::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 3px;
-  }
-  
-  .sc-lotto-market-card-grid::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
+}
+
+.sc-lotto-sidebar-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+.sc-lotto-sidebar-title {
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: hsl(0, 0%, 100%);
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.sc-lotto-market-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  overflow-y: auto;
+  /* flex-grow: 1; */
+  padding-left: 5px;
+  padding-right: 8px;
+}
+
+/* Custom scrollbar */
+.sc-lotto-market-card-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sc-lotto-market-card-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.sc-lotto-market-card-grid::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.sc-lotto-market-card-grid::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
 /* Base style */
 .sc-lotto-market-card {
-  background-color: white;
+  background: linear-gradient(135deg, #f0f9ff, #cce7f6);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   padding: 15px;
   cursor: pointer;
   transition: all 0.3s ease;
   border-left: 4px solid transparent;
-}
 
+}
+.market_name{
+  color: #284b63;
+}
 /* Default text color */
 .sc-lotto-market-card .sc-lotto-market-card-body h6 {
-  color: #284B63;
+  color: #000;
   font-weight: bold;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: "Georgia", serif;
+
 }
 
 /* Hover styles */
 .sc-lotto-market-card:hover {
   transform: scale(1.05);
-  background-color: #284B63;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #cce7f6, #a1cfee);
+  color: Black !important;
 }
+  
 
 /* Force white text on hover */
 .sc-lotto-market-card:hover .sc-lotto-market-card-body h6 {
-  color: white !important;
+  color: Black !important;
 }
 
 /* Active card styles */
 .sc-lotto-market-card.active {
-  border-left: 4px solid #4682B4;
-  background-color: #284B63;
+  border-left: 4px solid #4682b4;
+  background-color: #284b63;
 }
 
 /* Force white text on active */
 .sc-lotto-market-card.active .sc-lotto-market-card-body h6 {
-  color: white !important;
+  color: Black !important;
 }
 
-  
-  
-  .sc-lotto-no-markets {
-    /* width: 100%; */
-  }
-  
-  /* Main content styles */
-  .sc-lotto-main-content {
-    flex: 1;
-    padding: 30px;
-    /* background-color: #f5f5f5; */
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    height: 77vh;
-  }
-  
-  .sc-lotto-no-markets-message,
-  .sc-lotto-select-market {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    font-size: 1.2rem;
-    text-align: center;
+.sc-lotto-no-markets {
+  /* width: 100%; */
+}
 
-  }
-  /* Select Message */
-.sc-select-message{
-  background-color: #E6F7FF;
-  color:#284B63 ;
+/* Main content styles */
+.sc-lotto-main-content {
+  flex: 1;
+  padding: 30px;
+  /* background-color: #f5f5f5; */
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  height: 77vh;
+}
+
+.sc-lotto-no-markets-message,
+.sc-lotto-select-market {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 1.2rem;
+  text-align: center;
+}
+/* Select Message */
+.sc-select-message {
+  background-color: #e6f7ff;
+  color: #284b63;
   border-radius: 12px;
   padding: 60px;
+}
+/* Search form styles */
+.sc-lotto-search-form {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px;
+  background: linear-gradient(135deg, #f0f9ff, #cce7f6);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center vertically */
+  min-height: 400px; /* Give it some minimum height */
+}
+.sc-lotto-search-border-form {
+  max-width: 653px;
+  margin: 0 auto;
+}
+.sc-lotto-form-header h6 {
+  color: #284B63;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.sc-lotto-form-group {
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 400px; /* Limit input width */
+  margin-left: auto;
+  margin-right: auto; /* Center horizontally */
+}
+
+.sc-lotto-form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #4682b4;
+  font-weight: bold;
+}
+
+.sc-lotto-form-group select,
+.sc-lotto-form-group input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.sc-lotto-input-wrapper {
+  position: relative;
+}
+
+.sc-lotto-picker-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  z-index: 10;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin-top: 5px;
+}
+
+.sc-lotto-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.sc-lotto-picker-item {
+  padding: 8px;
+  text-align: center;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sc-lotto-picker-item:hover {
+  background-color: #e2e6ea;
+}
+
+.sc-lotto-picker-action {
+  grid-column: span 5;
+  background-color: #4682b4;
+  color: white;
+  font-weight: bold;
+}
+
+.sc-lotto-picker-action:hover {
+  background-color: #3a6d99;
+}
+
+.sc-lotto-form-submit {
+  text-align: center;
+  margin-top: 25px;
+}
+
+.sc-lotto-form-submit button {
+  background-color: #284b63;
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.sc-lotto-form-submit button:hover {
+  background-color: #3a6d99;
+}
+
+/* Results styles */
+.sc-lotto-back-button {
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 20px;
+  display: inline-block;
+}
+
+.sc-lotto-results-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 7px;
+  background: linear-gradient(135deg, #f0f9ff, #cce7f6);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.sc-lotto-results-container h4 {
+  color: #284B63;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.sc-lotto-results-container h5 {
+  color: #284B63;
+  margin-bottom: 15px;
 
 }
-  /* Search form styles */
-  .sc-lotto-search-form {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 30px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    display: flex;
+
+.sc-lotto-tickets-list {
+  max-height: 150px;
+  overflow-y: auto;
+  margin-bottom: 30px;
+  border: 1px solid #eee;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.sc-lotto-tickets-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sc-lotto-tickets-list li {
+  padding: 5px 0;
+  color: #3b6e91;
+}
+
+.sc-lotto-results-summary {
+  margin-top: 30px;
+}
+
+.sc-lotto-results-summary h5 {
+  margin-bottom: 10px;
+}
+
+.sc-lotto-results-summary span {
+  color: #3b6e91;
+  font-weight: normal;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .sc-lotto-container {
     flex-direction: column;
-    justify-content: center; /* Center vertically */
-    min-height: 400px; /* Give it some minimum height */
+  }
+
+  .sc-lotto-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .sc-lotto-market-card-grid {
+    max-height: 200px;
+  }
 }
-  .sc-lotto-search-border-form{
-    max-width: 653px;
-    margin: 0 auto;
+
+@media (max-width: 768px) {
+  .sc-lotto-main-content {
+    padding: 20px;
   }
-  .sc-lotto-form-header h6 {
-    color: #4682B4;
-    font-weight: bold;
-    letter-spacing: 1px;
-    text-align: center;
-    margin-bottom: 25px;
-  }
-  
-  .sc-lotto-form-group {
-    margin-bottom: 20px;
-    width: 100%;
-    max-width: 400px; /* Limit input width */
-    margin-left: auto;
-    margin-right: auto; /* Center horizontally */
-}
-  
-  .sc-lotto-form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: #4682B4;
-    font-weight: bold;
-  }
-  
-  .sc-lotto-form-group select,
-  .sc-lotto-form-group input {
-    width: 100%;
-    padding: 10px 15px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    font-size: 1rem;
-  }
-  
-  .sc-lotto-input-wrapper {
-    position: relative;
-  }
-  
-  .sc-lotto-picker-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    z-index: 10;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    margin-top: 5px;
-  }
-  
+
   .sc-lotto-picker-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(3, 1fr);
   }
-  
-  .sc-lotto-picker-item {
-    padding: 8px;
-    text-align: center;
-    background-color: #f8f9fa;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .sc-lotto-picker-item:hover {
-    background-color: #e2e6ea;
-  }
-  
+
   .sc-lotto-picker-action {
-    grid-column: span 5;
-    background-color: #4682B4;
-    color: white;
-    font-weight: bold;
-  }
-  
-  .sc-lotto-picker-action:hover {
-    background-color: #3a6d99;
-  }
-  
-  .sc-lotto-form-submit {
-    text-align: center;
-    margin-top: 25px;
-  }
-  
-  .sc-lotto-form-submit button {
-    background-color: #284B63;
-    color: white;
-    border: none;
-    padding: 10px 30px;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .sc-lotto-form-submit button:hover {
-    background-color: #3a6d99;
-  }
-  
-  /* Results styles */
-  .sc-lotto-back-button {
-    font-size: 1rem;
-    cursor: pointer;
-    margin-bottom: 20px;
-    display: inline-block;
-  }
-  
-  .sc-lotto-results-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 7px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    text-align: center;
-  }
-  
-  .sc-lotto-results-container h4 {
-    color: #4682B4;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-  
-  .sc-lotto-results-container h5 {
-    color: #4682B4;
-    margin-bottom: 15px;
-  }
-  
-  .sc-lotto-tickets-list {
-    max-height: 150px;
-    overflow-y: auto;
-    margin-bottom: 30px;
-    border: 1px solid #eee;
-    padding: 15px;
-    border-radius: 5px;
-  }
-  
-  .sc-lotto-tickets-list ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .sc-lotto-tickets-list li {
-    padding: 5px 0;
-    color: #3b6e91;
-  }
-  
-  .sc-lotto-results-summary {
-    margin-top: 30px;
-  }
-  
-  .sc-lotto-results-summary h5 {
-    margin-bottom: 10px;
-  }
-  
-  .sc-lotto-results-summary span {
-    color: #3b6e91;
-    font-weight: normal;
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 992px) {
-    .sc-lotto-container {
-      flex-direction: column;
-    }
-    
-    .sc-lotto-sidebar {
-      width: 100%;
-      border-right: none;
-      border-bottom: 1px solid #e0e0e0;
-    }
-  
-    .sc-lotto-market-card-grid {
-      max-height: 200px;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .sc-lotto-main-content {
-      padding: 20px;
-    }
-    
-    .sc-lotto-picker-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .sc-lotto-picker-action {
-      grid-column: span 3;
-    }
-  
-    .sc-lotto-search-form {
-      padding: 20px;
-    }
+    grid-column: span 3;
   }
 
+  .sc-lotto-search-form {
+    padding: 20px;
+  }
+}
 
-  /* Add these new styles at the end of your CSS file */
+/* Add these new styles at the end of your CSS file */
 .sc-lotto-market-search-wrapper {
   display: flex;
   justify-content: center;
@@ -378,8 +388,6 @@
   border-radius: 20px;
   font-size: 0.9rem;
 }
-
-
 
 /* Results View Container */
 .sc-lotto-results-view {
@@ -418,9 +426,7 @@
   position: relative;
   overflow: hidden;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
-
 }
-
 
 .ticket-left,
 .ticket-right {
@@ -437,7 +443,6 @@
 
 .ticket-left {
   transform: rotate(180deg);
-
 }
 
 .ticket-center {
@@ -474,11 +479,11 @@
   .ticket-grid {
     grid-template-columns: 1fr; /* Single column on mobile */
   }
-  
+
   .ticket-card {
     height: 100px; /* Slightly smaller on mobile */
   }
-  
+
   .ticket-left,
   .ticket-right {
     writing-mode: horizontal-tb;
@@ -486,7 +491,7 @@
     padding: 5px 0;
     height: auto;
   }
-  
+
   .ticket-center {
     border-left: none;
     border-right: none;

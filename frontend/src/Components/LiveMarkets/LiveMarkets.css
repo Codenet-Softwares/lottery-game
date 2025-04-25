@@ -55,12 +55,13 @@
 .market-item {
   margin: 10px 0;
   padding: 10px;
-  background-color: #444;
-  color: #fff;
+  background: linear-gradient(135deg, #cce7f6, #a1cfee);
+  color: black;
   border-radius: 5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+
 }
 
 .live-stats-button {

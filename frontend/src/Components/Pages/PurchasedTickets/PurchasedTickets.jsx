@@ -203,7 +203,7 @@ const PurchasedTickets = () => {
       <div
         className="container mt-5 p-3"
         style={{
-          background: "#e6f7ff",
+          background: "linear-gradient(135deg, #f0f9ff, #cce7f6)",
           borderRadius: "10px",
           boxShadow: "0 0 15px rgba(0,0,0,0.1)",
         }}
@@ -339,9 +339,9 @@ const PurchasedTickets = () => {
         {visibleMarkets.length > 0 ? (
           <>
             <div className="d-flex justify-content-between align-items-center mb-3">
-              <h2 className="fw-bold" style={{ color: "#284B63" }}>
+              <h3 className="fw-bold" style={{ color: "#284B63" }}>
                 PURCHASED LOTTERY TICKETS
-              </h2>
+              </h3>
               <div className="w-50">
                 <input
                   type="text"
