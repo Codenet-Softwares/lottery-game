@@ -13,18 +13,19 @@ const Sidebar = () => {
 
   useEffect(() => {
     setActiveItem(location.pathname);
+  
+    const matchingDropdown = dropdownItems.find(dropdown => 
+      dropdown.items.some(item => location.pathname.startsWith(item.to))
+    );
+    
+    if (matchingDropdown) {
+      setOpenDropdown(matchingDropdown.label);
+    } else {
+      setOpenDropdown(null);
+    }
+  
   }, [location.pathname]);
 
-  // const handleLogout = () => {
-  //   const confirmLogout = window.confirm("Are you sure you want to log out?");
-  //   if (confirmLogout) {
-  //     dispatch({ type: "LOG_OUT" });
-  //     toast.success("Logged out successfully!");
-  //     navigate("/");
-  //   } else {
-  //     toast.info("Logout cancelled.");
-  //   }
-  // };
 
   const toggleDropdown = (label) => {
     setOpenDropdown((prev) => (prev === label ? null : label));
@@ -50,6 +51,7 @@ const Sidebar = () => {
       permission: "",
     },
     { to: "/trash", icon: "fas fa-trash-alt", label: "Trash", permission: "" },
+    
   ];
 
   const dropdownItems = [
@@ -126,12 +128,17 @@ const Sidebar = () => {
 
   return (
     <div className="sidebar-container ">
-      <div className="sidebar_role">
-        <h3 className="fw-bold text-uppercase text-white text-center">
-        <Link to={"/dashboard"} className="admin_text text-decoration-none text-white"> {store.admin.roles} </Link>
-         
-        </h3>
-      </div>
+     <div className="sidebar_role">
+  <h3 className="fw-bold text-uppercase text-white text-center">
+    <Link
+      to={"/dashboard"}
+      className="admin_text text-decoration-none text-white"
+    >
+      {store.admin.roles}
+    </Link>
+  </h3>
+</div>
+
       <div className="sidebar-nav px-4 mt-4">
         {navItems.filter(hasPermission).map(({ to, icon, label }) => (
           <Link

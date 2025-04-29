@@ -1,23 +1,27 @@
 .sidebar-container {
-  width: 100%;
-  min-width: 200px; /* Ensures minimum usable width */
-  max-width: 100%;
-  height: 100%;
+  /* width: 250px; */
+  height: 100vh;
   background: #284b63;
   display: flex;
   flex-direction: column;
-  /* padding: 0px 20px 0 20px; */
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
 }
 
 .sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 15px 20px 15px;
 }
-.sidebar_role{
+
+.sidebar_role {
   background-color: #203f52;
   padding: 15px;
   font-family: "Georgia", serif;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 .sidebar-link {
   display: flex;
@@ -97,19 +101,12 @@
 }
 @media (max-width: 768px) {
   .sidebar-container {
-    padding: 80px 15px 0 15px;
+    width: 200px;
+    padding-top: 60px; /* if you want spacing under TopNavbar */
   }
 
-  .sidebar-link {
-    font-size: 0.85rem;
-    padding: 8px;
-  }
-
-  .sidebar-icon {
+  .sidebar_role h3 {
     font-size: 1rem;
   }
-
-  .sub-item h6 {
-    font-size: 0.8rem;
-  }
 }
+

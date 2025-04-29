@@ -118,9 +118,10 @@ const WinResult = () => {
     <div className="container d-flex justify-content-center mt-4">
       <div
         className="col-md-10 p-4 rounded shadow"
-        style={{ background: "#E6F7FF" }}
+        style={{  background: "linear-gradient(135deg, #f0f9ff, #cce7f6)"
+        }}
       >
-        <h2 className="text-center text-primary mb-3 fw-bold fw-bold text-uppercase">
+        <h2 className="text-center mb-3 fw-bold fw-bold text-uppercase" style={{color:"#284B63"}}>
           SubAdmin History
         </h2>
 

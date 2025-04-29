@@ -34,8 +34,8 @@
 
 .layout-scrollable {
   flex-grow: 1;
-  margin-top: 60px; /* height of top navbar */
+  margin-top: 60px;
   overflow-y: auto;
-  padding: 20px;
+  padding-left: 40px;
   background-color: #f4f5f9;
 }

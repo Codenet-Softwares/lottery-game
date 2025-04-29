@@ -9,16 +9,6 @@ const Dashboard = () => {
   console.log("====>> line 9", store);
   const cardsRef = useRef(null);
 
-  const scroll = (direction) => {
-    const cardWidth = 300; // Width of a single card
-    const gap = 20; // Gap between cards
-    const scrollDistance = cardWidth + gap;
-    cardsRef.current.scrollBy({
-      left: direction === "left" ? -scrollDistance : scrollDistance,
-      behavior: "smooth",
-    });
-  };
-
   // Filter DashCard based on roles & permissions
   const filteredDashCards =
     store.admin.roles === "admin"
@@ -59,18 +49,18 @@ const Dashboard = () => {
       : [];
 
   return (
-    <div className="container-fluid py-3 px-5 dashboard-container m-0 p-0 mt-3">
+    <div className="container-fluid py-3 px-3 px-md-5 dashboard-container m-0 mt-3">
     <div className="card-scroll-wrapper">
-      <div className="row card_row">
+      <div className="row card_row g-3">
         {filteredDashCards.map((card, index) => (
-          <div className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 mt-2" key={index}>
+          <div className="col-6 col-md-4 col-lg-3" key={index}>
             <div className="card mini-card h-100 text-white" style={card.cardstyle}>
               <div className="card-body d-flex flex-column align-items-center text-center">
                 <i className={`${card.icon} fa-2x mb-2 custom-icon-class`} aria-label={card.name}></i>
                 <h5 className="card_title mb-1 fw-bold">{card.name}</h5>
                 <p className="card-text fw-bold">{card.description}</p>
-                <div className="dash_btn rounded-pill">
-                  <Link to={card.buttonLink} className="btn mt-auto btn-sm text-light">
+                <div className="dash_btn rounded-pill mt-auto">
+                  <Link to={card.buttonLink} className="btn btn-sm text-light">
                     {card.buttonName}
                   </Link>
                 </div>
@@ -81,6 +71,7 @@ const Dashboard = () => {
       </div>
     </div>
   </div>
+  
   
   );
 };

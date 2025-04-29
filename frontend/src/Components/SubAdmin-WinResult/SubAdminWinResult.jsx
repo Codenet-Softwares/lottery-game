@@ -176,14 +176,13 @@ const Result = () => {
       style={{
         fontFamily: "Arial, sans-serif",
         margin: "20px",
-        background: "#f0f0f0",
-        minHeight: "75vh",
+        // minHeight: "75vh",
       }}
     >
       <div
         className="container-result mt-5 p-3"
         style={{
-          background: "#e6f7ff",
+          background: "linear-gradient(135deg, #f0f9ff, #cce7f6)",
           borderRadius: "10px",
           boxShadow: "0 0 15px rgba(0,0,0,0.1)",
         }}
