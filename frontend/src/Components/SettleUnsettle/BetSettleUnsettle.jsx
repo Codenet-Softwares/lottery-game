@@ -261,7 +261,7 @@ const BetSettleUnsettle = ({ marketId, backButton, onAllDataDeleted }) => {
           />
         </div>
       ) : (
-        <p className="text-center text-muted">Loading stats...</p>
+        <p className="text-center text-muted">Loading Stats...</p>
       )}
     </div>
   );

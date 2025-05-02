@@ -429,10 +429,10 @@ const MarketInsight = () => {
           <Card className="welcome-card shadow-sm">
             <Card.Body>
               <Card.Title className="welcome-title">
-                Welcome to the Lottery Market Overview!
+                Welcome To The Lottery Market Overview!
               </Card.Title>
               <Card.Text className="welcome-text">
-                Select a market from the left sidebar to view its details.
+                Select Market From The Left Sidebar To View Its Details.
               </Card.Text>
               {marketTimes.length === 0 && !showStats && (
                 <div className="d-flex justify-content-center align-items-center">

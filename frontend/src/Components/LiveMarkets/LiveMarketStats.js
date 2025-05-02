@@ -334,7 +334,7 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
           />
         </div>
       ) : (
-        <p className="text-center text-muted">Loading stats...</p>
+        <p className="text-center text-muted">Loading Stats...</p>
       )}
     </div>
   );

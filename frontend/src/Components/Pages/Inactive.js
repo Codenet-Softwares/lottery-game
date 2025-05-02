@@ -160,8 +160,8 @@ const Inactive = () => {
                     })
                   ) : (
                     <tr>
-                      <td colSpan="4" className="text-center">
-                        No inactive games found.
+                      <td colSpan="4" className="text-center text-danger">
+                        No Inactive Games Found.
                       </td>
                     </tr>
                   )}

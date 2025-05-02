@@ -219,7 +219,7 @@ const PurchasedTickets = () => {
               Select Lottery Market Date:
             </label>
             <p className="date-filter-description">
-              Please choose a date to view past available lottery markets.
+              Please Choose a Date To View Past Available Lottery Markets.
             </p>
           </div>
           <input
@@ -330,7 +330,7 @@ const PurchasedTickets = () => {
                 No Markets Available
               </h4>
               <p style={{ color: "#6c757d" }}>
-                Please try again later or check your purchases.
+                Please Try Again Later or Check Your Purchases.
               </p>
             </div>
           )}
@@ -469,7 +469,7 @@ const PurchasedTickets = () => {
                   ) : (
                     <tr>
                       <td colSpan="6" className="text-center">
-                        No tickets found.
+                        No tickets Found.
                       </td>
                     </tr>
                   )}
@@ -490,11 +490,11 @@ const PurchasedTickets = () => {
             >
               <div>
                 <h5 className="text-secondary text-center">
-                  No purchases to display
+                  No Purchases To Display
                 </h5>
                 <p className="mb-0 text-muted">
-                  Your purchase history will appear here once available markets
-                  are added.
+                  Your Purchase History Will Appear Here Once Available Markets
+                  Are Added.
                 </p>
               </div>
             </div>

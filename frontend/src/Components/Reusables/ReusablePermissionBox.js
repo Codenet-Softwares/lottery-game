@@ -26,7 +26,7 @@ export const ReusablePermissionBox = ({ permissions, onChange, error, permission
             </div>
           ))
         ) : (
-          <p className="no-permissions">No permissions available</p>
+          <p className="no-permissions">No Permissions Available</p>
         )}
       </div>
     <h6 className="fw-bold text-center">{error && <div className="error-message">{error}</div>}</h6>  

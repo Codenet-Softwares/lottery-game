@@ -245,7 +245,7 @@ export const FromToInput = ({
                     fontStyle: "italic",
                   }}
                 >
-                  No data
+                  No Data
                 </div>
               )}
             </div>
@@ -321,7 +321,7 @@ export const FromToInput = ({
                     fontStyle: "italic",
                   }}
                 >
-                  No matching data found
+                  No Matching Data Found
                 </div>
               )}
             </div>
@@ -639,7 +639,7 @@ export const FromToInputEdit = ({
                     fontStyle: "italic",
                   }}
                 >
-                  No data
+                  No Data
                 </div>
               )}
             </div>
@@ -715,7 +715,7 @@ export const FromToInputEdit = ({
                     fontStyle: "italic",
                   }}
                 >
-                  No matching data found
+                  No Matching Data Found
                 </div>
               )}
             </div>

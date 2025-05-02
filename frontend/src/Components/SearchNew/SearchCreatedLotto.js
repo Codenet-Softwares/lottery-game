@@ -157,7 +157,7 @@ const SearchCreatedLotto = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="no-tickets">No tickets found</div>
+                  <div className="no-tickets">No Tickets Found</div>
                 )}
 
                 {lotteryData.searchResult && (

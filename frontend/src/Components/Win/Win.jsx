@@ -464,7 +464,7 @@ const Win = () => {
                       fontSize: "1rem",
                     }}
                   >
-                    Submit Prizes for {data.marketName}
+                    Submit Prizes For {data.marketName}
                   </Button>
                 </div>
               </div>
@@ -473,7 +473,7 @@ const Win = () => {
         ) : (
           <div className="container-fluid d-flex justify-content-center fw-bold text-danger">
             {" "}
-            {!isLoading && <div>No draw times available.</div>}
+            {!isLoading && <div>No Draw Times Available.</div>}
           </div>
         )}
       </div>

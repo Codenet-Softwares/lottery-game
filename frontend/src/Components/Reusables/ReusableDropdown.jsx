@@ -118,7 +118,7 @@ const ReusableDropdown = ({
                 }}
               </Grid>
             ) : (
-              <div className="no-matched-data">No matched data found</div>
+              <div className="no-matched-data">No Matched Data Found</div>
             )}
           </div>
         </Dropdown.Menu>

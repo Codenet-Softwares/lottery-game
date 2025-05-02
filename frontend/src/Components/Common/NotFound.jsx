@@ -39,7 +39,7 @@ const NotFound = () => {
           margin: '20px 0',
         }}
       >
-        Oops! The page you're looking for doesn't exist.
+        Oops! The page you're Looking For Doesn't Exist.
       </h3>
       <Button
         href="/"

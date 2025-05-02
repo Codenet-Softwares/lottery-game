@@ -10,7 +10,7 @@ const DemoMap = () => {
   const handleCloseModal = () => setShowModal(false);
 
   if (!ApprovalData) {
-    return <div>No data available</div>;
+    return <div>No Data Available</div>;
   }
 
   const {

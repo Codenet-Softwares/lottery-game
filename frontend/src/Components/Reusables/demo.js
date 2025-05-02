@@ -130,10 +130,10 @@ const PrizeValidation = () => {
             className="btn btn-secondary mb-3 text-uppercase fw-bold"
             onClick={() => setSelectedMarket(null)}
           >
-            Back to Market List
+            Back To Market List
           </button>
           <h3 className="text-uppercase">
-            Approval List for {selectedMarket.marketName}
+            Approval List For {selectedMarket.marketName}
           </h3>
           <ReusableTable
             data={approvalData}
@@ -149,7 +149,7 @@ const PrizeValidation = () => {
             Prize Approval Market List
           </h2>
           {loading ? (
-            <p className="loading-text">Loading market data...</p>
+            <p className="loading-text">Loading Market Data...</p>
           ) : (
             <ReusableTable
               data={marketData}
