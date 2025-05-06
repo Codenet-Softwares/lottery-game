@@ -87,7 +87,7 @@ const LiveMarkets = () => {
                     style={{
                       padding: "10px 20px",
                       fontSize: "1rem",
-                      backgroundColor: "#4682B4",
+                      backgroundColor: "#284B63",
                       color: "white",
                       border: "none",
                       borderRadius: "5px",

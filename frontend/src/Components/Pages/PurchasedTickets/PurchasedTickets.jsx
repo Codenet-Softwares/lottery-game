@@ -198,12 +198,12 @@ const PurchasedTickets = () => {
   return (
     <div
       className="d-flex align-items-center justify-content-center"
-      style={{ background: "#f0f0f0", minHeight: "75vh" }}
+      // style={{ background: "#f0f0f0", minHeight: "100vh" }}
     >
       <div
         className="container mt-5 p-3"
         style={{
-          background: "#e6f7ff",
+          background: "linear-gradient(135deg, #f0f9ff, #cce7f6)",
           borderRadius: "10px",
           boxShadow: "0 0 15px rgba(0,0,0,0.1)",
         }}
@@ -219,7 +219,7 @@ const PurchasedTickets = () => {
               Select Lottery Market Date:
             </label>
             <p className="date-filter-description">
-              Please choose a date to view past available lottery markets.
+              Please Choose a Date To View Past Available Lottery Markets.
             </p>
           </div>
           <input
@@ -247,7 +247,7 @@ const PurchasedTickets = () => {
               <h4
                 className="fw-bold"
                 style={{
-                  color: "#4682B4",
+                  color: "#284B63",
                 }}
               >
                 LOTTERY MARKETS
@@ -330,7 +330,7 @@ const PurchasedTickets = () => {
                 No Markets Available
               </h4>
               <p style={{ color: "#6c757d" }}>
-                Please try again later or check your purchases.
+                Please Try Again Later or Check Your Purchases.
               </p>
             </div>
           )}
@@ -339,9 +339,9 @@ const PurchasedTickets = () => {
         {visibleMarkets.length > 0 ? (
           <>
             <div className="d-flex justify-content-between align-items-center mb-3">
-              <h2 className="fw-bold" style={{ color: "#4682B4" }}>
+              <h3 className="fw-bold" style={{ color: "#284B63" }}>
                 PURCHASED LOTTERY TICKETS
-              </h2>
+              </h3>
               <div className="w-50">
                 <input
                   type="text"
@@ -469,7 +469,7 @@ const PurchasedTickets = () => {
                   ) : (
                     <tr>
                       <td colSpan="6" className="text-center">
-                        No tickets found.
+                        No tickets Found.
                       </td>
                     </tr>
                   )}
@@ -490,11 +490,11 @@ const PurchasedTickets = () => {
             >
               <div>
                 <h5 className="text-secondary text-center">
-                  No purchases to display
+                  No Purchases To Display
                 </h5>
                 <p className="mb-0 text-muted">
-                  Your purchase history will appear here once available markets
-                  are added.
+                  Your Purchase History Will Appear Here Once Available Markets
+                  Are Added.
                 </p>
               </div>
             </div>

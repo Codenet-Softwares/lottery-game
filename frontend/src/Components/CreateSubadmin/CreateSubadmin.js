@@ -38,13 +38,14 @@ const CreateSubadmin = ({
 
   return (
     <div
-      className="d-flex align-items-center justify-content-center"
-      style={{ background: "#f0f0f0", minHeight: "75vh" }}
+      className="d-flex align-items-center justify-content-center mt-5"
     >
       <div
         className="container mt-3 p-4 shadow rounded"
         style={{
           background: "#fff",
+          // background: "linear-gradient(135deg, #f0f9ff, #cce7f6):,
+
           border: "2px solid black",
           boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
           maxWidth: "900px",
@@ -104,7 +105,8 @@ const CreateSubadmin = ({
           <div className="text-center mt-4">
             <button
               type="submit"
-              className=" btn btn-info createsubadmin-button"
+              className=" btn createsubadmin-button text-white"
+              style={{background:"#284B63"}}
             >
               Submit
             </button>

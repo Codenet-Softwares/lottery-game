@@ -196,10 +196,9 @@ const MarketInsight = () => {
       {/* Sidebar */}
       <aside className="alt-sidebar p-4">
         <h5
-          className="text-center text-white"
-          style={{ fontWeight: "800", letterSpacing: "1px" }}
+          className="text-center text-dark fw-bolder"
         >
-          LOTTERY MARKETS
+         LOTTERY MARKETS
         </h5>
         <div className="market-card-grid">
           {marketTimes.length > 0 ? (
@@ -230,7 +229,7 @@ const MarketInsight = () => {
             >
               <h4
                 className="text-center bg-white p-5 rounded-5"
-                style={{ color: "#2b3a67", fontWeight: "900" }}
+                style={{ color: "#284B63", fontWeight: "900" }}
               >
                 No <br />
                 Market <br />
@@ -430,10 +429,10 @@ const MarketInsight = () => {
           <Card className="welcome-card shadow-sm">
             <Card.Body>
               <Card.Title className="welcome-title">
-                Welcome to the Lottery Market Overview!
+                Welcome To The Lottery Market Overview!
               </Card.Title>
               <Card.Text className="welcome-text">
-                Select a market from the left sidebar to view its details.
+                Select Market From The Left Sidebar To View Its Details.
               </Card.Text>
               {marketTimes.length === 0 && !showStats && (
                 <div className="d-flex justify-content-center align-items-center">

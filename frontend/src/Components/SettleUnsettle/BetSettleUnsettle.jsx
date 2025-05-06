@@ -171,10 +171,10 @@ const BetSettleUnsettle = ({ marketId, backButton, onAllDataDeleted }) => {
       {betStats ? (
         <div className="container border-0" style={{ overflow: "hidden" }}>
           <div className="d-flex justify-content-between align-items-center mb-4">
+
             <div className="bet-settle-back-button d-flex justify-content-start">
               {backButton}
             </div>
-
             <h3 className="bet-settle-header fw-bold d-flex align-items-center mt-3">
               Market Stats For {betStats[0]?.marketName}
             </h3>
@@ -261,7 +261,7 @@ const BetSettleUnsettle = ({ marketId, backButton, onAllDataDeleted }) => {
           />
         </div>
       ) : (
-        <p className="text-center text-muted">Loading stats...</p>
+        <p className="text-center text-muted">Loading Stats...</p>
       )}
     </div>
   );

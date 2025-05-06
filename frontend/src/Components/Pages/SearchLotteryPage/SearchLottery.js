@@ -198,7 +198,7 @@ const SearchLottery = () => {
                   letterSpacing: "1px",
                 }}
               >
-                🔍 Search Lottery Tickets for {filteredMarket.marketName}
+                🔍 Search Lottery Tickets For {filteredMarket.marketName}
               </h2>
               {/* Pass filtered market and other props to Search component */}
               <Search

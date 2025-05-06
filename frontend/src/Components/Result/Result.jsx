@@ -183,18 +183,11 @@ const Result = () => {
   };
 
   return (
-    <div
-      style={{
-        fontFamily: "Arial, sans-serif",
-        margin: "20px",
-        background: "#f0f0f0",
-        minHeight: "75vh",
-      }}
-    >
+    <div className="m-5">
       <div
         className="container-result mt-5 p-3"
         style={{
-          background: "#e6f7ff",
+          background: "linear-gradient(135deg, #f0f9ff, #cce7f6)",
           borderRadius: "10px",
           boxShadow: "0 0 15px rgba(0,0,0,0.1)",
         }}
@@ -203,7 +196,7 @@ const Result = () => {
         <div
           className="d-flex align-items-center"
           style={{
-            backgroundColor: "#4682B4",
+            backgroundColor: "#284B63",
             padding: "10px",
             borderRadius: "8px",
             boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
@@ -263,7 +256,7 @@ const Result = () => {
                   fontWeight: "bold",
                 }}
               >
-                No markets found with results declared.
+                No Markets Found With Results Declared.
               </div>
             )}
           </div>
@@ -294,8 +287,8 @@ const Result = () => {
                 Select Declared Result Lottery Market Date:
               </label>
               <p className="date-filter-description">
-                Please choose a date to view past available results of lottery
-                markets.
+                Please Choose a Date To View Past Available Results Of Lottery
+                Markets.
               </p>
             </div>
             <input
@@ -314,7 +307,7 @@ const Result = () => {
         {/* Market Result Display */}
         <div className="mt-4">
           <h2 className="text-center" style={{ color: "#3b6e91" }}>
-            Results for{" "}
+            Results For{" "}
             <span style={{ color: "#4682B4" }}>
               {markets.find((m) => m.marketId === marketId)?.marketName ||
                 "Selected Market"}
@@ -326,7 +319,7 @@ const Result = () => {
 
           {/* Prize Distribution */}
           {results.length === 0 && !error ? (
-            <p className="text-center text-muted">No prize declared yet.</p>
+            <p className="text-center text-muted">No Prize Declared Yet.</p>
           ) : (
             <div className="accordion mt-4" id="prizeAccordion">
               {results.map((result, index) => (

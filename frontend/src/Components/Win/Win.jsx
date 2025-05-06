@@ -247,27 +247,9 @@ const Win = () => {
     >
       <div
         className="text-center w-100"
-        style={{
-          // backgroundColor: "#e6f7ff",
-          padding: "20px 0",
-          // borderBottom: "3px solid #4682B4",
-          borderBottomLeftRadius: "15px",
-          borderBottomRightRadius: "15px",
-          marginBottom: "20px",
-          // boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-        }}
+        
       >
-        {/* <h2
-          className="mb-1"
-          style={{
-            color: "#4682B4",
-            fontWeight: "bold",
-            letterSpacing: "1px",
-            fontSize: "2rem",
-          }}
-        >
-          🎉 Lottery Draw Times and Rankings 🎉
-        </h2> */}
+
         <div className="search-bar-container-win d-flex justify-content-center mb-2">
           <input
             type="text"
@@ -280,7 +262,7 @@ const Win = () => {
       </div>
 
       <div
-        className="border border-3 rounded-4 shadow-lg p-4"
+        className="border border-3 rounded-4 shadow-lg p-4 mt-4"
         style={{ width: "90%", maxWidth: "1000px", backgroundColor: "#ffffff" }}
       >
         {allActiveMarket && allActiveMarket.length > 0 ? (
@@ -289,7 +271,8 @@ const Win = () => {
               <div
                 key={index}
                 className="mb-4 p-3 rounded-3 shadow-sm"
-                style={{ backgroundColor: "#e6f7ff" }}
+                style={{   background: "linear-gradient(135deg, #f0f9ff, #cce7f6)"
+                }}
               >
                 <h4 style={{ color: "#007bb5", fontWeight: "bold" }}>
                   {data.marketName}
@@ -481,16 +464,16 @@ const Win = () => {
                       fontSize: "1rem",
                     }}
                   >
-                    Submit Prizes for {data.marketName}
+                    Submit Prizes For {data.marketName}
                   </Button>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="container-fluid d-flex justify-content-center">
+          <div className="container-fluid d-flex justify-content-center fw-bold text-danger">
             {" "}
-            {!isLoading && <div>No draw times available.</div>}
+            {!isLoading && <div>No Draw Times Available.</div>}
           </div>
         )}
       </div>

@@ -84,7 +84,7 @@ const Inactive = () => {
       <div className="card shadow-sm">
         <div
           className="card-header d-flex align-items-center justify-content-between p-3"
-          style={{ backgroundColor: "#0E1A35", color: "#FFFFFF" }}
+          style={{ backgroundColor: "#284B63", color: "#FFFFFF" }}
         >
           <h3 className="mb-0 fw-bold fs-5">ANNOUNCED GAME LIST</h3>
           <input
@@ -109,7 +109,7 @@ const Inactive = () => {
             onBlur={(e) => (e.target.style.borderColor = "#4682B4")}
           />
         </div>
-        <div className="card-body">
+        <div className="card-body" style={{background:"linear-gradient(135deg, #f0f9ff, #cce7f6)"}}>
           {/* Table */}
           <SingleCard
             className=" mb-5 "
@@ -120,13 +120,10 @@ const Inactive = () => {
             <div className="table-responsive">
               <table
                 className="table table-striped table-hover rounded-table"
-                style={{
-                  border: "2px solid #6c757d",
-                  borderRadius: "10px",
-                }}
+
               >
                 <thead
-                  className="table-primary"
+                  className="table-dark"
                   style={{
                     position: "sticky",
                     top: 0,
@@ -163,8 +160,8 @@ const Inactive = () => {
                     })
                   ) : (
                     <tr>
-                      <td colSpan="4" className="text-center">
-                        No inactive games found.
+                      <td colSpan="4" className="text-center text-danger">
+                        No Inactive Games Found.
                       </td>
                     </tr>
                   )}

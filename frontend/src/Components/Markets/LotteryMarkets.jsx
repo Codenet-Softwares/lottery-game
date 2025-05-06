@@ -391,9 +391,9 @@ const LotteryMarkets = () => {
                       />
                       <h4 className="text-warning mt-3">Oops! No Lottery Tickets found!</h4>
                       <p className="text-muted">
-                        Seems like the lottery fairy hasn't visited yet. 🧚‍♀️
+                        Seems Like The Lottery Fairy Hasn't Visited Yet. 🧚‍♀️
                         <br />
-                        Don’t worry, you can be the magician who creates the first one! 🎩✨
+                        Don’t Worry, You Can Be The Magician Who Creates The First One! 🎩✨
                       </p>
                       {/* <button
                       className="btn btn-primary mt-3"
@@ -613,7 +613,7 @@ const LotteryMarkets = () => {
           }
           inputs={[
             {
-              label: <>Are you sure you want to delete all the unpurchased lottery tickets?</>,
+              label: <>Are You Sure You Want To Delete All The Unpurchased Lottery Tickets?</>,
             },
           ]}
           buttonLabel="Delete"

@@ -27,7 +27,7 @@ const SearchCreatedLotto = () => {
     <div className="sc-lotto-container">
       <aside className="sc-lotto-sidebar">
         <div className="sc-lotto-sidebar-header">
-          <h5 className="sc-lotto-sidebar-title">LOTTERY MARKETS</h5>
+          <h5 className="sc-lotto-sidebar-title fw-bold text-dark">LOTTERY MARKETS</h5>
         </div>
         <div className="sc-lotto-market-card-grid">
           {filteredMarkets.length > 0 ? (
@@ -40,7 +40,7 @@ const SearchCreatedLotto = () => {
                 onClick={() => handleMarketClick(market)}
               >
                 <div className="sc-lotto-market-card-body">
-                  <h6>{market.marketName}</h6>
+                  <h6 className="">{market.marketName}</h6>
                 </div>
               </div>
             ))
@@ -48,7 +48,7 @@ const SearchCreatedLotto = () => {
             <div className="d-flex justify-content-center align-items-center ">
               <h4
                 className="text-center bg-white p-5 rounded-4"
-                style={{ color: "#2b3a67", fontWeight: "900" }}
+                style={{ color: "#284B63", fontWeight: "900" }}
               >
                 No <br />
                 Markets <br />
@@ -81,7 +81,7 @@ const SearchCreatedLotto = () => {
                     PRICE: <strong>{selectedMarket.price}</strong>
                   </div>
                   <div className="sc-lotto-form-header">
-                    <h6>{selectedMarket.marketName}</h6>
+                    <h6 className=" fw-bold">{selectedMarket.marketName}</h6>
                   </div>
                   <Formik
                     key={selectedMarket?.marketId || "form"}
@@ -137,7 +137,7 @@ const SearchCreatedLotto = () => {
             <div className="sc-lotto-search-border-form border border-2 border-secondary py-4 rounded-3">
               <div className="sc-lotto-results-container">
                 <h4>Search Results:</h4>
-                <h5>Tickets:</h5>
+                <h5 className="fw-bold">Tickets:</h5>
 
                 {lotteryData.searchResult?.tickets?.length ? (
                   <div className="ticket-grid-container">
@@ -157,7 +157,7 @@ const SearchCreatedLotto = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="no-tickets">No tickets found</div>
+                  <div className="no-tickets">No Tickets Found</div>
                 )}
 
                 {lotteryData.searchResult && (

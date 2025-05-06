@@ -66,7 +66,7 @@ const BetAfterWin = () => {
   };
 
   return (
-    <div className="bet-after-win-container">
+    <div className="bet-after-win-container m-5">
       <div className="bet-after-win-inner-container container-fluid ">
         {!selectedMarketId && (
           <>
@@ -133,7 +133,7 @@ const BetAfterWin = () => {
           <div className="bet-after-win-no-market-container">
             <div className="tv-static"></div>
             <div className="bet-after-win-no-market-text">
-              <span>No Live Market Found with this name</span>
+              <span>No Live Market Found With This Name</span>
             </div>
           </div>
         )}

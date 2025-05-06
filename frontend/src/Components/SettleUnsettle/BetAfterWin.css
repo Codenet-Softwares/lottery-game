@@ -1,10 +1,11 @@
 /* Main container styles */
 .bet-after-win-container {
-  height: 75vh;
+  /* height: 100vh; */
   overflow: hidden;
   text-align: center;
   border-radius: 1rem;
   border: 2px solid gray;
+
 }
 
 /* Inner container styles */
@@ -14,6 +15,8 @@
   display: flex;
   flex-direction: column;
   border-radius: 1rem;
+  background: linear-gradient(135deg, #f0f9ff, #cce7f6);
+
 }
 
 /* Header styles */
@@ -50,7 +53,7 @@
   align-items: center;
   padding: 0.75rem 1rem;
   margin-bottom: 0.5rem;
-  background-color: #e2e2e2;
+  background-color: #F6F6F6;
   border-radius: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -70,7 +73,7 @@
 
 .bet-after-win-live-stats-button {
   padding: 8px 16px;
-  background-color: #4682b4;
+  background-color: #284B63;
   color: white;
   border: none;
   border-radius: 4px;

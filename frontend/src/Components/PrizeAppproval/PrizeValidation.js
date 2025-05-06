@@ -198,7 +198,7 @@ const PrizeValidation = () => {
             Prize Approval Market List
           </h2>
           {loading ? (
-            <p className="loading-text">Loading market data...</p>
+            <p className="loading-text">Loading Market Data...</p>
           ) : (
             <ReusableTable
               data={marketData}

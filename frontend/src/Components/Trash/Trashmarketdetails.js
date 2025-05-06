@@ -147,7 +147,7 @@ const Trashmarketdetails = ({
                   className="no-results-found"
                   style={{ textAlign: "center" }}
                 >
-                  No results found
+                  No Results Found
                 </td>
               </tr>
             ) : (

@@ -1,49 +1,26 @@
-import React from 'react';
-import Footer from './Footer';
-import Layout from './Layout';
-import NavTop from './NavTop';
-
+import React from "react";
+import Footer from "./Footer";
+import Layout from "./Layout";
+import NavTop from "./NavTop";
+import Sidebar from "./Sidebar";
+import "./AdminLayout.css";
+import TopNavbar from "./TopNavbar";
 
 const AdminLayout = () => {
   return (
-    <div className="d-flex flex-column vh-100">
-      {/* Sticky Top Navigation */}
-      <div
-        className="sticky-top" 
-        style={{
-          zIndex: 1030,
-          backgroundColor: '#fff', 
-          boxShadow: '0px 1px 5px rgba(0,0,0,0.1)', 
-        }}
-      >
-        <NavTop />
+    <div className="admin-layout-container">
+      <div className="sidebar-fixed">
+        <Sidebar />
       </div>
 
-      {/* Main Content Area */}
+      <div className="main-content-area">
+        <div className="top-navbar-fixed">
+          <TopNavbar />
+        </div>
 
-      <div
-        className="flex-grow-1 overflow-auto"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <div className="p-4" style={{ flex: 1, minHeight: 0 }}>
-
+        <div className="layout-scrollable">
           <Layout />
         </div>
-      </div>
-
-      {/* Sticky Footer */}
-      <div
-        className="sticky-bottom mt-auto"
-        style={{
-          backgroundColor: '#f8f9fa',
-          boxShadow: '0px -1px 5px rgba(0,0,0,0.1)',
-          padding: '20px',
-        }}
-      >
-        <Footer />
       </div>
     </div>
   );

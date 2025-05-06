@@ -35,21 +35,19 @@ const CreateMarkets = () => {
         end_time: endTimeISO,
         price: parseFloat(values.priceForEach),
       };
-try {
-
-  const response = await generateLotteryNumber(requestBody);
-  if (response.success) {
-    console.log("Market created successfully!");
-    formik.resetForm();
-  } else {
-    console.error("Error creating market:", response.message);
-  }
-}catch (error) {
-  console.error("Error during the API request:", error);
-} finally {
-  hideLoader(); // Hide loader after the request completes
-}
-     
+      try {
+        const response = await generateLotteryNumber(requestBody);
+        if (response.success) {
+          console.log("Market created successfully!");
+          formik.resetForm();
+        } else {
+          console.error("Error creating market:", response.message);
+        }
+      } catch (error) {
+        console.error("Error during the API request:", error);
+      } finally {
+        hideLoader(); // Hide loader after the request completes
+      }
     },
   });
 
@@ -67,7 +65,6 @@ try {
     []
   );
   const timerOptions = useMemo(() => generateTimerOptions(), []);
-
 
   useEffect(() => {
     formik.setFieldValue("groupOptions", groupOptions);
@@ -113,21 +110,18 @@ try {
   ];
 
   return (
-    <div
-      className="d-flex align-items-center justify-content-center"
-      style={{ background: "#f0f0f0", minHeight: "75vh" }}
-    >
+    <div className="d-flex align-items-center justify-content-center mt-5">
       <div
         className="container mt-3 p-4 shadow rounded"
         style={{
-          background: "#fff",
-          border: "2px solid black",
+  background: "linear-gradient(135deg, #f0f9ff, #cce7f6)",
+          border: "2px solid #284B63",
           boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
           maxWidth: "900px",
           position: "relative",
         }}
       >
-        <h3 className="text-center mb-4">CREATE LOTTERY MARKETS</h3>
+        <h3 className="text-center mb-4 fw-bold">CREATE LOTTERY MARKETS</h3>
         <form onSubmit={formik.handleSubmit}>
           {inputConfig.map((input) => (
             <ReusableInput
@@ -176,7 +170,7 @@ try {
               type="submit"
               className="btn btn-primary px-4"
               style={{
-                background: "#4682B4",
+                background: "#284B63",
                 position: "absolute",
                 bottom: "-20px",
                 left: "50%",

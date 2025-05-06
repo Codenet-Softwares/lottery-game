@@ -1,17 +1,14 @@
 /* General Layout */
 .alt-dashboard-container {
   display: flex;
-  background-color: #f7f9fc;
-
   padding: 20px;
-  /* overflow-x: hidden; */
-
-  height: 75vh;
+  /* height: 100vh; */
+  overflow-y: hidden;
 }
 
 .alt-sidebar {
   width: 280px;
-  background-color: #2b3a67;
+  background-color: #b5b8c2;
   color: white;
   border-radius: 12px;
   overflow-y: auto;
@@ -32,7 +29,7 @@
 .market-card {
   width: 100%;
   margin-bottom: 10px;
-  background-color: #3f4a85;
+  background-color: #284B63;
   color: white;
   cursor: pointer;
   transition: transform 0.3s;
@@ -45,7 +42,7 @@
 }
 
 .market-title {
-  color: #3f4a85;
+  color: #284B63;
   font-weight: bold;
   font-size: 1.6rem;
   text-align: center;
@@ -198,6 +195,6 @@
 }
 
 .search-bar-container-custom input:focus {
-  border-color: #3f4a85;
+  border-color: #284B63;
   box-shadow: 0 0 5px rgba(63, 74, 133, 0.5);
 }
