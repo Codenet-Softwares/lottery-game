@@ -25,7 +25,7 @@ const TicketNumber = sequelize.define(
         prizeCategory: {
             type: DataTypes.ENUM('First Prize', 'Second Prize', 'Third Prize', 'Fourth Prize', 'Fifth Prize'),
             allowNull: false,
-          },
+        },
     },
     {
         timestamps: true
