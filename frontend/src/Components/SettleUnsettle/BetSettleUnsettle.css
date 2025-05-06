@@ -10,7 +10,7 @@
 .bet-settle-header {
   font-family: '"Arial", sans-serif';
   font-size: 2rem;
-  color: #5a8f7d;
+  color: #284B63;
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
   margin-left: auto;
   margin-right: auto;
@@ -29,7 +29,6 @@
   border-radius: 50px;
   border: 1px solid #4682b4;
   padding-left: 30px;
-  background: linear-gradient(to right, #e6f7ff, #4682b4);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }

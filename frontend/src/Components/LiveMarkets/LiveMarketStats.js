@@ -180,7 +180,7 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
               style={{
                 fontFamily: '"Arial", sans-serif',
                 fontSize: "2rem",
-                color: "#5a8f7d", // Unique formal color
+                color: "#284B63", // Unique formal color
                 textShadow: "1px 1px 4px rgba(0, 0, 0, 0.2)",
                 marginLeft: "auto",
                 marginRight: "auto",
@@ -203,7 +203,6 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
                 borderRadius: "50px",
                 border: "1px solid #4682B4",
                 paddingLeft: "30px",
-                background: "linear-gradient(to right, #e6f7ff, #4682B4)",
                 boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
                 transition: "all 0.3s ease",
               }}

@@ -18,17 +18,17 @@
   color: #fff;
   padding: 8px 16px;
   font-size: 14px;
-  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+  background: linear-gradient(135deg, #cce7f6, #a1cfee);
   transition: all 0.3s ease;
 }
-
+/* 
 .pagination-custom .page-link.btn-gradient:hover {
   background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%);
   transform: scale(1.05);
-}
+} */
 
 .pagination-custom .page-link:disabled {
-  background: #d3d3d3;
+  background: #fff;
   color: #8a8a8a;
   cursor: not-allowed;
 }
@@ -53,7 +53,7 @@
   font-size: 1rem;
   font-weight: 500;
   color: #2c3e50; /* Darker text for contrast */
-  background: hsl(213, 8%, 74%); /* Slightly lighter background for readability */
+  background: linear-gradient(135deg, #cce7f6, #a1cfee);
   padding: 12px 18px;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -68,7 +68,7 @@
 }
 
 .entries-highlight {
-  color: #2575fc; /* Maintain the blue highlight for emphasis */
+  color: #8a8a8a; /* Maintain the blue highlight for emphasis */
   font-weight: bold;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Enhanced shadow effect for visibility */
 }
