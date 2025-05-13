@@ -66,7 +66,7 @@ const BetAfterWin = () => {
   };
 
   return (
-    <div className="bet-after-win-container m-5">
+    <div className="bet-after-win-container m-5 border">
       <div className="bet-after-win-inner-container container-fluid ">
         {!selectedMarketId && (
           <>
