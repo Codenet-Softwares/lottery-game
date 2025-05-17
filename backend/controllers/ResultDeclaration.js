@@ -9,10 +9,11 @@ import TicketRange from '../models/ticketRange.model.js';
 import { TicketService } from '../constructor/ticketService.js';
 import sequelize from '../config/db.js';
 import WinResultRequest from '../models/winresultRequestModel.js';
+import TicketNumber from '../models/ticketNumber.model.js';
 
 export const ResultDeclare = async (req, res) => {
   try {
-    const  prizes= req.body;
+    const prizes = req.body;
     const { marketId } = req.params;
     
     const market = await TicketRange.findOne({ where: { marketId } });
@@ -248,228 +249,233 @@ export const ResultDeclare = async (req, res) => {
     let savedResults;
     if (generatedTickets.length > 0) {
       savedResults = await LotteryResult.bulkCreate(generatedTickets);
+      
+      // Save ticket numbers to TicketNumber model
+      const ticketNumbersToSave = [];
+      for (const result of savedResults) {
+        const ticketNumbers = Array.isArray(result.ticketNumber) ? result.ticketNumber : [result.ticketNumber];
+        
+        for (const ticket of ticketNumbers) {
+          ticketNumbersToSave.push({
+            ResultId: result.resultId,
+            MarketId: result.marketId,
+            marketName: result.marketName,
+            TicketNumber: ticket,
+            prizeCategory: result.prizeCategory,
+            prizeAmount: result.prizeAmount,
+            complementaryPrize: result.complementaryPrize || 0
+          });
+        }
+      }
+      
+      await TicketNumber.bulkCreate(ticketNumbersToSave);
     } else {
       return apiResponseErr(null, false, statusCode.badRequest, 'No valid tickets to save.', res);
     }
-    await WinResultRequest.update({isApproved: true, status : "Approve", remarks : "Congratulations! Your result has been approved."},{where:{marketId, isReject: false, status : "Pending"}});
 
-const normalizeTicketNumber = (ticket) => {
-  return ticket.replace(/\s+/g, '').toUpperCase();
-};
+    await WinResultRequest.update(
+      {isApproved: true, status: "Approve", remarks: "Congratulations! Your result has been approved."},
+      {where: {marketId, isReject: false, status: "Pending"}}
+    );
 
-const declaredResults = await LotteryResult.findAll({
-  where: { marketId },
-  attributes: ['ticketNumber', 'prizeCategory', 'prizeAmount', 'complementaryPrize','marketName'], // Ensure complementaryPrize is included
-  raw: true,
-});
+    const normalizeTicketNumber = (ticket) => {
+      return ticket.replace(/\s+/g, '').toUpperCase();
+    };
 
-const purchasedTickets = await PurchaseLottery.findAll({
-  where: { marketId },
-  attributes: ['userId', 'group', 'series', 'number','sem','lotteryPrice', 'marketName'],
-  raw: true,
-});
-
-const winningTicketsMap = new Map();
-
-declaredResults.forEach(result => {
-  const ticketNumbers = Array.isArray(result.ticketNumber) ? result.ticketNumber : [result.ticketNumber];
-  ticketNumbers.forEach(ticket => {
-    const normalizedTicket = normalizeTicketNumber(ticket);
-    winningTicketsMap.set(normalizedTicket, {
-      prizeCategory: result.prizeCategory,
-      prizeAmount: result.prizeAmount,
-      complementaryPrize: result.complementaryPrize, 
+    const declaredResults = await LotteryResult.findAll({
+      where: { marketId },
+      attributes: ['ticketNumber', 'prizeCategory', 'prizeAmount', 'complementaryPrize','marketName'],
+      raw: true,
     });
-  });
-});
 
-const winningTickets = [];
-const losingTickets = [];
+    const purchasedTickets = await PurchaseLottery.findAll({
+      where: { marketId },
+      attributes: ['userId', 'group', 'series', 'number','sem','lotteryPrice', 'marketName'],
+      raw: true,
+    });
 
-purchasedTickets.forEach(ticket => {
-  const ticketNumber = `${ticket.group.toString().padStart(2, '0')}${ticket.series}${ticket.number}`;
-  const normalizedTicket = normalizeTicketNumber(ticketNumber);
+    const winningTicketsMap = new Map();
 
-  console.log("normalizedTicket.............................................",normalizedTicket)
-
-  let isWinner = false;
-  let winningTicketDetails = null;
-  let matchType = null; 
-
-  for (const result of declaredResults) {
-    const ticketNumbers = Array.isArray(result.ticketNumber) ? result.ticketNumber : [result.ticketNumber];
-    for (const declaredTicket of ticketNumbers) {
-      const normalizedDeclaredTicket = normalizeTicketNumber(declaredTicket);
-
-  console.log("normalizedDeclaredTicket.............................................",normalizedDeclaredTicket)
-
-
-      if (result.prizeCategory === 'First Prize') {
-        if (normalizedDeclaredTicket === normalizedTicket) {
-          isWinner = true;
-          winningTicketDetails = {
-            prizeCategory: result.prizeCategory,
-            prizeAmount: result.prizeAmount, 
-          };
-          matchType = 'Exact Match'; 
-          break;
-        }
-        else if (normalizedDeclaredTicket.slice(-5) === normalizedTicket.slice(-5)) {
-          isWinner = true;
-          winningTicketDetails = {
-            prizeCategory: result.prizeCategory,
-            prizeAmount: result.complementaryPrize, 
-          };
-          matchType = 'Complementary Match'; 
-          break;
-        }
-      } else if (result.prizeCategory === 'Second Prize' && normalizedDeclaredTicket.slice(-5) === normalizedTicket.slice(-5)) {
-        isWinner = true;
-        winningTicketDetails = {
+    declaredResults.forEach(result => {
+      const ticketNumbers = Array.isArray(result.ticketNumber) ? result.ticketNumber : [result.ticketNumber];
+      ticketNumbers.forEach(ticket => {
+        const normalizedTicket = normalizeTicketNumber(ticket);
+        winningTicketsMap.set(normalizedTicket, {
           prizeCategory: result.prizeCategory,
-          sem: result.sem,
-          prizeAmount: result.prizeAmount 
-        };
-        matchType = 'Exact Match'; 
-        break;
-      } else if (
-        (result.prizeCategory === 'Third Prize' || result.prizeCategory === 'Fourth Prize' || result.prizeCategory === 'Fifth Prize') &&
-        normalizedDeclaredTicket.slice(-4) === normalizedTicket.slice(-4)
-      ) {
-        isWinner = true;
-        winningTicketDetails = {
-          prizeCategory: result.prizeCategory,
-          sem: result.sem,
-          prizeAmount: result.prizeAmount
-        };
-        matchType = 'Exact Match'; 
-        break;
+          prizeAmount: result.prizeAmount,
+          complementaryPrize: result.complementaryPrize, 
+        });
+      });
+    });
+
+    const winningTickets = [];
+    const losingTickets = [];
+
+    purchasedTickets.forEach(ticket => {
+      const ticketNumber = `${ticket.group.toString().padStart(2, '0')}${ticket.series}${ticket.number}`;
+      const normalizedTicket = normalizeTicketNumber(ticketNumber);
+
+      let isWinner = false;
+      let winningTicketDetails = null;
+      let matchType = null; 
+
+      for (const result of declaredResults) {
+        const ticketNumbers = Array.isArray(result.ticketNumber) ? result.ticketNumber : [result.ticketNumber];
+        for (const declaredTicket of ticketNumbers) {
+          const normalizedDeclaredTicket = normalizeTicketNumber(declaredTicket);
+
+          if (result.prizeCategory === 'First Prize') {
+            if (normalizedDeclaredTicket === normalizedTicket) {
+              isWinner = true;
+              winningTicketDetails = {
+                prizeCategory: result.prizeCategory,
+                prizeAmount: result.prizeAmount, 
+              };
+              matchType = 'Exact Match'; 
+              break;
+            }
+            else if (normalizedDeclaredTicket.slice(-5) === normalizedTicket.slice(-5)) {
+              isWinner = true;
+              winningTicketDetails = {
+                prizeCategory: result.prizeCategory,
+                prizeAmount: result.complementaryPrize, 
+              };
+              matchType = 'Complementary Match'; 
+              break;
+            }
+          } else if (result.prizeCategory === 'Second Prize' && normalizedDeclaredTicket.slice(-5) === normalizedTicket.slice(-5)) {
+            isWinner = true;
+            winningTicketDetails = {
+              prizeCategory: result.prizeCategory,
+              sem: result.sem,
+              prizeAmount: result.prizeAmount 
+            };
+            matchType = 'Exact Match'; 
+            break;
+          } else if (
+            (result.prizeCategory === 'Third Prize' || result.prizeCategory === 'Fourth Prize' || result.prizeCategory === 'Fifth Prize') &&
+            normalizedDeclaredTicket.slice(-4) === normalizedTicket.slice(-4)
+          ) {
+            isWinner = true;
+            winningTicketDetails = {
+              prizeCategory: result.prizeCategory,
+              sem: result.sem,
+              prizeAmount: result.prizeAmount
+            };
+            matchType = 'Exact Match'; 
+            break;
+          }
+        }
+        if (isWinner) break; 
+      }
+
+      if (isWinner && winningTicketDetails) {
+        winningTickets.push({
+          userId: ticket.userId,
+          ticketNumber: normalizedTicket,
+          prizeCategory: winningTicketDetails.prizeCategory,
+          prizeAmount: winningTicketDetails.prizeAmount,
+          lotteryPrice: ticket.lotteryPrice,
+          sem: ticket.sem,
+          matchType: matchType,
+          marketName: ticket.marketName 
+        });
+      } else {
+        losingTickets.push({
+          userId: ticket.userId,
+          ticketNumber: normalizedTicket,
+          lotteryPrice: ticket.lotteryPrice,
+          marketName: ticket.marketName,
+          sem: ticket.sem
+        });
+      }
+    });
+
+    const userTotalPrize = {};
+    const userLotteryPrice = {};
+
+    winningTickets.forEach(ticket => {
+      let calculatedPrize = ticket.prizeCategory === "First Prize" 
+          ? ticket.prizeAmount 
+          : ticket.prizeAmount * ticket.sem;
+
+      if (userTotalPrize[ticket.userId]) {
+          userTotalPrize[ticket.userId] += calculatedPrize;
+          userLotteryPrice[ticket.userId] += ticket.lotteryPrice;
+      } else {
+          userTotalPrize[ticket.userId] = calculatedPrize;
+          userLotteryPrice[ticket.userId] = ticket.lotteryPrice;
+      }
+    });
+
+    const baseURL = process.env.COLOR_GAME_URL;
+    for (const userId in userTotalPrize) {
+      try {
+          const response = await axios.post(`${baseURL}/api/users/update-balance`, {
+              userId,
+              prizeAmount: userTotalPrize[userId],
+              marketId,
+              lotteryPrice: userLotteryPrice[userId]
+          });
+          console.log(`Response for user ${userId}:`, response.data);
+      } catch (error) {
+          console.error(`Error updating balance for user ${userId}:`, error.response?.data || error.message);
       }
     }
-    if (isWinner) break; 
-  }
 
-  if (isWinner && winningTicketDetails) {
-    winningTickets.push({
-      userId: ticket.userId,
-      ticketNumber: normalizedTicket,
-      prizeCategory: winningTicketDetails.prizeCategory,
-      prizeAmount: winningTicketDetails.prizeAmount,
-      lotteryPrice: ticket.lotteryPrice,
-      sem: ticket.sem,
-      matchType: matchType,
-      marketName: ticket.marketName 
+    const userTotalLoss = {};
+    losingTickets.forEach(ticket => {
+      if (userTotalLoss[ticket.userId]) {
+          userTotalLoss[ticket.userId] += ticket.lotteryPrice;
+      } else {
+          userTotalLoss[ticket.userId] = ticket.lotteryPrice;
+      }
     });
-  } else {
-    losingTickets.push({
-      userId: ticket.userId,
-      ticketNumber: normalizedTicket,
-      lotteryPrice: ticket.lotteryPrice,
-      marketName: ticket.marketName ,
-      sem:  ticket.sem
-    });
-  }
-});
 
-const userTotalPrize = {};
-const userLotteryPrice = {};
-
-  winningTickets.forEach(ticket => {
-    let calculatedPrize = ticket.prizeCategory === "First Prize" 
-        ? ticket.prizeAmount 
-        : ticket.prizeAmount * ticket.sem;
-
-    if (userTotalPrize[ticket.userId]) {
-        userTotalPrize[ticket.userId] += calculatedPrize;
-        userLotteryPrice[ticket.userId] += ticket.lotteryPrice;
-    } else {
-        userTotalPrize[ticket.userId] = calculatedPrize;
-        userLotteryPrice[ticket.userId] = ticket.lotteryPrice;
+    for (const userId in userTotalLoss) {
+      try {
+          const response = await axios.post(`${baseURL}/api/users/remove-exposer`, {
+              userId,
+              marketId,
+              lotteryPrice: userTotalLoss[userId]  
+          });
+          console.log(`Response for user ${userId}:`, response.data);
+      } catch (error) {
+          console.error(`Error updating balance for user ${userId}:`, error.response?.data || error.message);
+      }
     }
-});
-    const baseURL = process.env.COLOR_GAME_URL;
-  for (const userId in userTotalPrize) {
-    try {
-        const response = await axios.post(`${baseURL}/api/users/update-balance`, {
-            userId,
-            prizeAmount: userTotalPrize[userId],
-            marketId,
-            lotteryPrice: userLotteryPrice[userId]
-        });
-        console.log(`Response for user ${userId}:`, response.data);
-    } catch (error) {
-        console.error(`Error updating balance for user ${userId}:`, error.response?.data || error.message);
-    }
-}
 
+    const profitLossData = [];
 
-const userTotalLoss = {};
-  losingTickets.forEach(ticket => {
-    if (userTotalLoss[ticket.userId]) {
-        userTotalLoss[ticket.userId] += ticket.lotteryPrice;
-    } else {
-        userTotalLoss[ticket.userId] = ticket.lotteryPrice;
-    }
-});
-
-for (const userId in userTotalLoss) {
-  try {
-      const response = await axios.post(`${baseURL}/api/users/remove-exposer`, {
-          userId,
-          marketId,
-          lotteryPrice: userTotalLoss[userId]  
+    // Collect winning ticket data
+    winningTickets.forEach((ticket) => {
+      profitLossData.push({
+        userId: ticket.userId,
+        marketId: marketId,
+        marketName: marketName,
+        lotteryPrice: ticket.lotteryPrice,
       });
-      console.log(`Response for user ${userId}:`, response.data);
-  } catch (error) {
-      console.error(`Error updating balance for user ${userId}:`, error.response?.data || error.message);
-  }
-}
+    });
 
-// for (const userId of Object.keys(userTotalLoss)) {
-//   try {
-//     await axios.post(`${baseURL}/api/lottery-profit-loss`, {
-//       userId,
-//       marketId,
-//       marketName,
-//     });
+    // Collect losing ticket data
+    losingTickets.forEach((ticket) => {
+      profitLossData.push({
+        userId: ticket.userId,
+        marketId: marketId,
+        marketName: marketName,
+        lotteryPrice: ticket.lotteryPrice,
+      });
+    });
 
-//     console.log(`Profit/Loss updated for user ${userId}`);
-//   } catch (error) {
-//     console.error(`Error updating Profit/Loss for user ${userId}:`, error.response?.data || error.message);
-//   }
-// }
-
-const profitLossData = [];
-
-// Collect winning ticket data
-winningTickets.forEach((ticket) => {
-  profitLossData.push({
-    userId: ticket.userId,
-    marketId: marketId,
-    marketName: marketName,
-    lotteryPrice: ticket.lotteryPrice,
-  });
-});
-
-// Collect losing ticket data
-losingTickets.forEach((ticket) => {
-  profitLossData.push({
-    userId: ticket.userId,
-    marketId: marketId,
-    marketName: marketName,
-    lotteryPrice: ticket.lotteryPrice,
-  });
-});
-
-// Send data to API
-for (const data of profitLossData) {
-  try {
-    await axios.post(`${baseURL}/api/lottery-profit-loss`, data);
-    console.log(`Data updated for user ${data.userId}`);
-  } catch (error) {
-    console.error(`Error updating data for user ${data.userId}:`, error.response?.data || error.message);
-  }
-}
+    // Send data to API
+    for (const data of profitLossData) {
+      try {
+        await axios.post(`${baseURL}/api/lottery-profit-loss`, data);
+        console.log(`Data updated for user ${data.userId}`);
+      } catch (error) {
+        console.error(`Error updating data for user ${data.userId}:`, error.response?.data || error.message);
+      }
+    }
 
     const declaredPrizeCategories = declaredResults.map((prize) => prize.prizeCategory);
     const isAllPrizesDeclared = allPrizeCategories.every((category) =>
@@ -498,7 +504,7 @@ for (const data of profitLossData) {
         winningTickets, 
         losingTickets 
       }
-    // Return the response with saved results and ticket details
+      
     return apiResponseSuccess(
       combineResult,
       true,
