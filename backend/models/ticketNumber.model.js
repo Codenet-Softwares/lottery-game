@@ -16,8 +16,12 @@ const TicketNumber = sequelize.define(
         },
         MarketId: {
             type: DataTypes.UUID,
-            allowNull: false,
+            allowNull: false,   
         },
+         marketName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
         TicketNumber: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -26,6 +30,15 @@ const TicketNumber = sequelize.define(
             type: DataTypes.ENUM('First Prize', 'Second Prize', 'Third Prize', 'Fourth Prize', 'Fifth Prize'),
             allowNull: false,
         },
+        prizeAmount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    complementaryPrize: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+   
     },
     {
         timestamps: true
