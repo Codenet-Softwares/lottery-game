@@ -1,18 +1,11 @@
 import React from "react";
 import { useFormik } from "formik";
-import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import { getAdminResetPasswordInitialState } from "../../Utils/initialState";
 import { resetPasswordSchema } from "../../Utils/validationSchema";
 import { SubAdminResetPassword } from "../../Utils/apiService";
 import { ReusableResetPasswordInput } from "../ReusableInput/ReusableInput";
-import { useAppContext } from "../../contextApi/context";
 
 const ResetPasswordSubAdmin = ({ userName, onClose = () => {} }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const state = location?.state || {};
-
   const handleResetPassword = async (values, { resetForm }) => {
     const { confirmPassword, ...resetValues } = values;
 
@@ -67,56 +60,70 @@ const ResetPasswordSubAdmin = ({ userName, onClose = () => {} }) => {
   });
 
   return (
-    <div
-      className="d-flex align-items-center justify-content-center"
-      style={{ background: "#f0f0f0", minHeight: "60vh" }}
-    >
+    <div className="modal show fade d-block" tabIndex="-1" role="dialog">
       <div
-        className="card shadow-lg p-4 rounded-4"
-        style={{ maxWidth: "500px", width: "100%" }}
+        className="modal-dialog modal-dialog-centered"
+        role="document"
+        style={{ maxWidth: "500px" }}
       >
-        <div className="text-center mb-4">
-          <i
-            className="bi bi-person-circle text-primary"
-            style={{ fontSize: "4rem" }}
-          ></i>
-          <h2 className="mt-3 text-primary">Reset Password</h2>
-          <p
-            className="text-uppercase fw-bold text-glow mt-3"
-            style={{
-              color: "#4682B4",
-              fontSize: "1.5rem",
-              letterSpacing: "2px",
-              animation: "glow 2s infinite alternate",
-            }}
-          >
-            {userName}
-          </p>
-        </div>
-        <form onSubmit={formik.handleSubmit}>
-          {inputFields.map((field, index) => (
-            <ReusableResetPasswordInput
-              key={index}
-              placeholder={field.placeholder}
-              name={field.name}
-              type={field.type}
-              value={formik.values[field.name]}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched[field.name] && formik.errors[field.name]}
-              showEyeIcon={field.showEyeIcon}
-            />
-          ))}
-          <div className="d-grid mt-3">
+        <div className="modal-content p-4 rounded-4 shadow-lg">
+          <div className="modal-header justify-content-center border-0">
+            <h5 className="modal-title text-primary w-100 text-center">
+              Reset Password
+            </h5>
             <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={formik.isSubmitting}
-            >
-              {formik.isSubmitting ? "Resetting..." : "Reset Password"}
-            </button>
+              type="button"
+              className="btn-close position-absolute end-0 me-3"
+              onClick={onClose}
+              aria-label="Close"
+            ></button>
           </div>
-        </form>
+
+          <div className="modal-body">
+            <div className="text-center mb-3">
+              <i
+                className="bi bi-person-circle text-primary"
+                style={{ fontSize: "3rem" }}
+              ></i>
+              <p
+                className="text-uppercase fw-bold mt-2"
+                style={{
+                  color: "#4682B4",
+                  letterSpacing: "1px",
+                }}
+              >
+                {userName}
+              </p>
+            </div>
+
+            <form onSubmit={formik.handleSubmit}>
+              {inputFields.map((field, index) => (
+                <ReusableResetPasswordInput
+                  key={index}
+                  placeholder={field.placeholder}
+                  name={field.name}
+                  type={field.type}
+                  value={formik.values[field.name]}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched[field.name] && formik.errors[field.name]
+                  }
+                  showEyeIcon={field.showEyeIcon}
+                />
+              ))}
+              <div className="d-grid mt-3">
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={formik.isSubmitting}
+                >
+                  {formik.isSubmitting ? "Resetting..." : "Reset Password"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   );
