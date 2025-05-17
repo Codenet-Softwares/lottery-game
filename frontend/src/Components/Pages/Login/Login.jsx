@@ -118,7 +118,7 @@ const Login = () => {
           bottom: "10px",
           width: "auto",
           height: "120%",
-          backgroundImage: `url(${backgroundImage04})`,
+          background:"#284B63",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",

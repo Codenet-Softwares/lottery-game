@@ -75,8 +75,8 @@ const SearchCreatedLotto = () => {
         {showSearch ? (
           selectedMarket ? (
             <div className="form-wrapper">
-              <div className="sc-lotto-search-border-form border border-2 border-secondary py-4 rounded-3">
-                <div className="sc-lotto-search-form ">
+              <div className="sc-lotto-search-border-form rounded-3">
+                <div className="sc-lotto-search-form border">
                   <div className="price-pill">
                     PRICE: <strong>{selectedMarket.price}</strong>
                   </div>
@@ -134,8 +134,8 @@ const SearchCreatedLotto = () => {
             <div className="sc-lotto-back-button bg-secondary px-2 rounded" onClick={handleBack}>
             <i className="bi bi-arrow-left"> Back To <strong>  {selectedMarket?.marketName || ""}</strong></i>
             </div>
-            <div className="sc-lotto-search-border-form border border-2 border-secondary py-4 rounded-3">
-              <div className="sc-lotto-results-container">
+            <div className="sc-lotto-search-border-form rounded-3">
+              <div className="sc-lotto-results-container border">
                 <h4>Search Results:</h4>
                 <h5 className="fw-bold">Tickets:</h5>
 
