@@ -144,7 +144,6 @@ const deletedPurchases = await PurchaseLottery.findAll({
 });
 
 
-    // Fetch ticket details for each deleted purchase
     const getData = await Promise.all(
       deletedPurchases.map(async (data) => {
         const tickets = await ticketService.list(
@@ -156,7 +155,7 @@ const deletedPurchases = await PurchaseLottery.findAll({
         );
 
         return {
-          trashMarketId: data.purchaseId, // You can use another unique ID if needed
+          purchaseId: data.purchaseId, 
           marketName: data.marketName,
           marketId: data.marketId,
           sem: data.sem,
