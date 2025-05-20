@@ -6,11 +6,10 @@ import {
   apiResponseSuccess,
 } from "../utils/response.js";
 import { statusCode } from "../utils/statusCodes.js";
-import sequelize from "../config/db.js";
-import { v4 as UUIDV4 } from "uuid";
+import {sequelize} from "../config/db.js";
 import jwt from "jsonwebtoken";
 import LotteryTrash from "../models/trash.model.js";
-import { Sequelize } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { TicketService } from "../constructor/ticketService.js";
 import LotteryResult from "../models/resultModel.js";
 
@@ -54,17 +53,11 @@ export const deleteliveBet = async (req, res) => {
       return res.status(statusCode.badRequest).json(response.data);
     }
 
-    await LotteryTrash.create(
-      {
-        trashMarkets: [livePurchaseId.dataValues],
-        trashMarketId: UUIDV4(),
-      },
-      { transaction }
-    );
 
-    await PurchaseLottery.destroy({
-      where: { purchaseId },
-    });
+   await PurchaseLottery.update(
+      { isDeleted: true },
+      { where: { purchaseId }, transaction }
+    );
 
     await transaction.commit();
 
@@ -89,58 +82,28 @@ export const deleteliveBet = async (req, res) => {
 
 export const getTrashMarket = async (req, res) => {
   try {
-    const  search  = req.query.search || "";
-    const existingMarket = await LotteryTrash.findAll({
-      attributes: ["trashMarkets"],
+    const search = req.query.search || "";
+
+    const whereClause = {
+      isDeleted: true,
+    };
+
+    if (search) {
+      whereClause.marketName = { [Op.like]: `%${search}%` };
+    }
+
+    const deletedPurchases = await PurchaseLottery.findAll({
+      where: whereClause,
       order: [["createdAt", "DESC"]],
     });
 
-    const allMarkets = [];
-    existingMarket.forEach((record) => {
-      const markets = record.trashMarkets;
-      if (Array.isArray(markets)) {
-        allMarkets.push(...markets);
-      }
-    });
-
-    if (allMarkets.length === 0) {
-      return apiResponseSuccess(
-        [],
-        true,
-        statusCode.success,
-        "No markets found",
-        res
-      );
-    }
-
-    const uniqueMarkets = [
-      ...new Map(
-        allMarkets.map((m) => [
-          m.marketId,
-          { marketId: m.marketId, marketName: m.marketName },
-        ])
-      ).values(),
-    ];
-
-    const filteredMarkets = search ? uniqueMarkets.filter((market) =>
-        market.marketName.toLowerCase().includes(search.toLowerCase())
-      ) : uniqueMarkets;
-
-      if (filteredMarkets.length === 0) {
-        return apiResponseSuccess(
-          [],
-          true,
-          statusCode.success,
-          "No matching markets found",
-          res
-        );
-      }
-
     return apiResponseSuccess(
-      filteredMarkets,
+      deletedPurchases,
       true,
       statusCode.success,
-      "Markets fetch successfully",
+      deletedPurchases.length
+        ? "Deleted purchases fetched successfully"
+        : "No deleted purchases found",
       res
     );
   } catch (error) {
@@ -157,80 +120,70 @@ export const getTrashMarket = async (req, res) => {
 export const getTrashBetDetails = async (req, res) => {
   try {
     let { page = 1, pageSize = 10, search = '' } = req.query;
+    const { marketId } = req.params;
 
     page = parseInt(page);
     pageSize = parseInt(pageSize);
 
-    const { marketId } = req.params;
-    const marketData = await LotteryTrash.findAll({
-      attributes: ["trashMarkets", "trashMarketId"],
-      where: Sequelize.where(
-        Sequelize.fn(
-          "JSON_CONTAINS",
-          Sequelize.col("trashMarkets"),
-          JSON.stringify([{ marketId }])
-        ),
-        true
-      ),
-    });
-
     const ticketService = new TicketService();
 
+    const whereClause = {
+  marketId,
+  isDeleted: true,
+};
+
+if (search) {
+  whereClause.userName = {
+    [Op.like]: `%${search}%`,
+  };
+}
+
+const deletedPurchases = await PurchaseLottery.findAll({
+  where: whereClause,
+  order: [['createdAt', 'DESC']],
+});
+
+
+    // Fetch ticket details for each deleted purchase
     const getData = await Promise.all(
-      marketData
-        .map((item) => {
-          const trashMarkets = item.trashMarkets;
+      deletedPurchases.map(async (data) => {
+        const tickets = await ticketService.list(
+          data.group,
+          data.series,
+          data.number,
+          data.sem,
+          data.marketId
+        );
 
-          const parsedMarkets = Array.isArray(trashMarkets)
-            ? trashMarkets
-            : JSON.parse(trashMarkets);
-
-          return parsedMarkets
-            .filter((data) => data.marketId === marketId)
-            .map(async (data) => {
-              const tickets = await ticketService.list(
-                data.group,
-                data.series,
-                data.number,
-                data.sem,
-                marketId
-              );
-
-              return {
-                trashMarketId: item.trashMarketId,
-                marketName: data.marketName,
-                marketId: data.marketId,
-                sem: data.sem,
-                price: data.price,
-                userId: data.userId,
-                userName: data.userName,
-                lotteryPrice: data.lotteryPrice,
-                Tickets: tickets,
-              };
-            });
-        })
-        .flat()
+        return {
+          trashMarketId: data.purchaseId, // You can use another unique ID if needed
+          marketName: data.marketName,
+          marketId: data.marketId,
+          sem: data.sem,
+          price: data.price,
+          userId: data.userId,
+          userName: data.userName,
+          lotteryPrice: data.lotteryPrice,
+          Tickets: tickets,
+        };
+      })
     );
 
-    const resolvedData = await Promise.all(getData);
-    const filteredData = resolvedData.filter((data) =>
-      data.userName.toLowerCase().includes(search.toLowerCase())
-    );
-
-    if (filteredData.length === 0) {
+    if (getData.length === 0) {
       return apiResponseSuccess(
         [],
         true,
         statusCode.success,
-        "No matching markets found",
+        "No matching trash bets found",
         res
       );
     }
 
+    // Pagination
     const offset = (page - 1) * pageSize;
-    const totalItems = resolvedData.length;
+    const totalItems = getData.length;
     const totalPages = Math.ceil(totalItems / pageSize);
-    const getAllMarkets = filteredData.slice(offset, offset + pageSize);
+    const paginatedData = getData.slice(offset, offset + pageSize);
 
     const paginationData = {
       page,
@@ -240,7 +193,7 @@ export const getTrashBetDetails = async (req, res) => {
     };
 
     return apiResponsePagination(
-      getAllMarkets,
+      paginatedData,
       true,
       statusCode.success,
       "Trash bet details fetched successfully!",
@@ -261,8 +214,8 @@ export const getTrashBetDetails = async (req, res) => {
 
 export const deleteTrash = async (req, res) => {
   try {
-    const {trashMarketId} = req.params
-    const trashData = await LotteryTrash.findOne({where: {trashMarketId} });
+    const {purchaseId} = req.params
+    const trashData = await PurchaseLottery.findOne({where: {purchaseId} });
 
     if (!trashData) {
       return apiResponseErr(
@@ -273,7 +226,11 @@ export const deleteTrash = async (req, res) => {
         res
       );
     }
-    await LotteryTrash.destroy({ where: { trashMarketId } });
+    await PurchaseLottery.update(
+      { isParmanentDeleted: true },
+      { where: { purchaseId } }
+    );
+    await PurchaseLottery.destroy({ where: { purchaseId } });
     return apiResponseSuccess(null, true, statusCode.success, 'Trash data deleted successfully', res)
 
   } catch (error) {
