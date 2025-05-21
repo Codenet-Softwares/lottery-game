@@ -335,6 +335,7 @@ export const deleteBetAfterWin = async (req, res) => {
         prizeAmount: winningTicket?.prizeAmount || 0, 
         prizeCategory: winningTicket?.prizeCategory || '',
         complementaryPrize: comPrize || 0,
+        price:ticketPurchaseId.lotteryPrice
       },
       { headers }
     );
