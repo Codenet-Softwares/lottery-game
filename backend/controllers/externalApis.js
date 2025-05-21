@@ -240,7 +240,7 @@ export const lotteryMarketAnalysis = async (req, res) => {
 export const getBetHistoryP_L = async (req, res) => {
   try {
     const { userId, userName, marketId } = req.body
-    const queryConditions = { resultAnnouncement: true, marketId };
+    const queryConditions = { resultAnnouncement: true, marketId,isDeleted:false };
     if (userId) queryConditions.userId = userId;
     if (userName) queryConditions.userName = userName;
 
