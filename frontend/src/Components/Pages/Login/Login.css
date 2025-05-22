@@ -1,23 +1,4 @@
-.custom-error-message {
-    font-size: 1rem;
-    font-family: 'Merriweather', serif;
-    font-weight: 700;
-    color: #ff4d4d; /* Vivid red for a striking look */
-    text-shadow: 2px 2px 5px rgba(255, 0, 0, 0.5); /* Soft red glow */
-    letter-spacing: 2px;
-    padding-left: 25px;
 
-    transition: all 0.3s ease-in-out;
-    animation: shake 0.3s ease-in-out;
-  }
-  
-  @keyframes shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-3px); }
-    50% { transform: translateX(3px); }
-    75% { transform: translateX(-3px); }
-    100% { transform: translateX(0); }
-  }
 
 
   

@@ -125,7 +125,7 @@ const PrizeValidation = () => {
       label: "Approval List",
       render: (row) => (
         <button
-          className="btn btn-primary text-uppercase fw-bold"
+          className="btn btn-primary text-uppercase fw-bold text-white"
           onClick={() => fetchApprovalData(row)}
         >
           View Approval

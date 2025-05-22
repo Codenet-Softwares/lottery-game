@@ -192,7 +192,7 @@ const MarketInsight = () => {
   };
   if (loading) return null;
   return (
-    <Container fluid className="alt-dashboard-container">
+    <Container fluid className="alt-dashboard-container text-uppercase">
       {/* Sidebar */}
       <aside className="alt-sidebar p-4">
         <h5

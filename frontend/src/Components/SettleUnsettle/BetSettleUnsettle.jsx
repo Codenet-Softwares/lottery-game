@@ -226,7 +226,7 @@ const BetSettleUnsettle = ({ marketId, backButton, onAllDataDeleted }) => {
                             className="btn btn-info"
                             onClick={() => handleShowTickets(user.details)}
                           >
-                            <i className="bi bi-ticket-detailed"></i> Show Tickets
+                            <i className="bi bi-ticket-detailed text-uppercase"></i> Show Tickets
                           </button>
                         </td>
                       </tr>

@@ -41,12 +41,11 @@ const CreateSubadmin = ({
       className="d-flex align-items-center justify-content-center mt-5"
     >
       <div
-        className="container mt-3 p-4 shadow rounded"
+        className="container mt-3 p-4 shadow rounded border"
         style={{
           background: "#fff",
           // background: "linear-gradient(135deg, #f0f9ff, #cce7f6):,
 
-          border: "2px solid black",
           boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
           maxWidth: "900px",
         }}
