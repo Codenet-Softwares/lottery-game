@@ -483,7 +483,7 @@ export async function TrashMarketsDelete(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.DELETE, body, isToast);
     const response = await makeCall(
-      `${urls.TrashMarketDetailsDelete}/${body.trashId}`,
+      `${urls.TrashMarketDetailsDelete}/${body.purchaseId}`,
 
       callParams,
       isToast
