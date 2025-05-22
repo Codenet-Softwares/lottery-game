@@ -24,12 +24,12 @@ const SearchCreatedLotto = () => {
   );
 
   return (
-    <div className="sc-lotto-container">
-      <aside className="sc-lotto-sidebar">
+    <div className="sc-lotto-container text-uppercase">
+      <aside className="sc-lotto-sidebar ">
         <div className="sc-lotto-sidebar-header">
           <h5 className="sc-lotto-sidebar-title fw-bold text-dark">LOTTERY MARKETS</h5>
         </div>
-        <div className="sc-lotto-market-card-grid">
+        <div className="sc-lotto-market-card-grid ">
           {filteredMarkets.length > 0 ? (
             filteredMarkets.map((market) => (
               <div

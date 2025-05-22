@@ -66,7 +66,7 @@ const BetAfterWin = () => {
   };
 
   return (
-    <div className="bet-after-win-container m-5 border">
+    <div className="bet-after-win-container m-5 border text-uppercase">
       <div className="bet-after-win-inner-container container-fluid ">
         {!selectedMarketId && (
           <>
@@ -107,7 +107,7 @@ const BetAfterWin = () => {
                 >
                   {market.marketName}
                   <button
-                    className="bet-after-win-live-stats-button"
+                    className="bet-after-win-live-stats-button text-uppercase fw-bold"
                     onClick={() => handleLiveStatsClick(market.marketId)}
                   >
                     Win Stats

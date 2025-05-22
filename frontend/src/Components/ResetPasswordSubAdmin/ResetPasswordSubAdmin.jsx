@@ -60,7 +60,7 @@ const ResetPasswordSubAdmin = ({ userName, onClose = () => {} }) => {
   });
 
   return (
-    <div className="modal show fade d-block" tabIndex="-1" role="dialog">
+    <div className="modal show fade d-block text-uppercase" tabIndex="-1" role="dialog">
       <div
         className="modal-dialog modal-dialog-centered"
         role="document"
@@ -68,7 +68,7 @@ const ResetPasswordSubAdmin = ({ userName, onClose = () => {} }) => {
       >
         <div className="modal-content p-4 rounded-4 shadow-lg">
           <div className="modal-header justify-content-center border-0">
-            <h5 className="modal-title text-primary w-100 text-center">
+            <h5 className="modal-title text-primary w-100 text-center fw-bold">
               Reset Password
             </h5>
             <button

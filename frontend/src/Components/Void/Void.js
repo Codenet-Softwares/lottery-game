@@ -74,11 +74,11 @@ const Void = () => {
   );
 
   return (
-    <div className="container my-5">
+    <div className="container my-5 text-uppercase">
       <div className="card shadow-sm">
         <div
           className="void-card-header d-flex align-items-center justify-content-between p-3"
-          // style={{ backgroundColor: "#284B63", color: "#FFFFFF" }}
+         
         >
           <h3 className="mb-0 fw-bold fs-5 text-start">VOID GAME LIST</h3>
           <input
@@ -144,14 +144,14 @@ const Void = () => {
                         <Accordion>
                           <Accordion.Item eventKey={index}>
                             <Accordion.Header>
-                              <strong>{market.marketName}</strong>
+                              <strong className="text-uppercase">{market.marketName}</strong>
                             </Accordion.Header>
                             <Accordion.Body>
                               <Row>
                                 <Col md={6} className="mb-3">
                                   <Card className="stat-card group-card shadow">
                                     <Card.Body className="d-flex align-items-center">
-                                      <i className="bi bi-people-fill stat-icon me-3"></i>
+                                      <i className="bi bi-people-fill stat-icon me-3 "></i>
                                       <div>
                                         <p className="mb-1 fw-bold text-dark">
                                           <strong>Group Range</strong>
