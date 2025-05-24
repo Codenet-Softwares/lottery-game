@@ -84,7 +84,7 @@ const Void = () => {
           <input
             type="text"
             className="search-bar-shrink-1"
-            placeholder="Search Void Marketnames..."
+            placeholder="Search By Market Name..."
             value={searchTerm}
             onChange={handleSearchMarketChange}
             style={{
@@ -108,7 +108,7 @@ const Void = () => {
           {isLoading ? (
             <div className="text-center">Loading...</div>
           ) : voidMarkets.length == 0 ? (
-            <div className=" text-center">No Data</div>
+            <div className=" text-center text-danger fw-bold">No Data</div>
           ) : (
             <>
               {/* Search and Pagination Controls */}
