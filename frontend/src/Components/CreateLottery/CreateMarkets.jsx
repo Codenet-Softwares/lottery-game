@@ -117,7 +117,7 @@ const CreateMarkets = () => {
           boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.5)",
           maxWidth: "900px",
           position: "relative",
-          background:"linear-gradient(135deg, #f0f9ff, #cce7f6)"
+          // background:"linear-gradient(135deg, #f0f9ff, #cce7f6)"
         }}
       >
         <h3 className="text-center mb-4 fw-bold">CREATE LOTTERY MARKETS</h3>

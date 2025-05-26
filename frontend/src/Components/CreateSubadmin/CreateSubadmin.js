@@ -6,7 +6,7 @@ import { ReusableInput } from "../ReusableInput/ReusableInput";
 import { createSubAdmin } from "../../Utils/apiService";
 import { ReusablePermissionBox } from "../Reusables/ReusablePermissionBox";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
-
+import { useAppContext } from "../../contextApi/context";
 const inputConfig = [
   { placeholder: "Username", name: "userName" },
   { placeholder: "Password", type: "password", name: "password" },
@@ -16,6 +16,7 @@ const CreateSubadmin = ({
   permissionsList = ["win-Lottery-Result", "result-View", "win-Analytics"],
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const { showLoader, hideLoader } = useAppContext();
 
   const formik = useFormik({
     initialValues: {
@@ -30,21 +31,21 @@ const CreateSubadmin = ({
         ...values,
         permissions: values.permissions.map(String).join(","),
       };
-      createSubAdmin(requestBody);
+      showLoader();
+      createSubAdmin(requestBody).finally(() => {
+        hideLoader();
+      });
       formik.resetForm();
     },
   });
-  
 
   return (
-    <div
-      className="d-flex align-items-center justify-content-center mt-5"
-    >
+    <div className="d-flex align-items-center justify-content-center mt-5">
       <div
         className="container mt-3 p-4 shadow rounded border"
         style={{
           background: "#fff",
-          background: "linear-gradient(135deg, #f0f9ff, #cce7f6)",
+          // background: "linear-gradient(135deg, #f0f9ff, #cce7f6):,
 
           boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
           maxWidth: "900px",
@@ -105,7 +106,7 @@ const CreateSubadmin = ({
             <button
               type="submit"
               className=" btn createsubadmin-button text-white"
-              style={{background:"#284B63"}}
+              style={{ background: "#284B63" }}
             >
               Submit
             </button>
