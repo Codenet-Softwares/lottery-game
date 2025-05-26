@@ -134,6 +134,18 @@ export const authorize = (roles, permissions) => {
         }
       }
 
+      if (roles.includes(string.Admin) || roles.includes(string.SubAdmin)) {
+        if (existingUser.token !== tokenParts[1]) {
+          return apiResponseErr(
+            null,
+            false,
+            statusCode.unauthorize,
+            "Token mismatch. Unauthorized access.",
+            res
+          );
+        }
+      }
+
       (req.user = existingUser),
         //  { accessToken: token };
         next();
