@@ -128,6 +128,9 @@ export const login = async (req, res) => {
       expiresIn: "1d",
     });
 
+    existingUser.token = accessToken;
+    await existingUser.save();
+
     return apiResponseSuccess(
       { accessToken, ...userResponse },
       true,
