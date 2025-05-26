@@ -80,7 +80,7 @@ const Inactive = () => {
   );
 
   return (
-    <div className="container my-5">
+    <div className="container my-5 text-uppercase">
       <div className="card shadow-sm">
         <div
           className="card-header d-flex align-items-center justify-content-between p-3"
@@ -90,7 +90,7 @@ const Inactive = () => {
           <input
             type="text"
             className="search-bar-shrink-1"
-            placeholder="Search Revoke Marketnames..."
+            placeholder="Search By Market Name..."
             value={searchTerm}
             onChange={handleSearchMarketChange}
             style={{
@@ -147,7 +147,7 @@ const Inactive = () => {
                           <td>{game.marketName}</td>
                           <td>
                             <button
-                              className="btn btn-danger"
+                              className="btn btn-danger text-uppercase fw-bold"
                               onClick={() =>
                                 handleRevokeAnnouncement(game.marketId)
                               }

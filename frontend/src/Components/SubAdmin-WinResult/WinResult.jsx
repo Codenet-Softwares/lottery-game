@@ -130,7 +130,7 @@ const WinResult = () => {
           <input
             type="text"
             className="form-control me-2"
-            placeholder="Search by market name"
+            placeholder="Search By Market Name"
             value={searchTerm}
             onChange={handleSearchChange}
           />

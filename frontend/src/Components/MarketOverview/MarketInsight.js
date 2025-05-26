@@ -192,7 +192,7 @@ const MarketInsight = () => {
   };
   if (loading) return null;
   return (
-    <Container fluid className="alt-dashboard-container">
+    <Container fluid className="alt-dashboard-container text-uppercase">
       {/* Sidebar */}
       <aside className="alt-sidebar p-4">
         <h5
@@ -247,7 +247,7 @@ const MarketInsight = () => {
           <input
             type="text"
             className="form-control w-80"
-            placeholder="Search for a Lottery market..."
+            placeholder="Search Lottery Market Name..."
             value={searchTerm}
             onChange={handleSearchChange}
           />

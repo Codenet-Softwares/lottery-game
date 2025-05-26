@@ -74,17 +74,17 @@ const Void = () => {
   );
 
   return (
-    <div className="container my-5">
+    <div className="container my-5 text-uppercase">
       <div className="card shadow-sm">
         <div
           className="void-card-header d-flex align-items-center justify-content-between p-3"
-          // style={{ backgroundColor: "#284B63", color: "#FFFFFF" }}
+         
         >
           <h3 className="mb-0 fw-bold fs-5 text-start">VOID GAME LIST</h3>
           <input
             type="text"
             className="search-bar-shrink-1"
-            placeholder="Search Void Marketnames..."
+            placeholder="Search By Market Name..."
             value={searchTerm}
             onChange={handleSearchMarketChange}
             style={{
@@ -108,7 +108,7 @@ const Void = () => {
           {isLoading ? (
             <div className="text-center">Loading...</div>
           ) : voidMarkets.length == 0 ? (
-            <div className=" text-center">No Data</div>
+            <div className=" text-center text-danger fw-bold">No Data</div>
           ) : (
             <>
               {/* Search and Pagination Controls */}
@@ -139,102 +139,100 @@ const Void = () => {
                   
                 >
                   <tbody>
-                    {voidMarkets.map((market, index) => (
-                      <tr key={market.id}>
-                        <Accordion>
-                          <Accordion.Item eventKey={index}>
-                            <Accordion.Header>
-                              <strong>{market.marketName}</strong>
-                            </Accordion.Header>
-                            <Accordion.Body>
-                              <Row>
-                                <Col md={6} className="mb-3">
-                                  <Card className="stat-card group-card shadow">
-                                    <Card.Body className="d-flex align-items-center">
-                                      <i className="bi bi-people-fill stat-icon me-3"></i>
-                                      <div>
-                                        <p className="mb-1 fw-bold text-dark">
-                                          <strong>Group Range</strong>
-                                        </p>
-                                        <p>
-                                          Start: {market.group_start} | End:{" "}
-                                          {market.group_end}
-                                        </p>
-                                      </div>
-                                    </Card.Body>
-                                  </Card>
-                                </Col>
-                                <Col md={6} className="mb-3">
-                                  <Card className="stat-card group-card shadow">
-                                    <Card.Body className="d-flex align-items-center">
-                                      <i className="bi bi-bar-chart-fill stat-icon me-3"></i>
-                                      <div>
-                                        <p className="mb-1 fw-bold text-dark">
-                                          <strong>Series Range</strong>
-                                        </p>
-                                        <p>
-                                          Start: {market.series_start} | End:{" "}
-                                          {market.series_end}
-                                        </p>
-                                      </div>
-                                    </Card.Body>
-                                  </Card>
-                                </Col>
-                                <Col md={6} className="mb-3">
-                                  <Card className="stat-card group-card shadow">
-                                    <Card.Body className="d-flex align-items-center">
-                                      <i className="bi bi-123 stat-icon me-3"></i>
-                                      <div>
-                                        <p className="mb-1 fw-bold text-dark">
-                                          <strong>Number Range</strong>
-                                        </p>
-                                        <p>
-                                          Start: {market.number_start} | End:{" "}
-                                          {market.number_end}
-                                        </p>
-                                      </div>
-                                    </Card.Body>
-                                  </Card>
-                                </Col>
-                                <Col md={6} className="mb-3">
-                                  <Card className="stat-card group-card shadow">
-                                    <Card.Body className="d-flex align-items-center">
-                                      <i className="bi bi-currency-rupee stat-icon me-5"></i>
-                                      <div>
-                                        <p className="mb-1 fw-bold text-dark">
-                                          <strong>Price</strong>
-                                        </p>
-                                        <p>{market.price}</p>
-                                      </div>
-                                    </Card.Body>
-                                  </Card>
-                                </Col>
-                                <Col md={6} className="mb-3">
-                                  <Card className="stat-card group-card shadow">
-                                    <Card.Body className="d-flex align-items-center">
-                                      <i className="bi bi-clock-fill stat-icon me-3"></i>
-                                      <div>
-                                        <p className="mb-1 fw-bold text-dark">
-                                          <strong>Date</strong>
-                                        </p>
-                                        <p>
-                                          {market
-                                            ? moment(market.date).format(
-                                                "MMMM Do YYYY"
-                                              )
-                                            : "N/A"}
-                                        </p>
-                                      </div>
-                                    </Card.Body>
-                                  </Card>
-                                </Col>
-                              </Row>
-                            </Accordion.Body>
-                          </Accordion.Item>
-                        </Accordion>
-                      </tr>
-                    ))}
-                  </tbody>
+  <tr>
+    <td colSpan="100%">
+      <Accordion defaultActiveKey={null} alwaysOpen={false}  className="p-2">
+        {voidMarkets.map((market, index) => (
+          <Accordion.Item eventKey={index.toString()} key={market.id}>
+            <Accordion.Header  className="p-1" style={{background:"linear-gradient(135deg, rgb(240, 249, 255), rgb(204, 231, 246))"}}>
+              <strong className="text-uppercase">{market.marketName}</strong>
+            </Accordion.Header>
+            <Accordion.Body>
+              <Row >
+                <Col md={6} className="mb-3">
+                  <Card className="stat-card group-card shadow">
+                    <Card.Body className="d-flex align-items-center">
+                      <i className="bi bi-people-fill stat-icon me-3 "></i>
+                      <div>
+                        <p className="mb-1 fw-bold text-dark">
+                          <strong>Group Range</strong>
+                        </p>
+                        <p>
+                          Start: {market.group_start} | End: {market.group_end}
+                        </p>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </Col>
+                <Col md={6} className="mb-3">
+                  <Card className="stat-card group-card shadow">
+                    <Card.Body className="d-flex align-items-center">
+                      <i className="bi bi-bar-chart-fill stat-icon me-3"></i>
+                      <div>
+                        <p className="mb-1 fw-bold text-dark">
+                          <strong>Series Range</strong>
+                        </p>
+                        <p>
+                          Start: {market.series_start} | End: {market.series_end}
+                        </p>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </Col>
+                <Col md={6} className="mb-3">
+                  <Card className="stat-card group-card shadow">
+                    <Card.Body className="d-flex align-items-center">
+                      <i className="bi bi-123 stat-icon me-3"></i>
+                      <div>
+                        <p className="mb-1 fw-bold text-dark">
+                          <strong>Number Range</strong>
+                        </p>
+                        <p>
+                          Start: {market.number_start} | End: {market.number_end}
+                        </p>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </Col>
+                <Col md={6} className="mb-3">
+                  <Card className="stat-card group-card shadow">
+                    <Card.Body className="d-flex align-items-center">
+                      <i className="bi bi-currency-rupee stat-icon me-5"></i>
+                      <div>
+                        <p className="mb-1 fw-bold text-dark">
+                          <strong>Price</strong>
+                        </p>
+                        <p>{market.price}</p>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </Col>
+                <Col md={6} className="mb-3">
+                  <Card className="stat-card group-card shadow">
+                    <Card.Body className="d-flex align-items-center">
+                      <i className="bi bi-clock-fill stat-icon me-3"></i>
+                      <div>
+                        <p className="mb-1 fw-bold text-dark">
+                          <strong>Date</strong>
+                        </p>
+                        <p>
+                          {market?.date
+                            ? moment(market.date).format("MMMM Do YYYY")
+                            : "N/A"}
+                        </p>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              </Row>
+            </Accordion.Body>
+          </Accordion.Item>
+        ))}
+      </Accordion>
+    </td>
+  </tr>
+</tbody>
+
                 </table>
               </div>
 

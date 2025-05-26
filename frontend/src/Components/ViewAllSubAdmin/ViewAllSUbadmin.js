@@ -11,18 +11,12 @@ const ViewAllSubadmin = () => {
   const [subAdmins, setSubAdmins] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [showMiniModal, setShowMiniModal] = useState(false);
-  const [error, setError] = useState(null);
-
-  console.log("selectedUser", selectedUser);
 
   useEffect(() => {
     const fetchSubAdmins = async () => {
       const response = await ViewAllSubAdmins();
       if (response.success) {
         setSubAdmins(response.data);
-      } else {
-        setError("Failed to fetch sub-admins");
       }
     };
     fetchSubAdmins();
@@ -58,40 +52,19 @@ const ViewAllSubadmin = () => {
 
   return (
     <>
-      <div>
-        <ReusableModal
-          show={showModal}
-          handleClose={() => {
+      {showModal && selectedUser && (
+        <ResetPasswordSubAdmin
+          userName={selectedUser}
+          onClose={() => {
             setShowModal(false);
+            setSelectedUser(null);
           }}
-          title="Reset Sub-Admin Password"
-          body={
-            <ResetPasswordSubAdmin
-              userName={selectedUser}
-              onClose={() => {
-                setShowModal(false);
-              }}
-            />
-          }
         />
-      </div>
-      {/* Sub-Admin Delete Modal Start*/}
-      {/* <div>
-        <ReusableMiniModal
-          show={showMiniModal}
-          handleClose={() => {
-            console.log("Closing Modal...");
-            setShowMiniModal(false);
-          }}
-          title="Reset Sub-Admin Password"
-        />
-      </div> */}
-      {/* Sub-Admin Delete Modal End*/}
+      )}
 
       <div
-        className="p-4 rounded-4 text-center shadow-lg m-5"
-        style={{   background: "linear-gradient(135deg, #f0f9ff, #cce7f6)",
-          border: "2px solid gray" }}
+        className="p-4 rounded-4 text-center shadow-lg m-5 border"
+        style={{ background: "linear-gradient(135deg, #f0f9ff, #cce7f6)" }}
       >
         <ReusableTable
           data={subAdmins}
