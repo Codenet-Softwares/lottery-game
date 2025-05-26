@@ -247,7 +247,7 @@ const MarketInsight = () => {
           <input
             type="text"
             className="form-control w-80"
-            placeholder="Search for a Lottery market..."
+            placeholder="Search Lottery Market Name..."
             value={searchTerm}
             onChange={handleSearchChange}
           />
