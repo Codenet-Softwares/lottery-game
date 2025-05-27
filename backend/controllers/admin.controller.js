@@ -128,6 +128,9 @@ export const login = async (req, res) => {
       expiresIn: "1d",
     });
 
+    existingUser.token = accessToken;
+    await existingUser.save();
+
     return apiResponseSuccess(
       { accessToken, ...userResponse },
       true,
@@ -313,7 +316,7 @@ export const adminPurchaseHistory = async (req, res) => {
     const { page = 1, limit = 10, search = "" } = req.query;
     const { marketId } = req.params;
     const offset = (page - 1) * parseInt(limit);
-    const whereFilter = { marketId };
+    const whereFilter = { marketId,isDeleted: false };
     if (search) {
       whereFilter[Op.or] = [
         { userName: { [Op.like]: `%${search}%` } },
@@ -1073,6 +1076,7 @@ export const liveLotteries = async (req, res) => {
     const whereConditions = {
       marketId,
       createdAt: { [Op.gte]: today },
+      isDeleted: false,
       resultAnnouncement: false,
     };
 

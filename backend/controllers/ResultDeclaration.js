@@ -6,8 +6,6 @@ import { statusCode } from '../utils/statusCodes.js';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import TicketRange from '../models/ticketRange.model.js';
-import { TicketService } from '../constructor/ticketService.js';
-import sequelize from '../config/db.js';
 import WinResultRequest from '../models/winresultRequestModel.js';
 import TicketNumber from '../models/ticketNumber.model.js';
 
