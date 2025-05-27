@@ -132,7 +132,7 @@ const BetAfterWin = () => {
         ) : (
           <div className="bet-after-win-no-market-container">
             <div className="tv-static"></div>
-            <div className="bet-after-win-no-market-text fw-bold h1">
+            <div className="bet-after-win-no-market-text fw-bold">
               <span>No Data Found</span>
             </div>
           </div>
