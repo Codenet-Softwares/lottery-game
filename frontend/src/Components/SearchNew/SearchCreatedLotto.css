@@ -15,8 +15,8 @@
     230,
     230,
     0.35
-  ); /* deeper transparency for more depth */
-  padding: 20px;
+  ); 
+  padding: 10px;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   border-right: 1px solid #e0e0e0;
   display: flex;
@@ -25,9 +25,9 @@
   flex-direction: column;
   overflow-y: auto;
   height: 83vh;
-  box-shadow: 0 2px 24px rgba(2, 51, 83, 0.4); /* softer, deeper shadow for watery depth */
-  backdrop-filter: blur(10px) saturate(150%); /* stronger blur + color saturation for a watery glass effect */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* subtle inner glow edge */
+  box-shadow: 0 2px 24px rgba(2, 51, 83, 0.4);
+  backdrop-filter: blur(10px) saturate(150%); 
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .sc-lotto-sidebar-header {
@@ -100,7 +100,7 @@
 
 /* Hover styles */
 .sc-lotto-market-card:hover {
-  transform: scale(1.05);
+  /* transform: scale(1.05); */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   background: linear-gradient(135deg, #cce7f6, #a1cfee);
   color: Black !important;

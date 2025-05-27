@@ -71,7 +71,7 @@ const LiveMarkets = () => {
   };
   return (
     <div
-      className="d-flex align-items-center justify-content-center"
+      className="d-flex align-items-center justify-content-center text-uppercase"
       style={{ background: "#f0f0f0", minHeight: "75vh" }}
     >
       <div className="tv-container">
