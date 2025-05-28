@@ -26,16 +26,19 @@ const PrizeValidation = () => {
   const [totalData, setTotalData] = useState(0);
   const [searchInput, setSearchInput] = useState("");
   const itemsPerPage = 10;
+
   useEffect(() => {
     const handler = setTimeout(() => {
-      setSearchTerm(searchInput);
-      setCurrentPage(1);
-    }, 500); // 500ms debounce
+      setCurrentPage(1); // Just reset page on search
+      setSearchTerm(searchInput); // Save input to actual searchTerm
+    }, 500);
 
     return () => clearTimeout(handler);
   }, [searchInput]);
+
+  console.log("searchInput", searchInput)
   // marketnames for the page of Prize Approval Market List
-  const fetchMarketData = async () => {
+  const fetchMarketData = async (searchTerm = "") => {
     try {
       setLoading(true);
       const allMarket = await PrizeValidationMarkets({
@@ -62,8 +65,8 @@ const PrizeValidation = () => {
 
   // rerender of the marketnames for the page of Prize Approval Market List
   useEffect(() => {
-    fetchMarketData();
-  }, [searchTerm, currentPage]);
+    fetchMarketData(searchTerm); // This runs when currentPage or searchTerm changes
+  }, [currentPage, searchTerm]);
 
   // ViewSubAdmins for the page of Prize Approval with respect to Market List
   const fetchApprovalData = async (market) => {
@@ -155,17 +158,17 @@ const PrizeValidation = () => {
 
   const filteredApprovalData = selectedMarketApprovals
     ? selectedMarketApprovals.subAdmins.reduce((acc, subAdmin, index) => {
-        if (index % 2 === 0) {
-          acc.push({
-            id: acc.length + 1,
-            subAdmin1: subAdmin.declearBy,
-            subAdmin2: "",
-          });
-        } else {
-          acc[acc.length - 1].subAdmin2 = subAdmin.declearBy;
-        }
-        return acc;
-      }, [])
+      if (index % 2 === 0) {
+        acc.push({
+          id: acc.length + 1,
+          subAdmin1: subAdmin.declearBy,
+          subAdmin2: "",
+        });
+      } else {
+        acc[acc.length - 1].subAdmin2 = subAdmin.declearBy;
+      }
+      return acc;
+    }, [])
     : [];
 
   const approvalColumns = [
@@ -227,6 +230,7 @@ const PrizeValidation = () => {
                 setSearchInput(term);
               }}
               onPageChange={setCurrentPage}
+              searchInput={searchInput}
             />
           )}
         </>

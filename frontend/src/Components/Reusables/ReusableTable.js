@@ -12,6 +12,7 @@ const ReusableTable = ({
   totalData,
   onSearch,
   onPageChange,
+  searchInput
 }) => {
   const totalPages = Math.ceil(totalData / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage + 1;
@@ -26,6 +27,7 @@ const ReusableTable = ({
           type="text"
           placeholder="Search..."
           className="form-control mb-3"
+          value={searchInput}
           onChange={(e) => onSearch(e.target.value)}
         />
       )}
@@ -63,7 +65,7 @@ const ReusableTable = ({
         </tbody>
       </table>
 
-      {paginationVisible  && (
+      {paginationVisible && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
