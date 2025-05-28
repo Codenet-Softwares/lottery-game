@@ -22,6 +22,7 @@ const Inactive = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1);
     }, 500);
 
     return () => clearTimeout(timer);
@@ -109,7 +110,7 @@ const Inactive = () => {
             onBlur={(e) => (e.target.style.borderColor = "#4682B4")}
           />
         </div>
-        <div className="card-body" style={{background:"linear-gradient(135deg, #f0f9ff, #cce7f6)"}}>
+        <div className="card-body" style={{ background: "linear-gradient(135deg, #f0f9ff, #cce7f6)" }}>
           {/* Table */}
           <SingleCard
             className=" mb-5 "
