@@ -8,15 +8,18 @@ import axios from 'axios';
 import TicketRange from '../models/ticketRange.model.js';
 import WinResultRequest from '../models/winresultRequestModel.js';
 import TicketNumber from '../models/ticketNumber.model.js';
+import { sequelize } from '../config/db.js';
 
 export const ResultDeclare = async (req, res) => {
+  let  transaction = await sequelize.transaction();
   try {
     const prizes = req.body;
     const { marketId } = req.params;
     
-    const market = await TicketRange.findOne({ where: { marketId } });
+    const market = await TicketRange.findOne({ where: { marketId }, transaction });
 
     if (!market) {
+      await transaction.rollback();
       return apiResponseErr(null, false, statusCode.badRequest, 'Market not found', res);
     }
 
@@ -49,6 +52,7 @@ export const ResultDeclare = async (req, res) => {
     );
 
     if (missingCategories.length > 0) {
+      await transaction.rollback();
       return apiResponseErr(
         null,
         false,
@@ -69,11 +73,13 @@ export const ResultDeclare = async (req, res) => {
       const { ticketNumber, prizeCategory, prizeAmount, complementaryPrize } = prize;
 
       if (!prizeLimits[prizeCategory]) {
+        await transaction.rollback();
         return apiResponseErr(null, false, statusCode.badRequest, 'Invalid prize category.', res);
       }
 
       const ticketNumbers = Array.isArray(ticketNumber) ? ticketNumber : [ticketNumber];
       if (ticketNumbers.length !== prizeLimits[prizeCategory]) {
+        await transaction.rollback();
         return apiResponseErr(
           null,
           false,
@@ -90,6 +96,7 @@ export const ResultDeclare = async (req, res) => {
           },
           marketId,
         },
+        transaction,
       });
 
       const isDuplicate = ticketNumbers.some(ticket =>
@@ -97,6 +104,7 @@ export const ResultDeclare = async (req, res) => {
       );
 
       if (isDuplicate) {
+        await transaction.rollback();
         return apiResponseErr(
           null,
           false,
@@ -108,9 +116,11 @@ export const ResultDeclare = async (req, res) => {
 
       const existingResults = await LotteryResult.findAll({
         where: { prizeCategory, marketId },
+        transaction,
       });
 
       if (existingResults.length >= prizeLimits[prizeCategory]) {
+        await transaction.rollback();
         return apiResponseErr(
           null,
           false,
@@ -151,6 +161,7 @@ export const ResultDeclare = async (req, res) => {
             prizeAmount,
           });
         } else {
+          await transaction.rollback();
           return apiResponseErr(
             null,
             false,
@@ -175,6 +186,7 @@ export const ResultDeclare = async (req, res) => {
             prizeAmount,
           });
         } else {
+          await transaction.rollback(); 
           return apiResponseErr(
             null,
             false,
@@ -204,6 +216,7 @@ export const ResultDeclare = async (req, res) => {
             prizeAmount,
           });
         } else {
+          await transaction.rollback();
           return apiResponseErr(
             null,
             false,
@@ -233,6 +246,7 @@ export const ResultDeclare = async (req, res) => {
             prizeAmount,
           });
         } else {
+          await transaction.rollback();
           return apiResponseErr(
             null,
             false,
@@ -246,7 +260,7 @@ export const ResultDeclare = async (req, res) => {
 
     let savedResults;
     if (generatedTickets.length > 0) {
-      savedResults = await LotteryResult.bulkCreate(generatedTickets);
+      savedResults = await LotteryResult.bulkCreate(generatedTickets,{ transaction });
       
       // Save ticket numbers to TicketNumber model
       const ticketNumbersToSave = [];
@@ -266,14 +280,15 @@ export const ResultDeclare = async (req, res) => {
         }
       }
       
-      await TicketNumber.bulkCreate(ticketNumbersToSave);
+      await TicketNumber.bulkCreate(ticketNumbersToSave, { transaction });
     } else {
+      await transaction.rollback();
       return apiResponseErr(null, false, statusCode.badRequest, 'No valid tickets to save.', res);
     }
 
     await WinResultRequest.update(
       {isApproved: true, status: "Approve", remarks: "Congratulations! Your result has been approved."},
-      {where: {marketId, isReject: false, status: "Pending"}}
+      {where: {marketId, isReject: false, status: "Pending"}, transaction}
     );
 
     const normalizeTicketNumber = (ticket) => {
@@ -284,6 +299,7 @@ export const ResultDeclare = async (req, res) => {
       where: { marketId },
       attributes: ['ticketNumber', 'prizeCategory', 'prizeAmount', 'complementaryPrize','marketName'],
       raw: true,
+      transaction
     });
 
     const purchasedTickets = await PurchaseLottery.findAll({
@@ -409,15 +425,16 @@ export const ResultDeclare = async (req, res) => {
     const baseURL = process.env.COLOR_GAME_URL;
     for (const userId in userTotalPrize) {
       try {
-          const response = await axios.post(`${baseURL}/api/users/update-balance`, {
+           await axios.post(`${baseURL}/api/users/update-balance`, {
               userId,
               prizeAmount: userTotalPrize[userId],
               marketId,
               lotteryPrice: userLotteryPrice[userId]
           });
-          console.log(`Response for user ${userId}:`, response.data);
       } catch (error) {
+          await transaction.rollback();
           console.error(`Error updating balance for user ${userId}:`, error.response?.data || error.message);
+          return apiResponseErr(null, false, statusCode.internalServerError, 'Failed to update user balance', res);
       }
     }
 
@@ -432,14 +449,14 @@ export const ResultDeclare = async (req, res) => {
 
     for (const userId in userTotalLoss) {
       try {
-          const response = await axios.post(`${baseURL}/api/users/remove-exposer`, {
+           await axios.post(`${baseURL}/api/users/remove-exposer`, {
               userId,
               marketId,
               lotteryPrice: userTotalLoss[userId]  
           });
-          console.log(`Response for user ${userId}:`, response.data);
       } catch (error) {
-          console.error(`Error updating balance for user ${userId}:`, error.response?.data || error.message);
+        await transaction.rollback();
+        return apiResponseErr(null, false, statusCode.internalServerError, 'Failed to update user exposer', res);
       }
     }
 
@@ -469,9 +486,8 @@ export const ResultDeclare = async (req, res) => {
     for (const data of profitLossData) {
       try {
         await axios.post(`${baseURL}/api/lottery-profit-loss`, data);
-        console.log(`Data updated for user ${data.userId}`);
       } catch (error) {
-        console.error(`Error updating data for user ${data.userId}:`, error.response?.data || error.message);
+        await transaction.rollback();
       }
     }
 
@@ -483,18 +499,18 @@ export const ResultDeclare = async (req, res) => {
     if (isAllPrizesDeclared) {
       await TicketRange.update(
         { isActive: false, isWin: true },
-        { where: { marketId } }
+        { where: { marketId }, transaction }
       );
     }
 
     await TicketRange.update(
       { winReference: true },
-      { where: { marketId } }
+      { where: { marketId }, transaction  }
     );
 
     await PurchaseLottery.update(
       { resultAnnouncement: true, settleTime: new Date(), hidePurchase: true },
-      { where: { marketId } }
+      { where: { marketId }, transaction  }
     );
 
     const combineResult = { 
@@ -511,7 +527,7 @@ export const ResultDeclare = async (req, res) => {
       res
     );
   } catch (error) {
-    console.log("error", error);
+    if (transaction) await transaction.rollback();
     return apiResponseErr(null, false, statusCode.internalServerError, error.message, res);
   }
 };
