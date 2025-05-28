@@ -64,9 +64,11 @@ const PrizeValidation = () => {
   };
 
   // rerender of the marketnames for the page of Prize Approval Market List
-  useEffect(() => {
-    fetchMarketData(searchTerm); // This runs when currentPage or searchTerm changes
-  }, [currentPage, searchTerm]);
+useEffect(() => {
+  if (searchTerm === "" || currentPage === 1 || totalData > 0) {
+    fetchMarketData(searchTerm);
+  }
+}, [currentPage, searchTerm]);
 
   // ViewSubAdmins for the page of Prize Approval with respect to Market List
   const fetchApprovalData = async (market) => {
