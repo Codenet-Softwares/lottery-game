@@ -24,16 +24,24 @@ const PrizeValidation = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalData, setTotalData] = useState(0);
+  const [searchInput, setSearchInput] = useState("");
   const itemsPerPage = 10;
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setSearchTerm(searchInput);
+      setCurrentPage(1);
+    }, 500); // 500ms debounce
 
+    return () => clearTimeout(handler);
+  }, [searchInput]);
   // marketnames for the page of Prize Approval Market List
   const fetchMarketData = async () => {
     try {
       setLoading(true);
-      const allMarket = await PrizeValidationMarkets({ 
+      const allMarket = await PrizeValidationMarkets({
         search: searchTerm,
         page: currentPage,
-        limit: itemsPerPage
+        limit: itemsPerPage,
       });
       console.log(allMarket);
 
@@ -216,8 +224,7 @@ const PrizeValidation = () => {
               currentPage={currentPage}
               totalData={totalData}
               onSearch={(term) => {
-                setSearchTerm(term);
-                setCurrentPage(1);
+                setSearchInput(term);
               }}
               onPageChange={setCurrentPage}
             />
