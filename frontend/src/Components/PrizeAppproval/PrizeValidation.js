@@ -21,22 +21,30 @@ const PrizeValidation = () => {
   const [modalContent, setModalContent] = useState([]);
   const [loadingModal, setLoadingModal] = useState(false);
   const { store, showLoader, hideLoader } = useAppContext();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalData, setTotalData] = useState(0);
+  const itemsPerPage = 10;
 
   // marketnames for the page of Prize Approval Market List
-
   const fetchMarketData = async () => {
     try {
       setLoading(true);
-      const allMarket = await PrizeValidationMarkets({ search: "" });
+      const allMarket = await PrizeValidationMarkets({ 
+        search: searchTerm,
+        page: currentPage,
+        limit: itemsPerPage
+      });
       console.log(allMarket);
 
       const formattedMarkets = allMarket.data.map((item, index) => ({
         id: item.marketId,
         marketName: item.marketName,
-        serialNumber: index + 1,
+        serialNumber: index + 1 + (currentPage - 1) * itemsPerPage,
       }));
 
       setMarketData(formattedMarkets);
+      setTotalData(allMarket.pagination?.totalItems || 0);
     } catch (error) {
       console.error("Error fetching market data:", error);
     } finally {
@@ -44,12 +52,12 @@ const PrizeValidation = () => {
     }
   };
 
-  // rerender of the  marketnames for the page of Prize Approval Market List
+  // rerender of the marketnames for the page of Prize Approval Market List
   useEffect(() => {
     fetchMarketData();
-  }, []);
+  }, [searchTerm, currentPage]);
 
-  //  ViewSubAdmins for the page of Prize Approval with respect to  Market List
+  // ViewSubAdmins for the page of Prize Approval with respect to Market List
   const fetchApprovalData = async (market) => {
     const response = await ViewSubAdminsPrizeValidationMarkets({}, market.id);
     console.log("Approval Data Response:", response);
@@ -61,7 +69,8 @@ const PrizeValidation = () => {
     }
     setSelectedMarket(market);
   };
-  //  comparelist  for the page of Prize Approval with respect to  Market List by 2 subadmins
+
+  // comparelist for the page of Prize Approval with respect to Market List by 2 subadmins
   const fetchComparisonData = async (marketId) => {
     const response = await ViewSubAdminsPrizeValidationMarketsCompareCheck(
       {},
@@ -76,13 +85,14 @@ const PrizeValidation = () => {
     }
     setShowModal(true); // Open the modal
   };
-  //  approve reject fetch and succeded here in this function
+
+  // approve reject fetch and succeded here in this function
   const handleApproveReject = async (type) => {
     if (!selectedMarket) return;
     showLoader(); // Show the loader before the API call starts
 
     if (type === "Approve") {
-      //  Call the first API (ApproveReject)
+      // Call the first API (ApproveReject)
       const response = await ApproveReject({ type }, selectedMarket.id);
 
       if (response?.success) {
@@ -97,7 +107,6 @@ const PrizeValidation = () => {
           setApprovalData([]);
           setShowModal(false);
           setSelectedMarket(null); // Reset to go back to Prize Approval Market List
-
           fetchMarketData();
         }
       }
@@ -109,12 +118,10 @@ const PrizeValidation = () => {
         setApprovalData([]);
         setShowModal(false);
         setSelectedMarket(null); // Reset to go back to Prize Approval Market List
-
         fetchMarketData();
       }
     }
     hideLoader(); // Hide the loader after the API call finishes
-
   };
 
   const marketColumns = [
@@ -203,9 +210,16 @@ const PrizeValidation = () => {
             <ReusableTable
               data={marketData}
               columns={marketColumns}
-              itemsPerPage={10}
-              showSearch={false}
+              itemsPerPage={itemsPerPage}
+              showSearch={true}
               paginationVisible={true}
+              currentPage={currentPage}
+              totalData={totalData}
+              onSearch={(term) => {
+                setSearchTerm(term);
+                setCurrentPage(1);
+              }}
+              onPageChange={setCurrentPage}
             />
           )}
         </>

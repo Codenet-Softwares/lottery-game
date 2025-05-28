@@ -630,7 +630,10 @@ export async function ViewAllSubAdmins(
 ) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
-    const response = await makeCall(urls.AllSubAdmins, callParams, isToast);
+    const response = await makeCall(
+      `${urls.AllSubAdmins}?page=${body.page}&limit=${body.limit}&search=${body.search}`, 
+      
+      callParams, isToast);
     return response;
   } catch (error) {
     throw error;

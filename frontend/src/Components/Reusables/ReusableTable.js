@@ -1,7 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import Pagination from "../Common/Pagination";
-
-// import "./ReusableTable.css";
 
 const ReusableTable = ({
   data,
@@ -10,44 +8,28 @@ const ReusableTable = ({
   tableHeading,
   showSearch,
   paginationVisible,
-  handleAction,
+  currentPage,
+  totalData,
+  onSearch,
+  onPageChange,
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // Filter data based on search term
-  const filteredData = data.filter((item) =>
-    columns.some((column) =>
-      item[column.key]
-        ?.toString()
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    )
-  );
-
-  // Pagination Logic
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.ceil(totalData / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage + 1;
-  const endIndex = Math.min(currentPage * itemsPerPage, filteredData.length);
-  const paginatedData = filteredData.slice(startIndex - 1, endIndex);
+  const endIndex = Math.min(currentPage * itemsPerPage, totalData);
 
   return (
     <div className="table-container-reusable">
-      {/* Table Heading */}
       {tableHeading && <h2 className="table-heading fw-bold">{tableHeading}</h2>}
 
-      {/* Search Input (conditionally rendered) */}
       {showSearch && (
         <input
           type="text"
           placeholder="Search..."
           className="form-control mb-3"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => onSearch(e.target.value)}
         />
       )}
 
-      {/* Table */}
       <table className="table table-bordered table-striped text-center table-hover">
         <thead className="table-dark">
           <tr>
@@ -59,22 +41,18 @@ const ReusableTable = ({
           </tr>
         </thead>
         <tbody>
-          {paginatedData.length > 0 ? (
-            paginatedData.map((row, index) => {
-              return (
-                <tr key={index}>
-                  {columns.map((column) => {
-                    return (
-                      <td key={column.key} className="text-uppercase">
-                        {column.render
-                          ? column.render(row, () => handleAction(row.userName))
-                          : row[column.key]}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })
+          {data && data.length > 0 ? (
+            data.map((row, index) => (
+              <tr key={index}>
+                {columns.map((column) => (
+                  <td key={column.key} className="text-uppercase">
+                    {column.render
+                      ? column.render(row)
+                      : row[column.key]}
+                  </td>
+                ))}
+              </tr>
+            ))
           ) : (
             <tr>
               <td colSpan={columns.length} className="text-center fw-bold text-danger">
@@ -85,15 +63,14 @@ const ReusableTable = ({
         </tbody>
       </table>
 
-      {/* Pagination */}
-      {paginationVisible && totalPages > 1 && (
+      {paginationVisible  && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
-          handlePageChange={setCurrentPage}
+          handlePageChange={onPageChange}
           startIndex={startIndex}
           endIndex={endIndex}
-          totalData={filteredData.length}
+          totalData={totalData}
         />
       )}
     </div>
