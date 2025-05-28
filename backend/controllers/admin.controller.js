@@ -1789,7 +1789,9 @@ export const getMatchData = async (req, res) => {
 export const getAllSubAdmin = async (req, res) => {
   try {
     const { page = 1, limit = 10, search = "" } = req.query;
-    const offset = (page - 1) * limit;
+
+    const currentPage = search ? 1 : Math.max(1, parseInt(page));
+    const offset = (currentPage - 1) * limit;
 
     const searchCondition = {
       role: string.SubAdmin,
@@ -1804,11 +1806,11 @@ export const getAllSubAdmin = async (req, res) => {
       where: searchCondition,
       order: [["createdAt", "DESC"]],
       limit: parseInt(limit),
-      offset: parseInt(offset),
+      offset: offset,
       raw: true,
     });
 
-    if (!existingAdmin || existingAdmin.length == 0) {
+    if (!existingAdmin || existingAdmin.length === 0) {
       return apiResponseSuccess(
         [],
         true,
@@ -1819,10 +1821,12 @@ export const getAllSubAdmin = async (req, res) => {
     }
 
     const totalItems = count;
-    const totalPages = Math.ceil(totalItems / parseInt(limit)); //
+    const totalPages = Math.ceil(totalItems / parseInt(limit));
+
+    const adjustedPage = Math.min(currentPage, totalPages);
 
     const pagination = {
-      page: parseInt(page),
+      page: adjustedPage,
       limit: parseInt(limit),
       totalPages,
       totalItems,
