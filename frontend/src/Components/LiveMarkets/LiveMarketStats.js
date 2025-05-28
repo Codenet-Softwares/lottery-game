@@ -228,7 +228,7 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
               .join(" | ")}
           </marquee>
 
-          <div className="table-responsive">
+          <div className="table-responsive text-uppercase">
             <table className="table table-striped table-bordered table-hover shadow m-0">
               <thead className="bg-primary text-white">
                 <tr>
@@ -296,7 +296,7 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
                             className="btn btn-info"
                             onClick={() => handleShowTickets(user.details)}
                           >
-                            <i className="bi bi-ticket-detailed"></i> Show
+                            <i className="bi bi-ticket-detailed "></i> Show
                             Tickets
                           </button>
                         </td>

@@ -10,19 +10,18 @@ const LiveMarkets = () => {
   const [filteredMarkets, setFilteredMarkets] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [selectedMarketId, setSelectedMarketId] = useState(null); // State for selected market ID
+  const [selectedMarketId, setSelectedMarketId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const marketsPerPage = 10;
-  // Debounce search term
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
     }, 500);
-
     return () => clearTimeout(timer);
   }, [searchTerm]);
-  // Fetch market data from the API
+
   const fetchMarkets = async (page) => {
     const response = await GetliveMarketBroadcast({
       page,
@@ -38,11 +37,15 @@ const LiveMarkets = () => {
     }
   };
 
+    // Reset to page 1 whenever search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchTerm]);
+
   useEffect(() => {
     fetchMarkets(currentPage);
-  }, [currentPage]);
+  }, [currentPage, debouncedSearchTerm]);
 
-  // Filter markets based on the debounced search term
   useEffect(() => {
     if (debouncedSearchTerm) {
       const filtered = markets.filter((market) =>
@@ -59,19 +62,21 @@ const LiveMarkets = () => {
   const handlePageChange = (page) => setCurrentPage(page);
 
   const handleViewStats = (marketId) => {
-    setSelectedMarketId(marketId); // Set the selected market ID
+    setSelectedMarketId(marketId);
   };
 
   const handleBack = () => {
-    setSelectedMarketId(null); // Clear the selected market ID
+    setSelectedMarketId(null);
     fetchMarkets(currentPage || 1);
   };
+
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
+
   return (
     <div
-      className="d-flex align-items-center justify-content-center"
+      className="d-flex align-items-center justify-content-center text-uppercase"
       style={{ background: "#f0f0f0", minHeight: "75vh" }}
     >
       <div className="tv-container">
@@ -103,18 +108,12 @@ const LiveMarkets = () => {
                 }
               />
             </div>
-          ) : markets.length === 0 ? (
-            <div className="no-market-container">
-              <div className="tv-static"></div>
-              <div className="no-market-text">
-                <span>No Live Market Available</span>
-              </div>
-            </div>
           ) : (
             <>
               <div className="live-alert">
                 <span className="red-dot"></span> LIVE
               </div>
+
               <div className="search-container-search-live">
                 <input
                   type="text"
@@ -125,7 +124,22 @@ const LiveMarkets = () => {
                   onChange={handleSearchChange}
                 />
               </div>
-              {filteredMarkets.length > 0 ? (
+
+              {markets.length === 0 ? (
+                <div className="no-market-container">
+                  <div className="tv-static"></div>
+                  <div className="no-market-text">
+                    <span>No Live Market Available</span>
+                  </div>
+                </div>
+              ) : filteredMarkets.length === 0 ? (
+                <div className="no-market-container">
+                  <div className="tv-static"></div>
+                  <div className="no-market-text">
+                    <span>No Live Market Found with this name</span>
+                  </div>
+                </div>
+              ) : (
                 <>
                   <ul className="market-list">
                     {filteredMarkets.map((market) => (
@@ -150,13 +164,6 @@ const LiveMarkets = () => {
                     />
                   </div>
                 </>
-              ) : (
-                <div className="no-market-container">
-                  <div className="tv-static"></div>
-                  <div className="no-market-text">
-                    <span>No Live Market Found with this name</span>
-                  </div>
-                </div>
               )}
             </>
           )}

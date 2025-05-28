@@ -36,7 +36,7 @@ const PurchasedTickets = () => {
   );
 
   return (
-    <div className="d-flex align-items-center justify-content-center">
+    <div className="d-flex align-items-center justify-content-center text-uppercase">
       <div
         className="container mt-5 p-3"
         style={{
@@ -187,7 +187,7 @@ const PurchasedTickets = () => {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Search purchased tickets by SEM.."
+                   placeholder="SEARCH PURCHASED TICKETS BY SEM.."
                   aria-label="Search tickets"
                   value={purchasedTicketState.searchTerm}
                   onChange={handleSearchChange}

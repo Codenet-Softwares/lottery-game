@@ -73,35 +73,35 @@ const CreateMarkets = () => {
   }, [groupOptions, seriesOptions, numberOptions]);
 
   const inputConfig = [
-    { placeholder: "Select Date", type: "date", name: "date" },
-    { placeholder: "Market Name", name: "marketName" },
-    { placeholder: "Price For Each SEM", type: "number", name: "priceForEach" },
+    { placeholder: "SELECT DATE", type: "date", name: "date" },
+    { placeholder: "MARKET NAME", name: "marketName" },
+    { placeholder: "PRICE FOR EACH SEM", type: "number", name: "priceForEach" },
   ];
 
   const fromToInputConfig = [
     {
-      placeholder: "Group (From - To)",
+      placeholder: "GROUP (FROM - TO)",
       fromName: "groupFrom",
       toName: "groupTo",
       options: groupOptions,
       inputType: "number",
     },
     {
-      placeholder: "Series (From - To)",
+      placeholder: "SERIES (FROM - TO)",
       fromName: "seriesFrom",
       toName: "seriesTo",
       options: seriesOptions,
       inputType: "text",
     },
     {
-      placeholder: "Number (From - To)",
+      placeholder: "NUMBER (FROM - TO)",
       fromName: "numberFrom",
       toName: "numberTo",
       options: numberOptions,
       inputType: "number",
     },
     {
-      placeholder: "Enter Timer (hh:mm AM/PM)",
+      placeholder: "ENTER TIMER (HH:MM AM/PM)",
       fromName: "timerFrom",
       toName: "timerTo",
       options: timerOptions,
@@ -114,9 +114,7 @@ const CreateMarkets = () => {
       <div
         className="container mt-3 p-4 shadow rounded border"
         style={{
-  background: "linear-gradient(135deg, #f0f9ff, #cce7f6)",
-         
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.5)",
           maxWidth: "900px",
           position: "relative",
         }}

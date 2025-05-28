@@ -49,7 +49,7 @@ const Dashboard = () => {
       : [];
 
   return (
-    <div className="container-fluid py-3 px-3 px-md-5 dashboard-container m-0 mt-3">
+    <div className="container-fluid py-3 px-3 px-md-5 dashboard-container m-0 mt-3 text-uppercase">
     <div className="card-scroll-wrapper">
       <div className="row card_row g-3">
         {filteredDashCards.map((card, index) => (
