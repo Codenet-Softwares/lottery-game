@@ -417,13 +417,13 @@ const MarketInsight = () => {
               </div>
             </Row>
 
-            <Button
+            {/* <Button
               variant="outline-primary"
               className="close-btn mt-4"
               onClick={() => setShowStats(false)}
             >
               Close Details
-            </Button>
+            </Button> */}
           </div>
         ) : (
           <Card className="welcome-card shadow-sm">
