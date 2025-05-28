@@ -67,6 +67,9 @@
 
 .ticket-item {
   padding: 5px 0;
+  color: #284B63;
+  font-weight: bold;
+  
 }
 
 .ticket-item:not(:last-child) {

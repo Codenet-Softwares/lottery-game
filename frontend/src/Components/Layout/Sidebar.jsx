@@ -13,19 +13,17 @@ const Sidebar = () => {
 
   useEffect(() => {
     setActiveItem(location.pathname);
-  
-    const matchingDropdown = dropdownItems.find(dropdown => 
-      dropdown.items.some(item => location.pathname.startsWith(item.to))
+
+    const matchingDropdown = dropdownItems.find((dropdown) =>
+      dropdown.items.some((item) => location.pathname.startsWith(item.to))
     );
-    
+
     if (matchingDropdown) {
       setOpenDropdown(matchingDropdown.label);
     } else {
       setOpenDropdown(null);
     }
-  
   }, [location.pathname]);
-
 
   const toggleDropdown = (label) => {
     setOpenDropdown((prev) => (prev === label ? null : label));
@@ -44,14 +42,6 @@ const Sidebar = () => {
       label: "Win Request",
       permission: "win-Lottery-Result",
     },
-    {
-      to: "/purchase-history",
-      icon: "fas fa-history",
-      label: "Purchase History",
-      permission: "",
-    },
-    { to: "/trash", icon: "fas fa-trash-alt", label: "Trash", permission: "" },
-    
   ];
 
   const dropdownItems = [
@@ -106,6 +96,15 @@ const Sidebar = () => {
       ],
     },
   ];
+  const singleNavLink = [
+    {
+      to: "/purchase-history",
+      icon: "fas fa-history",
+      label: "Purchase History",
+      permission: "",
+    },
+    { to: "/trash", icon: "fas fa-trash-alt", label: "Trash", permission: "" },
+  ];
   const userRoles =
     store?.admin?.roles?.split(",").map((role) => role.trim()) || [];
   const userPermissions =
@@ -128,23 +127,23 @@ const Sidebar = () => {
 
   return (
     <div className="sidebar-container ">
-     <div className="sidebar_role">
-  <h3 className="fw-bold text-uppercase text-white text-center">
-    <Link
-      to={"/dashboard"}
-      className="admin_text text-decoration-none text-white"
-    >
-      {store.admin.roles}
-    </Link>
-  </h3>
-</div>
+      <div className="sidebar_role">
+        <h3 className="fw-bold text-uppercase text-white text-center ">
+          <Link
+            to={"/dashboard"}
+            className="admin_text text-decoration-none text-white "
+          >
+            {store.admin.roles}
+          </Link>
+        </h3>
+      </div>
 
       <div className="sidebar-nav px-4 mt-4">
         {navItems.filter(hasPermission).map(({ to, icon, label }) => (
           <Link
             key={to}
             to={to}
-            className={`sidebar-link ${
+            className={`sidebar-link  ${
               location.pathname === to || location.pathname.startsWith(to)
                 ? "active"
                 : ""
@@ -184,6 +183,33 @@ const Sidebar = () => {
                   ))}
                 </div>
               )}
+              {/* Insert Purchase History below Lottery Overview */}
+              {label === "Lottery Overview" &&
+                hasPermission(singleNavLink[0]) && (
+                  <Link
+                    to={singleNavLink[0].to}
+                    className={`sidebar-link ${
+                      location.pathname === singleNavLink[0].to ? "active" : ""
+                    }`}
+                  >
+                    <i className={`${singleNavLink[0].icon} sidebar-icon`}></i>
+                    <span>{singleNavLink[0].label}</span>
+                  </Link>
+                )}
+
+              {/* Insert Trash below Subadmin Tools */}
+              {label === "Subadmin Tools" &&
+                hasPermission(singleNavLink[1]) && (
+                  <Link
+                    to={singleNavLink[1].to}
+                    className={`sidebar-link ${
+                      location.pathname === singleNavLink[1].to ? "active" : ""
+                    }`}
+                  >
+                    <i className={`${singleNavLink[1].icon} sidebar-icon`}></i>
+                    <span>{singleNavLink[1].label}</span>
+                  </Link>
+                )}
             </div>
           );
         })}

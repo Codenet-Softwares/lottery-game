@@ -183,7 +183,7 @@ const Result = () => {
   };
 
   return (
-    <div className="m-5">
+    <div className="m-5 text-uppercase">
       <div
         className="container-result mt-5 p-3"
         style={{

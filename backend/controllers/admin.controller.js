@@ -128,6 +128,9 @@ export const login = async (req, res) => {
       expiresIn: "1d",
     });
 
+    existingUser.token = accessToken;
+    await existingUser.save();
+
     return apiResponseSuccess(
       { accessToken, ...userResponse },
       true,
@@ -313,7 +316,7 @@ export const adminPurchaseHistory = async (req, res) => {
     const { page = 1, limit = 10, search = "" } = req.query;
     const { marketId } = req.params;
     const offset = (page - 1) * parseInt(limit);
-    const whereFilter = { marketId };
+    const whereFilter = { marketId,isDeleted: false };
     if (search) {
       whereFilter[Op.or] = [
         { userName: { [Op.like]: `%${search}%` } },
@@ -990,11 +993,9 @@ export const inactiveMarketStatus = async (req, res) => {
 export const liveMarkets = async (req, res) => {
   try {
     const { page = 1, limit = 10, search } = req.query;
-
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const offset = (page - 1) * limit;
 
     const searchCondition = search
       ? { marketName: { [Op.like]: `%${search}%` } }
@@ -1002,17 +1003,14 @@ export const liveMarkets = async (req, res) => {
 
     const activeTicketData = await TicketRange.findAll({
       attributes: ["marketId", "marketName", "gameName"],
-      where: {
-        isVoid: false,
-      },
+      where: { isVoid: false },
     });
     const marketIds = activeTicketData.map((data) => data.marketId);
-    const { count, rows: ticketData } = await PurchaseLottery.findAndCountAll({
+
+    const allTicketData = await PurchaseLottery.findAll({
       attributes: ["marketId", "marketName", "gameName"],
       where: {
-        createdAt: {
-          [Op.gte]: today,
-        },
+        createdAt: { [Op.gte]: today },
         resultAnnouncement: false,
         ...searchCondition,
         marketId: marketIds,
@@ -1020,24 +1018,26 @@ export const liveMarkets = async (req, res) => {
       order: [["createdAt", "DESC"]],
     });
 
-    if (!ticketData || ticketData.length === 0) {
+    if (!allTicketData || allTicketData.length === 0) {
       return apiResponseSuccess([], true, statusCode.success, "No data", res);
     }
 
-    const uniqueData = ticketData.reduce((acc, current) => {
+    const uniqueData = allTicketData.reduce((acc, current) => {
       const exists = acc.find((item) => item.marketName === current.marketName);
-      if (!exists) {
-        acc.push(current);
-      }
+      if (!exists) acc.push(current);
       return acc;
     }, []);
 
-    const paginatedData = uniqueData.slice(offset, offset + parseInt(limit));
+    const totalPages = Math.ceil(uniqueData.length / limit);
+    const currentPage = page > totalPages ? 1 : parseInt(page); 
+    const adjustedOffset = (currentPage - 1) * limit;
+
+    const paginatedData = uniqueData.slice(adjustedOffset, adjustedOffset + parseInt(limit));
 
     const pagination = {
-      page: parseInt(page),
+      page: currentPage,
       limit: parseInt(limit),
-      totalPages: Math.ceil(uniqueData.length / limit),
+      totalPages,
       totalItems: uniqueData.length,
     };
 
@@ -1073,6 +1073,7 @@ export const liveLotteries = async (req, res) => {
     const whereConditions = {
       marketId,
       createdAt: { [Op.gte]: today },
+      isDeleted: false,
       resultAnnouncement: false,
     };
 
