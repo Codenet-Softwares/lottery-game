@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import sequelize from './config/db.js';
+import {sequelize} from './config/db.js';
 import { ticketRoute } from './routes/ticket.route.js';
 import { userRoute } from './routes/user.route.js';
 import { adminRoutes } from './routes/admin.route.js';
@@ -65,7 +65,7 @@ UserRange.hasMany(PurchaseLottery, {
 });
 
 sequelize
-  .sync({ alter: false })
+  .sync({ alter: true })
   .then(() => {
     console.log('DB Synced!');
 

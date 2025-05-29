@@ -184,7 +184,7 @@ const BetSettleUnsettle = ({ marketId, backButton, onAllDataDeleted }) => {
             <input
               type="text"
               className="form-control bet-settle-search-input"
-              placeholder="Search By Username"
+              placeholder="Search By Username..."
               aria-label="Search"
               aria-describedby="button-search"
               value={searchTerm}
@@ -226,7 +226,7 @@ const BetSettleUnsettle = ({ marketId, backButton, onAllDataDeleted }) => {
                             className="btn btn-info"
                             onClick={() => handleShowTickets(user.details)}
                           >
-                            <i className="bi bi-ticket-detailed"></i> Show Tickets
+                            <i className="bi bi-ticket-detailed text-uppercase"></i> Show Tickets
                           </button>
                         </td>
                       </tr>

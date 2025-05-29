@@ -483,7 +483,7 @@ export async function TrashMarketsDelete(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.DELETE, body, isToast);
     const response = await makeCall(
-      `${urls.TrashMarketDetailsDelete}/${body.trashId}`,
+      `${urls.TrashMarketDetailsDelete}/${body.purchaseId}`,
 
       callParams,
       isToast
@@ -554,7 +554,7 @@ export async function PrizeValidationMarkets(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
     const response = await makeCall(
-      ` ${urls.compareValidationMarkets}?search=${body.search}`,
+      ` ${urls.compareValidationMarkets}?page=${body.page}&limit=${body.limit}&search=${body.search}`,
       callParams,
       isToast
     );
@@ -630,7 +630,10 @@ export async function ViewAllSubAdmins(
 ) {
   try {
     const callParams = await getAuthCallParams(strings.GET, body, isToast);
-    const response = await makeCall(urls.AllSubAdmins, callParams, isToast);
+    const response = await makeCall(
+      `${urls.AllSubAdmins}?page=${body.page}&limit=${body.limit}&search=${body.search}`, 
+      
+      callParams, isToast);
     return response;
   } catch (error) {
     throw error;

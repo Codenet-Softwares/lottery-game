@@ -21,22 +21,41 @@ const PrizeValidation = () => {
   const [modalContent, setModalContent] = useState([]);
   const [loadingModal, setLoadingModal] = useState(false);
   const { store, showLoader, hideLoader } = useAppContext();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalData, setTotalData] = useState(0);
+  const [searchInput, setSearchInput] = useState("");
+  const itemsPerPage = 10;
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setCurrentPage(1); // Just reset page on search
+      setSearchTerm(searchInput); // Save input to actual searchTerm
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchInput]);
+
+  console.log("searchInput", searchInput)
   // marketnames for the page of Prize Approval Market List
-
-  const fetchMarketData = async () => {
+  const fetchMarketData = async (searchTerm = "") => {
     try {
       setLoading(true);
-      const allMarket = await PrizeValidationMarkets({ search: "" });
+      const allMarket = await PrizeValidationMarkets({
+        search: searchTerm,
+        page: currentPage,
+        limit: itemsPerPage,
+      });
       console.log(allMarket);
 
       const formattedMarkets = allMarket.data.map((item, index) => ({
         id: item.marketId,
         marketName: item.marketName,
-        serialNumber: index + 1,
+        serialNumber: index + 1 + (currentPage - 1) * itemsPerPage,
       }));
 
       setMarketData(formattedMarkets);
+      setTotalData(allMarket.pagination?.totalItems || 0);
     } catch (error) {
       console.error("Error fetching market data:", error);
     } finally {
@@ -44,12 +63,14 @@ const PrizeValidation = () => {
     }
   };
 
-  // rerender of the  marketnames for the page of Prize Approval Market List
-  useEffect(() => {
-    fetchMarketData();
-  }, []);
+  // rerender of the marketnames for the page of Prize Approval Market List
+useEffect(() => {
+  if (searchTerm === "" || currentPage === 1 || totalData > 0) {
+    fetchMarketData(searchTerm);
+  }
+}, [currentPage, searchTerm]);
 
-  //  ViewSubAdmins for the page of Prize Approval with respect to  Market List
+  // ViewSubAdmins for the page of Prize Approval with respect to Market List
   const fetchApprovalData = async (market) => {
     const response = await ViewSubAdminsPrizeValidationMarkets({}, market.id);
     console.log("Approval Data Response:", response);
@@ -61,7 +82,8 @@ const PrizeValidation = () => {
     }
     setSelectedMarket(market);
   };
-  //  comparelist  for the page of Prize Approval with respect to  Market List by 2 subadmins
+
+  // comparelist for the page of Prize Approval with respect to Market List by 2 subadmins
   const fetchComparisonData = async (marketId) => {
     const response = await ViewSubAdminsPrizeValidationMarketsCompareCheck(
       {},
@@ -76,13 +98,14 @@ const PrizeValidation = () => {
     }
     setShowModal(true); // Open the modal
   };
-  //  approve reject fetch and succeded here in this function
+
+  // approve reject fetch and succeded here in this function
   const handleApproveReject = async (type) => {
     if (!selectedMarket) return;
     showLoader(); // Show the loader before the API call starts
 
     if (type === "Approve") {
-      //  Call the first API (ApproveReject)
+      // Call the first API (ApproveReject)
       const response = await ApproveReject({ type }, selectedMarket.id);
 
       if (response?.success) {
@@ -97,7 +120,6 @@ const PrizeValidation = () => {
           setApprovalData([]);
           setShowModal(false);
           setSelectedMarket(null); // Reset to go back to Prize Approval Market List
-
           fetchMarketData();
         }
       }
@@ -109,12 +131,10 @@ const PrizeValidation = () => {
         setApprovalData([]);
         setShowModal(false);
         setSelectedMarket(null); // Reset to go back to Prize Approval Market List
-
         fetchMarketData();
       }
     }
     hideLoader(); // Hide the loader after the API call finishes
-
   };
 
   const marketColumns = [
@@ -125,7 +145,7 @@ const PrizeValidation = () => {
       label: "Approval List",
       render: (row) => (
         <button
-          className="btn btn-primary text-uppercase fw-bold"
+          className="btn btn-primary text-uppercase fw-bold text-white"
           onClick={() => fetchApprovalData(row)}
         >
           View Approval
@@ -140,17 +160,17 @@ const PrizeValidation = () => {
 
   const filteredApprovalData = selectedMarketApprovals
     ? selectedMarketApprovals.subAdmins.reduce((acc, subAdmin, index) => {
-        if (index % 2 === 0) {
-          acc.push({
-            id: acc.length + 1,
-            subAdmin1: subAdmin.declearBy,
-            subAdmin2: "",
-          });
-        } else {
-          acc[acc.length - 1].subAdmin2 = subAdmin.declearBy;
-        }
-        return acc;
-      }, [])
+      if (index % 2 === 0) {
+        acc.push({
+          id: acc.length + 1,
+          subAdmin1: subAdmin.declearBy,
+          subAdmin2: "",
+        });
+      } else {
+        acc[acc.length - 1].subAdmin2 = subAdmin.declearBy;
+      }
+      return acc;
+    }, [])
     : [];
 
   const approvalColumns = [
@@ -203,9 +223,16 @@ const PrizeValidation = () => {
             <ReusableTable
               data={marketData}
               columns={marketColumns}
-              itemsPerPage={10}
-              showSearch={false}
+              itemsPerPage={itemsPerPage}
+              showSearch={true}
               paginationVisible={true}
+              currentPage={currentPage}
+              totalData={totalData}
+              onSearch={(term) => {
+                setSearchInput(term);
+              }}
+              onPageChange={setCurrentPage}
+              searchInput={searchInput}
             />
           )}
         </>

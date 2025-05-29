@@ -1,6 +1,7 @@
 import React from "react";
 
 const ViewTicketsModal = ({ isOpen, onClose, ticketNumbers }) => {
+  console.log('====>> line 3 modal',isOpen, onClose, ticketNumbers)
   return (
     <div
       className={`modal fade ${isOpen ? "show d-block" : ""}`}

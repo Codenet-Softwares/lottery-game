@@ -14,6 +14,6 @@ export const deleteGameRoute = (app) => {
 
       app.get('/api/get-trash-bet/:marketId', validateTrashMarketId, customErrorHandler, authorize([string.Admin]), getTrashBetDetails);
 
-      app.delete('/api/delete-trash/:trashMarketId', validateTrashMarket, customErrorHandler, authorize([string.Admin]), deleteTrash)
+      app.delete('/api/delete-trash/:purchaseId', validateTrashMarket, customErrorHandler, authorize([string.Admin]), deleteTrash)
 
   };

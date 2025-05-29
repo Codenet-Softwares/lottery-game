@@ -254,7 +254,7 @@ const Win = () => {
           <input
             type="text"
             className="form-control w-80"
-            placeholder="Search for Win Lottery market..."
+            placeholder="Search Lottery Market..."
             value={searchTerm}
             onChange={handleSearchChange}
           />

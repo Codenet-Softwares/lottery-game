@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../config/db.js';
+import {sequelize} from '../config/db.js';
 import bcrypt from 'bcrypt';
 
 const Admin = sequelize.define(
@@ -33,6 +33,9 @@ const Admin = sequelize.define(
     isReset: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
+    },
+    token: {
+      type: DataTypes.TEXT,
     },
   },
   {

@@ -35,7 +35,7 @@ const WinResult = () => {
         page: pagination.page,
         limit: pagination.limit,
         search: searchTerm,
-        status: statusFilter, // Add status filter here
+        status: statusFilter, 
       });
 
       if (response?.success) {
@@ -118,10 +118,12 @@ const WinResult = () => {
     <div className="container d-flex justify-content-center mt-4">
       <div
         className="col-md-10 p-4 rounded shadow"
-        style={{  background: "linear-gradient(135deg, #f0f9ff, #cce7f6)"
-        }}
+        style={{ background: "linear-gradient(135deg, #f0f9ff, #cce7f6)" }}
       >
-        <h2 className="text-center mb-3 fw-bold fw-bold text-uppercase" style={{color:"#284B63"}}>
+        <h2
+          className="text-center mb-3 fw-bold fw-bold text-uppercase"
+          style={{ color: "#284B63" }}
+        >
           SubAdmin History
         </h2>
 
@@ -130,7 +132,7 @@ const WinResult = () => {
           <input
             type="text"
             className="form-control me-2"
-            placeholder="Search by market name"
+            placeholder="Search By Market Name"
             value={searchTerm}
             onChange={handleSearchChange}
           />
@@ -169,29 +171,50 @@ const WinResult = () => {
                         <td className="text-center align-top">
                           {item.marketName}
                         </td>
-                        <td className="text-center align-top">{item.status}</td>
-                        <td className="text-start align-top text-wrap">
+                        <td className="text-center align-top">
+                          <span
+                            className={`badge rounded-pill px-3 py-2 fw-semibold ${
+                              item.status === "Approve"
+                                ? "bg-success text-white"
+                                : item.status === "Reject"
+                                ? "bg-danger text-white"
+                                : "bg-warning text-dark"
+                            }`}
+                            style={{ textTransform: "capitalize" }}
+                          >
+                            {item.status}
+                          </span>
+                        </td>
+                        <td className="text-start align-top text-wrap fw-semibold text-info">
                           {item.remarks ||
                             "Your submission is not yet approved."}
                         </td>
 
-                        <td>
-                          <button
-                            className={`btn fw-bold ${
-                              item.status === "Pending"
-                                ? "btn-danger opacity-50"
-                                : "btn-primary"
-                            }`}
-                            onClick={() =>
-                              fetchSubAdminTicketData(
-                                item.marketId,
-                                item.status
-                              )
-                            }
-                            disabled={item.status === "Pending"}
-                          >
-                            Show Prize
-                          </button>
+                        <td className="text-center align-top">
+                          {item.status === "Pending" ? (
+                            <span
+                              className="badge rounded-pill px-3 py-2 bg-warning text-dark fw-semibold opacity-75"
+                              style={{ cursor: "not-allowed" }}
+                            >
+                              Pending
+                            </span>
+                          ) : (
+                            <button
+                              className={`badge rounded-pill px-3 py-2 fw-semibold ${
+                                item.status === "Approve"
+                                  ? "bg-success text-white"
+                                  : "bg-danger text-white"
+                              }`}
+                              onClick={() =>
+                                fetchSubAdminTicketData(
+                                  item.marketId,
+                                  item.status
+                                )
+                              }
+                            >
+                              Show Prize
+                            </button>
+                          )}
                         </td>
 
                         <ReusableModal

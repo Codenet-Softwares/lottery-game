@@ -66,7 +66,7 @@ const BetAfterWin = () => {
   };
 
   return (
-    <div className="bet-after-win-container m-5">
+    <div className="bet-after-win-container m-5 border text-uppercase">
       <div className="bet-after-win-inner-container container-fluid ">
         {!selectedMarketId && (
           <>
@@ -75,7 +75,7 @@ const BetAfterWin = () => {
               <input
                 type="text"
                 className="form-control bet-after-win-search-input"
-                placeholder="Search By Market Name"
+                placeholder="Search By Market Name..."
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
@@ -107,7 +107,7 @@ const BetAfterWin = () => {
                 >
                   {market.marketName}
                   <button
-                    className="bet-after-win-live-stats-button"
+                    className="bet-after-win-live-stats-button text-uppercase fw-bold"
                     onClick={() => handleLiveStatsClick(market.marketId)}
                   >
                     Win Stats
@@ -132,8 +132,8 @@ const BetAfterWin = () => {
         ) : (
           <div className="bet-after-win-no-market-container">
             <div className="tv-static"></div>
-            <div className="bet-after-win-no-market-text">
-              <span>No Live Market Found With This Name</span>
+            <div className="bet-after-win-no-market-text fw-bold">
+              <span>No Data Found</span>
             </div>
           </div>
         )}

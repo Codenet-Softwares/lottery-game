@@ -1,39 +1,47 @@
-import { formatISO } from 'date-fns'; // Import date-fns to format dates
+import { format, formatISO } from "date-fns"; // Import date-fns to format dates
 
 export const getAdminInitialState = (body = {}) => {
   return {
-    accessToken: body.accessToken ?? '',
+    accessToken: body.accessToken ?? "",
     isLogin: !!body.accessToken, // Determine login status based on accessToken
-    userName: body.userName ?? '',
-    adminId: body.adminId ?? '',
+    userName: body.userName ?? "",
+    adminId: body.adminId ?? "",
     roles: body.role ?? [],
-    permissions:body.permissions ?? ''
+    permissions: body.permissions ?? "",
   };
 };
 
 export const getLotteryMarketsInitialState = (body = {}) => {
   const formatDateToFixedMilliseconds = (date) => {
     // Format the date to ISO string and ensure .000 for milliseconds
-    return date.toISOString().replace(/\.\d{3}Z$/, '.000Z');
+    return date.toISOString().replace(/\.\d{3}Z$/, ".000Z");
   };
   const now = new Date(); // Get current date
-  const drawDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12, 30, 0, 0); // Set to 12:30 PM today
+  const drawDate = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    12,
+    30,
+    0,
+    0
+  ); // Set to 12:30 PM today
   const formattedDrawDate = formatDateToFixedMilliseconds(drawDate); // Format to the correct ISO string
   return {
-    randomToken: body.randomToken ?? '',
+    randomToken: body.randomToken ?? "",
     lotteryCards: body.lotteryCards ?? [],
-    lotteryId: body.lotteryId ?? '',
+    lotteryId: body.lotteryId ?? "",
     isModalOpen: body.isModalOpen ?? false,
-    search: body.search ?? '',
+    search: body.search ?? "",
     inputs: body.inputs ?? {
-      name: '',
-      DateTime: '',
+      name: "",
+      DateTime: "",
       drawDate: formattedDrawDate, // Set the formatted drawDate
-      drawTime: '', // Added drawTime
-      firstPrize: '',
-      sem: '',
+      drawTime: "", // Added drawTime
+      firstPrize: "",
+      sem: "",
       tickets: [],
-      price: '',
+      price: "",
     },
     showModal: body.showModal ?? false,
     showTicketModal: body.showTicketModal ?? false,
@@ -51,7 +59,6 @@ export const getLotteryMarketsInitialState = (body = {}) => {
   };
 };
 
-
 export const getInitialValues = (body = {}) => {
   return {
     userName: "",
@@ -59,15 +66,14 @@ export const getInitialValues = (body = {}) => {
   };
 };
 
-
 export const getInitialLotteryValues = () => {
   return {
-    sem: '',
-    group: '',
-    series: '',
-    number: '',
-  }
-}
+    sem: "",
+    group: "",
+    series: "",
+    number: "",
+  };
+};
 
 export const getInitialCreateLotteryValues = (body = {}) => {
   return {
@@ -97,7 +103,7 @@ export function getLotteryRange(body = {}) {
     number_end: "",
   };
 }
-// for search lottery admin 
+// for search lottery admin
 export function getInitialLotteryData() {
   return {
     groups: [],
@@ -111,6 +117,28 @@ export function getInitialLotteryData() {
     startTimeForShowCountdown: null,
     endTimeForShowCountdown: null,
     isSuspend: false, // Added this field
-    isUpdate: null
+    isUpdate: null,
+  };
+}
+// THIS IS THE INITIAL STATE FOR THE PURCHASED TICKET HISTORY 
+export function initialPurchasedTicketsState() {
+  return {
+    purchasedTickets: [],
+    pagination: {
+      page: 1,
+      limit: 10,
+      totalPages: 0,
+      totalItems: 0,
+    },
+    markets: [],
+    selectedMarketId: null,
+    selectedDate: format(new Date(), "yyyy-MM-dd"),
+    searchTerm: "",
+    visibleStartIndex: 0,
+    loading: true,
+    loader: true,
+    dropdownOpen: null,
+    modalOpen: false,
+    selectedTickets: []
   };
 }

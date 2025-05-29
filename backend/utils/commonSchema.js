@@ -539,9 +539,9 @@ export const validateTrashMarketId = [
 ];
 
 export const validateTrashMarket = [
-  param("trashMarketId")
+  param("purchaseId")
     .isUUID()
-    .withMessage("Invalid Trash Id. It should be a valid UUID."),
+    .withMessage("Invalid purchase Id. It should be a valid UUID."),
 ];
 
 export const validateRevokeLiveBet = [
