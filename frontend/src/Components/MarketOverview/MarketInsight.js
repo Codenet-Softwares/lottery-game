@@ -132,30 +132,31 @@ const MarketInsight = () => {
   };
   // This is the void api implementation
   const handleVoidMarket = async (marketId) => {
-    showLoader();
+  const confirmed = window.confirm("Are you sure you want to void this market?");
+  if (!confirmed) return;
 
-    const requestBody = { marketId };
-    const response = await voidMarket(requestBody);
+  showLoader();
 
-    if (response.success) {
-      toast.success("Market voided successfully");
+  const requestBody = { marketId };
+  const response = await voidMarket(requestBody);
 
-      // Remove the voided market from the marketTimes state
-      setMarketTimes((prevMarketTimes) =>
-        prevMarketTimes.filter((market) => market.marketId !== marketId)
-      );
+  if (response.success) {
+    // Remove the voided market from the marketTimes state
+    setMarketTimes((prevMarketTimes) =>
+      prevMarketTimes.filter((market) => market.marketId !== marketId)
+    );
 
-      if (selectedMarket?.marketId === marketId) {
-        setSelectedMarket(null);
-        setShowStats(false);
-      }
-    } else {
-      toast.error(response.message || "Failed to void market");
+    if (selectedMarket?.marketId === marketId) {
+      setSelectedMarket(null);
+      setShowStats(false);
     }
+  } else {
+    // Optionally show an error message
+    // toast.error(response.message || "Failed to void market");
+  }
 
-    hideLoader();
-  };
-
+  hideLoader();
+};
   useEffect(() => {
     if (selectedMarket) {
       const fetchPurchasedTickets = async () => {
