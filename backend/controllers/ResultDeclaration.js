@@ -288,7 +288,8 @@ export const ResultDeclare = async (req, res) => {
     });
 
     const purchasedTickets = await PurchaseLottery.findAll({
-      where: { marketId },
+      where: { marketId,isDeleted:false },
+      
       attributes: ['userId', 'group', 'series', 'number','sem','lotteryPrice', 'marketName'],
       raw: true,
     });
