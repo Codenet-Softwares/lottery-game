@@ -10,7 +10,6 @@ import TicketRange from "../models/ticketRange.model.js";
 import CustomError from "../utils/extendError.js";
 import UserRange from "../models/user.model.js";
 import PurchaseLottery from "../models/purchase.model.js";
-import DrawDate from "../models/drawdateModel.js";
 import LotteryResult from "../models/resultModel.js";
 import { v4 as uuidv4 } from "uuid";
 import { getISTTime } from "../utils/commonMethods.js"
@@ -268,7 +267,7 @@ export const purchaseHistory = async (req, res) => {
     const offset = (page - 1) * parseInt(limit);
 
     const purchaseFilter = {
-      where: { userId, marketId, hidePurchase: false },
+      where: { userId, marketId, hidePurchase: false,isDeleted:false },
       include: [
         {
           model: UserRange,

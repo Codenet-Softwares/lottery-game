@@ -67,7 +67,7 @@ const Trashmarketdetails = ({
     if (window.confirm("Are you sure you want to delete this market?")) {
       try {
         showLoader(); // Show loader before the request
-        await TrashMarketsDelete({ trashId: trashId });
+        await TrashMarketsDelete({ purchaseId: trashId });
         alert("Market deleted successfully!");
         refreshMarkets(); // Refresh markets list
         fetchMarketDetails(selectedMarketId); // Refetch the market details
@@ -109,6 +109,7 @@ const Trashmarketdetails = ({
   const isNoResultsFound = details.length === 0;
   // Ensure `details` and `details[0]` are valid
   const marketName = details?.[0]?.marketName || "Unknown Market";
+
 
   return (
     <div className="market-details-container px-5">
@@ -172,7 +173,7 @@ const Trashmarketdetails = ({
                         className="bi bi-trash-fill delete-icon"
                         title="Delete Market"
                         onClick={() =>
-                          handleDelete(detail.trashMarketId, detail.marketId)
+                          handleDelete(detail.purchaseId, detail.marketId)
                         }
                       ></i>
                       <i
