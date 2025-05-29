@@ -1,7 +1,5 @@
 import React from "react";
-import Footer from "./Footer";
 import Layout from "./Layout";
-import NavTop from "./NavTop";
 import Sidebar from "./Sidebar";
 import "./AdminLayout.css";
 import TopNavbar from "./TopNavbar";

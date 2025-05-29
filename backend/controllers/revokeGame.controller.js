@@ -33,7 +33,7 @@ export const revokeMarket = async (req, res) => {
     await market.save();
 
     const usersByMarket = await PurchaseLottery.findAll({
-      where: { marketId },
+      where: { marketId,isDeleted:false },
       attributes: ["marketId", "userId", "userName"],
     });
 
