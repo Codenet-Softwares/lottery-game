@@ -214,7 +214,7 @@ const deletedPurchases = await PurchaseLottery.findAll({
 export const deleteTrash = async (req, res) => {
   try {
     const {purchaseId} = req.params
-    const trashData = await PurchaseLottery.findOne({where: {purchaseId} });
+    const trashData = await PurchaseLottery.findOne({where: {purchaseId,isDeleted:true} });
 
     if (!trashData) {
       return apiResponseErr(
@@ -260,7 +260,7 @@ export const deleteBetAfterWin = async (req, res) => {
     const { purchaseId } = req.body;
 
     const ticketPurchaseId = await PurchaseLottery.findOne({
-      where: { purchaseId },
+      where: { purchaseId ,isDeleted:false},
     });
 
     if (!ticketPurchaseId) {

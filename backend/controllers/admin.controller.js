@@ -538,7 +538,7 @@ export const getTicketNumbersByMarket = async (req, res) => {
     const { marketId } = req.params;
 
     const purchasedTickets = await PurchaseLottery.findAll({
-      where: { marketId: marketId },
+      where: { marketId: marketId,isDeleted:false },
       attributes: [
         "generateId",
         "userId",
@@ -1292,6 +1292,7 @@ export const afterWinLotteries = async (req, res) => {
     const whereConditions = {
       marketId,
       resultAnnouncement: true,
+      isDeleted:false,
     };
 
     if (search) {
