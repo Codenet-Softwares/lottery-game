@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Trashmarketdetails.css";
 import {
   TrashMarketsDelete,
@@ -21,6 +21,9 @@ const Trashmarketdetails = ({
   console.log("data from details", details);
   const { showLoader, hideLoader } = useAppContext();
   const [expandedTickets, setExpandedTickets] = useState(null);
+  const [storedMarketName, setStoredMarketName] = useState("");
+  // Ensure `details` and `details[0]` are valid
+  const marketName = details?.[0]?.marketName || "Unknown Market";
 
   const toggleTicketsDropdown = (index) => {
     setExpandedTickets(expandedTickets === index ? null : index);
@@ -47,7 +50,7 @@ const Trashmarketdetails = ({
     if (window.confirm("Are you sure you want to revoke this market?")) {
       try {
         showLoader(); // Show loader before the request
-        const requestBody = { purchaseId: purchaseId};
+        const requestBody = { purchaseId: purchaseId };
         const response = await RevokeMarketsDelete(requestBody);
 
         if (response.success) {
@@ -66,16 +69,19 @@ const Trashmarketdetails = ({
     }
   };
 
+  useEffect(() => {
+    if (details?.[0]?.marketName && !storedMarketName) {
+      setStoredMarketName(details[0].marketName);
+    }
+  }, [details, storedMarketName]);
   // Handle "No results found" scenario
   const isNoResultsFound = details.length === 0;
-  // Ensure `details` and `details[0]` are valid
-  const marketName = details?.[0]?.marketName || "Unknown Market";
 
   return (
     <div className="market-details-container px-5">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h3 className="market-details-title text-start fw-bold">
-          Trash Market Details Of {marketName}
+          Trash Market Details Of {storedMarketName || "Unknown Market"}
         </h3>
         <div className="search-container">
           <input
@@ -165,14 +171,16 @@ const Trashmarketdetails = ({
           </tbody>
         </table>
       </div>
-      <Pagination
-        currentPage={pagination.page}
-        totalPages={pagination.totalPages}
-        handlePageChange={handlePageChange}
-        totalData={pagination.totalItems}
-        startIndex={startIndex}
-        endIndex={endIndex}
-      />
+      {!isNoResultsFound && (
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          handlePageChange={handlePageChange}
+          totalData={pagination.totalItems}
+          startIndex={startIndex}
+          endIndex={endIndex}
+        />
+      )}
     </div>
   );
 };
