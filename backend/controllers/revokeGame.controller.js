@@ -122,91 +122,52 @@ export const getRevokeMarkets = async (req, res) => {
 
 export const RevokeLiveMarkets = async (req, res) => {
   try {
+    const { purchaseId } = req.body;
 
     const token = jwt.sign(
-          { role: req.user.role },
-          process.env.JWT_SECRET_KEY,
-          { expiresIn: "1h" }
-        );
-        const headers = {
-          Authorization: `Bearer ${token}`,
-        };
-    const { trashMarketId } = req.body;
-    const revokeData = await LotteryTrash.findOne({ where: { trashMarketId } });
-    if (!revokeData) {
-      return apiResponseErr(
-        null,
-        false,
-        statusCode.badRequest,
-        "Live bet Not Found",
+      { role: req.user.role },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "1h" }
+    );
+
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    const existingData = await PurchaseLottery.findOne({
+      where: { purchaseId },
+    });
+
+    if (!existingData) {
+      return apiResponseSuccess(
+        [],
+        true,
+        statusCode.success,
+        "Bet Not Found!",
         res
       );
     }
-    for (const market of revokeData.trashMarkets) {
-      const {
-        purchaseId,
-        generateId,
-        userId,
-        userName,
-        group,
-        series,
-        number,
-        sem,
-        marketName,
-        marketId,
-        lotteryPrice,
-        price,
-        resultAnnouncement,
-        gameName,
-        hidePurchase,
-        settleTime,
-        createdAt,
-        updatedAt,
-      } = market;
 
-       await PurchaseLottery.create({
-        purchaseId,
-        generateId,
-        userId,
-        userName,
-        group,
-        series,
-        number,
-        sem,
-        marketName,
-        marketId,
-        lotteryPrice,
-        price,
-        resultAnnouncement,
-        gameName,
-        hidePurchase,
-        settleTime,
-        createdAt,
-        updatedAt,
-      });
-    }
-    
-    const result = revokeData.trashMarkets.map(({ marketId, userId, lotteryPrice }) => ({
-      marketId,
-      userId,
-      lotteryPrice,
-    }));
+    await existingData.update({ isDeleted: false });
+
     const baseURL = process.env.COLOR_GAME_URL;
     const response = await axios.post(
       `${baseURL}/api/external/revoke-liveBet-lottery`,
       {
-        marketId: result[0]?.marketId,
-        userId: result[0]?.userId,
-        lotteryPrice: result[0]?.lotteryPrice,
+        marketId: existingData.marketId,
+        userId: existingData.userId,
+        lotteryPrice: existingData.lotteryPrice,
       },
       { headers }
-      
     );
-    await LotteryTrash.destroy({
-      where: { trashMarketId },
-    });
+
     return apiResponseSuccess(
-      revokeData,
+      {
+        purchaseId: existingData.purchaseId,
+        marketId: existingData.marketId,
+        userId: existingData.userId,
+        lotteryPrice: existingData.lotteryPrice,
+      },
       true,
       statusCode.success,
       "Live bet revoked successfully",
@@ -232,4 +193,5 @@ export const RevokeLiveMarkets = async (req, res) => {
     }
   }
 };
+
 

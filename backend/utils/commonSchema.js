@@ -545,8 +545,8 @@ export const validateTrashMarket = [
 ];
 
 export const validateRevokeLiveBet = [
-  body('trashMarketId')
-    .notEmpty().withMessage('trashMarketId ID is required')
+  body('purchaseId')
+    .notEmpty().withMessage('PurchaseId ID is required')
 ];
 
 export const validateResetPassword = [
