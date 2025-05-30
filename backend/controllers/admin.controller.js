@@ -744,6 +744,7 @@ export const getMarkets = async (req, res) => {
       attributes: ["marketId", "marketName"],
       where: {
         hidePurchase: false,
+        isDeleted : false,
         createdAt: {
           [Op.gte]: selectedDate,
           [Op.lt]: nextDay,
@@ -751,6 +752,8 @@ export const getMarkets = async (req, res) => {
       },
       order: [["createdAt", "DESC"]],
     });
+
+    console.log("ticketData",ticketData)
 
     if (!ticketData || ticketData.length === 0) {
       return apiResponseSuccess([], true, statusCode.success, "No data", res);
@@ -1014,6 +1017,7 @@ export const liveMarkets = async (req, res) => {
         resultAnnouncement: false,
         ...searchCondition,
         marketId: marketIds,
+        isDeleted : false,
       },
       order: [["createdAt", "DESC"]],
     });

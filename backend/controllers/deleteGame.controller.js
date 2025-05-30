@@ -93,7 +93,9 @@ export const getTrashMarket = async (req, res) => {
     }
 
     const deletedPurchases = await PurchaseLottery.findAll({
+      attributes: ["marketId","marketName"],
       where: whereClause,
+      group :[["marketId","marketName"]],
       order: [["createdAt", "DESC"]],
     });
 
