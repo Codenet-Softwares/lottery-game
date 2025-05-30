@@ -897,14 +897,11 @@ export const updateMarketStatus = async (req, res) => {
     // Update in the TicketRange model
     const [updatedCount] = await TicketRange.update(
       {
-        isActive: status,
         hideMarketUser: status,
         inactiveGame:true
       },
       { where: { marketId } }
     );
-
-    console.log("...............", updatedCount);
     
     if (updatedCount === 0) {
       return apiResponseErr(
