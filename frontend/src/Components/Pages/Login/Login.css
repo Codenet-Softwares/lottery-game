@@ -1,4 +1,60 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, hsl(207, 80%, 40%), hwb(207 39% 16%));
+}
 
+.wrapper {
+  background: rgba(255, 255, 255, 0.15); /* lighter white tint */
+  border: 10px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.1); 
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 30px;
+  animation: fadeIn 0.6s ease;
+}
+.input-box-login {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  border-radius: 40px 0 0 40px;
+  font-size: 16px;
+  color: #fff;
+  padding: 10px 20px;
+  min-height: 45px;
+  width: 100%;
+}
 
+.input-password-group {
+  display: flex;
+  align-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 40px;
+  background: transparent;
+  overflow: hidden;
+}
 
-  
+.input-password-toggle {
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  border-left: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.frosted-header {
+  background: rgba(255, 255, 255, 0.1); /* subtle white tint */
+  backdrop-filter: blur(12px); /* frosted glass effect */
+  border-radius: 16px 16px 0 0;
+  padding: 20px;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.05);
+}

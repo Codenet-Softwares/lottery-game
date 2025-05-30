@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import "./Trashmarketdetails.css";
-import { TrashMarketsDelete,RevokeMarketsDelete } from "../../Utils/apiService";
+import {
+  TrashMarketsDelete,
+  RevokeMarketsDelete,
+} from "../../Utils/apiService";
 import Pagination from "../Common/Pagination";
 import { useAppContext } from "../../contextApi/context";
 
@@ -15,7 +18,7 @@ const Trashmarketdetails = ({
   handleSearchChange,
   fetchMarketDetails, // pass the fetchMarketDetails function from the parent
 }) => {
-
+  console.log("data from details", details);
   const { showLoader, hideLoader } = useAppContext();
   const [expandedTickets, setExpandedTickets] = useState(null);
 
@@ -23,47 +26,7 @@ const Trashmarketdetails = ({
     setExpandedTickets(expandedTickets === index ? null : index);
   };
 
-  // const handleDelete = async (trashId,selectedMarketId) => {
- 
-  //   if (window.confirm("Are you sure you want to delete this market?")) {
-  //     try {
-  //       await TrashMarketsDelete({trashId:trashId });
-  //       alert("Market deleted successfully!");
-  //       // Call the refreshMarkets and also refetch market details after deletion
-  //       refreshMarkets(); // Refresh markets list
-  //       fetchMarketDetails( selectedMarketId); // Refetch the market details
-  //     } catch (error) {
-  //       console.error("Error deleting market:", error);
-  //       alert("Failed to delete the market. Please try again.");
-  //     }
-  //   }
-  // };
-
-  // const handleRevoke = async (trashId, selectedMarketId) => {
-  //  
-  //   if (window.confirm("Are you sure you want to revoke this market?")) {
-  //     const requestBody = {
-  //       trashMarketId:trashId
-
-  //     }
-      
-  //       const response = await RevokeMarketsDelete(requestBody);
-
-  //       if (response.success){
-  //         alert("Market revoked successfully!");
-  //       refreshMarkets(); // Refresh the markets list after revoke
-  //       fetchMarketDetails( selectedMarketId)
-
-  //       }else {
-
-  //         alert ("Error Revoking")
-  //       }
-        
-  //   }
-  // };
-
   const handleDelete = async (trashId, selectedMarketId) => {
- 
     if (window.confirm("Are you sure you want to delete this market?")) {
       try {
         showLoader(); // Show loader before the request
@@ -79,15 +42,14 @@ const Trashmarketdetails = ({
       }
     }
   };
-  
-  const handleRevoke = async (trashId, selectedMarketId) => {
 
+  const handleRevoke = async (purchaseId, selectedMarketId) => {
     if (window.confirm("Are you sure you want to revoke this market?")) {
       try {
         showLoader(); // Show loader before the request
-        const requestBody = { trashMarketId: trashId };
+        const requestBody = { purchaseId: purchaseId};
         const response = await RevokeMarketsDelete(requestBody);
-  
+
         if (response.success) {
           alert("Market revoked successfully!");
           refreshMarkets(); // Refresh the markets list after revoke
@@ -103,13 +65,11 @@ const Trashmarketdetails = ({
       }
     }
   };
-  
 
   // Handle "No results found" scenario
   const isNoResultsFound = details.length === 0;
   // Ensure `details` and `details[0]` are valid
   const marketName = details?.[0]?.marketName || "Unknown Market";
-
 
   return (
     <div className="market-details-container px-5">
@@ -180,7 +140,9 @@ const Trashmarketdetails = ({
                         className="bi bi-arrow-counterclockwise undo-icon"
                         title="Revoke"
                         style={{ marginLeft: "8px" }}
-                        onClick={() => handleRevoke(detail.trashMarketId, detail.marketId)}
+                        onClick={() =>
+                          handleRevoke(detail.purchaseId, detail.marketId)
+                        }
                       ></i>
                     </td>
                   </tr>

@@ -7,6 +7,7 @@ import { getInitialValues } from "../../../Utils/getInitialState";
 import { LoginSchema } from "../../../Utils/schema";
 import { useFormik } from "formik";
 import { useLocation } from "react-router-dom";
+import "./Login.css";
 
 const Login = () => {
   const { dispatch, store, showLoader, hideLoader } = useAppContext();
@@ -88,37 +89,38 @@ const Login = () => {
   }
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100 bg-light text-uppercase">
+    <div className="login-container text-uppercase">
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
-            <div className="card shadow border-2 rounded-4">
-              <div className="card-body p-4">
-                <div className="bg-primary text-white rounded-top-4 text-center py-3 mb-4">
+            <div className=" border border-3 border-dark rounded-4 wrapper ">
+              <div className="card-body p-3 px-1 py-2">
+                <div className="frosted-header text-center mb-4 text-dark">
                   <h3 className="text-uppercase fw-bold mb-0">Login</h3>
                 </div>
 
                 <form onSubmit={handleSubmit}>
                   {/* Username */}
+
                   <div className="mb-4 position-relative">
                     <label
                       htmlFor="userName"
-                      className="form-label fw-semibold"
+                      className="form-label fw-semibold text-dark"
                     >
                       Username
                     </label>
-                    <input
-                      type="text"
-                      id="userName"
-                      name="userName"
-                      className={`form-control rounded-3 px-3 py-2 ${
-                        errors.userName && touched.userName ? "is-invalid" : ""
-                      }`}
-                      placeholder="Enter Username"
-                      value={values.userName}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                    />
+                    <div className="input-password-group">
+                      <input
+                        type="text"
+                        id="userName"
+                        name="userName"
+                        className="input-box-login"
+                        placeholder="Enter Username"
+                        value={values.userName}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                      />
+                    </div>
                     {errors.userName && touched.userName && (
                       <div className="position-absolute text-danger small">
                         {errors.userName}
@@ -130,32 +132,24 @@ const Login = () => {
                   <div className="mb-4 position-relative">
                     <label
                       htmlFor="password"
-                      className="form-label fw-semibold"
+                      className="form-label fw-semibold text-dark"
                     >
                       Password
                     </label>
-                    <div className="input-group">
+                    <div className="input-password-group">
                       <input
                         type={showPassword ? "text" : "password"}
                         id="password"
                         name="password"
-                        className={`form-control rounded-start-3 px-3 py-2 ${
-                          errors.password && touched.password
-                            ? "is-invalid"
-                            : ""
-                        }`}
+                        className="input-box-login"
                         placeholder="Enter Password"
                         value={values.password}
                         onChange={handleChange}
                         onBlur={handleBlur}
                       />
-                      <span
-                        className={`input-group-text ${
-                          errors.password && touched.password
-                            ? "border-danger is-invalid rounded-end-3"
-                            : "rounded-end-3"
-                        }`}
-                        role="button"
+                      <button
+                        type="button"
+                        className="input-password-toggle"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         <i
@@ -163,10 +157,8 @@ const Login = () => {
                             showPassword ? "bi-eye-slash" : "bi-eye"
                           }`}
                         ></i>
-                      </span>
+                      </button>
                     </div>
-
-                    {/* Error absolutely positioned – doesn't expand layout */}
                     {errors.password && touched.password && (
                       <div className="position-absolute text-danger small">
                         {errors.password}
@@ -175,10 +167,10 @@ const Login = () => {
                   </div>
 
                   {/* Submit */}
-                  <div className="d-grid mt-5">
+                  <div className="d-flex justify-content-center mt-5">
                     <button
                       type="submit"
-                      className="btn btn-primary rounded-3 py-2 fw-semibold text-uppercase"
+                      className="btn btn-light px-5 py-2 rounded-pill fw-semibold text-uppercase"
                     >
                       Log In
                     </button>
