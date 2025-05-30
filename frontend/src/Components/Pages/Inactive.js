@@ -154,7 +154,7 @@ const Inactive = () => {
                     inactiveGames.map((game, index) => {
                       return (
                         <tr>
-                          <td>{index + 1}</td>
+                          <td>{startIndex + index}</td>
                           {/* <td>{game.gameName}</td> */}
                           <td>{game.marketName}</td>
                           <td>
@@ -172,7 +172,7 @@ const Inactive = () => {
                     })
                   ) : (
                     <tr>
-                      <td colSpan="4" className="text-center text-danger">
+                      <td colSpan="4" className="text-center text-danger fw-bold">
                         No Inactive Games Found.
                       </td>
                     </tr>

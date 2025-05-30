@@ -118,7 +118,7 @@ const LiveMarkets = () => {
                 <input
                   type="text"
                   className="form-control search-input-live"
-                  placeholder="Search By Market Name"
+                  placeholder="Search By Market Name..."
                   aria-label="Search markets"
                   value={searchTerm}
                   onChange={handleSearchChange}

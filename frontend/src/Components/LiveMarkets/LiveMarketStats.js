@@ -194,7 +194,7 @@ const LiveMarketStats = ({ marketId, backButton, refresh }) => {
             <input
               type="text"
               className="form-control"
-              placeholder="Search By Username"
+              placeholder="Search By Username..."
               aria-label="Search"
               aria-describedby="button-search"
               value={searchTerm}

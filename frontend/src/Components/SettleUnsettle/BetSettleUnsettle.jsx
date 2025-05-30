@@ -184,7 +184,7 @@ const BetSettleUnsettle = ({ marketId, backButton, onAllDataDeleted }) => {
             <input
               type="text"
               className="form-control bet-settle-search-input"
-              placeholder="Search By Username"
+              placeholder="Search By Username..."
               aria-label="Search"
               aria-describedby="button-search"
               value={searchTerm}
