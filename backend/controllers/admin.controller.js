@@ -880,9 +880,6 @@ export const updateMarketStatus = async (req, res) => {
   try {
     const { status, marketId } = req.body;
 
-    console.log("status......................", status);
-    console.log("marketId......................", marketId);
-
     // Validate that status is boolean and marketId exists
     if (typeof status !== 'boolean' || !marketId) {
       return apiResponseErr(

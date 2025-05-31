@@ -78,6 +78,7 @@ export const saveTicketRange = async (req, res) => {
         hideMarketUser: ticket.hideMarketUser,
         isActive: ticket.isActive,
         inactiveGame: ticket.inactiveGame,
+        isMarketExpired: false,
       });
 
     return apiResponseSuccess(

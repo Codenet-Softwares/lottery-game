@@ -8,15 +8,17 @@ export async function updateLottery() {
 
   try {
     const snapshot = await db.collection("lottery-db").get();
-
-    for (const doc of snapshot.docs) {
+   
+    snapshot.docs.forEach(async (doc) => {
       const data = doc.data();
+
+      if(data.isMarketExpired)  return;
 
       let startTime = parseDate(data.start_time);
       let endTime = parseDate(data.end_time);
 
       if (!startTime || !endTime || isNaN(startTime) || isNaN(endTime)) {
-        continue;
+        return
       }
 
       let updates = {};
@@ -28,10 +30,14 @@ export async function updateLottery() {
         updates.inactiveGame = true;
         updates.updatedAt = new Date().toISOString();
         shouldUpdate = true;
-      } else if (currentTime > endTime && data.isActive) {
+        console.log("first",doc.id)
+      }
+       if (currentTime > endTime && data.isActive) {
         updates.isActive = false;
+        updates.isMarketExpired = true;
         updates.updatedAt = new Date().toISOString();
         shouldUpdate = true;
+        console.log("last",doc.id)
       }
 
       if (shouldUpdate) {
@@ -41,6 +47,7 @@ export async function updateLottery() {
           (typeof updates.hideMarketUser !== 'undefined' && updates.hideMarketUser !== data.hideMarketUser);
 
         if (shouldActuallyUpdate) {
+          console.log("first update", doc.id);
           await db.collection("lottery-db").doc(doc.id).update(updates);
 
           await TicketRange.update(
@@ -57,7 +64,7 @@ export async function updateLottery() {
         }
       }
 
-    }
+    })
 
   } catch (error) {
     console.error("Error updating lottery:", error);
