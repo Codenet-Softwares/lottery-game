@@ -105,7 +105,7 @@ const Trash = () => {
   };
 
   return (
-    <div className="trash-container text-uppercase">
+    <div className="trash-container">
       <div className="main-container-trash">
         <div className="search-bar-container">
           <input
