@@ -120,7 +120,7 @@ const Trash = () => {
         <div className="crumpled-paper">
           <aside className="market-sidebar">
             <h3 className="fw-bold">Deleted Markets</h3>
-            <ul className="market-list-custom">
+            <ul className="market-list-custom text-truncate">
               {markets.map((market, index) => (
                 <li
                   key={index}

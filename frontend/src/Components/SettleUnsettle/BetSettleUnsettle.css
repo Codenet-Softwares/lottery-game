@@ -1,7 +1,7 @@
 /* Main container styles */
 .bet-settle-container {
   overflow: hidden;
-  background: #f0f0f0;
+  /* background: #f0f0f0; */
   border-radius: 8px;
   margin-top: 1rem;
 }

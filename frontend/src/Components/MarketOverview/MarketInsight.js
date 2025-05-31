@@ -132,30 +132,31 @@ const MarketInsight = () => {
   };
   // This is the void api implementation
   const handleVoidMarket = async (marketId) => {
-    showLoader();
+  const confirmed = window.confirm("Are you sure you want to void this market?");
+  if (!confirmed) return;
 
-    const requestBody = { marketId };
-    const response = await voidMarket(requestBody);
+  showLoader();
 
-    if (response.success) {
-      toast.success("Market voided successfully");
+  const requestBody = { marketId };
+  const response = await voidMarket(requestBody);
 
-      // Remove the voided market from the marketTimes state
-      setMarketTimes((prevMarketTimes) =>
-        prevMarketTimes.filter((market) => market.marketId !== marketId)
-      );
+  if (response.success) {
+    // Remove the voided market from the marketTimes state
+    setMarketTimes((prevMarketTimes) =>
+      prevMarketTimes.filter((market) => market.marketId !== marketId)
+    );
 
-      if (selectedMarket?.marketId === marketId) {
-        setSelectedMarket(null);
-        setShowStats(false);
-      }
-    } else {
-      toast.error(response.message || "Failed to void market");
+    if (selectedMarket?.marketId === marketId) {
+      setSelectedMarket(null);
+      setShowStats(false);
     }
+  } else {
+    // Optionally show an error message
+    // toast.error(response.message || "Failed to void market");
+  }
 
-    hideLoader();
-  };
-
+  hideLoader();
+};
   useEffect(() => {
     if (selectedMarket) {
       const fetchPurchasedTickets = async () => {
@@ -192,7 +193,7 @@ const MarketInsight = () => {
   };
   if (loading) return null;
   return (
-    <Container fluid className="alt-dashboard-container">
+    <Container fluid className="alt-dashboard-container text-uppercase">
       {/* Sidebar */}
       <aside className="alt-sidebar p-4">
         <h5
@@ -247,7 +248,7 @@ const MarketInsight = () => {
           <input
             type="text"
             className="form-control w-80"
-            placeholder="Search for a Lottery market..."
+            placeholder="Search Lottery Market Name..."
             value={searchTerm}
             onChange={handleSearchChange}
           />
@@ -417,13 +418,13 @@ const MarketInsight = () => {
               </div>
             </Row>
 
-            <Button
+            {/* <Button
               variant="outline-primary"
               className="close-btn mt-4"
               onClick={() => setShowStats(false)}
             >
               Close Details
-            </Button>
+            </Button> */}
           </div>
         ) : (
           <Card className="welcome-card shadow-sm">

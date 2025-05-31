@@ -24,12 +24,12 @@ const SearchCreatedLotto = () => {
   );
 
   return (
-    <div className="sc-lotto-container">
-      <aside className="sc-lotto-sidebar">
+    <div className="sc-lotto-container text-uppercase">
+      <aside className="sc-lotto-sidebar ">
         <div className="sc-lotto-sidebar-header">
           <h5 className="sc-lotto-sidebar-title fw-bold text-dark">LOTTERY MARKETS</h5>
         </div>
-        <div className="sc-lotto-market-card-grid">
+        <div className="sc-lotto-market-card-grid ">
           {filteredMarkets.length > 0 ? (
             filteredMarkets.map((market) => (
               <div
@@ -75,8 +75,8 @@ const SearchCreatedLotto = () => {
         {showSearch ? (
           selectedMarket ? (
             <div className="form-wrapper">
-              <div className="sc-lotto-search-border-form border border-2 border-secondary py-4 rounded-3">
-                <div className="sc-lotto-search-form ">
+              <div className="sc-lotto-search-border-form rounded-3">
+                <div className="sc-lotto-search-form border shadow-lg">
                   <div className="price-pill">
                     PRICE: <strong>{selectedMarket.price}</strong>
                   </div>
@@ -134,8 +134,8 @@ const SearchCreatedLotto = () => {
             <div className="sc-lotto-back-button bg-secondary px-2 rounded" onClick={handleBack}>
             <i className="bi bi-arrow-left"> Back To <strong>  {selectedMarket?.marketName || ""}</strong></i>
             </div>
-            <div className="sc-lotto-search-border-form border border-2 border-secondary py-4 rounded-3">
-              <div className="sc-lotto-results-container">
+            <div className="sc-lotto-search-border-form rounded-3">
+              <div className="sc-lotto-results-container border shadow-lg">
                 <h4>Search Results:</h4>
                 <h5 className="fw-bold">Tickets:</h5>
 

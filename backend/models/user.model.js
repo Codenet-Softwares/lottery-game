@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../config/db.js';
+import {sequelize} from '../config/db.js';
 import { v4 as uuidv4 } from 'uuid';
 
 const UserRange = sequelize.define(

@@ -18,7 +18,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isLoginFromStore = store?.admin?.isLogin ;
+  const isLoginFromStore = store?.admin?.isLogin;
 
   useEffect(() => {
     if (location.pathname == "/" && !isLoginFromStore) {
@@ -58,10 +58,15 @@ const Login = () => {
     const response = await adminLogin(values);
     console.log("Response from login:", response);
     if (response && response.success) {
-      if (response?.data?.message == "Password reset required. Please reset your password.") {
-        navigate("/subAdmin-reset-password", { state: { password: values.password, userName: values.userName } });
-        return; 
-    }
+      if (
+        response?.data?.message ==
+        "Password reset required. Please reset your password."
+      ) {
+        navigate("/subAdmin-reset-password", {
+          state: { password: values.password, userName: values.userName },
+        });
+        return;
+      }
 
       localStorage.setItem(
         strings.LOCAL_STORAGE_KEY,
@@ -118,7 +123,8 @@ const Login = () => {
           bottom: "10px",
           width: "auto",
           height: "120%",
-          backgroundImage: `url(${backgroundImage04})`,
+          // backgroundImage: `url(${backgroundImage04})`,
+          backgroundColor: "#203f52",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
@@ -132,15 +138,16 @@ const Login = () => {
           style={{
             maxWidth: "800px",
             margin: "0 auto",
-            backgroundColor: "hsla(0, 0%, 100%, 0.01)", // Light frosted effect for the background
-            backdropFilter: "blur(10px)", // Glassy frosted look
+            backgroundColor: "#4f678ab0", // Light frosted effect for the background
+            // backdropFilter: "blur(10px)", // Glassy frosted look
             borderRadius: "15px", // Slightly more rounded corners for elegance
             position: "relative",
             animation: "fadeIn 1s ease-out",
             zIndex: 1,
-            minHeight: "500px", // Fixed height
-            maxHeight: "500px", // Fixed height
+            minHeight: "350px", // Fixed height
+            maxHeight: "450px", // Fixed height
             overflow: "hidden",
+            border: "2px solid white",
             // boxShadow: "0 0 20px rgba(255, 255, 255, 0.3)",
           }}
         >
@@ -150,10 +157,10 @@ const Login = () => {
                 style={{
                   borderRadius: "15px",
                   border: "none",
-                  backgroundColor: "rgba(255, 255, 255, 0.01)", // Slightly transparent background
+                  // backgroundColor: "rgba(255, 255, 255, 0.01)", // Slightly transparent background
                   width: "750px", // Fixed width
                   height: "400px", // Fixed height
-                  boxShadow: "0 0 25px rgba(255, 255, 255)",
+                  // boxShadow: "0 0 25px rgba(255, 255, 255)",
                 }}
               >
                 <div
@@ -175,7 +182,7 @@ const Login = () => {
                       fontWeight: "600",
                     }}
                   >
-                     Login
+                    Login
                   </h5>
                 </div>
 
@@ -204,8 +211,8 @@ const Login = () => {
                         backgroundColor: "rgba(255, 255, 255, 0.01)", // Frosted white glass effect
                         color: "#fff",
                         backdropFilter: "blur(10px)", // Frost effect for the background
-                        boxShadow: "0 0 10px rgba(255, 255, 255, 50)", // Neon Glow
-                        transition: "0.3s ease-in-out",
+                        // boxShadow: "0 0 10px rgba(255, 255, 255, 50)", // Neon Glow
+                        // transition: "0.3s ease-in-out",
                       }}
                       value={values.userName}
                       onChange={handleChange}
@@ -234,6 +241,7 @@ const Login = () => {
                           className="custom-error-message"
                           style={{
                             margin: -20,
+                            color: "red",
                             visibility:
                               errors.userName && touched.userName
                                 ? "visible"
@@ -263,8 +271,8 @@ const Login = () => {
                         backgroundColor: "rgba(255, 255, 255, 0.01)", // Frosted white glass effect
                         color: "#fff",
                         backdropFilter: "blur(10px)", // Frost effect for the background
-                        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Soft shadow for a floating effect
-                        boxShadow: "0 0 10px rgba(255, 255, 255, 50)",
+                        // boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Soft shadow for a floating effect
+                        // boxShadow: "0 0 10px rgba(255, 255, 255, 50)",
                         transition: "0.3s ease-in-out",
                       }}
                       value={values.password}
@@ -313,6 +321,7 @@ const Login = () => {
                           className="custom-error-message"
                           style={{
                             margin: -20,
+                            color: "red",
                             visibility:
                               errors.password && touched.password
                                 ? "visible"
