@@ -13,7 +13,6 @@ import { ExternalApiModule } from './routes/externalApis.route.js';
 import { voidGameRoute } from './routes/void.route.js';
 import { revokeGameRoute } from './routes/revoke.route.js';
 import { deleteGameRoute } from './routes/delete.route.js';
-import { updateLottery } from './utils/lotteryCron.js';
 
 
 
@@ -72,12 +71,6 @@ sequelize
     app.listen(process.env.PORT, () => {
       console.log(`Server running at http://localhost:${process.env.PORT}`);
     });
-
-    const runLottery = async () => {
-      await updateLottery(); // Waits for previous run to complete
-      setTimeout(runLottery, 1000); // Runs every second (safely)
-    }; 
-    runLottery(); // Kick off the loop 
   })
   .catch((err) => {
     console.error('DB Sync Error:', err);
