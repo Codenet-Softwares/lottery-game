@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ViewAllSubAdmins } from "../../Utils/apiService";
+import { SubAdminDelete, ViewAllSubAdmins } from "../../Utils/apiService";
 import ReusableTable from "../Reusables/ReusableTable";
 import ResetPasswordSubAdmin from "../ResetPasswordSubAdmin/ResetPasswordSubAdmin";
 import { toast } from "react-toastify";
@@ -12,7 +12,7 @@ const ViewAllSubadmin = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalData, setTotalData] = useState(0);
   const itemsPerPage = 10;
-
+console.log('data',subAdmins)
   const fetchSubAdmins = async () => {
     try {
       const response = await ViewAllSubAdmins({
@@ -50,6 +50,22 @@ const ViewAllSubadmin = () => {
     setShowModal(true);
   };
 
+const handleDelete = async (adminId) => {
+  if (!window.confirm(`Are you sure you want to delete this sub-admin?`)) return;
+
+  try {
+    const response = await SubAdminDelete(adminId);
+    if (response?.success) {
+      toast.success("Sub-admin deleted successfully");
+      fetchSubAdmins(); // Refresh the data
+    } else {
+      toast.error("Failed to delete sub-admin");
+    }
+  } catch (error) {
+    console.error("Delete error:", error);
+    toast.error("An unexpected error occurred while deleting");
+  }
+};
   const columns = [
     { key: "userName", label: "Sub-Admin Names" },
     { key: "role", label: "Role" },
@@ -58,13 +74,22 @@ const ViewAllSubadmin = () => {
       key: "actions",
       label: "Action",
       render: (row) => (
-        <button
-          className="btn btn-primary btn-sm mx-2"
-          onClick={() => handleAction(row.userName)}
-          title="Reset Password"
-        >
-          <i className="fas fa-key"></i>
-        </button>
+        <div className="d-flex justify-content-center">
+          <button
+            className="btn btn-primary btn-sm mx-1"
+            onClick={() => handleAction(row.userName)}
+            title="Reset Password"
+          >
+            <i className="fas fa-key"></i>
+          </button>
+          <button
+            className="btn btn-danger btn-sm mx-1"
+            onClick={() => handleDelete(row.adminId)}
+            title="Delete Sub-Admin"
+          >
+            <i className="fas fa-trash-alt"></i>
+          </button>
+        </div>
       ),
     },
   ];
@@ -96,7 +121,7 @@ const ViewAllSubadmin = () => {
           totalData={totalData}
           onSearch={(term) => {
             setSearchTerm(term);
-            setCurrentPage(1); 
+            setCurrentPage(1);
           }}
           onPageChange={setCurrentPage}
         />

@@ -18,7 +18,6 @@ export const validationSchema = Yup.object({
     )
     .max(20, "Market name cannot exceed 20 characters") // Maximum 20 characters
     .required("Market Name Is Required"),
-    
 
   groupFrom: Yup.number()
     .required("Group From Is Required")
@@ -324,7 +323,6 @@ export const validationUpdateSchema = Yup.object({
 });
 
 export const resetPasswordSchema = Yup.object().shape({
-  oldPassword: Yup.string().required("Old password Is Required"),
   newPassword: Yup.string()
     .required("New password Is Required")
     .min(8, "New password must be at least 8 characters")

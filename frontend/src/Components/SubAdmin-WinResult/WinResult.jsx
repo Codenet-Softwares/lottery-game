@@ -35,7 +35,7 @@ const WinResult = () => {
         page: pagination.page,
         limit: pagination.limit,
         search: searchTerm,
-        status: statusFilter, 
+        status: statusFilter,
       });
 
       if (response?.success) {
@@ -191,30 +191,28 @@ const WinResult = () => {
                         </td>
 
                         <td className="text-center align-top">
-                          {item.status === "Pending" ? (
-                            <span
-                              className="badge rounded-pill px-3 py-2 bg-warning text-dark fw-semibold opacity-75"
-                              style={{ cursor: "not-allowed" }}
-                            >
-                              Pending
-                            </span>
-                          ) : (
-                            <button
-                              className={`badge rounded-pill px-3 py-2 fw-semibold ${
-                                item.status === "Approve"
-                                  ? "bg-success text-white"
-                                  : "bg-danger text-white"
-                              }`}
-                              onClick={() =>
-                                fetchSubAdminTicketData(
-                                  item.marketId,
-                                  item.status
-                                )
-                              }
-                            >
-                              Show Prize
-                            </button>
-                          )}
+                          <button
+                            className={`badge rounded-pill px-3 py-2 fw-semibold ${
+                              item.status === "Approve"
+                                ? "bg-success text-white"
+                                : item.status === "Reject"
+                                ? "bg-danger text-white"
+                                : "bg-warning text-dark opacity-75"
+                            }`}
+                            onClick={() =>
+                              fetchSubAdminTicketData(
+                                item.marketId,
+                                item.status
+                              )
+                            }
+                            
+                          >
+                            {item.status === "Approve"
+                              ? "Show Prize"
+                              : item.status === "Reject"
+                              ? "Show Prize"
+                              : "Pending"}
+                          </button>
                         </td>
 
                         <ReusableModal

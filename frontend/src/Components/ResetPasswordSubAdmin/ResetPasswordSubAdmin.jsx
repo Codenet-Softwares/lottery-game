@@ -25,13 +25,6 @@ const ResetPasswordSubAdmin = ({ userName, onClose = () => {} }) => {
 
   const inputFields = [
     {
-      id: "oldPassword",
-      name: "oldPassword",
-      type: "password",
-      placeholder: "Enter Old Password",
-      showEyeIcon: true,
-    },
-    {
       id: "newPassword",
       name: "newPassword",
       type: "password",
@@ -50,7 +43,6 @@ const ResetPasswordSubAdmin = ({ userName, onClose = () => {} }) => {
   const formik = useFormik({
     initialValues: {
       userName: userName || "",
-      oldPassword: "",
       newPassword: "",
       confirmPassword: "",
     },
@@ -60,7 +52,11 @@ const ResetPasswordSubAdmin = ({ userName, onClose = () => {} }) => {
   });
 
   return (
-    <div className="modal show fade d-block text-uppercase" tabIndex="-1" role="dialog">
+    <div
+      className="modal show fade d-block text-uppercase"
+      tabIndex="-1"
+      role="dialog"
+    >
       <div
         className="modal-dialog modal-dialog-centered"
         role="document"
