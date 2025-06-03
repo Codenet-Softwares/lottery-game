@@ -62,6 +62,7 @@ class UrlConstant {
   SubPasswordReset =`${this.url_dev}/${this.subadmin}/reset-password`;
   ViewSubAdminsTicket=`${this.url_dev}/${this.subadmin}/result-status`;
   SubMarkets=`${this.url_dev}/${this.subadmin}/dateWise-markets`;
+  SubAdmninDelete = `${this.url_dev}/subAdmin-delete`;
 }
 
 const urls = new UrlConstant();

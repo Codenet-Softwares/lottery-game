@@ -745,6 +745,21 @@ export async function ResetSubAdminPassword(body = {}, isToast = false) {
   }
 }
 
+
+export async function SubAdminDelete(AdminId, isToast = true) {
+  try {
+    const callParams = await getAuthCallParams(strings.DELETE, null, isToast);
+    const response = await makeCall(
+      `${urls.SubAdmninDelete}/${AdminId}`,
+      callParams,
+      isToast
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function SubAdminResetPassword(body = {}, isToast = false) {
   try {
     const callParams = await getAuthCallParams(strings.POST, body, isToast);

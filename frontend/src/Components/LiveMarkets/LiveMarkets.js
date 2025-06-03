@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import PaginationUi from "../Common/PaginationUi";
 import { GetliveMarketBroadcast } from "../../Utils/apiService";
 import LiveMarketStats from "./LiveMarketStats";
-
 import "./LiveMarkets.css";
 
 const LiveMarkets = () => {

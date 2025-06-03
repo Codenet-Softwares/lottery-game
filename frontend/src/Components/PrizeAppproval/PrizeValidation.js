@@ -11,6 +11,7 @@ import {
 } from "../../Utils/apiService";
 import ComparisonTable from "./ComparisonTable";
 import { useAppContext } from "../../contextApi/context";
+import { toast } from "react-toastify";
 
 const PrizeValidation = () => {
   const [marketData, setMarketData] = useState([]);
@@ -36,7 +37,7 @@ const PrizeValidation = () => {
     return () => clearTimeout(handler);
   }, [searchInput]);
 
-  console.log("searchInput", searchInput)
+  console.log("searchInput", searchInput);
   // marketnames for the page of Prize Approval Market List
   const fetchMarketData = async (searchTerm = "") => {
     try {
@@ -64,11 +65,11 @@ const PrizeValidation = () => {
   };
 
   // rerender of the marketnames for the page of Prize Approval Market List
-useEffect(() => {
-  if (searchTerm === "" || currentPage === 1 || totalData > 0) {
-    fetchMarketData(searchTerm);
-  }
-}, [currentPage, searchTerm]);
+  useEffect(() => {
+    if (searchTerm === "" || currentPage === 1 || totalData > 0) {
+      fetchMarketData(searchTerm);
+    }
+  }, [currentPage, searchTerm]);
 
   // ViewSubAdmins for the page of Prize Approval with respect to Market List
   const fetchApprovalData = async (market) => {
@@ -108,7 +109,9 @@ useEffect(() => {
       // Call the first API (ApproveReject)
       const response = await ApproveReject({ type }, selectedMarket.id);
 
-      if (response?.success) {
+      if (response?.success && response?.successCode === 200) {
+        // Show toast only ONCE here
+        toast.success(response.message); // server end message is not sent properly intimated
         // Pass the response from ApproveReject as the payload to CustomWining
         const customWiningResponse = await CustomWiningAdmin({
           resultArray: response.data,
@@ -116,7 +119,6 @@ useEffect(() => {
         });
 
         if (customWiningResponse?.success) {
-          alert(`${type} successful!`);
           setApprovalData([]);
           setShowModal(false);
           setSelectedMarket(null); // Reset to go back to Prize Approval Market List
@@ -127,7 +129,7 @@ useEffect(() => {
     if (type === "Reject") {
       const response = await ApproveReject({ type }, selectedMarket.id);
       if (!response?.success) {
-        alert(`${type} successful!`);
+        toast.info(response.message);
         setApprovalData([]);
         setShowModal(false);
         setSelectedMarket(null); // Reset to go back to Prize Approval Market List
@@ -160,17 +162,17 @@ useEffect(() => {
 
   const filteredApprovalData = selectedMarketApprovals
     ? selectedMarketApprovals.subAdmins.reduce((acc, subAdmin, index) => {
-      if (index % 2 === 0) {
-        acc.push({
-          id: acc.length + 1,
-          subAdmin1: subAdmin.declearBy,
-          subAdmin2: "",
-        });
-      } else {
-        acc[acc.length - 1].subAdmin2 = subAdmin.declearBy;
-      }
-      return acc;
-    }, [])
+        if (index % 2 === 0) {
+          acc.push({
+            id: acc.length + 1,
+            subAdmin1: subAdmin.declearBy,
+            subAdmin2: "",
+          });
+        } else {
+          acc[acc.length - 1].subAdmin2 = subAdmin.declearBy;
+        }
+        return acc;
+      }, [])
     : [];
 
   const approvalColumns = [

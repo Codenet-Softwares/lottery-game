@@ -12,6 +12,60 @@ const prizeOrder = [
 const ComparisonTable = ({ modalContent }) => {
   const { matchedEnteries = [], UnmatchedEntries = [] } = modalContent;
 
+    const isPendingStatus = modalContent && Array.isArray(modalContent.Tickets);
+     if (isPendingStatus) {
+    return (
+      <div className="table-responsive">
+        <table className="table table-bordered table-striped">
+          <thead className="table-dark">
+            <tr>
+              <th>Prize Name</th>
+              <th>Prize Amount</th>
+              <th>Tickets</th>
+              <th>Sub Prizes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {modalContent.Tickets.sort(
+              (a, b) => prizeOrder.indexOf(a.prizeName) - prizeOrder.indexOf(b.prizeName)
+            ).map((prize, index) => (
+              <tr key={`prize-${index}`}>
+                <td className="fw-bold text-primary">{prize.prizeName}</td>
+                <td>{prize.prizeAmount}</td>
+                <td>
+                  {prize.tickets && prize.tickets.length > 0 ? (
+                    <select className="form-select">
+                      {prize.tickets.map((ticket, i) => (
+                        <option key={i} value={ticket}>
+                          {ticket}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    "No tickets"
+                  )}
+                </td>
+                <td>
+                  {prize.subPrizes && prize.subPrizes.length > 0 ? (
+                    prize.subPrizes.map((subPrize, subIndex) => (
+                      <div key={subIndex} className="mb-2">
+                        <div className="fw-bold text-success">
+                          {subPrize.prizeName}: {subPrize.prizeAmount}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    "No sub prizes"
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
   // Sorting prizes based on the predefined order
   const sortedPrizeNames = [
     ...new Set(
