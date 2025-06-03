@@ -203,30 +203,20 @@ export const subAdminResetPassword = async (req, res) => {
 
 export const subAdminsResetPassword = async (req, res) => {
   try {
-    const { userName, oldPassword, newPassword } = req.body;
+    const { userName, newPassword } = req.body;
 
     const existingUser = await Admin.findOne({ where: { userName } });
 
-    if(!existingUser){
+    if (!existingUser) {
       return apiResponseErr(
         null,
         false,
         statusCode.badRequest,
-        "Admin not Found",
+        "Sub-admin not found",
         res
       );
     }
 
-    const isPasswordMatch = await bcrypt.compare(oldPassword, existingUser.password);
-    if (!isPasswordMatch) {
-      return apiResponseErr(
-        null,
-        false,
-        statusCode.badRequest,
-        "Invalid old password.",
-        res
-      );
-    }
     const passwordIsDuplicate = await bcrypt.compare(newPassword, existingUser.password);
     if (passwordIsDuplicate) {
       return apiResponseErr(
@@ -237,6 +227,7 @@ export const subAdminsResetPassword = async (req, res) => {
         res
       );
     }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
@@ -1844,6 +1835,41 @@ export const getAllSubAdmin = async (req, res) => {
     );
   } catch (error) {
     return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+export const deleteSubAdmin = async (req, res) => {
+  const { adminId } = req.params;
+
+  try {
+    const subAdmin = await Admin.findOne({
+      where: {
+        adminId,
+        role: 'subAdmin', 
+      },
+    });
+
+    if (!subAdmin) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        'Sub-admin not found',
+        res
+      );
+    }
+
+    await subAdmin.destroy();
+    return apiResponseSuccess(subAdmin, true, statusCode.success, 'Sub-admin deleted successfully', res)
+
+  } catch (error) {
+       return apiResponseErr(
       null,
       false,
       statusCode.internalServerError,

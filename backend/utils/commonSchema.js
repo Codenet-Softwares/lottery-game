@@ -17,16 +17,10 @@ export const resetPasswordSchema = [
     .trim()
     .notEmpty()
     .withMessage("Username is required"),
-  body("oldPassword")
-    .trim()
-    .notEmpty()
-    .withMessage("Old Password is required"),
   body("newPassword")
     .trim()
     .notEmpty()
     .withMessage("New Password is required")
-    .isLength({ min: 8 })
-    .withMessage("New Password must be at least 8 characters long")
     .isAlphanumeric()
     .withMessage("New Password must be alphanumeric"),
 ];
@@ -619,6 +613,12 @@ export const validateMarketWiseSubadmin = [
   param("marketId")
     .isUUID()
     .withMessage("Invalid marketId. It should be a valid UUID."),
+];
+
+export const validateDeleteSubAdmin = [
+  param('adminId')
+    .notEmpty().withMessage('adminId is required')
+    .isUUID().withMessage('adminId must be a valid UUID'),
 ];
 
 

@@ -8,6 +8,7 @@ import {
   createAdmin,
   createSubAdmin,
   dateWiseMarkets,
+  deleteSubAdmin,
   getAllMarkets,
   getAllSubAdmin,
   getInactiveMarket,
@@ -50,6 +51,7 @@ import {
   validateMarketWiseSubadmin,
   validateAdminApproveReject,
   resetPasswordSchema,
+  validateDeleteSubAdmin,
 } from "../utils/commonSchema.js";
 import customErrorHandler from "../utils/customErrorHandler.js";
 import { apiResponseErr, apiResponseSuccess } from "../utils/response.js";
@@ -226,6 +228,8 @@ export const adminRoutes = (app) => {
     authorize([string.Admin]),
     getAllSubAdmin
   );
+
+  app.delete('/api/subAdmin-delete/:adminId',validateDeleteSubAdmin,customErrorHandler,authorize([string.Admin]), deleteSubAdmin);
 
   app.post(
     "/api/admin/approved-reject/:marketId",
