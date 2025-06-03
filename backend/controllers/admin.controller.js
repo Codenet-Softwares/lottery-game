@@ -217,7 +217,10 @@ export const subAdminsResetPassword = async (req, res) => {
       );
     }
 
-    const passwordIsDuplicate = await bcrypt.compare(newPassword, existingUser.password);
+    const passwordIsDuplicate = await bcrypt.compare(
+      newPassword,
+      existingUser.password
+    );
     if (passwordIsDuplicate) {
       return apiResponseErr(
         null,
@@ -307,7 +310,7 @@ export const adminPurchaseHistory = async (req, res) => {
     const { page = 1, limit = 10, search = "" } = req.query;
     const { marketId } = req.params;
     const offset = (page - 1) * parseInt(limit);
-    const whereFilter = { marketId,isDeleted: false };
+    const whereFilter = { marketId, isDeleted: false };
     if (search) {
       whereFilter[Op.or] = [
         { userName: { [Op.like]: `%${search}%` } },
@@ -529,7 +532,7 @@ export const getTicketNumbersByMarket = async (req, res) => {
     const { marketId } = req.params;
 
     const purchasedTickets = await PurchaseLottery.findAll({
-      where: { marketId: marketId,isDeleted:false },
+      where: { marketId: marketId, isDeleted: false },
       attributes: [
         "generateId",
         "userId",
@@ -735,7 +738,7 @@ export const getMarkets = async (req, res) => {
       attributes: ["marketId", "marketName"],
       where: {
         hidePurchase: false,
-        isDeleted : false,
+        isDeleted: false,
         createdAt: {
           [Op.gte]: selectedDate,
           [Op.lt]: nextDay,
@@ -744,7 +747,7 @@ export const getMarkets = async (req, res) => {
       order: [["createdAt", "DESC"]],
     });
 
-    console.log("ticketData",ticketData)
+    console.log("ticketData", ticketData);
 
     if (!ticketData || ticketData.length === 0) {
       return apiResponseSuccess([], true, statusCode.success, "No data", res);
@@ -818,13 +821,13 @@ export const getInactiveMarket = async (req, res) => {
     };
 
     if (search) {
-      whereClause.marketName = { [Op.like]: `%${search}%`,};
+      whereClause.marketName = { [Op.like]: `%${search}%` };
     }
 
     const ticketData = await TicketRange.findAll({
-      attributes: ["marketId","marketName","gameName"],
+      attributes: ["marketId", "marketName", "gameName"],
       where: whereClause,
-      group: ["marketId","marketName","gameName"],
+      group: ["marketId", "marketName", "gameName"],
       order: [["createdAt", "DESC"]],
     });
 
@@ -837,9 +840,8 @@ export const getInactiveMarket = async (req, res) => {
 
     const validPage = page > totalPages ? 1 : page;
     const validOffset = (validPage - 1) * limit;
-    
-    const paginatedData = ticketData.slice(validOffset, validOffset + limit);
 
+    const paginatedData = ticketData.slice(validOffset, validOffset + limit);
 
     const pagination = {
       Page: parseInt(page),
@@ -875,7 +877,7 @@ export const updateMarketStatus = async (req, res) => {
     console.log("marketId......................", marketId);
 
     // Validate that status is boolean and marketId exists
-    if (typeof status !== 'boolean' || !marketId) {
+    if (typeof status !== "boolean" || !marketId) {
       return apiResponseErr(
         null,
         false,
@@ -889,11 +891,11 @@ export const updateMarketStatus = async (req, res) => {
     const [updatedCount] = await TicketRange.update(
       {
         hideMarketUser: status,
-        inactiveGame:true
+        inactiveGame: true,
       },
       { where: { marketId } }
     );
-    
+
     if (updatedCount === 0) {
       return apiResponseErr(
         null,
@@ -908,8 +910,8 @@ export const updateMarketStatus = async (req, res) => {
     const marketRef = db.collection("lottery-db").doc(String(marketId));
     await marketRef.set(
       {
-        updatedAt : new Date().toISOString(),
-        inactiveGame: true
+        updatedAt: new Date().toISOString(),
+        inactiveGame: true,
       },
       { merge: true }
     );
@@ -932,7 +934,6 @@ export const updateMarketStatus = async (req, res) => {
   }
 };
 
-
 export const inactiveMarketStatus = async (req, res) => {
   const { marketId } = req.body;
 
@@ -944,15 +945,15 @@ export const inactiveMarketStatus = async (req, res) => {
       },
       { where: { marketId } }
     );
-  // Update Firestore document
-  const marketRef = db.collection("lottery-db").doc(String(marketId));
-  await marketRef.set(
-    {
-      updatedAt : new Date().toISOString(),
-      inactiveGame:false
-    },
-    { merge: true }
-  );
+    // Update Firestore document
+    const marketRef = db.collection("lottery-db").doc(String(marketId));
+    await marketRef.set(
+      {
+        updatedAt: new Date().toISOString(),
+        inactiveGame: false,
+      },
+      { merge: true }
+    );
     if (updatedCount === 0) {
       return apiResponseErr(
         null,
@@ -987,7 +988,6 @@ export const liveMarkets = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-
     const searchCondition = search
       ? { marketName: { [Op.like]: `%${search}%` } }
       : {};
@@ -1005,7 +1005,7 @@ export const liveMarkets = async (req, res) => {
         resultAnnouncement: false,
         ...searchCondition,
         marketId: marketIds,
-        isDeleted : false,
+        isDeleted: false,
       },
       order: [["createdAt", "DESC"]],
     });
@@ -1021,10 +1021,13 @@ export const liveMarkets = async (req, res) => {
     }, []);
 
     const totalPages = Math.ceil(uniqueData.length / limit);
-    const currentPage = page > totalPages ? 1 : parseInt(page); 
+    const currentPage = page > totalPages ? 1 : parseInt(page);
     const adjustedOffset = (currentPage - 1) * limit;
 
-    const paginatedData = uniqueData.slice(adjustedOffset, adjustedOffset + parseInt(limit));
+    const paginatedData = uniqueData.slice(
+      adjustedOffset,
+      adjustedOffset + parseInt(limit)
+    );
 
     const pagination = {
       page: currentPage,
@@ -1284,7 +1287,7 @@ export const afterWinLotteries = async (req, res) => {
     const whereConditions = {
       marketId,
       resultAnnouncement: true,
-      isDeleted:false,
+      isDeleted: false,
     };
 
     if (search) {
@@ -1323,7 +1326,11 @@ export const afterWinLotteries = async (req, res) => {
           if (!Array.isArray(result.ticketNumber)) return false;
 
           if (result.prizeCategory === "First Prize") {
-            return result.ticketNumber.some(ticket => ticket.includes(fullTicketNumber) || ticket.includes(lastFiveDigits));
+            return result.ticketNumber.some(
+              (ticket) =>
+                ticket.includes(fullTicketNumber) ||
+                ticket.includes(lastFiveDigits)
+            );
           } else if (result.prizeCategory === "Second Prize") {
             return result.ticketNumber.includes(lastFiveDigits);
           } else {
@@ -1851,7 +1858,7 @@ export const deleteSubAdmin = async (req, res) => {
     const subAdmin = await Admin.findOne({
       where: {
         adminId,
-        role: 'subAdmin', 
+        role: "subAdmin",
       },
     });
 
@@ -1860,16 +1867,21 @@ export const deleteSubAdmin = async (req, res) => {
         null,
         false,
         statusCode.badRequest,
-        'Sub-admin not found',
+        "Sub-admin not found",
         res
       );
     }
 
     await subAdmin.destroy();
-    return apiResponseSuccess([], true, statusCode.success, 'Sub-admin deleted successfully', res)
-
+    return apiResponseSuccess(
+      [],
+      true,
+      statusCode.success,
+      "Sub-admin deleted successfully",
+      res
+    );
   } catch (error) {
-       return apiResponseErr(
+    return apiResponseErr(
       null,
       false,
       statusCode.internalServerError,
@@ -2258,7 +2270,7 @@ export const subAdminResultStatus = async (req, res) => {
       );
     }
 
-    if (status === "Pending" || status === "Approve") {
+    if (status === "Approve") {
       const existingResults = await WinResultRequest.findAll({
         where: { marketId, status },
         order: [["createdAt", "DESC"]],
@@ -2778,7 +2790,77 @@ export const subAdminResultStatus = async (req, res) => {
         "Comparison completed successfully.",
         res
       );
+    } else if (status === "Pending") {
+  const existingResults = await WinResultRequest.findAll({
+    where: { marketId, status },
+    order: [["createdAt", "DESC"]],
+  });
+
+  if (!existingResults || existingResults.length === 0) {
+    return apiResponseSuccess(
+      [],
+      true,
+      statusCode.success,
+      "No Data found!",
+      res
+    );
+  }
+
+  const { marketName, marketId: mId, adminId } = existingResults[0].dataValues;
+
+
+  const ticketsMap = new Map();
+
+  existingResults.forEach((result) => {
+    const {
+      prizeCategory,
+      ticketNumber,
+      prizeAmount,
+      complementaryPrize,
+    } = result.dataValues;
+
+    if (!ticketsMap.has(prizeCategory)) {
+      ticketsMap.set(prizeCategory, {
+        prizeName: prizeCategory,
+        tickets: [],
+        prizeAmount,
+        subPrizes: [],
+      });
     }
+
+    const currentTickets = Array.isArray(ticketNumber) ? ticketNumber : [ticketNumber];
+    ticketsMap.get(prizeCategory).tickets.push(...currentTickets);
+  });
+
+  if (ticketsMap.has("First Prize")) {
+    const firstPrizeEntry = ticketsMap.get("First Prize");
+    const firstPrizeComplement = existingResults.find(
+      (res) => res.dataValues.prizeCategory === "First Prize"
+    ).dataValues.complementaryPrize;
+
+    if (firstPrizeComplement && firstPrizeComplement > 0) {
+      firstPrizeEntry.subPrizes.push({
+        prizeName: "Complimentary Prize",
+        prizeAmount: firstPrizeComplement,
+      });
+    }
+  }
+
+  const Tickets = Array.from(ticketsMap.values()).map((entry) => {
+    entry.tickets = [...new Set(entry.tickets)];
+    return entry;
+  });
+
+  const responseData = {
+    marketId: mId,
+    adminId,
+    Tickets,
+  };
+
+  return apiResponseSuccess(responseData, true, statusCode.success, "Data fetched!", res);
+}
+
+
   } catch (error) {
     return apiResponseErr(
       null,
