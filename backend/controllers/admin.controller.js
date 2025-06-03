@@ -2004,7 +2004,7 @@ export const adminApproveReject = async (req, res) => {
         formattedResults,
         true,
         statusCode.success,
-        "Ticket fetch successfull!",
+        "This result is approved",
         res
       );
     } else {
