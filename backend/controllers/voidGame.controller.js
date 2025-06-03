@@ -10,6 +10,7 @@ import { Op } from "sequelize";
 import jwt from "jsonwebtoken";
 import axios from "axios";
 import LotteryResult from "../models/resultModel.js";
+import { deleteLotteryFromFirebase } from "../utils/firebase.delete.js";
 
 export const voidMarket = async (req, res) => {
   try {
@@ -65,6 +66,8 @@ export const voidMarket = async (req, res) => {
 
     await TicketRange.update({ isActive: false }, { where: { marketId } });
 
+    await deleteLotteryFromFirebase(marketId);
+    
     return apiResponseSuccess(
       usersByMarket,
       true,

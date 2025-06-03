@@ -9,6 +9,7 @@ import TicketRange from '../models/ticketRange.model.js';
 import WinResultRequest from '../models/winresultRequestModel.js';
 import TicketNumber from '../models/ticketNumber.model.js';
 import { sequelize } from '../config/db.js';
+import { deleteLotteryFromFirebase } from '../utils/firebase.delete.js';
 
 export const ResultDeclare = async (req, res) => {
   try {
@@ -498,6 +499,7 @@ export const ResultDeclare = async (req, res) => {
       { resultAnnouncement: true, settleTime: new Date(), hidePurchase: true },
       { where: { marketId } }
     );
+    await deleteLotteryFromFirebase(marketId);
 
     const combineResult = { 
         savedResults, 
