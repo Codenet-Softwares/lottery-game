@@ -50,6 +50,34 @@ export const revokeMarket = async (req, res) => {
     await PurchaseLottery.update({ resultAnnouncement: false , hidePurchase: false}, { where: { marketId } })
     await LotteryResult.destroy({  where: { marketId }});
 
+    const existingData = await TicketRange.findOne({ where: { marketId } });
+    if (!existingData) {
+      return apiResponseSuccess(
+        [],
+        true,
+        statusCode.success,
+        "Ticket Range Not Found",
+        res
+      );
+    }
+
+    const formatDateTime = (date) =>
+      date.toISOString().slice(0, 19).replace("T", " ");
+
+    // Save data to Firestore
+    await db
+      .collection("lottery-db")
+      .doc(existingData.marketId)
+      .set({
+        start_time: formatDateTime(existingData.start_time),
+        end_time: formatDateTime(existingData.end_time),
+        marketName: existingData.marketName,
+        date: formatDateTime(existingData.end_time),
+        hideMarketUser: existingData.hideMarketUser,
+        isActive: existingData.isActive,
+        inactiveGame: existingData.inactiveGame,
+      });
+
     return apiResponseSuccess(
       usersByMarket,
       true,
