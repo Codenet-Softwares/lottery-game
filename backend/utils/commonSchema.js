@@ -539,14 +539,14 @@ export const validateTrashMarketId = [
 ];
 
 export const validateTrashMarket = [
-  param("trashMarketId")
+  param("purchaseId")
     .isUUID()
-    .withMessage("Invalid Trash Id. It should be a valid UUID."),
+    .withMessage("Invalid purchase Id. It should be a valid UUID."),
 ];
 
 export const validateRevokeLiveBet = [
-  body('trashMarketId')
-    .notEmpty().withMessage('trashMarketId ID is required')
+  body('purchaseId')
+    .notEmpty().withMessage('PurchaseId ID is required')
 ];
 
 export const validateResetPassword = [

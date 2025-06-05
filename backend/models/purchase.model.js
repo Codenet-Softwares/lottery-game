@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../config/db.js';
+import {sequelize} from '../config/db.js';
 
 const PurchaseLottery = sequelize.define(
   'PurchaseLottery',
@@ -74,6 +74,15 @@ const PurchaseLottery = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+     isDeleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    isParmanentDeleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+},
+    
   },
   {
     tableName: "PurchaseLottery",

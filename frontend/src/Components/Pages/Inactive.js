@@ -22,6 +22,7 @@ const Inactive = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1);
     }, 500);
 
     return () => clearTimeout(timer);
@@ -53,17 +54,28 @@ const Inactive = () => {
   };
 
   const handleRevokeAnnouncement = async (marketId) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to revoke this market?"
+    );
+    if (!confirmed) return;
+
     try {
-      showLoader(); // Show the loader before the API call starts
-      const res = await isRevokeLottery({ marketId: marketId });
-      if (res) {
+      showLoader();
+
+      const res = await isRevokeLottery({ marketId });
+
+      if (res?.message) {
         toast.success(res.message);
         setRefresh((prev) => !prev);
+      } else {
+        // Optionally show a fallback error
+        // toast.error("Failed to revoke the market.");
       }
     } catch (err) {
-      console.error("Error fetching inactive games:", err);
+      console.error("Error revoking market:", err);
+      // toast.error("An unexpected error occurred while revoking the market.");
     } finally {
-      hideLoader(); // Hide the loader after the API call finishes
+      hideLoader();
     }
   };
 
@@ -80,7 +92,7 @@ const Inactive = () => {
   );
 
   return (
-    <div className="container my-5">
+    <div className="container my-5 text-uppercase">
       <div className="card shadow-sm">
         <div
           className="card-header d-flex align-items-center justify-content-between p-3"
@@ -90,7 +102,7 @@ const Inactive = () => {
           <input
             type="text"
             className="search-bar-shrink-1"
-            placeholder="Search Revoke Marketnames..."
+            placeholder="Search By Market Name..."
             value={searchTerm}
             onChange={handleSearchMarketChange}
             style={{
@@ -109,7 +121,10 @@ const Inactive = () => {
             onBlur={(e) => (e.target.style.borderColor = "#4682B4")}
           />
         </div>
-        <div className="card-body" style={{background:"linear-gradient(135deg, #f0f9ff, #cce7f6)"}}>
+        <div
+          className="card-body"
+          style={{ background: "linear-gradient(135deg, #f0f9ff, #cce7f6)" }}
+        >
           {/* Table */}
           <SingleCard
             className=" mb-5 "
@@ -118,10 +133,7 @@ const Inactive = () => {
             }}
           >
             <div className="table-responsive">
-              <table
-                className="table table-striped table-hover rounded-table"
-
-              >
+              <table className="table table-striped table-hover rounded-table">
                 <thead
                   className="table-dark"
                   style={{
@@ -142,12 +154,12 @@ const Inactive = () => {
                     inactiveGames.map((game, index) => {
                       return (
                         <tr>
-                          <td>{index + 1}</td>
+                          <td>{startIndex + index}</td>
                           {/* <td>{game.gameName}</td> */}
                           <td>{game.marketName}</td>
                           <td>
                             <button
-                              className="btn btn-danger"
+                              className="btn btn-danger text-uppercase fw-bold"
                               onClick={() =>
                                 handleRevokeAnnouncement(game.marketId)
                               }
@@ -160,7 +172,7 @@ const Inactive = () => {
                     })
                   ) : (
                     <tr>
-                      <td colSpan="4" className="text-center text-danger">
+                      <td colSpan="4" className="text-center text-danger fw-bold">
                         No Inactive Games Found.
                       </td>
                     </tr>

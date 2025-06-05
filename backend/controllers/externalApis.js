@@ -66,6 +66,7 @@ export const getLotteryBetHistory = async (req, res) => {
 
     const queryConditions = {
       isVoid: false,
+      isDeleted:false,
       createdAt: {
         [Op.between]: [new Date(startDate), new Date(endDate)],
       },
@@ -175,6 +176,7 @@ export const lotteryMarketAnalysis = async (req, res) => {
         marketId,
         createdAt: { [Op.gte]: today },
         resultAnnouncement: false,
+        isDeleted:false
       },
     });
 
@@ -240,12 +242,13 @@ export const lotteryMarketAnalysis = async (req, res) => {
 export const getBetHistoryP_L = async (req, res) => {
   try {
     const { userId, userName, marketId } = req.body
-    const queryConditions = { resultAnnouncement: true, marketId };
+    const queryConditions = { resultAnnouncement: true, marketId,isDeleted:false };
     if (userId) queryConditions.userId = userId;
     if (userName) queryConditions.userName = userName;
 
     const purchaseLotteries = await PurchaseLottery.findAll({
       where: queryConditions,
+      isDeleted:false
     });
 
     if (purchaseLotteries.length === 0) {
