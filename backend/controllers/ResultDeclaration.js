@@ -8,8 +8,9 @@ import axios from 'axios';
 import TicketRange from '../models/ticketRange.model.js';
 import WinResultRequest from '../models/winresultRequestModel.js';
 import TicketNumber from '../models/ticketNumber.model.js';
-import { sequelize } from '../config/db.js';
+import { sequelize, sql } from '../config/db.js';
 import { deleteLotteryFromFirebase } from '../utils/firebase.delete.js';
+import NotificationService from '../utils/notification_service.js';
 
 export const ResultDeclare = async (req, res) => {
   try {
@@ -499,6 +500,58 @@ export const ResultDeclare = async (req, res) => {
       { resultAnnouncement: true, settleTime: new Date(), hidePurchase: true },
       { where: { marketId } }
     );
+
+        // Notification 
+        const [allUsers] = await sql.execute(`SELECT id, fcm_token, userName, userId 
+          FROM colorgame_refactor.user 
+          WHERE isActive = true AND fcm_token IS NOT NULL`
+        );
+    
+        const notificationService = new NotificationService();
+    
+        for (const user of allUsers) {
+          if (user.fcm_token) {
+            let title
+            let message
+    
+        title = `Results Declared: ${market.marketName}`;
+        message = `The final results for "${market.marketName}" have been declared. Check now to see if you've secured a win!`;
+
+    
+            await notificationService.sendNotification(
+              title,
+              message,
+              {
+                type: "lottery",
+                marketId: marketId.toString(),
+                userId: user.userId.toString(),
+              },
+              user.fcm_token
+            );
+
+        await sql.query(
+          `INSERT INTO Notifications (UserId, MarketId, message, type)
+         VALUES (:userId, :marketId, :message, :type)`,
+          {
+            replacements: {
+              userId: user.userId,
+              marketId,
+              message,
+              type: 'lottery',
+            },
+          }
+        );
+
+
+        await Notification.create({
+          UserId: user.userId,
+          MarketId: marketId,
+          message,
+          type: "lottery",
+        });
+      }
+    }
+
     await deleteLotteryFromFirebase(marketId);
 
     const combineResult = { 
