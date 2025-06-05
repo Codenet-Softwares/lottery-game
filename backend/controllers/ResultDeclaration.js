@@ -16,7 +16,7 @@ export const ResultDeclare = async (req, res) => {
   try {
     const prizes = req.body;
     const { marketId } = req.params;
-    
+
     const market = await TicketRange.findOne({ where: { marketId } });
 
     if (!market) {
@@ -56,7 +56,7 @@ export const ResultDeclare = async (req, res) => {
         null,
         false,
         statusCode.badRequest,
-       `The following prize categories are missing: ${missingCategories.join(', ')}`,
+        `The following prize categories are missing: ${missingCategories.join(', ')}`,
         res
       );
     }
@@ -250,12 +250,12 @@ export const ResultDeclare = async (req, res) => {
     let savedResults;
     if (generatedTickets.length > 0) {
       savedResults = await LotteryResult.bulkCreate(generatedTickets);
-      
+
       // Save ticket numbers to TicketNumber model
       const ticketNumbersToSave = [];
       for (const result of savedResults) {
         const ticketNumbers = Array.isArray(result.ticketNumber) ? result.ticketNumber : [result.ticketNumber];
-        
+
         for (const ticket of ticketNumbers) {
           ticketNumbersToSave.push({
             ResultId: result.resultId,
@@ -268,15 +268,15 @@ export const ResultDeclare = async (req, res) => {
           });
         }
       }
-      
+
       await TicketNumber.bulkCreate(ticketNumbersToSave);
     } else {
       return apiResponseErr(null, false, statusCode.badRequest, 'No valid tickets to save.', res);
     }
 
     await WinResultRequest.update(
-      {isApproved: true, status: "Approve", remarks: "Congratulations! Your result has been approved."},
-      {where: {marketId, isReject: false, status: "Pending"}}
+      { isApproved: true, status: "Approve", remarks: "Congratulations! Your result has been approved." },
+      { where: { marketId, isReject: false, status: "Pending" } }
     );
 
     const normalizeTicketNumber = (ticket) => {
@@ -285,14 +285,14 @@ export const ResultDeclare = async (req, res) => {
 
     const declaredResults = await LotteryResult.findAll({
       where: { marketId },
-      attributes: ['ticketNumber', 'prizeCategory', 'prizeAmount', 'complementaryPrize','marketName'],
+      attributes: ['ticketNumber', 'prizeCategory', 'prizeAmount', 'complementaryPrize', 'marketName'],
       raw: true,
     });
 
     const purchasedTickets = await PurchaseLottery.findAll({
-      where: { marketId,isDeleted:false },
-      
-      attributes: ['userId', 'group', 'series', 'number','sem','lotteryPrice', 'marketName'],
+      where: { marketId, isDeleted: false },
+
+      attributes: ['userId', 'group', 'series', 'number', 'sem', 'lotteryPrice', 'marketName'],
       raw: true,
     });
 
@@ -305,7 +305,7 @@ export const ResultDeclare = async (req, res) => {
         winningTicketsMap.set(normalizedTicket, {
           prizeCategory: result.prizeCategory,
           prizeAmount: result.prizeAmount,
-          complementaryPrize: result.complementaryPrize, 
+          complementaryPrize: result.complementaryPrize,
         });
       });
     });
@@ -319,7 +319,7 @@ export const ResultDeclare = async (req, res) => {
 
       let isWinner = false;
       let winningTicketDetails = null;
-      let matchType = null; 
+      let matchType = null;
 
       for (const result of declaredResults) {
         const ticketNumbers = Array.isArray(result.ticketNumber) ? result.ticketNumber : [result.ticketNumber];
@@ -331,18 +331,18 @@ export const ResultDeclare = async (req, res) => {
               isWinner = true;
               winningTicketDetails = {
                 prizeCategory: result.prizeCategory,
-                prizeAmount: result.prizeAmount, 
+                prizeAmount: result.prizeAmount,
               };
-              matchType = 'Exact Match'; 
+              matchType = 'Exact Match';
               break;
             }
             else if (normalizedDeclaredTicket.slice(-5) === normalizedTicket.slice(-5)) {
               isWinner = true;
               winningTicketDetails = {
                 prizeCategory: result.prizeCategory,
-                prizeAmount: result.complementaryPrize, 
+                prizeAmount: result.complementaryPrize,
               };
-              matchType = 'Complementary Match'; 
+              matchType = 'Complementary Match';
               break;
             }
           } else if (result.prizeCategory === 'Second Prize' && normalizedDeclaredTicket.slice(-5) === normalizedTicket.slice(-5)) {
@@ -350,9 +350,9 @@ export const ResultDeclare = async (req, res) => {
             winningTicketDetails = {
               prizeCategory: result.prizeCategory,
               sem: result.sem,
-              prizeAmount: result.prizeAmount 
+              prizeAmount: result.prizeAmount
             };
-            matchType = 'Exact Match'; 
+            matchType = 'Exact Match';
             break;
           } else if (
             (result.prizeCategory === 'Third Prize' || result.prizeCategory === 'Fourth Prize' || result.prizeCategory === 'Fifth Prize') &&
@@ -364,11 +364,11 @@ export const ResultDeclare = async (req, res) => {
               sem: result.sem,
               prizeAmount: result.prizeAmount
             };
-            matchType = 'Exact Match'; 
+            matchType = 'Exact Match';
             break;
           }
         }
-        if (isWinner) break; 
+        if (isWinner) break;
       }
 
       if (isWinner && winningTicketDetails) {
@@ -380,7 +380,7 @@ export const ResultDeclare = async (req, res) => {
           lotteryPrice: ticket.lotteryPrice,
           sem: ticket.sem,
           matchType: matchType,
-          marketName: ticket.marketName 
+          marketName: ticket.marketName
         });
       } else {
         losingTickets.push({
@@ -397,53 +397,53 @@ export const ResultDeclare = async (req, res) => {
     const userLotteryPrice = {};
 
     winningTickets.forEach(ticket => {
-      let calculatedPrize = ticket.prizeCategory === "First Prize" 
-          ? ticket.prizeAmount 
-          : ticket.prizeAmount * ticket.sem;
+      let calculatedPrize = ticket.prizeCategory === "First Prize"
+        ? ticket.prizeAmount
+        : ticket.prizeAmount * ticket.sem;
 
       if (userTotalPrize[ticket.userId]) {
-          userTotalPrize[ticket.userId] += calculatedPrize;
-          userLotteryPrice[ticket.userId] += ticket.lotteryPrice;
+        userTotalPrize[ticket.userId] += calculatedPrize;
+        userLotteryPrice[ticket.userId] += ticket.lotteryPrice;
       } else {
-          userTotalPrize[ticket.userId] = calculatedPrize;
-          userLotteryPrice[ticket.userId] = ticket.lotteryPrice;
+        userTotalPrize[ticket.userId] = calculatedPrize;
+        userLotteryPrice[ticket.userId] = ticket.lotteryPrice;
       }
     });
 
     const baseURL = process.env.COLOR_GAME_URL;
     for (const userId in userTotalPrize) {
       try {
-          const response = await axios.post(`${baseURL}/api/users/update-balance`, {
-              userId,
-              prizeAmount: userTotalPrize[userId],
-              marketId,
-              lotteryPrice: userLotteryPrice[userId]
-          });
-          console.log(`Response for user ${userId}:`, response.data);
+        const response = await axios.post(`${baseURL}/api/users/update-balance`, {
+          userId,
+          prizeAmount: userTotalPrize[userId],
+          marketId,
+          lotteryPrice: userLotteryPrice[userId]
+        });
+        console.log(`Response for user ${userId}:`, response.data);
       } catch (error) {
-          console.error(`Error updating balance for user ${userId}:`, error.response?.data || error.message);
+        console.error(`Error updating balance for user ${userId}:`, error.response?.data || error.message);
       }
     }
 
     const userTotalLoss = {};
     losingTickets.forEach(ticket => {
       if (userTotalLoss[ticket.userId]) {
-          userTotalLoss[ticket.userId] += ticket.lotteryPrice;
+        userTotalLoss[ticket.userId] += ticket.lotteryPrice;
       } else {
-          userTotalLoss[ticket.userId] = ticket.lotteryPrice;
+        userTotalLoss[ticket.userId] = ticket.lotteryPrice;
       }
     });
 
     for (const userId in userTotalLoss) {
       try {
-          const response = await axios.post(`${baseURL}/api/users/remove-exposer`, {
-              userId,
-              marketId,
-              lotteryPrice: userTotalLoss[userId]  
-          });
-          console.log(`Response for user ${userId}:`, response.data);
+        const response = await axios.post(`${baseURL}/api/users/remove-exposer`, {
+          userId,
+          marketId,
+          lotteryPrice: userTotalLoss[userId]
+        });
+        console.log(`Response for user ${userId}:`, response.data);
       } catch (error) {
-          console.error(`Error updating balance for user ${userId}:`, error.response?.data || error.message);
+        console.error(`Error updating balance for user ${userId}:`, error.response?.data || error.message);
       }
     }
 
@@ -501,50 +501,50 @@ export const ResultDeclare = async (req, res) => {
       { where: { marketId } }
     );
 
-        // Notification 
-        const [allUsers] = await sql.execute(`SELECT id, fcm_token, userName, userId 
+    // Notification 
+    const [allUsers] = await sql.execute(`SELECT id, fcm_token, userName, userId 
           FROM colorgame_refactor.user 
           WHERE isActive = true AND fcm_token IS NOT NULL`
-        );
-    
-        const notificationService = new NotificationService();
-    
-        for (const user of allUsers) {
-          if (user.fcm_token) {
-            let title
-            let message
-    
+    );
+
+    const notificationService = new NotificationService();
+
+    for (const user of allUsers) {
+      if (user.fcm_token) {
+        let title
+        let message
+
         title = `🏁 Results Declared: ${market.marketName}`;
         message = `The final results for "${market.marketName}" have been declared. Check now to see if you've secured a win!`;
 
-    
-            await notificationService.sendNotification(
-              title,
-              message,
-              {
-                type: "lottery",
-                marketId: marketId.toString(),
-                userId: user.userId.toString(),
-              },
-              user.fcm_token
-            );
+
+        await notificationService.sendNotification(
+          title,
+          message,
+          {
+            type: "lottery",
+            marketId: marketId.toString(),
+            userId: user.userId.toString(),
+          },
+          user.fcm_token
+        );
 
         await sql.query(
           `INSERT INTO colorgame_refactor.Notifications (UserId, MarketId, message, type)
          VALUES (?, ?, ?, ?)`,
-         [user.userId, market.marketId, message, "lottery"]
+          [user.userId, market.marketId, message, "lottery"]
         );
       }
     }
 
     await deleteLotteryFromFirebase(marketId);
 
-    const combineResult = { 
-        savedResults, 
-        winningTickets, 
-        losingTickets 
-      }
-      
+    const combineResult = {
+      savedResults,
+      winningTickets,
+      losingTickets
+    }
+
     return apiResponseSuccess(
       combineResult,
       true,
@@ -661,10 +661,10 @@ export const subadminResultRequest = async (req, res) => {
 
     const rejectedSubadmins = await WinResultRequest.findAll({
       attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("adminId")), "adminId"]],
-      where: { 
-        marketId, 
+      where: {
+        marketId,
         isReject: true,
-        status : 'Reject',
+        status: 'Reject',
       },
       raw: true,
     });
@@ -683,10 +683,10 @@ export const subadminResultRequest = async (req, res) => {
 
     const existingMarket = await WinResultRequest.findAll({
       attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("adminId")), "adminId"]],
-      where: { 
-        marketId, 
-        isApproved: false, 
-        isReject: false 
+      where: {
+        marketId,
+        isApproved: false,
+        isReject: false
       },
       raw: true,
     });
@@ -802,8 +802,10 @@ export const subadminResultRequest = async (req, res) => {
       }
 
       const existingResults = await WinResultRequest.findAll({
-        where: { prizeCategory, marketId, adminId, isReject: false,
-          isApproved: false },
+        where: {
+          prizeCategory, marketId, adminId, isReject: false,
+          isApproved: false
+        },
       });
 
       if (existingResults.length >= prizeLimits[prizeCategory]) {
@@ -959,7 +961,7 @@ export const subadminResultRequest = async (req, res) => {
       savedResults = await WinResultRequest.bulkCreate(generatedTickets);
 
       const existingAdminIds = await WinResultRequest.findAll({
-        where: { marketId, isReject: false, isApproved: false  },
+        where: { marketId, isReject: false, isApproved: false },
         attributes: [
           "adminId",
           "marketId",
@@ -1036,7 +1038,7 @@ export const subadminResultRequest = async (req, res) => {
       if (matchedAdminIds.size > 0) {
         await WinResultRequest.update(
           { type: "Matched" },
-          { where: { adminId: Array.from(matchedAdminIds), marketId, status: 'Pending'} }
+          { where: { adminId: Array.from(matchedAdminIds), marketId, status: 'Pending' } }
         );
       }
 
