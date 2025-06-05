@@ -514,7 +514,7 @@ export const ResultDeclare = async (req, res) => {
             let title
             let message
     
-        title = `Results Declared: ${market.marketName}`;
+        title = `🏁 Results Declared: ${market.marketName}`;
         message = `The final results for "${market.marketName}" have been declared. Check now to see if you've secured a win!`;
 
     
@@ -530,25 +530,10 @@ export const ResultDeclare = async (req, res) => {
             );
 
         await sql.query(
-          `INSERT INTO Notifications (UserId, MarketId, message, type)
-         VALUES (:userId, :marketId, :message, :type)`,
-          {
-            replacements: {
-              userId: user.userId,
-              marketId,
-              message,
-              type: 'lottery',
-            },
-          }
+          `INSERT INTO colorgame_refactor.Notifications (UserId, MarketId, message, type)
+         VALUES (?, ?, ?, ?)`,
+         [user.userId, market.marketId, message, "lottery"]
         );
-
-
-        await Notification.create({
-          UserId: user.userId,
-          MarketId: marketId,
-          message,
-          type: "lottery",
-        });
       }
     }
 
