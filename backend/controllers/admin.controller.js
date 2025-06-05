@@ -2951,3 +2951,52 @@ export const subAdminResultStatus = async (req, res) => {
     );
   }
 };
+
+
+export const createTitleTextNotification = async (req, res) => {
+  try {
+    const { message, title } = req.body;
+
+    const [allUsers] = await sql.execute(`SELECT id, fcm_token, userName, userId 
+      FROM colorgame_refactor.user 
+      WHERE isActive = true AND fcm_token IS NOT NULL`
+    );
+
+    const notificationService = new NotificationService();
+    const createdNotifications = [];
+
+    for (const user of allUsers) {
+      if (user.fcm_token) {
+        await notificationService.sendNotification(
+          title,
+          message,
+          { userId: user.userId.toString() },
+          user.fcm_token
+        );
+
+        const newNotif = await sql.execute(
+          `INSERT INTO colorgame_refactor.notification (UserId, message)
+                   VALUES (?, ?)`,
+          [user.userId, message,]
+        );
+
+        createdNotifications.push(newNotif);
+      }
+    }
+
+    return res.status(statusCode.create).send(
+      apiResponseSuccess(
+        createdNotifications,
+        true,
+        statusCode.create,
+        "Notifications created with title and message."
+      )
+    );
+
+  } catch (error) {
+    console.error("Error in createTitleTextNotification:", error);
+    return res.status(statusCode.internalServerError).send(
+      apiResponseErr(null, false, statusCode.internalServerError, error.message)
+    );
+  }
+};

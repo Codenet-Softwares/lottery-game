@@ -628,3 +628,17 @@ export const validateAdminApproveReject = [
     .withMessage("Invalid marketId. It should be a valid UUID."),
     body('type').trim().notEmpty().withMessage('Type is required'),
 ];
+
+export const validateTitleText = [
+  body('title')
+    .notEmpty()
+    .withMessage('Title is required')
+    .isString()
+    .withMessage('Title must be a string'),
+
+  body('message')
+    .notEmpty()
+    .withMessage('Message is required')
+    .isString()
+    .withMessage('Message must be a string'),
+];

@@ -7,6 +7,7 @@ import {
   afteWinMarkets,
   createAdmin,
   createSubAdmin,
+  createTitleTextNotification,
   dateWiseMarkets,
   deleteSubAdmin,
   getAllMarkets,
@@ -52,6 +53,7 @@ import {
   validateAdminApproveReject,
   resetPasswordSchema,
   validateDeleteSubAdmin,
+  validateTitleText,
 } from "../utils/commonSchema.js";
 import customErrorHandler from "../utils/customErrorHandler.js";
 import { apiResponseErr, apiResponseSuccess } from "../utils/response.js";
@@ -262,4 +264,6 @@ export const adminRoutes = (app) => {
     authorize([string.SubAdmin], [string.resultView]),
     subAdminResultStatus
   );
+
+  app.post('/api/create-notification-lottery', validateTitleText, customErrorHandler, authorize([string.Admin]), createTitleTextNotification);
 };
