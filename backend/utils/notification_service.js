@@ -1,6 +1,5 @@
 import { initializeApp, getApps } from "firebase-admin/app";
 import { getMessaging } from "firebase-admin/messaging";
-import userSchema from "../models/user.model.js";
 import { sql } from "../config/db.js";
 
 export default class NotificationService {

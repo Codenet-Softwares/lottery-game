@@ -22,7 +22,6 @@ import WinResultRequest from "../models/winresultRequestModel.js";
 import { string } from "../constructor/string.js";
 import { db } from "../config/firebase.js";
 import NotificationService from "../utils/notification_service.js";
-import Notification from "../models/notification.model.js";
 dotenv.config();
 
 export const createAdmin = async (req, res) => {
