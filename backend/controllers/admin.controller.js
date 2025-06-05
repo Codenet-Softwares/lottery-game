@@ -21,6 +21,8 @@ import WinResultRequest from "../models/winresultRequestModel.js";
 
 import { string } from "../constructor/string.js";
 import { db } from "../config/firebase.js";
+import NotificationService from "../utils/notification_service.js";
+import Notification from "../models/notification.model.js";
 dotenv.config();
 
 export const createAdmin = async (req, res) => {
@@ -873,8 +875,9 @@ export const updateMarketStatus = async (req, res) => {
   try {
     const { status, marketId } = req.body;
 
-    console.log("status......................", status);
-    console.log("marketId......................", marketId);
+    const existingMarket = await TicketRange.findOne({
+      where: { marketId }
+    })
 
     // Validate that status is boolean and marketId exists
     if (typeof status !== "boolean" || !marketId) {
@@ -916,6 +919,42 @@ export const updateMarketStatus = async (req, res) => {
       { merge: true }
     );
 
+    // Notification 
+    const [allUsers] = await sql.execute(`SELECT id, fcm_token, userName, userId 
+      FROM colorgame_refactor.user 
+      WHERE isActive = true AND fcm_token IS NOT NULL`
+    );
+
+    const notificationService = new NotificationService();
+
+    for (const user of allUsers) {
+      if (user.fcm_token) {
+        let title
+        let message
+
+        title = `Market Live: ${existingMarket.marketName}`;
+        message = `The market "${existingMarket.marketName}" is now live. Start playing now!`;
+
+        await notificationService.sendNotification(
+          title,
+          message,
+          {
+            type: "lottery",
+            marketId: marketId.toString(),
+            userId: user.userId.toString(),
+          },
+          user.fcm_token
+        );
+
+        await Notification.create({
+          UserId: user.userId,
+          MarketId: marketId,
+          message,
+          type: "lottery",
+        });
+      }
+    }
+
     return apiResponseSuccess(
       status,
       true,
@@ -935,9 +974,13 @@ export const updateMarketStatus = async (req, res) => {
 };
 
 export const inactiveMarketStatus = async (req, res) => {
-  const { marketId } = req.body;
-
   try {
+    const { marketId } = req.body;
+
+    const existingMarket = await TicketRange.findOne({
+      where: { marketId }
+    })
+
     const [updatedCount] = await TicketRange.update(
       {
         //isActive: false,
@@ -954,6 +997,43 @@ export const inactiveMarketStatus = async (req, res) => {
       },
       { merge: true }
     );
+
+    // Notification 
+    const [allUsers] = await sql.execute(`SELECT id, fcm_token, userName, userId 
+  FROM colorgame_refactor.user 
+  WHERE isActive = true AND fcm_token IS NOT NULL`
+    );
+
+    const notificationService = new NotificationService();
+
+    for (const user of allUsers) {
+      if (user.fcm_token) {
+        let title
+        let message
+
+        title = `Market Closed: ${existingMarket.marketName}`;
+        message = `The market "${existingMarket.marketName}" has been closed. Stay tuned for updates.`;
+
+        await notificationService.sendNotification(
+          title,
+          message,
+          {
+            type: "lottery",
+            marketId: marketId.toString(),
+            userId: user.userId.toString(),
+          },
+          user.fcm_token
+        );
+
+        await Notification.create({
+          UserId: user.userId,
+          MarketId: marketId,
+          message,
+          type: "lottery",
+        });
+      }
+    }
+
     if (updatedCount === 0) {
       return apiResponseErr(
         null,
@@ -971,6 +1051,7 @@ export const inactiveMarketStatus = async (req, res) => {
         res
       );
     }
+
   } catch (error) {
     return apiResponseErr(
       null,
@@ -1732,9 +1813,9 @@ export const getMatchData = async (req, res) => {
 
         const unmatchedSubPrizes = hasUnmatchedSubPrizes
           ? prize.SubPrizes.map((sp) => ({
-              prizeName: sp.prizeName,
-              DeclaredPrizes: sp.DeclaredPrizes,
-            }))
+            prizeName: sp.prizeName,
+            DeclaredPrizes: sp.DeclaredPrizes,
+          }))
           : [];
 
         if (
@@ -2389,9 +2470,9 @@ export const subAdminResultStatus = async (req, res) => {
 
           const unmatchedSubPrizes = hasUnmatchedSubPrizes
             ? prize.SubPrizes.map((sp) => ({
-                prizeName: sp.prizeName,
-                DeclaredPrizes: sp.DeclaredPrizes,
-              }))
+              prizeName: sp.prizeName,
+              DeclaredPrizes: sp.DeclaredPrizes,
+            }))
             : [];
 
           if (
@@ -2450,21 +2531,21 @@ export const subAdminResultStatus = async (req, res) => {
       structuredResults.matchedEnteries.forEach((entry) => {
         const filteredDeclaredPrizes = entry.DeclaredPrizes
           ? Object.fromEntries(
-              Object.entries(entry.DeclaredPrizes).filter(([key]) =>
-                declarersForTargetAdmin.includes(key)
-              )
+            Object.entries(entry.DeclaredPrizes).filter(([key]) =>
+              declarersForTargetAdmin.includes(key)
             )
+          )
           : null;
 
         const filteredSubPrizes = entry.SubPrizes
           ? entry.SubPrizes.map((sp) => ({
-              prizeName: sp.prizeName,
-              DeclaredPrizes: Object.fromEntries(
-                Object.entries(sp.DeclaredPrizes).filter(([key]) =>
-                  declarersForTargetAdmin.includes(key)
-                )
-              ),
-            })).filter((sp) => Object.keys(sp.DeclaredPrizes).length > 0)
+            prizeName: sp.prizeName,
+            DeclaredPrizes: Object.fromEntries(
+              Object.entries(sp.DeclaredPrizes).filter(([key]) =>
+                declarersForTargetAdmin.includes(key)
+              )
+            ),
+          })).filter((sp) => Object.keys(sp.DeclaredPrizes).length > 0)
           : [];
 
         if (
@@ -2485,27 +2566,27 @@ export const subAdminResultStatus = async (req, res) => {
       structuredResults.UnmatchedEntries.forEach((entry) => {
         const filteredDeclaredPrizes = entry.DeclaredPrizes
           ? Object.fromEntries(
-              Object.entries(entry.DeclaredPrizes).filter(([key]) =>
-                declarersForTargetAdmin.includes(key)
-              )
+            Object.entries(entry.DeclaredPrizes).filter(([key]) =>
+              declarersForTargetAdmin.includes(key)
             )
+          )
           : null;
 
         const filteredTickets = entry.Tickets
           ? entry.Tickets.filter((t) =>
-              declarersForTargetAdmin.includes(t.declaredBy)
-            )
+            declarersForTargetAdmin.includes(t.declaredBy)
+          )
           : [];
 
         const filteredSubPrizes = entry.SubPrizes
           ? entry.SubPrizes.map((sp) => ({
-              prizeName: sp.prizeName,
-              DeclaredPrizes: Object.fromEntries(
-                Object.entries(sp.DeclaredPrizes).filter(([key]) =>
-                  declarersForTargetAdmin.includes(key)
-                )
-              ),
-            })).filter((sp) => Object.keys(sp.DeclaredPrizes).length > 0)
+            prizeName: sp.prizeName,
+            DeclaredPrizes: Object.fromEntries(
+              Object.entries(sp.DeclaredPrizes).filter(([key]) =>
+                declarersForTargetAdmin.includes(key)
+              )
+            ),
+          })).filter((sp) => Object.keys(sp.DeclaredPrizes).length > 0)
           : [];
 
         if (
@@ -2649,9 +2730,9 @@ export const subAdminResultStatus = async (req, res) => {
 
           const unmatchedSubPrizes = hasUnmatchedSubPrizes
             ? prize.SubPrizes.map((sp) => ({
-                prizeName: sp.prizeName,
-                DeclaredPrizes: sp.DeclaredPrizes,
-              }))
+              prizeName: sp.prizeName,
+              DeclaredPrizes: sp.DeclaredPrizes,
+            }))
             : [];
 
           if (
@@ -2710,21 +2791,21 @@ export const subAdminResultStatus = async (req, res) => {
       structuredResults.matchedEnteries.forEach((entry) => {
         const filteredDeclaredPrizes = entry.DeclaredPrizes
           ? Object.fromEntries(
-              Object.entries(entry.DeclaredPrizes).filter(([key]) =>
-                declarersForTargetAdmin.includes(key)
-              )
+            Object.entries(entry.DeclaredPrizes).filter(([key]) =>
+              declarersForTargetAdmin.includes(key)
             )
+          )
           : null;
 
         const filteredSubPrizes = entry.SubPrizes
           ? entry.SubPrizes.map((sp) => ({
-              prizeName: sp.prizeName,
-              DeclaredPrizes: Object.fromEntries(
-                Object.entries(sp.DeclaredPrizes).filter(([key]) =>
-                  declarersForTargetAdmin.includes(key)
-                )
-              ),
-            })).filter((sp) => Object.keys(sp.DeclaredPrizes).length > 0)
+            prizeName: sp.prizeName,
+            DeclaredPrizes: Object.fromEntries(
+              Object.entries(sp.DeclaredPrizes).filter(([key]) =>
+                declarersForTargetAdmin.includes(key)
+              )
+            ),
+          })).filter((sp) => Object.keys(sp.DeclaredPrizes).length > 0)
           : [];
 
         if (
@@ -2745,27 +2826,27 @@ export const subAdminResultStatus = async (req, res) => {
       structuredResults.UnmatchedEntries.forEach((entry) => {
         const filteredDeclaredPrizes = entry.DeclaredPrizes
           ? Object.fromEntries(
-              Object.entries(entry.DeclaredPrizes).filter(([key]) =>
-                declarersForTargetAdmin.includes(key)
-              )
+            Object.entries(entry.DeclaredPrizes).filter(([key]) =>
+              declarersForTargetAdmin.includes(key)
             )
+          )
           : null;
 
         const filteredTickets = entry.Tickets
           ? entry.Tickets.filter((t) =>
-              declarersForTargetAdmin.includes(t.declaredBy)
-            )
+            declarersForTargetAdmin.includes(t.declaredBy)
+          )
           : [];
 
         const filteredSubPrizes = entry.SubPrizes
           ? entry.SubPrizes.map((sp) => ({
-              prizeName: sp.prizeName,
-              DeclaredPrizes: Object.fromEntries(
-                Object.entries(sp.DeclaredPrizes).filter(([key]) =>
-                  declarersForTargetAdmin.includes(key)
-                )
-              ),
-            })).filter((sp) => Object.keys(sp.DeclaredPrizes).length > 0)
+            prizeName: sp.prizeName,
+            DeclaredPrizes: Object.fromEntries(
+              Object.entries(sp.DeclaredPrizes).filter(([key]) =>
+                declarersForTargetAdmin.includes(key)
+              )
+            ),
+          })).filter((sp) => Object.keys(sp.DeclaredPrizes).length > 0)
           : [];
 
         if (
@@ -2791,74 +2872,74 @@ export const subAdminResultStatus = async (req, res) => {
         res
       );
     } else if (status === "Pending") {
-  const existingResults = await WinResultRequest.findAll({
-    where: { marketId, status },
-    order: [["createdAt", "DESC"]],
-  });
-
-  if (!existingResults || existingResults.length === 0) {
-    return apiResponseSuccess(
-      [],
-      true,
-      statusCode.success,
-      "No Data found!",
-      res
-    );
-  }
-
-  const { marketName, marketId: mId, adminId } = existingResults[0].dataValues;
-
-
-  const ticketsMap = new Map();
-
-  existingResults.forEach((result) => {
-    const {
-      prizeCategory,
-      ticketNumber,
-      prizeAmount,
-      complementaryPrize,
-    } = result.dataValues;
-
-    if (!ticketsMap.has(prizeCategory)) {
-      ticketsMap.set(prizeCategory, {
-        prizeName: prizeCategory,
-        tickets: [],
-        prizeAmount,
-        subPrizes: [],
+      const existingResults = await WinResultRequest.findAll({
+        where: { marketId, status },
+        order: [["createdAt", "DESC"]],
       });
-    }
 
-    const currentTickets = Array.isArray(ticketNumber) ? ticketNumber : [ticketNumber];
-    ticketsMap.get(prizeCategory).tickets.push(...currentTickets);
-  });
+      if (!existingResults || existingResults.length === 0) {
+        return apiResponseSuccess(
+          [],
+          true,
+          statusCode.success,
+          "No Data found!",
+          res
+        );
+      }
 
-  if (ticketsMap.has("First Prize")) {
-    const firstPrizeEntry = ticketsMap.get("First Prize");
-    const firstPrizeComplement = existingResults.find(
-      (res) => res.dataValues.prizeCategory === "First Prize"
-    ).dataValues.complementaryPrize;
+      const { marketName, marketId: mId, adminId } = existingResults[0].dataValues;
 
-    if (firstPrizeComplement && firstPrizeComplement > 0) {
-      firstPrizeEntry.subPrizes.push({
-        prizeName: "Complimentary Prize",
-        prizeAmount: firstPrizeComplement,
+
+      const ticketsMap = new Map();
+
+      existingResults.forEach((result) => {
+        const {
+          prizeCategory,
+          ticketNumber,
+          prizeAmount,
+          complementaryPrize,
+        } = result.dataValues;
+
+        if (!ticketsMap.has(prizeCategory)) {
+          ticketsMap.set(prizeCategory, {
+            prizeName: prizeCategory,
+            tickets: [],
+            prizeAmount,
+            subPrizes: [],
+          });
+        }
+
+        const currentTickets = Array.isArray(ticketNumber) ? ticketNumber : [ticketNumber];
+        ticketsMap.get(prizeCategory).tickets.push(...currentTickets);
       });
+
+      if (ticketsMap.has("First Prize")) {
+        const firstPrizeEntry = ticketsMap.get("First Prize");
+        const firstPrizeComplement = existingResults.find(
+          (res) => res.dataValues.prizeCategory === "First Prize"
+        ).dataValues.complementaryPrize;
+
+        if (firstPrizeComplement && firstPrizeComplement > 0) {
+          firstPrizeEntry.subPrizes.push({
+            prizeName: "Complimentary Prize",
+            prizeAmount: firstPrizeComplement,
+          });
+        }
+      }
+
+      const Tickets = Array.from(ticketsMap.values()).map((entry) => {
+        entry.tickets = [...new Set(entry.tickets)];
+        return entry;
+      });
+
+      const responseData = {
+        marketId: mId,
+        adminId,
+        Tickets,
+      };
+
+      return apiResponseSuccess(responseData, true, statusCode.success, "Data fetched!", res);
     }
-  }
-
-  const Tickets = Array.from(ticketsMap.values()).map((entry) => {
-    entry.tickets = [...new Set(entry.tickets)];
-    return entry;
-  });
-
-  const responseData = {
-    marketId: mId,
-    adminId,
-    Tickets,
-  };
-
-  return apiResponseSuccess(responseData, true, statusCode.success, "Data fetched!", res);
-}
 
 
   } catch (error) {
