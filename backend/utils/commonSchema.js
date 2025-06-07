@@ -642,3 +642,17 @@ export const validateTitleText = [
     .isString()
     .withMessage('Message must be a string'),
 ];
+
+export const validateHotGame = [
+  body('marketId')
+    .notEmpty()
+    .withMessage('Market ID is required')
+    .isUUID()
+    .withMessage('Market ID must be a valid UUID'),
+
+  body('status')
+    .notEmpty()
+    .withMessage('Status is required')
+    .isBoolean()
+    .withMessage('Status must be a boolean'),
+];

@@ -89,6 +89,10 @@ const TicketRange = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    hotGame: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     tableName: 'TicketRange',

@@ -22,6 +22,7 @@ import WinResultRequest from "../models/winresultRequestModel.js";
 import { string } from "../constructor/string.js";
 import { db } from "../config/firebase.js";
 import NotificationService from "../utils/notification_service.js";
+import { sql } from "../config/db.js";
 dotenv.config();
 
 export const createAdmin = async (req, res) => {
@@ -3000,3 +3001,45 @@ export const createTitleTextNotification = async (req, res) => {
     );
   }
 };
+
+
+export const updateHotGameStatus = async(req, res) => {
+  try {
+    const { marketId, status } = req.body;
+
+    const existingMarket = await TicketRange.findOne({
+      where: { marketId }
+    });
+
+    if (!existingMarket) {
+       return apiResponseSuccess([], true, statusCode.success, "Data not found!", res);
+    }
+
+    const updatedMarket = await TicketRange.update(
+      { hotGame: status },
+      { where: { marketId } }
+    ); 
+
+    if (updatedMarket[0] === 0) {
+       return apiResponseSuccess([], true, statusCode.success, "No changes made to the market.", res);
+    }
+
+    return apiResponseSuccess(
+      [],
+      true,
+      statusCode.success,
+      "Hot game status updated successfully.",
+      res
+    );
+
+  } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+
+}

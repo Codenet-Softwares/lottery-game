@@ -31,6 +31,7 @@ import {
   subAdminResetPassword,
   subAdminResultStatus,
   subAdminsResetPassword,
+  updateHotGameStatus,
   updateMarketStatus,
   winResultMarket,
 } from "../controllers/admin.controller.js";
@@ -54,6 +55,7 @@ import {
   resetPasswordSchema,
   validateDeleteSubAdmin,
   validateTitleText,
+  validateHotGame,
 } from "../utils/commonSchema.js";
 import customErrorHandler from "../utils/customErrorHandler.js";
 import { apiResponseErr, apiResponseSuccess } from "../utils/response.js";
@@ -266,4 +268,7 @@ export const adminRoutes = (app) => {
   );
 
   app.post('/api/create-notification-lottery', validateTitleText, customErrorHandler, authorize([string.Admin]), createTitleTextNotification);
-};
+
+  app.put('/api/update-hotGame-status', validateHotGame, customErrorHandler, authorize([string.Admin]), updateHotGameStatus);
+
+}

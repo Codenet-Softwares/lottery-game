@@ -358,6 +358,10 @@ export const getIsactiveMarket = async (req, res) => {
         res
       );
     }
+    
+    ticketData.sort((a, b) => {
+      return (b.hotGame === true) - (a.hotGame === true);
+    });
 
     return apiResponseSuccess(
       ticketData,
