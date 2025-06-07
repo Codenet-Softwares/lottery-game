@@ -26,6 +26,7 @@ import UpdateMarketModal from "./UpdateMarketModal";
 const MarketInsight = () => {
   const [marketTimes, setMarketTimes] = useState([]);
   const [selectedMarket, setSelectedMarket] = useState(null);
+  const [selectedHighlight, setSelectedHighlight] = useState(null);
   const [showStats, setShowStats] = useState(false);
   const [purchasedTickets, setPurchasedTickets] = useState([]);
   const { showLoader, hideLoader } = useAppContext();
@@ -194,7 +195,7 @@ const MarketInsight = () => {
   const handleHotHighlightToggle = async () => {
     if (!selectedMarket) return;
 
-    const newStatus = !selectedMarket.hotHighlight;
+    const newStatus = !selectedMarket.hotGame; // Fix: use hotGame, not hotHighlight
 
     showLoader();
 
@@ -206,11 +207,21 @@ const MarketInsight = () => {
       true
     );
 
-    if (response && response.success) {
+    if (response?.success && response.data) {
       setSelectedMarket((prev) => ({
         ...prev,
-        hotHighlight: newStatus,
+        hotGame: newStatus, // Fix here
       }));
+
+      // Update list as well
+      setMarketTimes((prevMarkets) =>
+        prevMarkets.map((market) =>
+          market.marketId === selectedMarket.marketId
+            ? { ...market, hotGame: newStatus }
+            : market
+        )
+      );
+
       setRefresh((prev) => !prev);
     }
 
@@ -308,17 +319,15 @@ const MarketInsight = () => {
                     htmlFor="flexSwitchHotHighlight"
                     style={{ minWidth: "100px", textAlign: "right" }}
                   >
-                    {selectedMarket.hotHighlight
-                      ? "Highlight On"
-                      : "Highlight Off"}
+                   {selectedMarket.hotGame ? "Highlight On" : "Highlight Off"}
                   </label>
                   <div className="form-check form-switch m-0">
                     <input
                       className="form-check-input"
                       type="checkbox"
                       id="flexSwitchHotHighlight"
-                      checked={selectedMarket.hotHighlight}
-                      onChange={handleHotHighlightToggle}
+                      checked={selectedMarket.hotGame} // Fix here
+                      onChange={handleHotHighlightToggle} // Already correct
                       style={{ cursor: "pointer" }}
                     />
                   </div>
