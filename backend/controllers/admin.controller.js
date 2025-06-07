@@ -3045,6 +3045,16 @@ export const updateHotGameStatus = async (req, res) => {
       );
     }
 
+
+     const marketRef = db.collection("lottery-db").doc(String(marketId));
+    await marketRef.set(
+      {
+        updatedAt: new Date().toISOString(),
+        hotGame: status,
+      },
+      { merge: true }
+    );
+
     return apiResponseSuccess(
       [],
       true,
