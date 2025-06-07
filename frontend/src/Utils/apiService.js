@@ -805,3 +805,16 @@ export async function GetResultMarketSub(body = {}, isToast = false) {
   }
 }
 
+
+
+
+export async function updateHotHighlightStatus (body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.PUT, body, isToast);
+    const response = await makeCall(`${urls.updateHotHighlightStatus}`, callParams);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
