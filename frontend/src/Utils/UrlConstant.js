@@ -63,6 +63,7 @@ class UrlConstant {
   ViewSubAdminsTicket=`${this.url_dev}/${this.subadmin}/result-status`;
   SubMarkets=`${this.url_dev}/${this.subadmin}/dateWise-markets`;
   SubAdmninDelete = `${this.url_dev}/subAdmin-delete`;
+  updateHotHighlightStatus = `${this.url_dev}/update-hotGame-status`
 }
 
 const urls = new UrlConstant();
