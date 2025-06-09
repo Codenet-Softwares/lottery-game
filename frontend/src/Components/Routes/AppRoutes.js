@@ -30,7 +30,7 @@ import SubAdminWinResult from "../SubAdmin-WinResult/SubAdminWinResult";
 import SubAdminReset from "../SubAdminResetPassword/SubAdminReset";
 import DemoMap from "../demoMap";
 import SearchCreatedLotto from "../SearchNew/SearchCreatedLotto";
-
+import LotteryNotificationCreator from "../pushNotifications/LotteryNotificationCreator";
 
 const AppRoutes = () => {
   return (
@@ -49,7 +49,10 @@ const AppRoutes = () => {
       />
       <BrowserRouter>
         <Routes>
-        <Route path="/subAdmin-reset-password" element={<SubAdminReset/>}></Route>
+          <Route
+            path="/subAdmin-reset-password"
+            element={<SubAdminReset />}
+          ></Route>
 
           <Route path="/" element={<Login />}></Route>
           <Route path="/login" element={<Login />}></Route>
@@ -75,7 +78,7 @@ const AppRoutes = () => {
 
             <Route path="/win" element={<Win />} />
             <Route path="/search-lottery" element={<SearchLottery />} />
-            <Route path="/search-lotto" element={<SearchCreatedLotto/>} />
+            <Route path="/search-lotto" element={<SearchCreatedLotto />} />
             <Route path="/get-void-market" element={<Void />} />
 
             <Route path="/inactive" element={<Inactive />} />
@@ -89,10 +92,19 @@ const AppRoutes = () => {
             <Route path="/bet-tracker/:marketId?" element={<BetAfterWin />} />
             <Route path="/view-all-subadmin" element={<ViewAllSubadmin />} />
             <Route path="/subAdminData" element={<WinResult />} />
-            <Route path="/subAdmin-win-result/:marketId" element={<SubAdminWinResult />} />
-            <Route path="/subAdmin-win-result" element={<SubAdminWinResult/>} />
-            <Route path="/demo" element={<DemoMap/>} />
-           
+            <Route
+              path="/subAdmin-win-result/:marketId"
+              element={<SubAdminWinResult />}
+            />
+            <Route
+              path="/subAdmin-win-result"
+              element={<SubAdminWinResult />}
+            />
+            <Route
+              path="/lottery-notification"
+              element={<LotteryNotificationCreator />}
+            />
+            <Route path="/demo" element={<DemoMap />} />
           </Route>
           {/* not found */}
           <Route path="*" element={<NotFound />} />
