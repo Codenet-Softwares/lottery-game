@@ -2999,11 +2999,22 @@ export const createTitleTextNotification = async (req, res) => {
           user.fcm_token
         );
 
-        const newNotif = await sql.execute(
+        await sql.execute(
           `INSERT INTO colorgame_refactor.Notifications (UserId, message, type, createdAt, updatedAt)
                    VALUES (?, ?, ?, NOW(), NOW())`,
           [user.userId, message, "lottery"]
         );
+
+        const marketRef = db.collection("lottery-notification").doc(String(user.userId));
+    await marketRef.set(
+      {
+        updatedAt: new Date().toISOString(),
+        UserId: user.userId,
+        message: message,
+        type: "lottery",
+      },
+      { merge: true }
+    );
       }
     }
 
