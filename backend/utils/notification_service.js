@@ -1,7 +1,7 @@
 import { initializeApp, getApps } from "firebase-admin/app";
 import { getMessaging } from "firebase-admin/messaging";
 import userSchema from "../models/user.model.js";
-import serviceAccount from "../lottery-firebase.json" with { type: "json" };
+import serviceAccount from "../cg-firebase.json" assert { type: "json" };
 
 export default class NotificationService {
   static FIREBASE_APP = null;
@@ -55,7 +55,7 @@ export default class NotificationService {
     }
   }
 
-  async deleteFcmToken(fcm_token) {
+  static async deleteFcmToken(fcm_token) {
     try {
       const user = await userSchema.findOne({
         where: {
