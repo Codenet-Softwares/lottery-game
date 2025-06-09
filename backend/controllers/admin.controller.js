@@ -950,6 +950,19 @@ export const updateMarketStatus = async (req, res) => {
        VALUES (?, ?, ?, ?, NOW(), NOW())`,
           [user.userId, marketId, message, "lottery"]
         );
+
+        const marketRef = db.collection("lottery-notification").doc(String(user.userId));
+    await marketRef.set(
+      {
+        updatedAt: new Date().toISOString(),
+        UserId: user.userId,
+        marketId: marketId,
+        message: message,
+        type: "lottery",
+      },
+      { merge: true }
+    );
+
       }
     }
 
@@ -1025,6 +1038,18 @@ export const inactiveMarketStatus = async (req, res) => {
           `INSERT INTO colorgame_refactor.Notifications (UserId, MarketId, message, type, createdAt, updatedAt)
        VALUES (?, ?, ?, ?, NOW(), NOW())`,
           [user.userId, marketId, message, "lottery"]
+        );
+
+        const marketRef = db.collection("lottery-notification").doc(String(user.userId));
+        await marketRef.set(
+          {
+            updatedAt: new Date().toISOString(),
+            UserId: user.userId,
+            marketId: marketId,
+            message: message,
+            type: "lottery",
+          },
+          { merge: true }
         );
       }
     }

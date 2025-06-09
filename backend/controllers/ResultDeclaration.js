@@ -507,7 +507,6 @@ export const ResultDeclare = async (req, res) => {
           WHERE isActive = true AND fcm_token IS NOT NULL`
     );
 
-    const notificationService = new NotificationService();
 
     for (const user of allUsers) {
       if (user.fcm_token) {
@@ -534,6 +533,18 @@ export const ResultDeclare = async (req, res) => {
          VALUES (?, ?, ?, ?)`,
           [user.userId, market.marketId, message, "lottery"]
         );
+
+         const marketRef = db.collection("lottery-notification").doc(String(user.userId));
+            await marketRef.set(
+              {
+                updatedAt: new Date().toISOString(),
+                UserId: user.userId,
+                marketId: market.marketId,
+                message: message,
+                type: "lottery",
+              },
+              { merge: true }
+            );
       }
     }
 
