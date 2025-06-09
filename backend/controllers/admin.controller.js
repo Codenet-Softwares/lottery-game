@@ -925,7 +925,6 @@ export const updateMarketStatus = async (req, res) => {
       FROM colorgame_refactor.user 
       WHERE isActive = true AND fcm_token IS NOT NULL`);
 
-    const notificationService = new NotificationService();
 
     for (const user of allUsers) {
       if (user.fcm_token) {
@@ -935,7 +934,7 @@ export const updateMarketStatus = async (req, res) => {
         title = `Market Live: ${existingMarket.marketName}`;
         message = `The market "${existingMarket.marketName}" is now live. Start playing now!`;
 
-        await notificationService.sendNotification(
+        await NotificationService.sendNotification(
           title,
           message,
           {
@@ -1003,7 +1002,6 @@ export const inactiveMarketStatus = async (req, res) => {
   WHERE isActive = true AND fcm_token IS NOT NULL
 `);
 
-    const notificationService = new NotificationService();
 
     for (const user of allUsers) {
       if (user.fcm_token) {
@@ -1011,7 +1009,7 @@ export const inactiveMarketStatus = async (req, res) => {
         const message = `The market "${existingMarket.marketName}" has been closed. Stay tuned for updates.`;
 
         // Send push notification
-        await notificationService.sendNotification(
+        await NotificationService.sendNotification(
           title,
           message,
           {
@@ -2965,12 +2963,11 @@ export const createTitleTextNotification = async (req, res) => {
       FROM colorgame_refactor.user 
       WHERE isActive = true AND fcm_token IS NOT NULL`);
 
-    const notificationService = new NotificationService();
     const createdNotifications = [];
 
     for (const user of allUsers) {
       if (user.fcm_token) {
-        await notificationService.sendNotification(
+        await NotificationService.sendNotification(
           title,
           message,
           { userId: user.userId.toString() },

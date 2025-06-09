@@ -1,4 +1,4 @@
-import { getBetHistoryP_L, getLiveMarkets, getLotteryBetHistory, lotteryMarketAnalysis } from "../controllers/externalApis.js";
+import { getBetHistoryP_L, getInPlayMarket, getLiveMarkets, getLotteryBetHistory, lotteryMarketAnalysis } from "../controllers/externalApis.js";
 
 export const ExternalApiModule = (app) => {
     app.post('/api/lottery-external-bet-history', getLotteryBetHistory);
@@ -7,6 +7,8 @@ export const ExternalApiModule = (app) => {
 
     app.post('/api/lottery-external-betHistory-profitLoss', getBetHistoryP_L);
 
-    app.get('/api/get-live-markets', getLiveMarkets)
+    app.get('/api/get-live-markets', getLiveMarkets);
+
+    app.get('/api/user/in-play-market', getInPlayMarket);
 
 }

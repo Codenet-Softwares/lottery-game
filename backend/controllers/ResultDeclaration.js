@@ -518,7 +518,7 @@ export const ResultDeclare = async (req, res) => {
         message = `The final results for "${market.marketName}" have been declared. Check now to see if you've secured a win!`;
 
 
-        await notificationService.sendNotification(
+        await NotificationService.sendNotification(
           title,
           message,
           {
