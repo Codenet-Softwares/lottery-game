@@ -349,7 +349,6 @@ export const getIsactiveMarket = async (req, res) => {
         // isActive: true,
         inactiveGame: true
       },
-      order: [["createdAt", "DESC"]],
     });
     if (!ticketData) {
       return apiResponseErr(
