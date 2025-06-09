@@ -818,3 +818,21 @@ export async function updateHotHighlightStatus (body = {}, isToast = false) {
   }
 }
 
+
+
+
+
+
+
+export async function createLotteryNotification(body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.POST, body, isToast);
+    const response = await makeCall(
+      urls.createLotteryNotification,
+      callParams
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}

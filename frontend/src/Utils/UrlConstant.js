@@ -1,12 +1,12 @@
 class UrlConstant {
-  constructor() { }
+  constructor() {}
   //url was commented
 
   url_dev = process.env.REACT_APP_API_URL;
 
   admin = "admin";
   login = `${this.url_dev}/login`;
-  subadmin = "subadmin"
+  subadmin = "subadmin";
   generateTicketId = `${this.url_dev}/ticket-create`;
   generateLottery = `${this.url_dev}/create-lottery`;
   getLotteryTicket = `${this.url_dev}/getAllLotteries`;
@@ -42,7 +42,7 @@ class UrlConstant {
   DeletedLiveBetsMarkets = `${this.url_dev}/get-trash-market`;
   LiveBetsMarketsDetailsDeleted = `${this.url_dev}/get-trash-bet`;
   TrashMarketDetailsDelete = `${this.url_dev}/delete-trash`;
-  RevokeDelete = `${this.url_dev}/revoke-live-market`;;
+  RevokeDelete = `${this.url_dev}/revoke-live-market`;
   resetPasswordAdmin = `${this.url_dev}/${this.admin}/reset-password`;
   UpdateDetails = `${this.url_dev}/${this.admin}/update-market`;
   subAdminCreate = `${this.url_dev}/${this.admin}/create-subAdmin`;
@@ -55,15 +55,17 @@ class UrlConstant {
   allLiveBetMarket = `${this.url_dev}/afterWin-lotteries`;
   DeleteLiveMarketBets = `${this.url_dev}/delete-Bet-afterWin-lottery`;
   getVoidBetMarket = `${this.url_dev}/void-market-afterWin-lottery`;
-  getUpdateInactive = `${this.url_dev}/update-inactive-market-status`
+  getUpdateInactive = `${this.url_dev}/update-inactive-market-status`;
   getSubAdminWinResult = `${this.url_dev}/subAdmin/get-subAdmin-history`;
-  GetResultSubAdmin =`${this.url_dev}/${this.subadmin}/get-result`;
-  subAdminResetPassword =`${this.url_dev}/${this.subadmin}-reset-password`
-  SubPasswordReset =`${this.url_dev}/${this.subadmin}/reset-password`;
-  ViewSubAdminsTicket=`${this.url_dev}/${this.subadmin}/result-status`;
-  SubMarkets=`${this.url_dev}/${this.subadmin}/dateWise-markets`;
+  GetResultSubAdmin = `${this.url_dev}/${this.subadmin}/get-result`;
+  subAdminResetPassword = `${this.url_dev}/${this.subadmin}-reset-password`;
+  SubPasswordReset = `${this.url_dev}/${this.subadmin}/reset-password`;
+  ViewSubAdminsTicket = `${this.url_dev}/${this.subadmin}/result-status`;
+  SubMarkets = `${this.url_dev}/${this.subadmin}/dateWise-markets`;
   SubAdmninDelete = `${this.url_dev}/subAdmin-delete`;
   updateHotHighlightStatus = `${this.url_dev}/update-hotGame-status`
+  createLotteryNotification = `${this.url_dev}/create-notification-lottery`;
+
 }
 
 const urls = new UrlConstant();

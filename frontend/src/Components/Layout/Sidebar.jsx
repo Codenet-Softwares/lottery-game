@@ -95,6 +95,18 @@ const Sidebar = () => {
         },
       ],
     },
+
+    {
+      label: "Notification",
+      icon: "fas fa-bell",
+      items: [
+        {
+          to: "/lottery-notification",
+          label: "Create notification",
+          permission: "",
+        },
+      ],
+    },
   ];
   const singleNavLink = [
     {
@@ -210,6 +222,27 @@ const Sidebar = () => {
                     <span>{singleNavLink[1].label}</span>
                   </Link>
                 )}
+
+              {/* {userRoles.includes("admin") && (
+                <div className="sidebar-dropdown">
+                  <div className="sidebar-link dropdown-toggle">
+                    <i className="fas fa-bell sidebar-icon"></i>
+                    <span>Notification</span>
+                  </div>
+                  <div className="dropdown-items">
+                    <Link
+                      to="/lottery-notification"
+                      className={`sidebar-link sub-item ${
+                        location.pathname === "/lottery-notification"
+                          ? "active"
+                          : ""
+                      }`}
+                    >
+                      <h6>Root Custom Notification</h6>
+                    </Link>
+                  </div>
+                </div>
+              )} */}
             </div>
           );
         })}
