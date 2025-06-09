@@ -7,6 +7,7 @@ import {
   apiResponseSuccess,
 } from "../utils/response.js";
 import { statusCode } from "../utils/statusCodes.js";
+import TicketRange from "../models/ticketRange.model.js";
 
 export const getLotteryBetHistory = async (req, res) => {
   try {
@@ -326,3 +327,41 @@ export const getLiveMarkets = async (req, res) => {
     );
   }
 };
+
+
+export const getInPlayMarket = async(req, res) => {
+  try {
+    const existingMarket = await TicketRange.findAll({
+      attributes:['gameName','marketId','marketName','isActive','inactiveGame','hotGame','start_Time','end_Time'],
+      where: { isActive: true, inactiveGame : true, isWin: false },
+      order: [["createdAt", "DESC"]],
+    });
+    if (!existingMarket || existingMarket.length === 0) {
+      return apiResponseSuccess(
+        [],
+        true,
+        statusCode.success,
+        "No in-play markets found",
+        res
+      );
+    }
+
+   return apiResponseSuccess(
+      existingMarket,
+      true,
+      statusCode.success,
+      "Success",
+      res
+    );
+
+  } catch (error) {
+     return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+
+}
