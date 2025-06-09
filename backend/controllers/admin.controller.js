@@ -2975,7 +2975,7 @@ export const createTitleTextNotification = async (req, res) => {
         );
 
         const newNotif = await sql.execute(
-          `INSERT INTO colorgame_refactor.notification (UserId, message)
+          `INSERT INTO colorgame_refactor.Notifications (UserId, message)
                    VALUES (?, ?)`,
           [user.userId, message]
         );
@@ -2984,28 +2984,21 @@ export const createTitleTextNotification = async (req, res) => {
       }
     }
 
-    return res
-      .status(statusCode.create)
-      .send(
-        apiResponseSuccess(
-          createdNotifications,
-          true,
-          statusCode.create,
-          "Notifications created with title and message."
-        )
-      );
+    return apiResponseSuccess(
+      createdNotifications,
+      true,
+      statusCode.success,
+      "Notification sent successfully!",
+      res
+    );
   } catch (error) {
-    console.error("Error in createTitleTextNotification:", error);
-    return res
-      .status(statusCode.internalServerError)
-      .send(
-        apiResponseErr(
-          null,
-          false,
-          statusCode.internalServerError,
-          error.message
-        )
-      );
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
   }
 };
 
