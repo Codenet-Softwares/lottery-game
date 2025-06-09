@@ -18,6 +18,7 @@ import {
   voidMarket,
   isActiveLottery,
   getUpdateMarket,
+  updateHotHighlightStatus,
 } from "../../Utils/apiService";
 import { useAppContext } from "../../contextApi/context";
 import { toast } from "react-toastify";
@@ -25,6 +26,7 @@ import UpdateMarketModal from "./UpdateMarketModal";
 const MarketInsight = () => {
   const [marketTimes, setMarketTimes] = useState([]);
   const [selectedMarket, setSelectedMarket] = useState(null);
+  const [selectedHighlight, setSelectedHighlight] = useState(null);
   const [showStats, setShowStats] = useState(false);
   const [purchasedTickets, setPurchasedTickets] = useState([]);
   const { showLoader, hideLoader } = useAppContext();
@@ -132,31 +134,33 @@ const MarketInsight = () => {
   };
   // This is the void api implementation
   const handleVoidMarket = async (marketId) => {
-  const confirmed = window.confirm("Are you sure you want to void this market?");
-  if (!confirmed) return;
-
-  showLoader();
-
-  const requestBody = { marketId };
-  const response = await voidMarket(requestBody);
-
-  if (response.success) {
-    // Remove the voided market from the marketTimes state
-    setMarketTimes((prevMarketTimes) =>
-      prevMarketTimes.filter((market) => market.marketId !== marketId)
+    const confirmed = window.confirm(
+      "Are you sure you want to void this market?"
     );
+    if (!confirmed) return;
 
-    if (selectedMarket?.marketId === marketId) {
-      setSelectedMarket(null);
-      setShowStats(false);
+    showLoader();
+
+    const requestBody = { marketId };
+    const response = await voidMarket(requestBody);
+
+    if (response.success) {
+      // Remove the voided market from the marketTimes state
+      setMarketTimes((prevMarketTimes) =>
+        prevMarketTimes.filter((market) => market.marketId !== marketId)
+      );
+
+      if (selectedMarket?.marketId === marketId) {
+        setSelectedMarket(null);
+        setShowStats(false);
+      }
+    } else {
+      // Optionally show an error message
+      // toast.error(response.message || "Failed to void market");
     }
-  } else {
-    // Optionally show an error message
-    // toast.error(response.message || "Failed to void market");
-  }
 
-  hideLoader();
-};
+    hideLoader();
+  };
   useEffect(() => {
     if (selectedMarket) {
       const fetchPurchasedTickets = async () => {
@@ -187,6 +191,43 @@ const MarketInsight = () => {
     console.log("Response:", response);
   };
 
+  // for the hot highlight
+  const handleHotHighlightToggle = async () => {
+    if (!selectedMarket) return;
+
+    const newStatus = !selectedMarket.hotGame; // Fix: use hotGame, not hotHighlight
+
+    showLoader();
+
+    const response = await updateHotHighlightStatus(
+      {
+        marketId: selectedMarket.marketId,
+        status: newStatus,
+      },
+      true
+    );
+
+    if (response?.success && response.data) {
+      setSelectedMarket((prev) => ({
+        ...prev,
+        hotGame: newStatus, // Fix here
+      }));
+
+      // Update list as well
+      setMarketTimes((prevMarkets) =>
+        prevMarkets.map((market) =>
+          market.marketId === selectedMarket.marketId
+            ? { ...market, hotGame: newStatus }
+            : market
+        )
+      );
+
+      setRefresh((prev) => !prev);
+    }
+
+    hideLoader();
+  };
+
   const handleMarketClick = (market) => {
     setSelectedMarket(market);
     setShowStats(true);
@@ -196,11 +237,7 @@ const MarketInsight = () => {
     <Container fluid className="alt-dashboard-container text-uppercase">
       {/* Sidebar */}
       <aside className="alt-sidebar p-4">
-        <h5
-          className="text-center text-dark fw-bolder"
-        >
-         LOTTERY MARKETS
-        </h5>
+        <h5 className="text-center text-dark fw-bolder">LOTTERY MARKETS</h5>
         <div className="market-card-grid">
           {marketTimes.length > 0 ? (
             marketTimes.map((market) => (
@@ -270,25 +307,53 @@ const MarketInsight = () => {
                 }}
                 onClick={() => openModal(selectedMarket)} // Open modal with market details
               ></i>
-              {/* Switch for Market Status Filter */}
-              <div className="d-flex justify-content-end mb-3">
-                <div className="form-check form-switch">
-                  <input
-                    className="form-check-input "
-                    type="checkbox"
-                    id="flexSwitchCheckActive"
-                    checked={selectedMarket.inactiveGame}
-                    onChange={() =>
-                      handleMarketStatusToggle(selectedMarket.inactiveGame)
-                    }
-                    style={{ cursor: "pointer" }}
-                  />
+
+              <div
+                className="d-flex flex-column align-items-end mb-3"
+                style={{ rowGap: "12px" }}
+              >
+                {/* Hot Highlight Switch */}
+                <div className="d-flex align-items-center gap-2">
                   <label
-                    className="form-check-label"
+                    className="form-check-label me-2 text-end"
+                    htmlFor="flexSwitchHotHighlight"
+                    style={{ minWidth: "100px", textAlign: "right" }}
+                  >
+                   {selectedMarket.hotGame ? "Highlight On" : "Highlight Off"}
+                  </label>
+                  <div className="form-check form-switch m-0">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="flexSwitchHotHighlight"
+                      checked={selectedMarket.hotGame} // Fix here
+                      onChange={handleHotHighlightToggle} // Already correct
+                      style={{ cursor: "pointer" }}
+                    />
+                  </div>
+                </div>
+
+                {/* Market Status Switch */}
+                <div className="d-flex align-items-center gap-2">
+                  <label
+                    className="form-check-label me-2 text-end"
                     htmlFor="flexSwitchCheckActive"
+                    style={{ minWidth: "100px", textAlign: "right" }}
                   >
                     {selectedMarket.inactiveGame ? "Active" : "Inactive"}
                   </label>
+                  <div className="form-check form-switch m-0">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="flexSwitchCheckActive"
+                      checked={selectedMarket.inactiveGame}
+                      onChange={() =>
+                        handleMarketStatusToggle(selectedMarket.inactiveGame)
+                      }
+                      style={{ cursor: "pointer" }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
