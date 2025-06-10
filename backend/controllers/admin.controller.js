@@ -945,24 +945,25 @@ export const updateMarketStatus = async (req, res) => {
           user.fcm_token
         );
 
-           await sql.execute(
+        await sql.execute(
           `INSERT INTO colorgame_refactor.Notifications (UserId, MarketId, message, type, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, NOW(), NOW())`,
-          [user.userId, marketId, message, "lottery"]
+       VALUES (?, ?, ?, ?, ?, ?)`,
+          [user.userId, marketId, message, "lottery", new Date(), new Date()]
         );
 
-        const marketRef = db.collection("lottery-notification").doc(String(user.userId));
-    await marketRef.set(
-      {
-        updatedAt: new Date().toISOString(),
-        UserId: user.userId,
-        marketId: marketId,
-        message: message,
-        type: "lottery",
-      },
-      { merge: true }
-    );
+               const notificationsRef = db
+          .collection("lottery-notification")
+          .doc(user.userId)
+          .collection("notifications");
 
+        await notificationsRef.add({
+          UserId: user.userId,
+          marketId: marketId,
+          message: message,
+          type: "Lottery",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
       }
     }
 
@@ -1036,21 +1037,23 @@ export const inactiveMarketStatus = async (req, res) => {
         // Insert notification into DB using raw SQL
         await sql.execute(
           `INSERT INTO colorgame_refactor.Notifications (UserId, MarketId, message, type, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, NOW(), NOW())`,
-          [user.userId, marketId, message, "lottery"]
+       VALUES (?, ?, ?, ?, ?, ?)`,
+          [user.userId, marketId, message, "lottery", new Date(), new Date()]
         );
 
-        const marketRef = db.collection("lottery-notification").doc(String(user.userId));
-        await marketRef.set(
-          {
-            updatedAt: new Date().toISOString(),
-            UserId: user.userId,
-            marketId: marketId,
-            message: message,
-            type: "lottery",
-          },
-          { merge: true }
-        );
+        const notificationsRef = db
+          .collection("lottery-notification")
+          .doc(user.userId)
+          .collection("notifications");
+
+        await notificationsRef.add({
+          UserId: user.userId,
+          marketId: marketId,
+          message: message,
+          type: "Lottery",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
       }
     }
 
@@ -3001,20 +3004,21 @@ export const createTitleTextNotification = async (req, res) => {
 
         await sql.execute(
           `INSERT INTO colorgame_refactor.Notifications (UserId, message, type, createdAt, updatedAt)
-                   VALUES (?, ?, ?, NOW(), NOW())`,
-          [user.userId, message, "lottery"]
+                   VALUES (?, ?, ?, ?, ?)`,
+          [user.userId, message, "lottery", new Date(), new Date()]
         );
+        const notificationsRef = db
+          .collection("lottery-notification")
+          .doc(user.userId)
+          .collection("notifications");
 
-        const marketRef = db.collection("lottery-notification").doc(String(user.userId));
-    await marketRef.set(
-      {
-        updatedAt: new Date().toISOString(),
-        UserId: user.userId,
-        message: message,
-        type: "lottery",
-      },
-      { merge: true }
-    );
+        await notificationsRef.add({
+          UserId: user.userId,
+          message: message,
+          type: "Lottery",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
       }
     }
 

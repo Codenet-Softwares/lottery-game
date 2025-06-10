@@ -510,12 +510,11 @@ export const ResultDeclare = async (req, res) => {
 
     for (const user of allUsers) {
       if (user.fcm_token) {
-        let title
-        let message
+        let title;
+        let message;
 
         title = `🏁 Results Declared: ${market.marketName}`;
         message = `The final results for "${market.marketName}" have been declared. Check now to see if you've secured a win!`;
-
 
         await NotificationService.sendNotification(
           title,
@@ -528,28 +527,26 @@ export const ResultDeclare = async (req, res) => {
           user.fcm_token
         );
 
-        const now = new Date();
-
         await sql.query(
           `INSERT INTO colorgame_refactor.Notifications 
    (UserId, MarketId, message, type, createdAt, updatedAt)
-   VALUES (?, ?, ?, ?, NOW(), NOW())`,
-          [user.userId, market.marketId, message, "lottery"]
+   VALUES (?, ?, ?, ?, ?, ?)`,
+          [user.userId, market.marketId, message, "lottery", new Date(), new Date()]
         );
 
-        const marketRef = db
+        const notificationsRef = db
           .collection("lottery-notification")
-          .doc(String(user.userId));
-        await marketRef.set(
-          {
-            updatedAt: new Date().toISOString(),
-            UserId: user.userId,
-            marketId: market.marketId,
-            message: message,
-            type: "lottery",
-          },
-          { merge: true }
-        );
+          .doc(user.userId)
+          .collection("notifications");
+
+        await notificationsRef.add({
+          UserId: user.userId,
+          marketId: market.marketId,
+          message: message,
+          type: "Lottery",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
       }
     }
 
