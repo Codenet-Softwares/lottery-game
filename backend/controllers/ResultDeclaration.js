@@ -528,23 +528,28 @@ export const ResultDeclare = async (req, res) => {
           user.fcm_token
         );
 
+        const now = new Date();
+
         await sql.query(
-          `INSERT INTO colorgame_refactor.Notifications (UserId, MarketId, message, type)
-         VALUES (?, ?, ?, ?)`,
+          `INSERT INTO colorgame_refactor.Notifications 
+   (UserId, MarketId, message, type, createdAt, updatedAt)
+   VALUES (?, ?, ?, ?, NOW(), NOW())`,
           [user.userId, market.marketId, message, "lottery"]
         );
 
-         const marketRef = db.collection("lottery-notification").doc(String(user.userId));
-            await marketRef.set(
-              {
-                updatedAt: new Date().toISOString(),
-                UserId: user.userId,
-                marketId: market.marketId,
-                message: message,
-                type: "lottery",
-              },
-              { merge: true }
-            );
+        const marketRef = db
+          .collection("lottery-notification")
+          .doc(String(user.userId));
+        await marketRef.set(
+          {
+            updatedAt: new Date().toISOString(),
+            UserId: user.userId,
+            marketId: market.marketId,
+            message: message,
+            type: "lottery",
+          },
+          { merge: true }
+        );
       }
     }
 
