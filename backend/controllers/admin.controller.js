@@ -3004,8 +3004,8 @@ export const createTitleTextNotification = async (req, res) => {
 
         await sql.execute(
           `INSERT INTO colorgame_refactor.Notifications (UserId, message, type, createdAt, updatedAt)
-                   VALUES (?, ?, ?, ?, ?)`,
-          [user.userId, message, "lottery", new Date(), new Date()]
+                   VALUES (?, ?, ?, NOW(), NOW())`,
+          [user.userId, message, "lottery"]
         );
         const notificationsRef = db
           .collection("lottery-notification")
