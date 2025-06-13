@@ -16,7 +16,7 @@ export const validationSchema = Yup.object({
       /^[a-zA-Z0-9.:\s]+$/,
       "Market name can only contain letters, numbers,  spaces and dot (.,:)"
     )
-    .max(20, "Market name cannot exceed 20 characters") // Maximum 20 characters
+    .max(30, "Market name cannot exceed 20 characters") // Maximum 30 characters
     .required("Market Name Is Required"),
 
   groupFrom: Yup.number()
