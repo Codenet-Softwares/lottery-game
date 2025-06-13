@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import useDebounce from "../../Utils/customHook/useDebounce ";
 import { FixedSizeGrid as Grid } from "react-window";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export const ReusableInput = ({
   placeholder,
@@ -13,7 +15,7 @@ export const ReusableInput = ({
   error,
 }) => (
   <div className="form-group mb-3">
-       {label && (
+    {label && (
       <label htmlFor={name} className="form-label">
         {label}
       </label>
@@ -22,7 +24,7 @@ export const ReusableInput = ({
       type={type}
       name={name}
       className={`form-control ${error ? "is-invalid" : ""}`}
-       placeholder={!label ? placeholder : undefined} // Only show placeholder if no label 
+      placeholder={!label ? placeholder : undefined} // Only show placeholder if no label
       value={value}
       onChange={onChange}
       onBlur={onBlur}
@@ -54,7 +56,7 @@ export const FromToInput = ({
   toError,
   options,
   inputType,
-  label // Add the new label prop
+  label, // Add the new label prop
 }) => {
   console.log("Dropdown Options for", fromName, options);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -174,11 +176,7 @@ export const FromToInput = ({
 
   return (
     <div className="form-group mb-3">
-          {label && (
-        <label className="form-label d-block mb-2">
-          {label}
-        </label>
-      )}
+      {label && <label className="form-label d-block mb-2">{label}</label>}
       <div className="d-flex gap-2">
         <div className="position-relative" style={{ flex: 1 }}>
           <input
@@ -258,7 +256,7 @@ export const FromToInput = ({
           ref={containerRef}
         >
           <input
-             type={inputType}
+            type={inputType}
             name={toName}
             className={`form-control ${toError ? "is-invalid" : ""}`}
             placeholder={placeholder}
@@ -332,6 +330,108 @@ export const FromToInput = ({
   );
 };
 
+export const DateTimeInput = ({
+  name,
+  value,
+  onChange,
+  onBlur,
+  placeholder,
+  error,
+  timeOptions,
+}) => {
+  const [selectedDate, setSelectedDate] = useState(
+    value ? new Date(value) : null
+  );
+  const [selectedTime, setSelectedTime] = useState(
+    value ? new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""
+  );
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    setShowDatePicker(false);
+    if (date && selectedTime) {
+      const [hours, minutes] = selectedTime.split(':');
+      date.setHours(parseInt(hours, 10));
+      date.setMinutes(parseInt(minutes, 10));
+      onChange({ target: { name, value: date.toISOString() } });
+    }
+  };
+
+  const handleTimeChange = (e) => {
+    const time = e.target.value;
+    setSelectedTime(time);
+    if (selectedDate && time) {
+      const [hours, minutes] = time.split(':');
+      const newDate = new Date(selectedDate);
+      newDate.setHours(parseInt(hours, 10));
+      newDate.setMinutes(parseInt(minutes, 10));
+      onChange({ target: { name, value: newDate.toISOString() } });
+    }
+  };
+
+  return (
+    <div className="form-group position-relative" style={{ minHeight: '72px' }}>
+      <div className="d-flex align-items-center">
+        <button
+          type="button"
+          className="btn btn-outline-secondary me-2"
+          onClick={() => setShowDatePicker(!showDatePicker)}
+        >
+          <i className="bi bi-calendar"></i>
+        </button>
+        <input
+          type="text"
+          className={`form-control ${error ? "is-invalid" : ""}`}
+          placeholder={placeholder}
+          value={selectedDate ? selectedDate.toLocaleDateString() : ""}
+          readOnly
+        />
+        <select
+          className={`form-control ms-2 ${error ? "is-invalid" : ""}`}
+          value={selectedTime}
+          onChange={handleTimeChange}
+          onBlur={onBlur}
+        >
+          <option value="">Select Time</option>
+          {timeOptions.map((time) => (
+            <option key={time} value={time}>
+              {time}
+            </option>
+          ))}
+        </select>
+      </div>
+      {showDatePicker && (
+        <div className="position-absolute" style={{ zIndex: 1000 }}>
+          <DatePicker
+            selected={selectedDate}
+            onChange={handleDateChange}
+            inline
+          />
+        </div>
+      )}
+      <div 
+        className="text-danger d-flex align-items-center"
+        style={{
+          position: 'absolute',
+          bottom: '0',
+          left: '0',
+          fontSize: '0.85rem',
+          height: '20px',
+          width: '100%',
+          visibility: error ? 'visible' : 'hidden'
+        }}
+      >
+        {error && (
+          <>
+            <i className="bi bi-info-circle me-1"></i>
+            <span>{error}</span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 export const ReusableResetPasswordInput = ({
   placeholder,
   name,
@@ -393,8 +493,7 @@ export const ReusableResetPasswordInput = ({
   );
 };
 
-
-// for edit of markets 
+// for edit of markets
 
 export const ReusableInputEdit = ({
   placeholder,
@@ -407,7 +506,7 @@ export const ReusableInputEdit = ({
   error,
 }) => (
   <div className="form-group mb-1">
-       {label && (
+    {label && (
       <label htmlFor={name} className="form-label text-uppercase fw-bold">
         {label}
       </label>
@@ -416,7 +515,7 @@ export const ReusableInputEdit = ({
       type={type}
       name={name}
       className={`form-control ${error ? "is-invalid" : ""}`}
-       placeholder={!label ? placeholder : undefined} // Only show placeholder if no label 
+      placeholder={!label ? placeholder : undefined} // Only show placeholder if no label
       value={value}
       onChange={onChange}
       onBlur={onBlur}
@@ -448,7 +547,7 @@ export const FromToInputEdit = ({
   toError,
   options,
   inputType,
-  label // Add the new label prop
+  label, // Add the new label prop
 }) => {
   console.log("Dropdown Options for", fromName, options);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -568,7 +667,7 @@ export const FromToInputEdit = ({
 
   return (
     <div className="form-group mb-1">
-          {label && (
+      {label && (
         <label className="form-label d-block mb-1 fw-bold text-uppercase">
           {label}
         </label>
@@ -652,7 +751,7 @@ export const FromToInputEdit = ({
           ref={containerRef}
         >
           <input
-             type={inputType}
+            type={inputType}
             name={toName}
             className={`form-control ${toError ? "is-invalid" : ""}`}
             placeholder={placeholder}

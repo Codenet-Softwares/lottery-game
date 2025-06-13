@@ -152,6 +152,10 @@ export const validationSchema = Yup.object({
       }
     ),
 
+  startDateTime: Yup.date().required("Start date & time is required"),
+  endDateTime: Yup.date()
+    .required("End date & time is required")
+    .min(Yup.ref("startDateTime"), "End time must be after start time"),
   priceForEach: Yup.number()
     .required("Price Is Required")
     .moreThan(0, "Price Must Be Greater Than 0")
