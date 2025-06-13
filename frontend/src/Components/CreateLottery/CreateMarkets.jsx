@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { useFormik } from "formik";
 import { validationSchema } from "../../Utils/validationSchema";
 import { initialCreateMarketFormStates } from "../../Utils/initialState";
-import { FromToInput, ReusableInput } from "../ReusableInput/ReusableInput";
+import { DateTimeInput, FromToInput, ReusableInput } from "../ReusableInput/ReusableInput";
 import {
   convertTimeToISO,
   generateFilterData,
@@ -18,6 +18,7 @@ const CreateMarkets = () => {
     initialValues: initialCreateMarketFormStates,
     validationSchema: validationSchema,
     onSubmit: async (values) => {
+      console.log('values submitted',values)
       showLoader(); // Show loader before the request
       const startTimeISO = convertTimeToISO(values.timerFrom, values.date);
       const endTimeISO = convertTimeToISO(values.timerTo, values.date);
@@ -31,12 +32,13 @@ const CreateMarkets = () => {
         },
         series: { start: values.seriesFrom, end: values.seriesTo },
         number: { min: values.numberFrom, max: values.numberTo },
-        start_time: startTimeISO,
-        end_time: endTimeISO,
+        start_time: values.startDateTime,
+        end_time: values.endDateTime,
         price: parseFloat(values.priceForEach),
       };
       try {
         const response = await generateLotteryNumber(requestBody);
+        console.log('Request body being sent:', requestBody)
         if (response.success) {
           console.log("Market created successfully!");
           formik.resetForm();
@@ -73,7 +75,7 @@ const CreateMarkets = () => {
   }, [groupOptions, seriesOptions, numberOptions]);
 
   const inputConfig = [
-    { placeholder: "SELECT DATE", type: "date", name: "date" },
+    // { placeholder: "SELECT DATE", type: "date", name: "date" },
     { placeholder: "MARKET NAME", name: "marketName" },
     { placeholder: "PRICE FOR EACH SEM", type: "number", name: "priceForEach" },
   ];
@@ -100,13 +102,13 @@ const CreateMarkets = () => {
       options: numberOptions,
       inputType: "number",
     },
-    {
-      placeholder: "ENTER TIMER (HH:MM AM/PM)",
-      fromName: "timerFrom",
-      toName: "timerTo",
-      options: timerOptions,
-      inputType: "text",
-    },
+    // {
+    //   placeholder: "ENTER TIMER (HH:MM AM/PM)",
+    //   fromName: "timerFrom",
+    //   toName: "timerTo",
+    //   options: timerOptions,
+    //   inputType: "text",
+    // },
   ];
 
   return (
@@ -121,6 +123,35 @@ const CreateMarkets = () => {
       >
         <h3 className="text-center mb-4 fw-bold">CREATE LOTTERY MARKETS</h3>
         <form onSubmit={formik.handleSubmit}>
+
+                {/* Date Time Inputs */}
+          <div className="row">
+            <div className="col-md-6 mb-4">
+              <DateTimeInput
+                name="startDateTime"
+                placeholder="START DATE & TIME"
+                value={formik.values.startDateTime}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.startDateTime && formik.errors.startDateTime
+                }
+                timeOptions={timerOptions}
+              />
+            </div>
+            <div className="col-md-6">
+              <DateTimeInput
+                name="endDateTime"
+                placeholder="END DATE & TIME"
+                value={formik.values.endDateTime}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.endDateTime && formik.errors.endDateTime}
+                timeOptions={timerOptions}
+              />
+            </div>
+          </div>
+
           {inputConfig.map((input) => (
             <ReusableInput
               key={input.name}
@@ -134,6 +165,7 @@ const CreateMarkets = () => {
             />
           ))}
 
+      
           {fromToInputConfig.map((input) => (
             <FromToInput
               key={input.fromName}
