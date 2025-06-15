@@ -401,6 +401,7 @@ export const adminPurchaseHistory = async (req, res) => {
       res
     );
   } catch (error) {
+    console.log(error)
     apiResponseErr(
       error.data ?? null,
       false,
@@ -613,9 +614,6 @@ export const getAllMarkets = async (req, res) => {
 
     const { search = "" } = req.query;
     const whereCondition = {
-      date: {
-        [Op.gte]: today,
-      },
       isWin: false,
       isVoid: false,
     };
@@ -3091,6 +3089,171 @@ export const updateHotGameStatus = async (req, res) => {
       res
     );
   } catch (error) {
+    return apiResponseErr(
+      null,
+      false,
+      statusCode.internalServerError,
+      error.message,
+      res
+    );
+  }
+};
+
+export const updateSubadminTicket = async (req, res) => {
+  try {
+    const { marketId, updatedData } = req.body;
+    const { adminId } = req.user;
+
+    // Validate input
+    if (!marketId || !updatedData || !Array.isArray(updatedData)) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Invalid request data. Market ID and updated data array are required.",
+        res
+      );
+    }
+
+    // Get all existing rejected results for this market
+    const existingResults = await WinResultRequest.findAll({
+      where: { marketId, status: "Reject", adminId },
+    });
+
+    if (!existingResults || existingResults.length === 0) {
+      return apiResponseSuccess(
+        [],
+        true,
+        statusCode.success,
+        "No data found to update!",
+        res
+      );
+    }
+
+    // Process each updated prize category
+    const updatePromises = updatedData.map(async (prizeData) => {
+      const { prizeCategory, prizeAmount, ticketNumber, complementaryPrize } = prizeData;
+
+      // Find all existing records for this prize category
+      const existingRecords = existingResults.filter(
+        r => r.prizeCategory === prizeCategory
+      );
+
+      // Update existing records
+      const updatePromises = existingRecords.map(record => {
+        return record.update({
+          prizeAmount,
+          ticketNumber: Array.isArray(ticketNumber) ? ticketNumber : [ticketNumber],
+          complementaryPrize: complementaryPrize || 0,
+          isReject : false,
+          status : "Pending"
+          // update other fields as needed
+        });
+      });
+
+      return Promise.all(updatePromises);
+    });
+
+    // Execute all updates
+    await Promise.all(updatePromises);
+
+    // Fetch updated data to return
+    const updatedResults = await WinResultRequest.findAll({
+      where: { marketId, status: "Reject", adminId },
+    });
+
+    // Format the response similar to your original structure
+    const response = {
+      marketName: updatedResults[0]?.marketName || '',
+      marketId,
+      adminId: [adminId],
+      declearBy: [...new Set(updatedResults.map(r => r.declearBy))],
+      updatedData: updatedData.map(data => ({
+        prizeCategory: data.prizeCategory,
+        prizeAmount: data.prizeAmount,
+        ticketNumber: Array.isArray(data.ticketNumber) ? data.ticketNumber : [data.ticketNumber],
+        complementaryPrize: data.complementaryPrize || null
+      }))
+    };
+
+      const groupedByAdmin = {};
+      updatedResults.forEach((entry) => {
+        const {
+          adminId,
+          marketId,
+          ticketNumber,
+          prizeCategory,
+          prizeAmount,
+          complementaryPrize,
+        } = entry;
+        const key = `${prizeCategory}-${prizeAmount}-${complementaryPrize}-${marketId}`;
+
+        if (!groupedByAdmin[adminId]) groupedByAdmin[adminId] = {};
+
+        if (!groupedByAdmin[adminId][key])
+          groupedByAdmin[adminId][key] = new Set();
+        ticketNumber.forEach((ticket) =>
+          groupedByAdmin[adminId][key].add(ticket)
+        );
+      });
+
+      const adminIds = Object.keys(groupedByAdmin);
+
+      const matchedAdminIds = new Set();
+      for (let i = 0; i < adminIds.length; i++) {
+        for (let j = i + 1; j < adminIds.length; j++) {
+          const admin1 = adminIds[i];
+          const admin2 = adminIds[j];
+
+          let isMatched = true;
+
+          const keys1 = Object.keys(groupedByAdmin[admin1]);
+          const keys2 = Object.keys(groupedByAdmin[admin2]);
+
+          if (keys1.length !== keys2.length) {
+            isMatched = false;
+          } else {
+            for (const key of keys1) {
+              if (!groupedByAdmin[admin2][key]) {
+                isMatched = false;
+                break;
+              }
+              const tickets1 = groupedByAdmin[admin1][key];
+              const tickets2 = groupedByAdmin[admin2][key];
+
+              if (
+                tickets1.size !== tickets2.size ||
+                [...tickets1].some((ticket) => !tickets2.has(ticket))
+              ) {
+                isMatched = false;
+                break;
+              }
+            }
+          }
+
+          if (isMatched) {
+            matchedAdminIds.add(admin1);
+            matchedAdminIds.add(admin2);
+          }
+        }
+      }
+
+      if (matchedAdminIds.size > 0) {
+        await WinResultRequest.update(
+          { type: "Matched" },
+          { where: { adminId: Array.from(matchedAdminIds), marketId, status: 'Pending' } }
+        );
+      }
+
+    return apiResponseSuccess(
+      response,
+      true,
+      statusCode.success,
+      "Tickets updated successfully.",
+      res
+    );
+  } catch (error) {
+    console.log(error)
     return apiResponseErr(
       null,
       false,

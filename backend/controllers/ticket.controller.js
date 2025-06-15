@@ -240,14 +240,9 @@ export const updateMarket = async (req, res) => {
 
 export const geTicketRange = async (req, res) => {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
+ 
     const { search = "" } = req.query;
     const whereCondition = {
-      date: {
-        [Op.gte]: today,
-      },
       isWin: false,
       isVoid: false,
     };
@@ -286,14 +281,8 @@ export const geTicketRange = async (req, res) => {
 
 export const geTicketRangeExternal = async (req, res) => {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
     const { search = "" } = req.query;
     const whereCondition = {
-      date: {
-        [Op.gte]: today,
-      },
       isWin: false,
       isVoid: false,
       inactiveGame: true,
@@ -333,17 +322,10 @@ export const geTicketRangeExternal = async (req, res) => {
 
 export const getIsactiveMarket = async (req, res) => {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
     const ticketData = await TicketRange.findAll({
       where: {
-        date: {
-          [Op.gte]: today,
-        },
         isVoid: false,
         isWin: false,
-        // isActive: true,
         inactiveGame: true
       },
     });
