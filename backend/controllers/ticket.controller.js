@@ -14,12 +14,11 @@ export const saveTicketRange = async (req, res) => {
       start_time,
       end_time,
       marketName,
-      date,
       price,
     } = req.body;
 
     const currentDate = new Date();
-    const providedDate = new Date(date);
+    const providedDate = new Date(start_time);
 
     if (providedDate < currentDate.setHours(0, 0, 0, 0)) {
       return apiResponseErr(
@@ -34,7 +33,7 @@ export const saveTicketRange = async (req, res) => {
     const existingMarket = await TicketRange.findOne({
       where: {
         marketName,
-        date: providedDate,
+        start_time: providedDate,
       },
     });
 
@@ -56,10 +55,9 @@ export const saveTicketRange = async (req, res) => {
       series_end: series.end,
       number_start: number.min,
       number_end: number.max,
-      start_time: new Date(start_time),
+      start_time: providedDate,
       end_time: new Date(end_time),
       marketName,
-      date: providedDate,
       price,
       hideMarketUser: false,
       isActive: false,
@@ -128,7 +126,6 @@ export const updateMarket = async (req, res) => {
       "start_time",
       "end_time",
       "marketName",
-      "date",
       "price",
     ];
     const updates = { isUpdate: true }; // Set isUpdate to true when API is hit
