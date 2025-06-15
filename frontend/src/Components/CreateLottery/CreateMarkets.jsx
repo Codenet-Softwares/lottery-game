@@ -16,7 +16,7 @@ const CreateMarkets = () => {
 
   const formik = useFormik({
     initialValues: initialCreateMarketFormStates,
-    validationSchema: validationSchema,
+    // validationSchema: validationSchema,
     onSubmit: async (values) => {
       console.log("Submitted", values);
       // showLoader();

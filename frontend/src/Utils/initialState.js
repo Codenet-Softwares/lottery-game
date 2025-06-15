@@ -1,6 +1,5 @@
 export const initialCreateMarketFormStates = {
-  date: "",
-  marketName: "",
+   marketName: "",
   groupFrom: "",
   groupTo: "",
   seriesFrom: "",

@@ -44,7 +44,7 @@ const Win = () => {
           2: { amount: "", ticketNumbers: Array(10).fill("") },
           3: { amount: "", ticketNumbers: Array(10).fill("") },
           4: { amount: "", ticketNumbers: Array(10).fill("") },
-          5: { amount: "", ticketNumbers: Array(50).fill("") },
+          5: { amount: "", ticketNumbers: Array(100).fill("") },
         };
         return acc;
       }, {});
@@ -230,7 +230,7 @@ const Win = () => {
     2: { rank: "2nd", description: "Prize for 10 winners" },
     3: { rank: "3rd", description: "Prize for 10 winners" },
     4: { rank: "4th", description: "Prize for 10 winners" },
-    5: { rank: "5th", description: "Prize for 50 winners" },
+    5: { rank: "5th", description: "Prize for 100 winners" },
   };
 
   // if (loading) {
