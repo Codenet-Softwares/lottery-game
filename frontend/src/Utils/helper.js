@@ -70,30 +70,16 @@ export const generateFilterData = ({
   }
 };
 
-// Helper function to convert time to ISO string
-export const convertTimeToISO = (time, date) => {
-  if (!time || !date) return null;
 
-  const [hourMin, meridiem] = time.split(" ");
-  const [hours, minutes] = hourMin.split(":").map(Number);
-
-  // Convert 12-hour clock to 24-hour clock
-  const adjustedHours =
-    meridiem === "PM" && hours !== 12
-      ? hours + 12
-      : hours === 12 && meridiem === "AM"
-      ? 0
-      : hours;
-
-  // Create a new Date object with the selected date
-  const dateTime = new Date(date);
-  dateTime.setHours(adjustedHours, minutes, 0, 0);
-
-  dateTime.setHours(dateTime.getHours() + 5, dateTime.getMinutes() + 30);
-
-  // Convert the date-time to UTC (Z) in ISO 8601 format
-  return dateTime.toISOString();
+// Fix: Correct ISO conversion without manual offset
+export const convertTimeToISO = (localDateTimeString) => {
+  const date = new Date(localDateTimeString);
+  date.setHours(date.getHours() + 5);
+  date.setMinutes(date.getMinutes() + 30);
+  return date.toISOString();
 };
+
+
 
 // helper.js
 

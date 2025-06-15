@@ -836,3 +836,17 @@ export async function createLotteryNotification(body = {}, isToast = false) {
     throw error;
   }
 }
+
+
+export async function editLotteryTicketsWin(body = {}, isToast = false) {
+  try {
+    const callParams = await getAuthCallParams(strings.PUT, body, isToast);
+    const response = await makeCall(
+      urls.editTicketsapproval,
+      callParams
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
