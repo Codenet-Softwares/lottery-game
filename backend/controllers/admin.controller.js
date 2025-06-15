@@ -613,9 +613,6 @@ export const getAllMarkets = async (req, res) => {
 
     const { search = "" } = req.query;
     const whereCondition = {
-      date: {
-        [Op.gte]: today,
-      },
       isWin: false,
       isVoid: false,
     };

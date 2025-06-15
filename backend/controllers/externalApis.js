@@ -130,7 +130,7 @@ export const getLotteryBetHistory = async (req, res) => {
           marketId: purchase.marketId,
           amount: purchase.lotteryPrice,
           ticketPrice: purchase.price,
-          date : purchase.settleTime,
+          date : purchase.createdAt,
           tickets,
           sem,
         };

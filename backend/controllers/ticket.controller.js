@@ -243,14 +243,9 @@ export const updateMarket = async (req, res) => {
 
 export const geTicketRange = async (req, res) => {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
+ 
     const { search = "" } = req.query;
     const whereCondition = {
-      date: {
-        [Op.gte]: today,
-      },
       isWin: false,
       isVoid: false,
     };
@@ -294,9 +289,6 @@ export const geTicketRangeExternal = async (req, res) => {
 
     const { search = "" } = req.query;
     const whereCondition = {
-      date: {
-        [Op.gte]: today,
-      },
       isWin: false,
       isVoid: false,
       inactiveGame: true,

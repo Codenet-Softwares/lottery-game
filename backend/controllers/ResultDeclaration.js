@@ -11,6 +11,7 @@ import TicketNumber from '../models/ticketNumber.model.js';
 import { sequelize, sql } from '../config/db.js';
 import { deleteLotteryFromFirebase } from '../utils/firebase.delete.js';
 import NotificationService from '../utils/notification_service.js';
+import { db } from '../config/firebase.js';
 
 export const ResultDeclare = async (req, res) => {
   try {
