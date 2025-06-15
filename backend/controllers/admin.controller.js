@@ -3099,13 +3099,25 @@ export const updateHotGameStatus = async (req, res) => {
   }
 };
 
-export const updateSubadminTicket = async (req, res) => {
+export const editSubadminTicket = async (req, res) => {
   try {
-    const { marketId, } = req.body;
+    const { marketId, updatedData } = req.body;
     const { adminId } = req.user;
 
+    // Validate input
+    if (!marketId || !updatedData || !Array.isArray(updatedData)) {
+      return apiResponseErr(
+        null,
+        false,
+        statusCode.badRequest,
+        "Invalid request data. Market ID and updated data array are required.",
+        res
+      );
+    }
+
+    // Get all existing rejected results for this market
     const existingResults = await WinResultRequest.findAll({
-      where: { marketId, status: "Reject" },
+      where: { marketId, status: "Reject", adminId },
     });
 
     if (!existingResults || existingResults.length === 0) {
@@ -3113,256 +3125,77 @@ export const updateSubadminTicket = async (req, res) => {
         [],
         true,
         statusCode.success,
-        "No Data found!",
+        "No data found to update!",
         res
       );
     }
 
-    const structuredResults = {
-      marketName: existingResults[0].marketName,
-      marketId: existingResults[0].marketId,
-      adminId: [...new Set(existingResults.map((r) => r.adminId))],
-      declearBy: [...new Set(existingResults.map((r) => r.declearBy))],
-      matchedEnteries: [],
-      UnmatchedEntries: [],
+    // Process each updated prize category
+    const updatePromises = updatedData.map(async (prizeData) => {
+      const { prizeCategory, prizeAmount, ticketNumber, complementaryPrize } = prizeData;
+
+      // Find all existing records for this prize category
+      const existingRecords = existingResults.filter(
+        r => r.prizeCategory === prizeCategory
+      );
+
+      if (existingRecords.length === 0) {
+        // If no existing records for this category, create new ones
+        const newRecord = await WinResultRequest.create({
+          marketId,
+          marketName: existingResults[0].marketName,
+          adminId,
+          declearBy: adminId, // or whatever logic you use for declearBy
+          prizeCategory,
+          prizeAmount,
+          ticketNumber: Array.isArray(ticketNumber) ? ticketNumber : [ticketNumber],
+          complementaryPrize: complementaryPrize || null,
+          status: "Reject", // or whatever status you want after update
+          // include other necessary fields
+        });
+        return newRecord;
+      }
+
+      // Update existing records
+      const updatePromises = existingRecords.map(record => {
+        return record.update({
+          prizeAmount,
+          ticketNumber: Array.isArray(ticketNumber) ? ticketNumber : [ticketNumber],
+          complementaryPrize: complementaryPrize || null,
+          // update other fields as needed
+        });
+      });
+
+      return Promise.all(updatePromises);
+    });
+
+    // Execute all updates
+    await Promise.all(updatePromises);
+
+    // Fetch updated data to return
+    const updatedResults = await WinResultRequest.findAll({
+      where: { marketId, status: "Reject", adminId },
+    });
+
+    // Format the response similar to your original structure
+    const response = {
+      marketName: updatedResults[0]?.marketName || '',
+      marketId,
+      adminId: [adminId],
+      declearBy: [...new Set(updatedResults.map(r => r.declearBy))],
+      updatedData: updatedData.map(data => ({
+        prizeCategory: data.prizeCategory,
+        prizeAmount: data.prizeAmount,
+        ticketNumber: Array.isArray(data.ticketNumber) ? data.ticketNumber : [data.ticketNumber],
+        complementaryPrize: data.complementaryPrize || null
+      }))
     };
-
-    const prizeMap = new Map();
-
-    // Group data by prizeCategory
-    existingResults.forEach((result) => {
-      if (!prizeMap.has(result.prizeCategory)) {
-        prizeMap.set(result.prizeCategory, {
-          prizeName: result.prizeCategory,
-          ticketsByDeclarer: {},
-          DeclaredPrizes: {},
-          SubPrizes: [],
-        });
-      }
-
-      const prize = prizeMap.get(result.prizeCategory);
-      prize.DeclaredPrizes[result.declearBy] = result.prizeAmount;
-
-      // Ensure ticketNumber is an array
-      const ticketArray = Array.isArray(result.ticketNumber)
-        ? result.ticketNumber
-        : [result.ticketNumber];
-
-      if (!prize.ticketsByDeclarer[result.declearBy]) {
-        prize.ticketsByDeclarer[result.declearBy] = [];
-      }
-      prize.ticketsByDeclarer[result.declearBy].push(...ticketArray);
-
-      if (result.complementaryPrize) {
-        let subPrize = prize.SubPrizes.find(
-          (sp) => sp.prizeName === "Complimentary Prize"
-        );
-        if (!subPrize) {
-          subPrize = { prizeName: "Complimentary Prize", DeclaredPrizes: {} };
-          prize.SubPrizes.push(subPrize);
-        }
-        subPrize.DeclaredPrizes[result.declearBy] = result.complementaryPrize;
-      }
-    });
-
-    // Compare and structure matched and unmatched entries
-    prizeMap.forEach((prize) => {
-      const declarers = Object.keys(prize.ticketsByDeclarer);
-      const allTicketsArrays = declarers.map(
-        (declarer) => prize.ticketsByDeclarer[declarer]
-      );
-
-      const commonTickets = allTicketsArrays.reduce((a, b) =>
-        a.filter((ticket) => b.includes(ticket))
-      );
-
-      const unmatchedTickets = declarers
-        .map((declarer) => {
-          const tickets = prize.ticketsByDeclarer[declarer];
-          const notMatched = tickets.filter(
-            (ticket) => !commonTickets.includes(ticket)
-          );
-          return { declaredBy: declarer, ticketNumber: notMatched };
-        })
-        .filter((entry) => entry.ticketNumber.length > 0);
-
-      const declaredPrizeValues = Object.values(prize.DeclaredPrizes);
-      const declaredPrizesMatch = declaredPrizeValues.every(
-        (val) => val === declaredPrizeValues[0]
-      );
-
-      let subPrizesMatch = true;
-      for (const subPrize of prize.SubPrizes) {
-        const values = Object.values(subPrize.DeclaredPrizes);
-        if (!values.every((val) => val === values[0])) {
-          subPrizesMatch = false;
-          break;
-        }
-      }
-
-      const isAllMatched =
-        commonTickets.length > 0 &&
-        declaredPrizesMatch &&
-        subPrizesMatch &&
-        unmatchedTickets.length === 0;
-
-      if (isAllMatched) {
-        const matchEntry = {
-          prizeName: prize.prizeName,
-          Tickets: commonTickets,
-          DeclaredPrizes: prize.DeclaredPrizes,
-          SubPrizes: prize.SubPrizes,
-        };
-        structuredResults.matchedEnteries.push(matchEntry);
-      } else {
-        const hasUnmatchedTickets = unmatchedTickets.length > 0;
-        const hasUnmatchedDeclaredPrizes = !declaredPrizesMatch;
-        const hasUnmatchedSubPrizes = !subPrizesMatch;
-
-        const unmatchedSubPrizes = hasUnmatchedSubPrizes
-          ? prize.SubPrizes.map((sp) => ({
-              prizeName: sp.prizeName,
-              DeclaredPrizes: sp.DeclaredPrizes,
-            }))
-          : [];
-
-        if (
-          hasUnmatchedTickets ||
-          hasUnmatchedDeclaredPrizes ||
-          hasUnmatchedSubPrizes
-        ) {
-          structuredResults.UnmatchedEntries.push({
-            prizeName: prize.prizeName,
-            Tickets: hasUnmatchedTickets ? unmatchedTickets : [],
-            DeclaredPrizes: hasUnmatchedDeclaredPrizes
-              ? prize.DeclaredPrizes
-              : null,
-            SubPrizes: unmatchedSubPrizes,
-          });
-        }
-
-        const partialMatchEntry = {
-          prizeName: prize.prizeName,
-          Tickets: commonTickets.length > 0 ? commonTickets : [],
-          DeclaredPrizes: declaredPrizesMatch ? prize.DeclaredPrizes : null,
-          SubPrizes: subPrizesMatch ? prize.SubPrizes : [],
-        };
-
-        if (
-          partialMatchEntry.Tickets.length > 0 ||
-          partialMatchEntry.DeclaredPrizes ||
-          partialMatchEntry.SubPrizes.length > 0
-        ) {
-          structuredResults.matchedEnteries.push(partialMatchEntry);
-        }
-      }
-    });
-
-    // FILTER RESULTS FOR SPECIFIC ADMIN
-    const targetAdminId = adminId;
-
-    // Get the related declarers for the target admin
-    const declarersForTargetAdmin = [
-      ...new Set(
-        existingResults
-          .filter((r) => r.adminId === targetAdminId)
-          .map((r) => r.declearBy)
-      ),
-    ];
-
-    const filteredStructuredResults = {
-      ...structuredResults,
-      adminId: [targetAdminId],
-      declearBy: declarersForTargetAdmin,
-      matchedEnteries: [],
-      UnmatchedEntries: [],
-    };
-
-    // Filter matchedEnteries
-    structuredResults.matchedEnteries.forEach((entry) => {
-      const filteredDeclaredPrizes = entry.DeclaredPrizes
-        ? Object.fromEntries(
-            Object.entries(entry.DeclaredPrizes).filter(([key]) =>
-              declarersForTargetAdmin.includes(key)
-            )
-          )
-        : null;
-
-      const filteredSubPrizes = entry.SubPrizes
-        ? entry.SubPrizes.map((sp) => ({
-            prizeName: sp.prizeName,
-            DeclaredPrizes: Object.fromEntries(
-              Object.entries(sp.DeclaredPrizes).filter(([key]) =>
-                declarersForTargetAdmin.includes(key)
-              )
-            ),
-          })).filter((sp) => Object.keys(sp.DeclaredPrizes).length > 0)
-        : [];
-
-      if (
-        (filteredDeclaredPrizes &&
-          Object.keys(filteredDeclaredPrizes).length > 0) ||
-        (filteredSubPrizes && filteredSubPrizes.length > 0)
-      ) {
-        filteredStructuredResults.matchedEnteries.push({
-          prizeName: entry.prizeName,
-          Tickets: entry.Tickets,
-          DeclaredPrizes: filteredDeclaredPrizes,
-          SubPrizes: filteredSubPrizes,
-        });
-      }
-    });
-
-    // Filter UnmatchedEntries
-    structuredResults.UnmatchedEntries.forEach((entry) => {
-      const filteredDeclaredPrizes = entry.DeclaredPrizes
-        ? Object.fromEntries(
-            Object.entries(entry.DeclaredPrizes).filter(([key]) =>
-              declarersForTargetAdmin.includes(key)
-            )
-          )
-        : null;
-
-      const filteredTickets = entry.Tickets
-        ? entry.Tickets.filter((t) =>
-            declarersForTargetAdmin.includes(t.declaredBy)
-          )
-        : [];
-
-      const filteredSubPrizes = entry.SubPrizes
-        ? entry.SubPrizes.map((sp) => ({
-            prizeName: sp.prizeName,
-            DeclaredPrizes: Object.fromEntries(
-              Object.entries(sp.DeclaredPrizes).filter(([key]) =>
-                declarersForTargetAdmin.includes(key)
-              )
-            ),
-          })).filter((sp) => Object.keys(sp.DeclaredPrizes).length > 0)
-        : [];
-
-      if (
-        (filteredTickets && filteredTickets.length > 0) ||
-        (filteredDeclaredPrizes &&
-          Object.keys(filteredDeclaredPrizes).length > 0) ||
-        (filteredSubPrizes && filteredSubPrizes.length > 0)
-      ) {
-        filteredStructuredResults.UnmatchedEntries.push({
-          prizeName: entry.prizeName,
-          Tickets: filteredTickets,
-          DeclaredPrizes: filteredDeclaredPrizes,
-          SubPrizes: filteredSubPrizes,
-        });
-      }
-    });
-
-
-
 
     return apiResponseSuccess(
-      filteredStructuredResults,
+      response,
       true,
       statusCode.success,
-      "Ticket fetch successfully.",
+      "Tickets updated successfully.",
       res
     );
   } catch (error) {
