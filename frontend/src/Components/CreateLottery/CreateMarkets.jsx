@@ -18,12 +18,14 @@ const CreateMarkets = () => {
     initialValues: initialCreateMarketFormStates,
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      showLoader(); // Show loader before the request
+      console.log("Submitted", values);
+      // showLoader();
+
+      // Show loader before the request
       const startTimeISO = convertTimeToISO(values.timerFrom, values.date);
       const endTimeISO = convertTimeToISO(values.timerTo, values.date);
 
       const requestBody = {
-        date: new Date(values.date).toISOString(),
         marketName: values.marketName,
         group: {
           min: parseInt(values.groupFrom, 10),
@@ -73,7 +75,7 @@ const CreateMarkets = () => {
   }, [groupOptions, seriesOptions, numberOptions]);
 
   const inputConfig = [
-    { placeholder: "SELECT DATE", type: "date", name: "date" },
+    // { placeholder: "SELECT DATE", type: "date", name: "date" },
     { placeholder: "MARKET NAME", name: "marketName" },
     { placeholder: "PRICE FOR EACH SEM", type: "number", name: "priceForEach" },
   ];
@@ -101,11 +103,9 @@ const CreateMarkets = () => {
       inputType: "number",
     },
     {
-      placeholder: "ENTER TIMER (HH:MM AM/PM)",
       fromName: "timerFrom",
       toName: "timerTo",
-      options: timerOptions,
-      inputType: "text",
+      inputType: "datetime-local",
     },
   ];
 
@@ -152,7 +152,7 @@ const CreateMarkets = () => {
               toError={
                 formik.touched[input.toName] && formik.errors[input.toName]
               } // Show error if touched
-              options={input.options}
+              options={input.options || []}
             />
           ))}
 

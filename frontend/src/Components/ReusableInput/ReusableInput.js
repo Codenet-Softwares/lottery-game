@@ -13,7 +13,7 @@ export const ReusableInput = ({
   error,
 }) => (
   <div className="form-group mb-3">
-       {label && (
+    {label && (
       <label htmlFor={name} className="form-label">
         {label}
       </label>
@@ -22,7 +22,7 @@ export const ReusableInput = ({
       type={type}
       name={name}
       className={`form-control ${error ? "is-invalid" : ""}`}
-       placeholder={!label ? placeholder : undefined} // Only show placeholder if no label 
+      placeholder={!label ? placeholder : undefined} // Only show placeholder if no label
       value={value}
       onChange={onChange}
       onBlur={onBlur}
@@ -54,15 +54,15 @@ export const FromToInput = ({
   toError,
   options,
   inputType,
-  label // Add the new label prop
+  label,
+  dateTimeConfig = {}, // optional config for datetime
 }) => {
-  console.log("Dropdown Options for", fromName, options);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeInput, setActiveInput] = useState(null);
   const [typedFromValue, setTypedFromValue] = useState(fromValue);
   const [typedToValue, setTypedToValue] = useState(toValue);
   const dropdownRef = useRef(null);
-  const containerRef = useRef(null); // Ref for the container
+  const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
 
   const debouncedFromValue = useDebounce(typedFromValue, 300);
@@ -77,20 +77,19 @@ export const FromToInput = ({
   }, [toValue]);
 
   useEffect(() => {
-    // Set container width dynamically
     if (containerRef.current) {
       setContainerWidth(containerRef.current.offsetWidth);
     }
-  }, [containerRef.current]); // Recalculate width when the container is resized
+  }, [containerRef.current]);
 
   const handleInputClick = (inputName) => {
-    setActiveInput(inputName);
-    setIsDropdownOpen(true);
+    if (inputType !== "datetime") {
+      setActiveInput(inputName);
+      setIsDropdownOpen(true);
+    }
   };
 
   const handleOptionClick = (value, inputName) => {
-    console.log("Option clicked:", value, inputName, fromName);
-
     if (inputName === fromName) {
       setTypedFromValue(value);
       onChangeFrom({ target: { name: fromName, value } });
@@ -111,7 +110,7 @@ export const FromToInput = ({
         );
 
   const Row = ({ columnIndex, rowIndex, style }) => {
-    const index = rowIndex * 3 + columnIndex; // 3 columns per row
+    const index = rowIndex * 3 + columnIndex;
     if (index >= filteredOptions.length) return null;
 
     return (
@@ -119,23 +118,14 @@ export const FromToInput = ({
         style={{
           ...style,
           display: "block",
-          margin: "0",
           padding: "8px",
-          textAlign: "left",
           border: "1px solid #ddd",
           borderRadius: "4px",
           backgroundColor: "#f8f9fa",
-          transition: "background-color 0.3s",
         }}
         className="btn btn-light btn-sm text-start"
-        onClick={() => {
-          handleOptionClick(filteredOptions[index], activeInput);
-        }}
-        onKeyUp={() => {
-          console.log("filteredOptions[index]:", filteredOptions[index]);
-          console.log("activeInput:", activeInput);
-          handleOptionClick(filteredOptions[index], activeInput);
-        }}
+        onClick={() => handleOptionClick(filteredOptions[index], activeInput)}
+        onKeyUp={() => handleOptionClick(filteredOptions[index], activeInput)}
         onMouseEnter={(e) => (e.target.style.backgroundColor = "#e6f7ff")}
         onMouseLeave={(e) => (e.target.style.backgroundColor = "#f8f9fa")}
       >
@@ -150,54 +140,63 @@ export const FromToInput = ({
         setIsDropdownOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // const handleFromChange = (e) => setTypedFromValue(e.target.value);
-  // const handleToChange = (e) => setTypedToValue(e.target.value);
   const handleFromChange = (e) => {
-    const value = e.target.value;
+    const value =
+      inputType === "datetime"
+        ? new Date(e.target.value).toISOString()
+        : e.target.value;
     setTypedFromValue(value);
     onChangeFrom({ target: { name: fromName, value } });
   };
 
   const handleToChange = (e) => {
-    const value = e.target.value;
+    const value =
+      inputType === "datetime"
+        ? new Date(e.target.value).toISOString()
+        : e.target.value;
     setTypedToValue(value);
     onChangeTo({ target: { name: toName, value } });
   };
 
+  const getLocalISODateValue = (iso) => {
+    if (!iso) return "";
+    try {
+      const date = new Date(iso);
+      return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16); // For datetime-local
+    } catch {
+      return "";
+    }
+  };
+
   return (
     <div className="form-group mb-3">
-          {label && (
-        <label className="form-label d-block mb-2">
-          {label}
-        </label>
-      )}
+      {label && <label className="form-label d-block mb-2">{label}</label>}
       <div className="d-flex gap-2">
         <div className="position-relative" style={{ flex: 1 }}>
           <input
-            type={inputType}
+            type={inputType === "datetime" ? "datetime-local" : inputType}
             name={fromName}
             className={`form-control ${fromError ? "is-invalid" : ""}`}
             placeholder={placeholder}
-            value={typedFromValue}
+            value={
+              inputType === "datetime"
+                ? getLocalISODateValue(typedFromValue)
+                : typedFromValue
+            }
             onClick={() => handleInputClick(fromName)}
             onChange={handleFromChange}
+            {...dateTimeConfig}
             style={{ height: "40px" }}
           />
-          {/* Consistent error message space */}
           <div
-            className="text-danger no-cursor d-flex align-items-center mt-1"
-            style={{
-              height: "20px", // Fixed height for error message
-              fontSize: "0.85rem",
-            }}
+            className="text-danger mt-1"
+            style={{ height: "20px", fontSize: "0.85rem" }}
           >
             {fromError && (
               <>
@@ -206,50 +205,48 @@ export const FromToInput = ({
               </>
             )}
           </div>
-          {isDropdownOpen && activeInput === fromName && containerWidth > 0 && (
-            <div
-              ref={dropdownRef}
-              className="dropdown-grid"
-              style={{
-                position: "absolute",
-                top: "100%",
-                left: 0,
-                right: 0,
-                maxHeight: "200px",
-                overflowY: "hidden",
-                overflowX: "hidden", // Allow horizontal scroll if needed
-                zIndex: 10,
-                width: "100%", // Ensure it takes full width
-                border: "1px solid #ddd",
-                borderRadius: "4px",
-                backgroundColor: "#fff",
-              }}
-            >
-              {filteredOptions.length > 0 ? (
-                <Grid
-                  columnCount={3}
-                  columnWidth={containerWidth / 3}
-                  height={200}
-                  rowCount={Math.ceil(filteredOptions.length / 3)}
-                  rowHeight={40}
-                  width={containerWidth}
-                >
-                  {Row}
-                </Grid>
-              ) : (
-                <div
-                  style={{
-                    padding: "8px",
-                    textAlign: "center",
-                    color: "#999",
-                    fontStyle: "italic",
-                  }}
-                >
-                  No Data
-                </div>
-              )}
-            </div>
-          )}
+
+          {isDropdownOpen &&
+            activeInput === fromName &&
+            containerWidth > 0 &&
+            inputType !== "datetime" &&
+            Array.isArray(options) &&
+            options.length > 0 && (
+              <div
+                ref={dropdownRef}
+                className="dropdown-grid"
+                style={{
+                  position: "absolute",
+                  top: "100%",
+                  left: 0,
+                  right: 0,
+                  maxHeight: "200px",
+                  zIndex: 10,
+                  overflow: "hidden",
+                  width: "100%",
+                  border: "1px solid #ddd",
+                  borderRadius: "4px",
+                  backgroundColor: "#fff",
+                }}
+              >
+                {filteredOptions.length > 0 ? (
+                  <Grid
+                    columnCount={3}
+                    columnWidth={containerWidth / 3}
+                    height={200}
+                    rowCount={Math.ceil(filteredOptions.length / 3)}
+                    rowHeight={40}
+                    width={containerWidth}
+                  >
+                    {Row}
+                  </Grid>
+                ) : (
+                  <div className="text-muted p-2 text-center fst-italic">
+                    No Data
+                  </div>
+                )}
+              </div>
+            )}
         </div>
 
         <div
@@ -258,22 +255,23 @@ export const FromToInput = ({
           ref={containerRef}
         >
           <input
-             type={inputType}
+            type={inputType === "datetime" ? "datetime-local" : inputType}
             name={toName}
             className={`form-control ${toError ? "is-invalid" : ""}`}
             placeholder={placeholder}
-            value={typedToValue}
+            value={
+              inputType === "datetime"
+                ? getLocalISODateValue(typedToValue)
+                : typedToValue
+            }
             onClick={() => handleInputClick(toName)}
             onChange={handleToChange}
+            {...dateTimeConfig}
             style={{ height: "40px" }}
           />
-          {/* Consistent error message space */}
           <div
-            className="text-danger no-cursor d-flex align-items-center mt-1"
-            style={{
-              height: "20px", // Fixed height for error message
-              fontSize: "0.85rem",
-            }}
+            className="text-danger mt-1"
+            style={{ height: "20px", fontSize: "0.85rem" }}
           >
             {toError && (
               <>
@@ -282,50 +280,48 @@ export const FromToInput = ({
               </>
             )}
           </div>
-          {isDropdownOpen && activeInput === toName && containerWidth > 0 && (
-            <div
-              ref={dropdownRef}
-              className="dropdown-grid"
-              style={{
-                position: "absolute",
-                top: "100%",
-                left: 0,
-                right: 0,
-                maxHeight: "200px",
-                overflowY: "hidden",
-                overflowX: "hidden",
-                zIndex: 10,
-                width: "100%", // Ensure it takes full width
-                border: "1px solid #ddd",
-                borderRadius: "4px",
-                backgroundColor: "#fff",
-              }}
-            >
-              {filteredOptions.length > 0 ? (
-                <Grid
-                  columnCount={3}
-                  columnWidth={containerWidth / 3}
-                  height={200}
-                  rowCount={Math.ceil(filteredOptions.length / 3)}
-                  rowHeight={40}
-                  width={containerWidth}
-                >
-                  {Row}
-                </Grid>
-              ) : (
-                <div
-                  style={{
-                    padding: "8px",
-                    textAlign: "center",
-                    color: "#999",
-                    fontStyle: "italic",
-                  }}
-                >
-                  No Matching Data Found
-                </div>
-              )}
-            </div>
-          )}
+
+          {isDropdownOpen &&
+            activeInput === toName &&
+            containerWidth > 0 &&
+            inputType !== "datetime" &&
+            Array.isArray(options) &&
+            options.length > 0 && (
+              <div
+                ref={dropdownRef}
+                className="dropdown-grid"
+                style={{
+                  position: "absolute",
+                  top: "100%",
+                  left: 0,
+                  right: 0,
+                  maxHeight: "200px",
+                  zIndex: 10,
+                  overflow: "hidden",
+                  width: "100%",
+                  border: "1px solid #ddd",
+                  borderRadius: "4px",
+                  backgroundColor: "#fff",
+                }}
+              >
+                {filteredOptions.length > 0 ? (
+                  <Grid
+                    columnCount={3}
+                    columnWidth={containerWidth / 3}
+                    height={200}
+                    rowCount={Math.ceil(filteredOptions.length / 3)}
+                    rowHeight={40}
+                    width={containerWidth}
+                  >
+                    {Row}
+                  </Grid>
+                ) : (
+                  <div className="text-muted p-2 text-center fst-italic">
+                    No Matching Data Found
+                  </div>
+                )}
+              </div>
+            )}
         </div>
       </div>
     </div>
@@ -393,8 +389,7 @@ export const ReusableResetPasswordInput = ({
   );
 };
 
-
-// for edit of markets 
+// for edit of markets
 
 export const ReusableInputEdit = ({
   placeholder,
@@ -407,7 +402,7 @@ export const ReusableInputEdit = ({
   error,
 }) => (
   <div className="form-group mb-1">
-       {label && (
+    {label && (
       <label htmlFor={name} className="form-label text-uppercase fw-bold">
         {label}
       </label>
@@ -416,7 +411,7 @@ export const ReusableInputEdit = ({
       type={type}
       name={name}
       className={`form-control ${error ? "is-invalid" : ""}`}
-       placeholder={!label ? placeholder : undefined} // Only show placeholder if no label 
+      placeholder={!label ? placeholder : undefined} // Only show placeholder if no label
       value={value}
       onChange={onChange}
       onBlur={onBlur}
@@ -448,7 +443,7 @@ export const FromToInputEdit = ({
   toError,
   options,
   inputType,
-  label // Add the new label prop
+  label, // Add the new label prop
 }) => {
   console.log("Dropdown Options for", fromName, options);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -568,7 +563,7 @@ export const FromToInputEdit = ({
 
   return (
     <div className="form-group mb-1">
-          {label && (
+      {label && (
         <label className="form-label d-block mb-1 fw-bold text-uppercase">
           {label}
         </label>
@@ -652,7 +647,7 @@ export const FromToInputEdit = ({
           ref={containerRef}
         >
           <input
-             type={inputType}
+            type={inputType}
             name={toName}
             className={`form-control ${toError ? "is-invalid" : ""}`}
             placeholder={placeholder}

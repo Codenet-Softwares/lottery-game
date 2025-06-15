@@ -70,7 +70,8 @@ export const generateFilterData = ({
   }
 };
 
-// Helper function to convert time to ISO string
+
+// Fix: Correct ISO conversion without manual offset
 export const convertTimeToISO = (time, date) => {
   if (!time || !date) return null;
 
@@ -81,19 +82,20 @@ export const convertTimeToISO = (time, date) => {
   const adjustedHours =
     meridiem === "PM" && hours !== 12
       ? hours + 12
-      : hours === 12 && meridiem === "AM"
+      : meridiem === "AM" && hours === 12
       ? 0
       : hours;
 
-  // Create a new Date object with the selected date
   const dateTime = new Date(date);
-  dateTime.setHours(adjustedHours, minutes, 0, 0);
+  dateTime.setHours(adjustedHours);
+  dateTime.setMinutes(minutes);
+  dateTime.setSeconds(0);
+  dateTime.setMilliseconds(0);
 
-  dateTime.setHours(dateTime.getHours() + 5, dateTime.getMinutes() + 30);
-
-  // Convert the date-time to UTC (Z) in ISO 8601 format
+  // No manual offset — ISO will handle UTC conversion
   return dateTime.toISOString();
 };
+
 
 // helper.js
 
