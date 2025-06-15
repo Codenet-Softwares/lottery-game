@@ -16,14 +16,15 @@ const CreateMarkets = () => {
 
   const formik = useFormik({
     initialValues: initialCreateMarketFormStates,
-    // validationSchema: validationSchema,
+    validationSchema: validationSchema,
     onSubmit: async (values) => {
       console.log("Submitted", values);
       // showLoader();
 
       // Show loader before the request
-      const startTimeISO = convertTimeToISO(values.timerFrom, values.date);
-      const endTimeISO = convertTimeToISO(values.timerTo, values.date);
+      const startTimeISO = convertTimeToISO(values.timerFrom);
+      const endTimeISO = convertTimeToISO(values.timerTo);
+      console.log("submit",startTimeISO)
 
       const requestBody = {
         marketName: values.marketName,

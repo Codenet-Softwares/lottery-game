@@ -72,29 +72,13 @@ export const generateFilterData = ({
 
 
 // Fix: Correct ISO conversion without manual offset
-export const convertTimeToISO = (time, date) => {
-  if (!time || !date) return null;
-
-  const [hourMin, meridiem] = time.split(" ");
-  const [hours, minutes] = hourMin.split(":").map(Number);
-
-  // Convert 12-hour clock to 24-hour clock
-  const adjustedHours =
-    meridiem === "PM" && hours !== 12
-      ? hours + 12
-      : meridiem === "AM" && hours === 12
-      ? 0
-      : hours;
-
-  const dateTime = new Date(date);
-  dateTime.setHours(adjustedHours);
-  dateTime.setMinutes(minutes);
-  dateTime.setSeconds(0);
-  dateTime.setMilliseconds(0);
-
-  // No manual offset — ISO will handle UTC conversion
-  return dateTime.toISOString();
+export const convertTimeToISO = (localDateTimeString) => {
+  const date = new Date(localDateTimeString);
+  date.setHours(date.getHours() + 5);
+  date.setMinutes(date.getMinutes() + 30);
+  return date.toISOString();
 };
+
 
 
 // helper.js
