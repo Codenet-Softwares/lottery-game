@@ -65,6 +65,7 @@ class UrlConstant {
   SubAdmninDelete = `${this.url_dev}/subAdmin-delete`;
   updateHotHighlightStatus = `${this.url_dev}/update-hotGame-status`
   createLotteryNotification = `${this.url_dev}/create-notification-lottery`;
+  editTicketsapproval = `${this.url_dev}/${this.subadmin}/edit-ticket`
 
 }
 

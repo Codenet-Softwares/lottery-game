@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import {
+  editLotteryTicketsWin,
   subAdminWinResult,
   ViewSubAdminsTickets,
 } from "../../Utils/apiService";
 import Pagination from "../Common/Pagination";
 import ReusableModal from "../Reusables/ReusableModal";
 import ComparisonTable from "../PrizeAppproval/ComparisonTable";
-import { Button, Form, Accordion, Modal } from "react-bootstrap";
+import { FaEdit } from "react-icons/fa";
+import { Accordion, Button, Form } from "react-bootstrap";
 const WinResult = () => {
   const [loading, setLoading] = useState(true);
   const [subAdminResult, setSubAdminResult] = useState([]);
@@ -15,29 +17,17 @@ const WinResult = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState([]);
-  const [editmodalContent, setEditModalContent] = useState([]);
   const [loadingModal, setLoadingModal] = useState(false);
-  const [selectedMarketTicket, setSelectedMarketTicket] = useState(null);
-  const [editablePrizes, setEditablePrizes] = useState({});
-  const [errors, setErrors] = useState({});
-  const [currentMarket, setCurrentMarket] = useState(null);
+  const [selectedMarket, setSelectedMarket] = useState(null);
+  const [editableTickets, setEditableTickets] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [modalType, setModalType] = useState(null); // 'view' | 'edit' | null
-  console.log("data", modalContent);
+  console.log("editableTickets", editableTickets);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
     totalPages: 0,
     totalItems: 0,
   });
-
-  const prizeData = {
-    1: { rank: "1st", description: "Top prize for the winner" },
-    2: { rank: "2nd", description: "Prize for 10 winners" },
-    3: { rank: "3rd", description: "Prize for 10 winners" },
-    4: { rank: "4th", description: "Prize for 10 winners" },
-    5: { rank: "5th", description: "Prize for 100 winners" },
-  };
   const handleShowDetails = () => {
     setTimeout(() => {
       setShowModal(true);
@@ -74,21 +64,24 @@ const WinResult = () => {
   useEffect(() => {
     fetchSubAdminResult();
   }, [pagination.page, pagination.limit, searchTerm, statusFilter]);
-  // Update fetchSubAdminTicketData:
-  const fetchSubAdminTicketData = async (
-    marketId,
-    status,
-    preventModal = false
-  ) => {
+  const fetchSubAdminTicketData = async (marketId, status) => {
     try {
+      console.log(
+        "Fetching ticket data for Market ID:",
+        marketId,
+        "Status:",
+        status
+      );
+
       const response = await ViewSubAdminsTickets({ status }, marketId);
+      console.log("Comparison Data Response:", response);
+
       if (response?.success) {
         setModalContent(response.data || []);
-        if (!preventModal) {
-          setShowModal(true);
-        }
+        setShowModal(true);
       } else {
         setModalContent([]);
+        console.warn("No data found for this Market ID and Status.");
       }
     } catch (error) {
       console.error("Error fetching sub-admin ticket data:", error);
@@ -125,160 +118,156 @@ const WinResult = () => {
     pagination.page * pagination.limit,
     pagination.totalItems
   );
-  const handleTicketChange = (rank, index, value, rankInput) => {
-    if (value.length > 10 && rankInput === "1st") return;
-    if (value.length > 5 && rankInput === "2nd") return;
-    if (value.length > 4 && ["3rd", "4th", "5th"].includes(rankInput)) return;
 
-    if (validateInput(value)) {
-      setErrors((prev) => ({ ...prev, [rank]: undefined }));
-      setEditablePrizes((prev) => {
-        const newPrizes = { ...prev };
-        newPrizes[currentMarket.marketName][rank].ticketNumbers[index] = value;
-        newPrizes[currentMarket.marketName][rank].isMatched = false; // Mark as unmatched when edited
-        return newPrizes;
+  const fetchTicketsForEdit = async (marketId, marketName) => {
+    try {
+      setLoadingModal(true);
+      const response = await ViewSubAdminsTickets(
+        { status: "Reject" },
+        marketId
+      );
+
+      if (response?.success) {
+        // Initialize the editable tickets with proper structure
+        const tickets = {
+          matchedEnteries: response.data?.matchedEnteries || [],
+          UnmatchedEntries: response.data?.UnmatchedEntries || [],
+        };
+        setEditableTickets(tickets);
+        setSelectedMarket({ marketId, marketName });
+        setShowEditModal(true);
+      } else {
+        setEditableTickets({
+          matchedEnteries: [],
+          UnmatchedEntries: [],
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching tickets for edit:", error);
+      setEditableTickets({
+        matchedEnteries: [],
+        UnmatchedEntries: [],
       });
-    } else {
-      setErrors((prev) => ({
-        ...prev,
-        [rank]: "Invalid input. Please avoid special characters.",
-      }));
+    } finally {
+      setLoadingModal(false);
     }
   };
 
-  const handlePrizeChange = (rank, value) => {
-    if (validateInput(value)) {
-      setErrors((prev) => ({ ...prev, [rank]: undefined }));
-      setEditablePrizes((prev) => {
-        const newPrizes = { ...prev };
-        newPrizes[currentMarket.marketName][rank].amount = value;
-        newPrizes[currentMarket.marketName][rank].isMatched = false; // Mark as unmatched when edited
-        return newPrizes;
-      });
-    } else {
-      setErrors((prev) => ({
-        ...prev,
-        [rank]: "Invalid input. Please avoid special characters.",
-      }));
-    }
+  const handleTicketChange = (type, prizeIndex, ticketIndex, value) => {
+    setEditableTickets((prev) => {
+      const newTickets = { ...prev };
+
+      if (type === "matched") {
+        // For matched tickets (array of strings)
+        newTickets.matchedEnteries[prizeIndex].Tickets[ticketIndex] = value;
+      } else {
+        // For unmatched tickets (array of objects)
+        newTickets.UnmatchedEntries[prizeIndex].Tickets[
+          ticketIndex
+        ].ticketNumber[0] = value;
+      }
+
+      return newTickets;
+    });
   };
 
-  // 1. Add a new function to combine fetching and editing
-// Update fetchAndPrepareEdit:
-const fetchAndPrepareEdit = async (marketId, status) => {
+  const handlePrizeAmountChange = (type, prizeIndex, value) => {
+    setEditableTickets((prev) => {
+      const newTickets = { ...prev };
+
+      if (type === "matched") {
+        // Update prize amount for matched entries
+        const prizeName = newTickets.matchedEnteries[prizeIndex].prizeName;
+        newTickets.matchedEnteries[prizeIndex].DeclaredPrizes = {
+          [prizeName]: value,
+        };
+      } else {
+        // Update prize amount for unmatched entries
+        newTickets.UnmatchedEntries[prizeIndex].Tickets[0].amount = value;
+      }
+
+      return newTickets;
+    });
+  };
+
+  const handleComplementaryChange = (prizeIndex, value) => {
+    setEditableTickets((prev) => {
+      const newTickets = { ...prev };
+
+      // Find the first prize in matched entries
+      const firstPrizeIndex = newTickets.matchedEnteries.findIndex(
+        (item) => item.prizeName === "First Prize"
+      );
+
+      if (firstPrizeIndex !== -1) {
+        newTickets.matchedEnteries[firstPrizeIndex].complementaryAmount = value;
+      }
+
+      return newTickets;
+    });
+  };
+
+const handleSaveChanges = async () => {
   try {
-    // Fetch data but prevent the view modal from opening
-    await fetchSubAdminTicketData(marketId, status, true);
-    
-    const response = await ViewSubAdminsTickets({ status }, marketId);
-    if (response?.success && response.data) {
-      setEditModalContent(response.data);
-      handlePrepareEdit(response.data);
-    } else {
-      setEditModalContent([]);
+    if (!selectedMarket?.marketId) {
+      throw new Error("No market selected");
     }
-  } catch (error) {
-    console.error("Error fetching sub-admin ticket data:", error);
-  }
-};
-  // for edit section
-  const handlePrepareEdit = (market) => {
-    setCurrentMarket(market);
 
-    // Transform the matchedEnteries and UnmatchedEntries into the editable format
-    const transformedPrizes = {};
+    // Prepare the updatedData array in the required format
+    const updatedData = [];
 
     // Process matched entries
-    market.matchedEnteries?.forEach((item) => {
-      const rankNumber =
-        item.prizeName === "First Prize"
-          ? "1"
-          : item.prizeName === "Second Prize"
-          ? "2"
-          : item.prizeName === "Third Prize"
-          ? "3"
-          : item.prizeName === "Fourth Prize"
-          ? "4"
-          : "5";
-
-      const declaredAmount = item.DeclaredPrizes?.Demo || "";
-
-      transformedPrizes[rankNumber] = {
-        amount: declaredAmount.toString(),
-        complementaryAmount: "", // Will be set for first prize if available
-        ticketNumbers: item.Tickets || [],
-        isMatched: true,
-        prizeName: item.prizeName,
+    editableTickets.matchedEnteries?.forEach((prizeGroup) => {
+      const prizeItem = {
+        prizeCategory: prizeGroup.prizeName,
+        prizeAmount: Number(Object.values(prizeGroup.DeclaredPrizes)[0]) || 0,
+        ticketNumber: prizeGroup.Tickets || [],
       };
 
-      // Handle First Prize complementary amount if available
-      if (rankNumber === "1" && item.SubPrizes?.length > 0) {
-        transformedPrizes[rankNumber].complementaryAmount =
-          item.SubPrizes[0].DeclaredPrizes?.Demo?.toString() || "";
+      // Add complementary prize for First Prize
+      if (prizeGroup.prizeName === "First Prize" && prizeGroup.complementaryAmount) {
+        prizeItem.complementaryPrize = Number(prizeGroup.complementaryAmount) || 0;
+      }
+
+      updatedData.push(prizeItem);
+    });
+
+    // Process unmatched entries
+    editableTickets.UnmatchedEntries?.forEach((prizeGroup) => {
+      const tickets = prizeGroup.Tickets?.map(ticket => ticket.ticketNumber?.[0]).filter(Boolean);
+      
+      if (tickets && tickets.length > 0) {
+        updatedData.push({
+          prizeCategory: prizeGroup.prizeName,
+          prizeAmount: Number(prizeGroup.Tickets?.[0]?.amount) || 0,
+          ticketNumber: tickets,
+        });
       }
     });
 
-    // Process unmatched entries (these will be marked as unmatched)
-    market.UnmatchedEntries?.forEach((item) => {
-      const rankNumber =
-        item.prizeName === "First Prize"
-          ? "1"
-          : item.prizeName === "Second Prize"
-          ? "2"
-          : item.prizeName === "Third Prize"
-          ? "3"
-          : item.prizeName === "Fourth Prize"
-          ? "4"
-          : "5";
+    // Prepare the request body
+    const requestBody = {
+      marketId: selectedMarket.marketId,
+      updatedData: updatedData
+    };
 
-      // Only add if not already processed from matched entries
-      if (!transformedPrizes[rankNumber]) {
-        const declaredAmount = item.DeclaredPrizes?.Demo || "";
+    console.log("Saving changes with data:", requestBody);
 
-        transformedPrizes[rankNumber] = {
-          amount: declaredAmount.toString(),
-          complementaryAmount: "",
-          ticketNumbers: item.Tickets?.map((t) => t.ticketNumber).flat() || [],
-          isMatched: false,
-          prizeName: item.prizeName,
-        };
-      }
-    });
+    // Call the API
+    const response = await editLotteryTicketsWin(requestBody, true);
 
-    setEditablePrizes({
-      [market.marketName]: transformedPrizes,
-    });
-    setShowEditModal(true);
-  };
-
-  const handleSaveChanges = async () => {
-    // Here you would call your API to save the changes
-    // For now, we'll just close the modal and refresh the data
-    setShowEditModal(false);
-    fetchSubAdminResult();
-  };
-
-  const validateInput = (value) => {
-    const invalidCharacters = /[-*#+=@_]/;
-    return !invalidCharacters.test(value);
-  };
-
-  const handleComplementaryChange = (rank, value) => {
-    if (validateInput(value)) {
-      setErrors((prev) => ({ ...prev, [rank]: undefined }));
-      setEditablePrizes((prev) => {
-        const newPrizes = { ...prev };
-        newPrizes[currentMarket.marketName][rank].complementaryAmount = value;
-        newPrizes[currentMarket.marketName][rank].isMatched = false; // Mark as unmatched when edited
-        return newPrizes;
-      });
+    if (response?.success) {
+      alert("Changes saved successfully!");
+      fetchSubAdminResult(); // Refresh the data
+      setShowEditModal(false);
     } else {
-      setErrors((prev) => ({
-        ...prev,
-        [rank]: "Invalid input. Please avoid special characters.",
-      }));
+      throw new Error(response?.message || "Failed to save changes");
     }
-  };
+  } catch (error) {
+    console.error("Error saving changes:", error);
+    alert(`Error saving changes: ${error.message}`);
+  }
+};
 
   return (
     <div className="container d-flex justify-content-center mt-4">
@@ -378,15 +367,19 @@ const fetchAndPrepareEdit = async (marketId, status) => {
                               ? "Show Prize"
                               : "Pending"}
                           </button>
+
                           {item.status === "Reject" && (
                             <button
-                              className="btn btn-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mt-2"
-                              style={{ width: "32px", height: "32px" }}
+                              className="badge rounded-pill px-3 py-2 bg-primary text-white"
                               onClick={() =>
-                                fetchAndPrepareEdit(item.marketId, item.status)
+                                fetchTicketsForEdit(
+                                  item.marketId,
+                                  item.marketName
+                                )
                               }
+                              title="Edit Tickets"
                             >
-                              <i className="fas fa-edit"></i>
+                              <FaEdit />
                             </button>
                           )}
                         </td>
@@ -404,6 +397,271 @@ const fetchAndPrepareEdit = async (marketId, status) => {
                             />
                           }
                         />
+
+                        {/* Edit Tickets Modal */}
+                        <ReusableModal
+                          show={showEditModal}
+                          handleClose={() => {
+                            setShowEditModal(false);
+                          }}
+                          title={`Edit Prizes for ${
+                            selectedMarket?.marketName || ""
+                          }`}
+                          size="xl"
+                          footerButtons={[
+                            {
+                              text: "Cancel",
+                              className: "btn btn-secondary me-2",
+                              onClick: () => setShowEditModal(false),
+                            },
+                            {
+                              text: "Save Changes",
+                              className: "btn btn-primary",
+                              onClick: handleSaveChanges,
+                            },
+                          ]}
+                          body={
+                            loadingModal ? (
+                              <p className="text-center text-muted">
+                                Loading tickets...
+                              </p>
+                            ) : editableTickets ? (
+                              <div className="ticket-edit-container">
+                                <Accordion defaultActiveKey="0">
+                                  {/* Matched Tickets */}
+                                  {editableTickets.matchedEnteries?.map(
+                                    (prizeGroup, prizeIndex) => (
+                                      <Accordion.Item
+                                        key={`matched-${prizeIndex}`}
+                                        eventKey={`matched-${prizeIndex}`}
+                                      >
+                                        <Accordion.Header
+                                          style={{ backgroundColor: "#d4edda" }}
+                                        >
+                                          {prizeGroup.prizeName}
+                                        </Accordion.Header>
+                                        <Accordion.Body>
+                                          {/* Prize Amount */}
+                                          <Form.Label
+                                            style={{
+                                              color: "#555",
+                                              fontSize: "0.9rem",
+                                            }}
+                                          >
+                                            Prize Amount:
+                                          </Form.Label>
+                                          <Form.Control
+                                            type="text"
+                                            value={
+                                              Object.values(
+                                                prizeGroup.DeclaredPrizes
+                                              )[0] || ""
+                                            }
+                                            onChange={(e) =>
+                                              handlePrizeAmountChange(
+                                                "matched",
+                                                prizeIndex,
+                                                e.target.value
+                                              )
+                                            }
+                                            style={{
+                                              borderRadius: "8px",
+                                              fontSize: "0.95rem",
+                                              marginBottom: "15px",
+                                              borderColor: "#28a745",
+                                            }}
+                                          />
+
+                                          {/* Ticket Numbers */}
+                                          <Form.Label
+                                            style={{
+                                              color: "#555",
+                                              fontSize: "0.9rem",
+                                            }}
+                                          >
+                                            Ticket Numbers:
+                                          </Form.Label>
+                                          <div className="d-flex flex-wrap gap-2 mt-1">
+                                            {prizeGroup.Tickets?.map(
+                                              (ticketNumber, ticketIndex) => (
+                                                <Form.Group
+                                                  key={`matched-ticket-${ticketIndex}`}
+                                                  style={{
+                                                    width: "calc(20% - 10px)",
+                                                  }}
+                                                >
+                                                  <Form.Control
+                                                    type="text"
+                                                    value={ticketNumber}
+                                                    onChange={(e) =>
+                                                      handleTicketChange(
+                                                        "matched",
+                                                        prizeIndex,
+                                                        ticketIndex,
+                                                        e.target.value
+                                                      )
+                                                    }
+                                                    style={{
+                                                      borderColor: "#28a745",
+                                                      backgroundColor:
+                                                        "transparent",
+                                                    }}
+                                                  />
+                                                </Form.Group>
+                                              )
+                                            )}
+                                          </div>
+
+                                          {/* Complementary Amount for First Prize */}
+                                          {prizeGroup.prizeName ===
+                                            "First Prize" && (
+                                            <>
+                                              <Form.Label
+                                                style={{
+                                                  color: "#555",
+                                                  fontSize: "0.9rem",
+                                                }}
+                                              >
+                                                Complementary Amount:
+                                              </Form.Label>
+                                              <Form.Control
+                                                type="text"
+                                                value={
+                                                  prizeGroup.complementaryAmount ||
+                                                  ""
+                                                }
+                                                onChange={(e) =>
+                                                  handleComplementaryChange(
+                                                    prizeIndex,
+                                                    e.target.value
+                                                  )
+                                                }
+                                                style={{
+                                                  borderRadius: "8px",
+                                                  fontSize: "0.95rem",
+                                                  marginBottom: "15px",
+                                                  borderColor: "#28a745",
+                                                }}
+                                              />
+                                            </>
+                                          )}
+                                        </Accordion.Body>
+                                      </Accordion.Item>
+                                    )
+                                  )}
+
+                                  {/* Unmatched Tickets */}
+                                  {editableTickets.UnmatchedEntries?.map(
+                                    (prizeGroup, prizeIndex) => (
+                                      <Accordion.Item
+                                        key={`unmatched-${prizeIndex}`}
+                                        eventKey={`unmatched-${prizeIndex}`}
+                                      >
+                                        <Accordion.Header
+                                          style={{ backgroundColor: "#f8d7da" }}
+                                        >
+                                          {prizeGroup.prizeName}
+                                          <span className="ms-2 badge bg-danger">
+                                            Unmatched
+                                          </span>
+                                        </Accordion.Header>
+                                        <Accordion.Body>
+                                          {/* Prize Amount */}
+                                          <Form.Label
+                                            style={{
+                                              color: "#555",
+                                              fontSize: "0.9rem",
+                                            }}
+                                          >
+                                            Prize Amount:
+                                          </Form.Label>
+                                          <Form.Control
+                                            type="text"
+                                            value={
+                                              prizeGroup.Tickets?.[0]?.amount ||
+                                              ""
+                                            }
+                                            onChange={(e) =>
+                                              handlePrizeAmountChange(
+                                                "unmatched",
+                                                prizeIndex,
+                                                e.target.value
+                                              )
+                                            }
+                                            style={{
+                                              borderRadius: "8px",
+                                              fontSize: "0.95rem",
+                                              marginBottom: "15px",
+                                              borderColor: "#dc3545",
+                                              backgroundColor: "#fff0f0",
+                                            }}
+                                          />
+
+                                          {/* Ticket Numbers */}
+                                          <Form.Label
+                                            style={{
+                                              color: "#555",
+                                              fontSize: "0.9rem",
+                                            }}
+                                          >
+                                            Ticket Numbers:
+                                          </Form.Label>
+                                          <div className="d-flex flex-wrap gap-2 mt-1">
+                                            {prizeGroup.Tickets?.map(
+                                              (ticket, ticketIndex) => (
+                                                <Form.Group
+                                                  key={`unmatched-ticket-${ticketIndex}`}
+                                                  style={{
+                                                    width: "calc(20% - 10px)",
+                                                  }}
+                                                >
+                                                  <Form.Control
+                                                    type="text"
+                                                    value={
+                                                      ticket
+                                                        .ticketNumber?.[0] || ""
+                                                    }
+                                                    onChange={(e) =>
+                                                      handleTicketChange(
+                                                        "unmatched",
+                                                        prizeIndex,
+                                                        ticketIndex,
+                                                        e.target.value
+                                                      )
+                                                    }
+                                                    style={{
+                                                      borderColor: "#dc3545",
+                                                      backgroundColor:
+                                                        "#fff0f0",
+                                                    }}
+                                                  />
+                                                  <small className="text-danger d-block">
+                                                    Unmatched
+                                                  </small>
+                                                </Form.Group>
+                                              )
+                                            )}
+                                          </div>
+                                        </Accordion.Body>
+                                      </Accordion.Item>
+                                    )
+                                  )}
+                                </Accordion>
+
+                                {!editableTickets.matchedEnteries?.length &&
+                                  !editableTickets.UnmatchedEntries?.length && (
+                                    <p className="text-center text-muted">
+                                      No tickets found for this market
+                                    </p>
+                                  )}
+                              </div>
+                            ) : (
+                              <p className="text-center text-muted">
+                                No tickets data available
+                              </p>
+                            )
+                          }
+                        />
                       </tr>
                     ))
                   ) : (
@@ -419,201 +677,6 @@ const fetchAndPrepareEdit = async (marketId, status) => {
                 </tbody>
               </table>
             </div>
-
-            {/* Edit Prize Modal */}
-            <Modal
-              show={showEditModal}
-              onHide={() => setShowEditModal(false)}
-              size="lg"
-              centered
-            >
-              <Modal.Header closeButton className="bg-primary text-white">
-                <Modal.Title>
-                  Edit Prizes for {currentMarket?.marketName}
-                </Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                {currentMarket && editablePrizes[currentMarket.marketName] && (
-                  <Accordion defaultActiveKey="0">
-                    {Object.entries(prizeData).map(
-                      ([key, { rank, description }]) => {
-                        const prizeInfo =
-                          editablePrizes[currentMarket.marketName][key];
-                        if (!prizeInfo) return null;
-
-                        return (
-                          <Accordion.Item eventKey={key} key={key}>
-                            <Accordion.Header
-                              style={{
-                                backgroundColor: prizeInfo.isMatched
-                                  ? "#d4edda"
-                                  : "#f8d7da",
-                              }}
-                            >
-                              {rank} Prize - {description}
-                            </Accordion.Header>
-                            <Accordion.Body>
-                              {/* For the 1st Prize, include ticket number input */}
-                              {["1"].includes(key) && (
-                                <div>
-                                  <Form.Label
-                                    style={{
-                                      color: "#555",
-                                      fontSize: "0.9rem",
-                                    }}
-                                  >
-                                    Enter Ticket Number:
-                                  </Form.Label>
-                                  <Form.Control
-                                    type="text"
-                                    value={prizeInfo.ticketNumbers[0] || ""}
-                                    onChange={(e) =>
-                                      handleTicketChange(
-                                        key,
-                                        0,
-                                        e.target.value,
-                                        prizeData[key].rank
-                                      )
-                                    }
-                                    placeholder="Enter ticket number"
-                                    style={{
-                                      borderRadius: "8px",
-                                      fontSize: "0.95rem",
-                                      marginBottom: "15px",
-                                    }}
-                                  />
-                                  {errors[key]?.ticketNumber0 && (
-                                    <div>
-                                      <small className="text-danger">
-                                        {errors[key].ticketNumber0}
-                                      </small>
-                                    </div>
-                                  )}
-                                  <Form.Label
-                                    style={{
-                                      color: "#555",
-                                      fontSize: "0.9rem",
-                                    }}
-                                  >
-                                    Enter Complementary Amount:
-                                  </Form.Label>
-                                  <Form.Control
-                                    type="text"
-                                    value={prizeInfo.complementaryAmount || ""}
-                                    onChange={(e) =>
-                                      handleComplementaryChange(
-                                        key,
-                                        e.target.value
-                                      )
-                                    }
-                                    placeholder="Enter complementary amount"
-                                    style={{
-                                      borderRadius: "8px",
-                                      fontSize: "0.95rem",
-                                      marginBottom: "15px",
-                                    }}
-                                  />
-                                  {errors[key]?.complementaryAmount && (
-                                    <small className="text-danger">
-                                      {errors[key].complementaryAmount}
-                                    </small>
-                                  )}
-                                </div>
-                              )}
-
-                              {/* Prize Amount Input */}
-                              <Form.Label
-                                style={{ color: "#555", fontSize: "0.9rem" }}
-                              >
-                                Enter Prize Amount:
-                              </Form.Label>
-                              <Form.Control
-                                type="text"
-                                value={prizeInfo.amount || ""}
-                                onChange={(e) =>
-                                  handlePrizeChange(key, e.target.value)
-                                }
-                                placeholder="Enter amount"
-                                style={{
-                                  borderRadius: "8px",
-                                  fontSize: "0.95rem",
-                                  marginBottom: "15px",
-                                }}
-                              />
-                              {errors[key]?.amount && (
-                                <small className="text-danger">
-                                  {errors[key].amount}
-                                </small>
-                              )}
-                              {/* Ticket Numbers Input for other prizes */}
-                              {!["1"].includes(key) && (
-                                <div>
-                                  <Form.Label
-                                    style={{
-                                      color: "#555",
-                                      fontSize: "0.9rem",
-                                    }}
-                                  >
-                                    Enter Ticket Numbers (
-                                    {prizeData[key].description}):
-                                  </Form.Label>
-                                  <div className="d-flex flex-wrap gap-2 mt-1">
-                                    {(prizeInfo.ticketNumbers || []).map(
-                                      (ticket, idx) => (
-                                        <Form.Group
-                                          key={idx}
-                                          style={{ width: "calc(20% - 10px)" }}
-                                        >
-                                          <Form.Control
-                                            type="text"
-                                            value={ticket}
-                                            onChange={(e) =>
-                                              handleTicketChange(
-                                                key,
-                                                idx,
-                                                e.target.value,
-                                                prizeData[key].rank
-                                              )
-                                            }
-                                            placeholder={`Ticket ${idx + 1}`}
-                                          />
-                                          {errors[key]?.[
-                                            `ticketNumber${idx}`
-                                          ] && (
-                                            <small className="text-danger">
-                                              {
-                                                errors[key][
-                                                  `ticketNumber${idx}`
-                                                ]
-                                              }
-                                            </small>
-                                          )}
-                                        </Form.Group>
-                                      )
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                            </Accordion.Body>
-                          </Accordion.Item>
-                        );
-                      }
-                    )}
-                  </Accordion>
-                )}
-              </Modal.Body>
-              <Modal.Footer>
-                <Button
-                  variant="secondary"
-                  onClick={() => setShowEditModal(false)}
-                >
-                  Cancel
-                </Button>
-                <Button variant="primary" onClick={handleSaveChanges}>
-                  Save Changes
-                </Button>
-              </Modal.Footer>
-            </Modal>
 
             {subAdminResult?.length > 0 && (
               <Pagination
