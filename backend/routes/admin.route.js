@@ -33,6 +33,7 @@ import {
   subAdminsResetPassword,
   updateHotGameStatus,
   updateMarketStatus,
+  updateSubadminTicket,
   winResultMarket,
 } from "../controllers/admin.controller.js";
 import { authorize } from "../middlewares/auth.js";
@@ -270,5 +271,7 @@ export const adminRoutes = (app) => {
   app.post('/api/create-notification-lottery', validateTitleText, customErrorHandler, authorize([string.Admin]), createTitleTextNotification);
 
   app.put('/api/update-hotGame-status', validateHotGame, customErrorHandler, authorize([string.Admin]), updateHotGameStatus);
+
+  app.put('/api/subadmin/edit-ticket',authorize([string.SubAdmin]), updateSubadminTicket)
 
 }
