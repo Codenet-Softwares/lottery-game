@@ -3099,7 +3099,7 @@ export const updateHotGameStatus = async (req, res) => {
   }
 };
 
-export const editSubadminTicket = async (req, res) => {
+export const updateSubadminTicket = async (req, res) => {
   try {
     const { marketId, updatedData } = req.body;
     const { adminId } = req.user;
@@ -3139,29 +3139,14 @@ export const editSubadminTicket = async (req, res) => {
         r => r.prizeCategory === prizeCategory
       );
 
-      if (existingRecords.length === 0) {
-        // If no existing records for this category, create new ones
-        const newRecord = await WinResultRequest.create({
-          marketId,
-          marketName: existingResults[0].marketName,
-          adminId,
-          declearBy: adminId, // or whatever logic you use for declearBy
-          prizeCategory,
-          prizeAmount,
-          ticketNumber: Array.isArray(ticketNumber) ? ticketNumber : [ticketNumber],
-          complementaryPrize: complementaryPrize || null,
-          status: "Reject", // or whatever status you want after update
-          // include other necessary fields
-        });
-        return newRecord;
-      }
-
       // Update existing records
       const updatePromises = existingRecords.map(record => {
         return record.update({
           prizeAmount,
           ticketNumber: Array.isArray(ticketNumber) ? ticketNumber : [ticketNumber],
-          complementaryPrize: complementaryPrize || null,
+          complementaryPrize: complementaryPrize || 0,
+          isReject : false,
+          status : "Pending"
           // update other fields as needed
         });
       });
@@ -3191,6 +3176,75 @@ export const editSubadminTicket = async (req, res) => {
       }))
     };
 
+      const groupedByAdmin = {};
+      updatedResults.forEach((entry) => {
+        const {
+          adminId,
+          marketId,
+          ticketNumber,
+          prizeCategory,
+          prizeAmount,
+          complementaryPrize,
+        } = entry;
+        const key = `${prizeCategory}-${prizeAmount}-${complementaryPrize}-${marketId}`;
+
+        if (!groupedByAdmin[adminId]) groupedByAdmin[adminId] = {};
+
+        if (!groupedByAdmin[adminId][key])
+          groupedByAdmin[adminId][key] = new Set();
+        ticketNumber.forEach((ticket) =>
+          groupedByAdmin[adminId][key].add(ticket)
+        );
+      });
+
+      const adminIds = Object.keys(groupedByAdmin);
+
+      const matchedAdminIds = new Set();
+      for (let i = 0; i < adminIds.length; i++) {
+        for (let j = i + 1; j < adminIds.length; j++) {
+          const admin1 = adminIds[i];
+          const admin2 = adminIds[j];
+
+          let isMatched = true;
+
+          const keys1 = Object.keys(groupedByAdmin[admin1]);
+          const keys2 = Object.keys(groupedByAdmin[admin2]);
+
+          if (keys1.length !== keys2.length) {
+            isMatched = false;
+          } else {
+            for (const key of keys1) {
+              if (!groupedByAdmin[admin2][key]) {
+                isMatched = false;
+                break;
+              }
+              const tickets1 = groupedByAdmin[admin1][key];
+              const tickets2 = groupedByAdmin[admin2][key];
+
+              if (
+                tickets1.size !== tickets2.size ||
+                [...tickets1].some((ticket) => !tickets2.has(ticket))
+              ) {
+                isMatched = false;
+                break;
+              }
+            }
+          }
+
+          if (isMatched) {
+            matchedAdminIds.add(admin1);
+            matchedAdminIds.add(admin2);
+          }
+        }
+      }
+
+      if (matchedAdminIds.size > 0) {
+        await WinResultRequest.update(
+          { type: "Matched" },
+          { where: { adminId: Array.from(matchedAdminIds), marketId, status: 'Pending' } }
+        );
+      }
+
     return apiResponseSuccess(
       response,
       true,
@@ -3199,6 +3253,7 @@ export const editSubadminTicket = async (req, res) => {
       res
     );
   } catch (error) {
+    console.log(error)
     return apiResponseErr(
       null,
       false,
