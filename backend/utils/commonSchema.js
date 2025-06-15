@@ -139,10 +139,10 @@ export const validateTicketRange = [
     .notEmpty()
     .withMessage('Market name is required'),
   
-  body('date').notEmpty().withMessage('Date is required')
-    .isISO8601()
-    .withMessage('Date must be a valid ISO8601 date')
-    ,
+  // body('date').notEmpty().withMessage('Date is required')
+  //   .isISO8601()
+  //   .withMessage('Date must be a valid ISO8601 date')
+  //   ,
   
     body('price')
     .exists()
